@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import subprocess
-import time
 import paramiko
 import socket
 import wget
@@ -11,7 +10,6 @@ import socket
 import json
 import argparse
 import re
-import itertools
 from zipfile import ZipFile
 
 parser = argparse.ArgumentParser(description="ideascube/kiwix installer for raspberrypi.")
