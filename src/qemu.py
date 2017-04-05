@@ -1,17 +1,26 @@
-# TODO: don't use ssh anymore
-
 import os
 import subprocess
-import socket
-import paramiko
-import select
+import collections
+import sys
+from select import select
 
-def getFreePort():
-    with socket.socket() as s:
-        s.bind(("",0))
-        port = s.getsockname()[1]
+# TODO: raise exception instead of assert
 
-    return port
+# TODO: is this the right encoding ? or do we want utf-8
+encoding = sys.getfilesystemencoding()
+
+def wait_signal(fd, signal, timeout):
+    ring_buf = collections.deque(maxlen=len(signal))
+    while True:
+        selected, _, _ = select([fd], [], [], timeout)
+        if fd in selected:
+            buf = os.read(fd, 1024).decode(encoding)
+            sys.stdout.write(buf)
+            ring_buf.extend(buf)
+            if list(ring_buf) == list(signal):
+                return True
+        else:
+            return False
 
 class Qemu:
     __image = None
@@ -19,7 +28,12 @@ class Qemu:
     __dtb = None
 
     __qemu = None
-    __client = None
+    __stdin = None
+    __stdout = None
+
+    __prompt= "unique_prompt_ezkfjejklejklcez$"
+
+    timeout = 30
 
     def __init__(self, kernel, dtb, image):
         print("--> launch qemu")
@@ -29,9 +43,8 @@ class Qemu:
         self.__boot()
 
     def __boot(self):
-        ssh_port = getFreePort()
-
-        pipe_reader, pipe_writer = os.pipe()
+        self.__stdout, stdout_writer= os.pipe()
+        stdin_reader, self.__stdin= os.pipe()
         self.__qemu = subprocess.Popen([
             "qemu-system-arm",
             "-m", "1G",
@@ -41,30 +54,24 @@ class Qemu:
             "-append", "root=/dev/mmcblk0p2 console=ttyAMA0 console=tty",
             "-serial", "stdio",
             "-sd", self.__image,
-            "-redir", "tcp:%d::22" % ssh_port,
-            # "-display", "none", # TODO: no display
+            "-display", "none",
             "-no-reboot",
-            ], stdout=pipe_writer, stderr=subprocess.STDOUT)
+            ], stdin=stdin_reader, stdout=stdout_writer, stderr=subprocess.STDOUT)
 
-        while True:
-            selected, _, _ = select.select([pipe_reader], [], [], 30)
-            if pipe_reader in selected:
-                if os.read(pipe_reader, 1024) == b'login: ':
-                    break
-            else:
-                # TODO: raise exception
-                break
-
-        self.__client = paramiko.SSHClient()
-        self.__client.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())
-        self.__client.connect("localhost", port=ssh_port, username="pi", password="raspberry")
+        assert(wait_signal(self.__stdout, "login: ", self.timeout))
+        os.write(self.__stdin, b"pi\r")
+        assert(wait_signal(self.__stdout, "Password: ", self.timeout))
+        os.write(self.__stdin, b"raspberry\r")
+        assert(wait_signal(self.__stdout, "pi@raspberrypi:~$ ", self.timeout))
+        os.write(self.__stdin, bytes("sudo su\r", encoding))
+        assert(wait_signal(self.__stdout, "root@raspberrypi:/home/pi# ", self.timeout))
+        os.write(self.__stdin, bytes("export PS1=\"{}\"\r".format(self.__prompt), encoding))
+        # add "\n" is mandatory not to match the command
+        assert(wait_signal(self.__stdout, "\n" + self.__prompt, self.timeout))
 
     def __shutdown(self):
         self.exec("sudo shutdown 0")
-        self.__client.close()
         self.__qemu.wait()
-
-        self.__client = None
         self.__qemu = None
 
     def reboot(self):
@@ -73,19 +80,8 @@ class Qemu:
         self.__boot()
 
     def exec(self, command):
-        print(command)
-        _, stdout, stderr = self.__client.exec_command(command)
-        while True:
-            line = stdout.readline()
-            if line == "":
-                break
-            print(line.replace("\n", ""))
-
-        for line in stderr.readlines():
-            print("STDERR: " + line.replace("\n", ""))
-
-    def open_sftp(self):
-        return self.__client.open_sftp()
+        os.write(self.__stdin, bytes(command + "\r", encoding))
+        assert(wait_signal(self.__stdout, self.__prompt, self.timeout))
 
     def close(self):
         print("--> shutdown")

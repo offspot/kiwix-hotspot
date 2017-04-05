@@ -8,11 +8,6 @@ import subprocess
 import json
 from qemu import Qemu
 
-# Priviledge needed to mount raspbian image to set ssh
-if os.geteuid() != 0:
-    exit("You need to have root privileges to run this script.\nPlease try again, this time using 'sudo'. Exiting.")
-
-
 parser = argparse.ArgumentParser(description="ideascube/kiwix installer for raspberrypi.")
 parser.add_argument("-n", "--name", help="name of the box (mybox)", default="mybox")
 parser.add_argument("-t", "--timezone", help="timezone (Europe/Paris)", default="Europe/Paris")
@@ -46,7 +41,7 @@ if resize_image:
     # %  start of partition
     #    resize to max
     # w  write change
-    fdiskCmd = """sudo LANG=C fdisk /dev/mmcblk0 <<EEOF
+    fdiskCmd = """LANG=C fdisk /dev/mmcblk0 <<END_OF_CMD
 d
 2
 n
@@ -55,29 +50,29 @@ p
 %d
 
 w
-EEOF""" % raspbian.secondPartitionSector
+END_OF_CMD""" % raspbian.secondPartitionSector
     qemu.exec(fdiskCmd)
     qemu.reboot()
 
     print("--> resize filesystem")
-    qemu.exec("sudo resize2fs /dev/mmcblk0p2")
+    qemu.exec("resize2fs /dev/mmcblk0p2")
 
 print("--> install ansible")
-qemu.exec("sudo apt-get update")
-qemu.exec("sudo apt-get install -y python-pip git python-dev libffi-dev libssl-dev gnutls-bin")
+qemu.exec("apt-get update")
+qemu.exec("apt-get install -y python-pip git python-dev libffi-dev libssl-dev gnutls-bin")
 # TODO does markupsafe and cryptography are necessary ?
-qemu.exec("sudo pip install ansible==2.2 markupsafe cryptography --upgrade")
+qemu.exec("pip install ansible==2.2 markupsafe cryptography --upgrade")
 
 print("--> clone ansiblecube")
 ansiblecube_url = "https://github.com/thiolliere/ansiblecube.git"
 ansiblecube_path = "/var/lib/ansible/local"
 
-qemu.exec("sudo mkdir --mode 0755 -p %s" % ansiblecube_path)
-qemu.exec("sudo git clone {url} {path}".format(url=ansiblecube_url, path=ansiblecube_path))
-qemu.exec("sudo cp %s/hosts /etc/ansible/hosts" % ansiblecube_path)
+qemu.exec("mkdir --mode 0755 -p %s" % ansiblecube_path)
+qemu.exec("git clone {url} {path}".format(url=ansiblecube_url, path=ansiblecube_path))
+qemu.exec("cp %s/hosts /etc/ansible/hosts" % ansiblecube_path)
 
 hostname = args.name.replace("_", "-")
-qemu.exec("sudo hostname %s" % hostname)
+qemu.exec("hostname %s" % hostname)
 
 device_list = {hostname: {
     "kalite": {
@@ -98,13 +93,9 @@ device_list = {hostname: {
     }
 }}
 
-with qemu.open_sftp() as sftp_client:
-    with sftp_client.file("device_list.fact", "w") as device_list_file:
-        device_list_file.write(json.dumps(device_list, indent=4))
-
 facts_path = "/etc/ansible/facts.d"
-qemu.exec("sudo mkdir --mode 0755 -p %s" % facts_path)
-qemu.exec("sudo mv device_list.fact %s" % facts_path)
+qemu.exec("mkdir --mode 0755 -p %s" % facts_path)
+device_list_cmd = "cat > {}/device_list.fact <<END_OF_CMD \n{}\n END_OF_CMD".format(facts_path, json.dumps(device_list, indent=4))
 
 extra_vars = "ideascube_project_name=%s" % args.name
 extra_vars += " timezone=%s" % args.timezone

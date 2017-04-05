@@ -22,13 +22,3 @@ def make():
         print("--> extract raspbian-lite")
         zipFile = ZipFile(zipFileName)
         zipFile.extract(image)
-
-    print("--> enable ssh")
-    subprocess.check_call(["mkdir", "mnt"])
-    subprocess.check_call(["mount", "-o", "offset=%d" % (firstPartitionSector*sectorSize), image, "mnt"])
-    subprocess.check_call(["touch", "mnt/ssh"])
-    subprocess.check_call(["sync"])
-    subprocess.check_call(["umount", "mnt"])
-    subprocess.check_call(["sync"])
-    subprocess.check_call(["rmdir", "mnt"])
-
