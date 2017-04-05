@@ -6,6 +6,7 @@ import vexpress_boot
 import raspbian
 import subprocess
 import json
+from pretty_print import print_step
 from qemu import Qemu
 
 parser = argparse.ArgumentParser(description="ideascube/kiwix installer for raspberrypi.")
@@ -23,16 +24,17 @@ os.chdir("build")
 vexpress_boot.make()
 raspbian.make()
 
+# TODO: make it an argument
 resize_image = True
 
 if resize_image:
-    print("--> resize image")
+    print_step("resize image")
     subprocess.check_call(["qemu-img", "resize", "-f", "raw", raspbian.image, "5G"])
 
 qemu = Qemu(vexpress_boot.kernel_path, vexpress_boot.dtb_path, raspbian.image)
 
 if resize_image:
-    print("--> resize partition")
+    print_step("resize partition")
     # d  delete partition
     # 2  second partition
     # n  create partition
@@ -41,7 +43,7 @@ if resize_image:
     # %  start of partition
     #    resize to max
     # w  write change
-    fdiskCmd = """LANG=C fdisk /dev/mmcblk0 <<END_OF_CMD
+    fdiskCmd = """sudo LANG=C fdisk /dev/mmcblk0 <<END_OF_CMD
 d
 2
 n
@@ -54,25 +56,25 @@ END_OF_CMD""" % raspbian.secondPartitionSector
     qemu.exec(fdiskCmd)
     qemu.reboot()
 
-    print("--> resize filesystem")
-    qemu.exec("resize2fs /dev/mmcblk0p2")
+    print_step("resize filesystem")
+    qemu.exec("sudo resize2fs /dev/mmcblk0p2")
 
-print("--> install ansible")
-qemu.exec("apt-get update")
-qemu.exec("apt-get install -y python-pip git python-dev libffi-dev libssl-dev gnutls-bin")
+print_step("install ansible")
+qemu.exec("sudo apt-get update")
+qemu.exec("sudo apt-get install -y python-pip git python-dev libffi-dev libssl-dev gnutls-bin")
 # TODO does markupsafe and cryptography are necessary ?
-qemu.exec("pip install ansible==2.2 markupsafe cryptography --upgrade")
+qemu.exec("sudo pip install ansible==2.2 markupsafe cryptography --upgrade")
 
-print("--> clone ansiblecube")
+print_step("clone ansiblecube")
 ansiblecube_url = "https://github.com/thiolliere/ansiblecube.git"
 ansiblecube_path = "/var/lib/ansible/local"
 
-qemu.exec("mkdir --mode 0755 -p %s" % ansiblecube_path)
-qemu.exec("git clone {url} {path}".format(url=ansiblecube_url, path=ansiblecube_path))
-qemu.exec("cp %s/hosts /etc/ansible/hosts" % ansiblecube_path)
+qemu.exec("sudo mkdir --mode 0755 -p %s" % ansiblecube_path)
+qemu.exec("sudo git clone {url} {path}".format(url=ansiblecube_url, path=ansiblecube_path))
+qemu.exec("sudo cp %s/hosts /etc/ansible/hosts" % ansiblecube_path)
 
 hostname = args.name.replace("_", "-")
-qemu.exec("hostname %s" % hostname)
+qemu.exec("sudo hostname %s" % hostname)
 
 device_list = {hostname: {
     "kalite": {
@@ -94,8 +96,10 @@ device_list = {hostname: {
 }}
 
 facts_path = "/etc/ansible/facts.d"
-qemu.exec("mkdir --mode 0755 -p %s" % facts_path)
-device_list_cmd = "cat > {}/device_list.fact <<END_OF_CMD \n{}\n END_OF_CMD".format(facts_path, json.dumps(device_list, indent=4))
+qemu.exec("sudo mkdir --mode 0755 -p %s" % facts_path)
+# `sudo cat` doesn't give priviledge on redirection
+qemu.exec("cat > /tmp/device_list.fact <<END_OF_CMD\n{}\nEND_OF_CMD".format(json.dumps(device_list, indent=4)))
+qemu.exec("sudo mv /tmp/device_list.fact {}/device_list.fact".format(facts_path))
 
 extra_vars = "ideascube_project_name=%s" % args.name
 extra_vars += " timezone=%s" % args.timezone

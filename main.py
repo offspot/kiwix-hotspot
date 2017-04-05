@@ -24,6 +24,9 @@ args = parser.parse_args()
 os.makedirs("build", exist_ok=True)
 os.chdir("build")
 
+def print_step(step):
+    print("\n\[\033[01;35m\]-->" + step + "\n\[\033[00m\]")
+
 if os.geteuid() != 0:
     exit("You need to have root privileges to run this script.\nPlease try again, this time using 'sudo'. Exiting.")
 
@@ -33,16 +36,16 @@ if not os.path.isdir("vexpress-boot"):
     linux_zip = linux_folder + ".zip"
 
     if not os.path.isdir(linux_folder):
-        print("--> download linux")
+        print_step("download linux")
         raspbianLiteImageZip = wget.download("https://github.com/torvalds/linux/archive/v{}.zip".format(linux_version), out=linux_zip)
 
-        print("\n--> extract linux")
+        print_step("extract linux")
         zipFile = ZipFile(linux_zip)
         zipFile.extractall()
 
     os.chdir(linux_folder)
 
-    print("--> set linux configuration")
+    print_step("set linux configuration")
     subprocess.check_call("make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- vexpress_defconfig", shell=True)
 
     # Modify configuration
@@ -67,10 +70,10 @@ if not os.path.isdir("vexpress-boot"):
             w.write("\n")
         w.flush()
 
-    print("--> compile linux")
+    print_step("compile linux")
     subprocess.check_call("make -j 2 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- all", shell=True, stdin=fd_reader)
 
-    print("--> create vexpress-boot")
+    print_step("create vexpress-boot")
     os.mkdir("../vexpress-boot")
     subprocess.check_call("cp .config arch/arm/boot/zImage arch/arm/boot/dts/vexpress-v2p-ca9.dtb ../vexpress-boot", shell=True)
 
@@ -85,11 +88,11 @@ raspbianLiteURLDirVersion = "2017-03-03"
 raspbianLiteImage = raspbianLiteVersion + "-raspbian-jessie-lite.img"
 
 if not os.path.isfile(raspbianLiteImage):
-    print("--> download raspbian-lite")
+    print_step("download raspbian-lite")
     zipFileName = raspbianLiteVersion + "-raspbian-jessie-lite.zip"
     raspbianLiteImageZip = wget.download("http://vx2-downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-{}/{}-raspbian-jessie-lite.zip".format(raspbianLiteURLDirVersion, raspbianLiteVersion), out=zipFileName)
 
-    print("--> extract raspbian-lite")
+    print_step("extract raspbian-lite")
     zipFile = ZipFile(zipFileName)
     zipFile.extract(raspbianLiteImage)
 
@@ -98,7 +101,7 @@ sectorSize = 512
 firstPartitionSector = 8192
 secondPartitionSector = 137216
 
-print("--> enable ssh")
+print_step("enable ssh")
 subprocess.check_call(["mkdir", "mnt"])
 subprocess.check_call(["mount", "-o", "offset=%d" % (firstPartitionSector*sectorSize), raspbianLiteImage, "mnt"])
 subprocess.check_call(["touch", "mnt/ssh"])
@@ -118,7 +121,7 @@ def startVM():
     qemuSSHPort = getFreePort()
 
     pipe_reader, pipe_writer = os.pipe()
-    print("--> launch qemu")
+    print_step("launch qemu")
     qemu = subprocess.Popen([
         "qemu-system-arm",
         "-m", "1G",
@@ -142,7 +145,7 @@ def startVM():
             # TODO: raise exception
             break
 
-    print("--> start ssh connection")
+    print_step("start ssh connection")
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())
     client.connect("localhost", port=qemuSSHPort, username="pi", password="raspberry")
@@ -163,12 +166,12 @@ def exec_wait_print(client, command):
 
 resizeImage = True
 if resizeImage:
-    print("--> resize image")
+    print_step("resize image")
     subprocess.check_call(["qemu-img", "resize", "-f", "raw", raspbianLiteImage, "5G"])
 
     client, qemu = startVM()
 
-    print("--> resize partition")
+    print_step("resize partition")
     # d  delete partition
     # 2  second partition
     # n  create partition
@@ -189,7 +192,7 @@ w
 EEOF""" % secondPartitionSector
     exec_wait_print(client, fdiskCmd)
 
-    print("--> reboot")
+    print_step("reboot")
     exec_wait_print(client, "sudo shutdown 0")
     client.close()
     qemu.wait()
@@ -197,16 +200,16 @@ EEOF""" % secondPartitionSector
 client, qemu = startVM()
 
 if resizeImage:
-    print("--> resize filesystem")
+    print_step("resize filesystem")
     exec_wait_print(client, "sudo resize2fs /dev/mmcblk0p2")
 
-print("--> install ansible")
+print_step("install ansible")
 exec_wait_print(client, "sudo apt-get update")
 exec_wait_print(client, "sudo apt-get install -y python-pip git python-dev libffi-dev libssl-dev gnutls-bin")
 # TODO does markupsafe and cryptography are necessary ?
 exec_wait_print(client, "sudo pip install ansible==2.2 markupsafe cryptography --upgrade")
 
-print("--> clone ansiblecube")
+print_step("clone ansiblecube")
 ansiblecube_url = "https://github.com/thiolliere/ansiblecube.git"
 ansiblecube_path = "/var/lib/ansible/local"
 
@@ -266,7 +269,7 @@ print((
     "--extra-vars", extra_vars,
     "main.yml"))
 
-print("--> shutdown")
+print_step("shutdown")
 exec_wait_print(client, "sudo shutdown 0")
 client.close()
 qemu.wait()
