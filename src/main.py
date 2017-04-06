@@ -35,6 +35,7 @@ qemu = Qemu(vexpress_boot.kernel_path, vexpress_boot.dtb_path, raspbian.image)
 
 if resize_image:
     print_step("resize partition")
+
     # d  delete partition
     # 2  second partition
     # n  create partition
@@ -99,7 +100,8 @@ device_list = {hostname: {
 
 facts_path = "/etc/ansible/facts.d"
 qemu.exec("sudo mkdir --mode 0755 -p %s" % facts_path)
-# `sudo cat` doesn't give priviledge on redirection
+
+# Use cat and then move because `sudo cat` doesn't give priviledge on redirection
 qemu.exec("cat > /tmp/device_list.fact <<END_OF_CMD\n{}\nEND_OF_CMD".format(json.dumps(device_list, indent=4)))
 qemu.exec("sudo mv /tmp/device_list.fact {}/device_list.fact".format(facts_path))
 
