@@ -2,7 +2,7 @@ import os
 import re
 import subprocess
 import wget
-from pretty_print import print_step
+import pretty_print
 from zipfile import ZipFile
 
 boot_dir = "vexpress-boot"
@@ -16,7 +16,7 @@ linux_folder = "linux-" + linux_version
 linux_zip = linux_folder + ".zip"
 
 def make():
-    print_step("make vexpress boot")
+    pretty_print.step("make vexpress boot")
     if os.path.isdir(boot_dir):
         assert(os.path.isfile(kernel_path))
         assert(os.path.isfile(dtb_path))
@@ -24,16 +24,16 @@ def make():
         return
 
     if not os.path.isdir(linux_folder):
-        print_step("download linux")
+        pretty_print.step("download linux")
         raspbianLiteImageZip = wget.download("https://github.com/torvalds/linux/archive/v{}.zip".format(linux_version), out=linux_zip)
 
-        print_step("extract linux")
+        pretty_print.step("extract linux")
         zipFile = ZipFile(linux_zip)
         zipFile.extractall()
 
     os.chdir(linux_folder)
 
-    print_step("set linux configuration")
+    pretty_print.step("set linux configuration")
     subprocess.check_call("make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- vexpress_defconfig", shell=True)
 
     # Modify configuration
@@ -58,10 +58,10 @@ def make():
             w.write("\n")
         w.flush()
 
-    print_step("compile linux")
+    pretty_print.step("compile linux")
     subprocess.check_call("make -j 2 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- all", shell=True, stdin=fd_reader)
 
-    print_step("create vexpress boot directory")
+    pretty_print.step("create vexpress boot directory")
     os.mkdir("../{}".format(boot_dir))
     subprocess.check_call("cp .config arch/arm/boot/zImage arch/arm/boot/dts/vexpress-v2p-ca9.dtb ../{}".format(boot_dir), shell=True)
 

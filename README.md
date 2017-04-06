@@ -4,9 +4,12 @@ This installer install ideascube on an SD card for raspberrypi 2 or raspberrypi 
 
 ## How to use it
 
+tested on linux
+
 dependencies:
 
 * distribution packages:
+  * gcc-arm-linux-gnueabihf
   * qemu
   * python3
 
@@ -17,7 +20,7 @@ dependencies:
 
 run:
 
-`python3 src/main.py`
+`python3 src/main.py --help`
 
 ## Principle
 

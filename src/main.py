@@ -3,11 +3,12 @@
 import os
 import argparse
 import vexpress_boot
+import catalog
 import raspbian
 import subprocess
 import json
-from pretty_print import print_step
-from qemu import Qemu
+import pretty_print
+import qemu
 
 parser = argparse.ArgumentParser(description="ideascube/kiwix installer for raspberrypi.")
 parser.add_argument("-n", "--name", help="name of the box (mybox)", default="mybox")
@@ -15,26 +16,33 @@ parser.add_argument("-t", "--timezone", help="timezone (Europe/Paris)", default=
 parser.add_argument('-w', "--wifi-pwd", help="wifi password (Open)")
 parser.add_argument('-k', "--kalite", help="install kalite (fr | en | ar | es)", choices=["fr", "en", "ar", "er"], nargs="*")
 parser.add_argument('-z', "--zim-install", help="install zim", nargs="*")
+parser.add_argument('-r', "--resize", help="resize image in GiB", type=float)
+parser.add_argument('-c', "--catalog", help="build zim catalog and exit", action="store_true")
+parser.add_argument('-s', "--sd", help="sd card device to put the image onto")
 
 args = parser.parse_args()
 
 os.makedirs("build", exist_ok=True)
 os.chdir("build")
 
+if args.catalog:
+    catalog.make()
+    exit(0)
+
 vexpress_boot.make()
 raspbian.make()
 
-# TODO: make it an argument
-resize_image = True
+current_size = qemu.get_image_size(raspbian.image)
+resize_image = args.resize and args.resize != current_size
 
 if resize_image:
-    print_step("resize image")
-    subprocess.check_call(["qemu-img", "resize", "-f", "raw", raspbian.image, "5G"])
+    pretty_print.step("resize image")
+    qemu.resize_image(raspbian.image, current_size, args.resize)
 
-qemu = Qemu(vexpress_boot.kernel_path, vexpress_boot.dtb_path, raspbian.image)
+vm = qemu.Qemu(vexpress_boot.kernel_path, vexpress_boot.dtb_path, raspbian.image)
 
 if resize_image:
-    print_step("resize partition")
+    pretty_print.step("resize partition")
 
     # d  delete partition
     # 2  second partition
@@ -54,30 +62,32 @@ p
 
 w
 END_OF_CMD""" % raspbian.secondPartitionSector
-    qemu.exec(fdiskCmd)
-    qemu.reboot()
+    vm.exec(fdiskCmd)
+    vm.reboot()
 
-    print_step("resize filesystem")
-    qemu.exec("sudo resize2fs /dev/mmcblk0p2")
+    pretty_print.step("resize filesystem")
+    vm.exec("sudo resize2fs /dev/mmcblk0p2")
 
-print_step("install ansible")
+pretty_print.step("install ansible")
 
-qemu.exec("sudo apt-get update")
-qemu.exec("sudo apt-get install -y python-pip git python-dev libffi-dev libssl-dev gnutls-bin")
+vm.exec("sudo apt-get update")
+vm.exec("sudo apt-get install -y python-pip git python-dev libffi-dev libssl-dev gnutls-bin")
 
-qemu.exec("sudo pip install ansible==2.2 markupsafe")
-qemu.exec("sudo pip install cryptography --upgrade")
+vm.exec("sudo pip install ansible==2.2 markupsafe")
+vm.exec("sudo pip install cryptography --upgrade")
 
-print_step("clone ansiblecube")
+pretty_print.step("clone ansiblecube")
+
 ansiblecube_url = "https://github.com/thiolliere/ansiblecube.git"
 ansiblecube_path = "/var/lib/ansible/local"
 
-qemu.exec("sudo mkdir --mode 0755 -p %s" % ansiblecube_path)
-qemu.exec("sudo git clone {url} {path}".format(url=ansiblecube_url, path=ansiblecube_path))
-qemu.exec("sudo cp %s/hosts /etc/ansible/hosts" % ansiblecube_path)
+vm.exec("sudo mkdir --mode 0755 -p %s" % ansiblecube_path)
+vm.exec("sudo git clone {url} {path}".format(url=ansiblecube_url, path=ansiblecube_path))
+vm.exec("sudo cp %s/hosts /etc/ansible/hosts" % ansiblecube_path)
 
 hostname = args.name.replace("_", "-")
-qemu.exec("sudo hostname %s" % hostname)
+
+vm.exec("sudo hostname %s" % hostname)
 
 device_list = {hostname: {
     "kalite": {
@@ -99,11 +109,12 @@ device_list = {hostname: {
 }}
 
 facts_path = "/etc/ansible/facts.d"
-qemu.exec("sudo mkdir --mode 0755 -p %s" % facts_path)
+
+vm.exec("sudo mkdir --mode 0755 -p %s" % facts_path)
 
 # Use cat and then move because `sudo cat` doesn't give priviledge on redirection
-qemu.exec("cat > /tmp/device_list.fact <<END_OF_CMD\n{}\nEND_OF_CMD".format(json.dumps(device_list, indent=4)))
-qemu.exec("sudo mv /tmp/device_list.fact {}/device_list.fact".format(facts_path))
+vm.exec("cat > /tmp/device_list.fact <<END_OF_CMD\n{}\nEND_OF_CMD".format(json.dumps(device_list, indent=4)))
+vm.exec("sudo mv /tmp/device_list.fact {}/device_list.fact".format(facts_path))
 
 extra_vars = "ideascube_project_name=%s" % args.name
 extra_vars += " timezone=%s" % args.timezone
@@ -122,6 +133,6 @@ ansible_pull_cmd += " --tags master,custom"
 ansible_pull_cmd += " --extra-vars \"%s\"" % extra_vars
 ansible_pull_cmd += " main.yml"
 
-qemu.exec(ansible_pull_cmd)
+vm.exec(ansible_pull_cmd)
 
-qemu.close()
+vm.close()

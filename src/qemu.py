@@ -5,8 +5,8 @@ import sys
 import socket
 import paramiko
 import select
-from pretty_print import print_step
-from pretty_print import print_err
+import re
+import pretty_print
 from select import select
 
 def get_free_port():
@@ -21,8 +21,6 @@ def wait_signal(fd, signal, timeout):
     while True:
         selected, _, _ = select([fd], [], [], timeout)
         if fd in selected:
-            # TODO: TODO: do not decode but encode signal
-            # TODO: does encoding are rights
             buf = os.read(fd, 1024)
             try:
                 sys.stdout.write(buf.decode("utf-8"))
@@ -35,6 +33,24 @@ def wait_signal(fd, signal, timeout):
             return False
 
 timeout = 30
+
+def get_image_size(image):
+    pipe_reader, pipe_writer = os.pipe()
+    subprocess.check_call(["qemu-img", "info", "-f", "raw", image], stdout=pipe_writer)
+    pipe_reader = os.fdopen(pipe_reader)
+    pipe_reader.readline()
+    pipe_reader.readline()
+    size_line = pipe_reader.readline()
+    matches = re.findall(r"virtual size: (.*)G", size_line)
+    assert(len(matches) == 1)
+    return matches[0]
+
+def resize_image(image, current_size, resize_size):
+    if resize_size < current_size:
+        pretty_print.err("error: cannot decrease image size")
+        exit(1)
+
+    subprocess.check_call(["qemu-img", "resize", "-f", "raw", image, "{}G".format(resize_size)])
 
 class Qemu:
     __image = None
@@ -49,7 +65,7 @@ class Qemu:
     # prompt end by ":~$ "
     # sudo doesn't require password
     def __init__(self, kernel, dtb, image):
-        print_step("launch qemu")
+        pretty_print.step("launch qemu")
         self.__kernel = kernel
         self.__dtb = dtb
         self.__image = image
@@ -98,7 +114,7 @@ class Qemu:
         self.__qemu = None
 
     def reboot(self):
-        print_step("reboot qemu")
+        pretty_print.step("reboot qemu")
         self.__shutdown()
         self.__boot()
 
@@ -112,9 +128,9 @@ class Qemu:
             print(line.replace("\n", ""))
 
         for line in stderr.readlines():
-            print_err("STDERR: " + line.replace("\n", ""))
+            pretty_print.err("STDERR: " + line.replace("\n", ""))
 
     def close(self):
-        print_step("shutdown")
+        pretty_print.step("shutdown")
         self.__shutdown()
 
