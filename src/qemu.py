@@ -43,7 +43,7 @@ def get_image_size(image):
     size_line = pipe_reader.readline()
     matches = re.findall(r"virtual size: (.*)G", size_line)
     assert(len(matches) == 1)
-    return matches[0]
+    return float(matches[0])
 
 def resize_image(image, current_size, resize_size):
     if resize_size < current_size:
