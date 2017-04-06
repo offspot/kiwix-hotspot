@@ -136,3 +136,35 @@ ansible_pull_cmd += " main.yml"
 vm.exec(ansible_pull_cmd)
 
 vm.close()
+
+pretty_print.step("image done")
+
+if args.sd:
+    pretty_print.step("copy image to sd card")
+    qemu.get_image_size(raspbian.image)
+
+    image = os.open(raspbian.image, os.O_RDONLY)
+    sd = os.open(args.sd, os.O_WRONLY)
+
+    total_size = os.lseek(image, 0, os.SEEK_END)
+    os.lseek(image, 0, os.SEEK_SET)
+    current_percentage = 0.0
+    while True:
+        current_size = os.lseek(image, 0, os.SEEK_CUR)
+        new_percentage = (100 * current_size) / total_size
+        if new_percentage != current_percentage:
+            current_percentage = new_percentage
+            print(str(current_percentage) + "%")
+
+        buf = os.read(image, 4096)
+        if buf == b"":
+            break
+        os.write(sd, buf)
+
+    os.close(image)
+    pretty_print.step("sync")
+    os.fsync(sd)
+    os.close(sd)
+
+    pretty_print.step("done")
+
