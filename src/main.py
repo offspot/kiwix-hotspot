@@ -60,10 +60,12 @@ END_OF_CMD""" % raspbian.secondPartitionSector
     qemu.exec("sudo resize2fs /dev/mmcblk0p2")
 
 print_step("install ansible")
+
 qemu.exec("sudo apt-get update")
 qemu.exec("sudo apt-get install -y python-pip git python-dev libffi-dev libssl-dev gnutls-bin")
-# TODO does markupsafe and cryptography are necessary ?
-qemu.exec("sudo pip install ansible==2.2 markupsafe cryptography --upgrade")
+
+qemu.exec("sudo pip install ansible==2.2 markupsafe")
+qemu.exec("sudo pip install cryptography --upgrade")
 
 print_step("clone ansiblecube")
 ansiblecube_url = "https://github.com/thiolliere/ansiblecube.git"
