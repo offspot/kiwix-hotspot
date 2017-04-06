@@ -1,33 +1,33 @@
 # ideascube_raspberrypi_installer
 
-## how to compile linux kernel for vexpress
+This installer install ideascube on an SD card for raspberrypi 2 or raspberrypi 3
 
-download last version of linux:
+## How to use it
 
-https://github.com/torvalds/linux/archive/v4.10.zip
+dependencies:
 
-compile for vexpress:
+* distribution packages:
+  * qemu
+  * python3
 
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- vexpress_defconfig
+* python packages:
+  * wget
+  * zipfile
+  * paramiko
 
-modify configuration:
+run:
 
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig
+`python3 src/main.py`
 
-check that vfat is enabled
-(you can search with `/`)
-add ipv6
-save and quit
+## Principle
 
-TODO add iptables with mangle etc... for portal captive
+The installer emulate the architecture armhf in QEMU.
 
-compile:
+Inside the emulator it builds ideascube with ansiblecube.
 
-make -j 2 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- all
+## Current state
 
-récupérer zImage et vexpress-v2p-ca9.dtb
-
-mkdir ../vexpress-boot
-cp .config arch/arm/boot/zImage arch/arm/boot/dts/vexpress-v2p-ca9.dtb ../vexpress-boot
-
-
+* build linux to be used in the virtual machine
+* download raspbian-lite
+* resize the image
+* run ansible-pull
