@@ -111,16 +111,17 @@ if args.wifi_pwd:
     extra_vars += " wpa_pass=%s" % args.wifi_pwd
 extra_vars += " git_branch=oneUpdateFile"
 extra_vars += " own_config_file=True"
+extra_vars += " managed_by_bsf=False"
 
-print("cmd:")
-print((
-    "/usr/local/bin/ansible-pull",
-    "--checkout", "oneUpdateFile",
-    "-directory", "/var/lib/ansible/local",
-    "--inventory", "hosts",
-    "--url", "https://github.com/thiolliere/ansiblecube.git",
-    "--tags", "master,custom",
-    "--extra-vars", extra_vars,
-    "main.yml"))
+ansible_pull_cmd = "sudo /usr/local/bin/ansible-pull"
+ansible_pull_cmd += " --checkout oneUpdateFile"
+ansible_pull_cmd += " --directory /var/lib/ansible/local"
+ansible_pull_cmd += " --inventory hosts"
+ansible_pull_cmd += " --url https://github.com/thiolliere/ansiblecube.git"
+ansible_pull_cmd += " --tags master,custom"
+ansible_pull_cmd += " --extra-vars \"%s\"" % extra_vars
+ansible_pull_cmd += " main.yml"
+
+qemu.exec(ansible_pull_cmd)
 
 qemu.close()
