@@ -5,7 +5,6 @@ import argparse
 import vexpress_boot
 import catalog
 import raspbian
-import subprocess
 import json
 import pretty_print
 import qemu

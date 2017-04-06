@@ -1,5 +1,4 @@
 import wget
-import subprocess
 import os
 import pretty_print
 from zipfile import ZipFile
