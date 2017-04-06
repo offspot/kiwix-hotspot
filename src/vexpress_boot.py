@@ -37,29 +37,22 @@ def make():
     subprocess.check_call("make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- vexpress_defconfig", shell=True)
 
     # Modify configuration
-    config = open(".config", 'a')
-
-    # Enable IPV6
-    config.write("CONFIG_IPV6=y\n")
-
-    # Disable HW_RANDOM otherwise
-    with open(".config", "r") as sources:
-        lines = sources.readlines()
-    with open(".config", "w") as sources:
+    with open(".config", "r") as config:
+        lines = config.readlines()
+    with open(".config", "w") as config:
         for line in lines:
-            sources.write(re.sub(r'^CONFIG_HW_RANDOM=y$', 'CONFIG_HW_RANDOM=n', line))
+            # Disable HW_RANDOM otherwise
+            line = re.sub(r"^CONFIG_HW_RANDOM=y$", "CONFIG_HW_RANDOM=n", line)
 
-    # This pipe send enter character to compilation command
-    # because the change of configuration will ask for the
-    # setting of new parameter
-    fd_reader, fd_writer = os.pipe()
-    with os.fdopen(fd_writer, 'w') as w:
-        for _ in range(0, 100):
-            w.write("\n")
-        w.flush()
+            # Enable IPV6
+            line = re.sub(r"^# CONFIG_IPV6 is not set$", "CONFIG_IPV6=y", line)
+
+            config.write(line)
+
+    subprocess.check_call("make -j 2 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- olddefconfig", shell=True)
 
     pretty_print.step("compile linux")
-    subprocess.check_call("make -j 2 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- all", shell=True, stdin=fd_reader)
+    subprocess.check_call("make -j 2 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- all", shell=True)
 
     pretty_print.step("create vexpress boot directory")
     os.mkdir("../{}".format(boot_dir))
