@@ -107,7 +107,7 @@ device_list = {hostname: {
         "name": args.zim_install or [],
     },
     "portal": {
-        "activated": False, # TODO set portal activated
+        "activated": True, # TODO set portal activated
     }
 }}
 

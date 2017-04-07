@@ -49,8 +49,7 @@ def make():
         config.write("CONFIG_IPV6=y")
 
         # Enable netfilter
-        # TODO enable
-        # config.write(netfilter_conf)
+        config.write(netfilter_conf)
 
     subprocess.check_call("make -j 2 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- olddefconfig", shell=True)
 
