@@ -32,7 +32,7 @@ def wait_signal(fd, signal, timeout):
         else:
             return False
 
-timeout = 30
+timeout = 60*3
 
 def get_image_size(image):
     pipe_reader, pipe_writer = os.pipe()
