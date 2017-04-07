@@ -1,0 +1,13 @@
+language: python
+python: 3.5
+dist: trusty
+sudo: required
+addons:
+    apt:
+        packages:
+            qemu
+            qemu-system-arm
+            gcc-arm-linux-gnueabihf
+install:
+    - pip install -r requirements.txt
+script: python src/main.py -z wikiquote.en -r 5 -q
