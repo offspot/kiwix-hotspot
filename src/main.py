@@ -95,6 +95,7 @@ ansiblecube_path = "/var/lib/ansible/local"
 
 vm.exec("sudo mkdir --mode 0755 -p %s" % ansiblecube_path)
 vm.exec("sudo git clone {url} {path}".format(url=ansiblecube_url, path=ansiblecube_path))
+vm.exec("sudo mkdir --mode 0755 -p /etc/ansible")
 vm.exec("sudo cp %s/hosts /etc/ansible/hosts" % ansiblecube_path)
 
 hostname = args.name.replace("_", "-")
