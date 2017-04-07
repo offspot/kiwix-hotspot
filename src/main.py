@@ -6,6 +6,7 @@ import vexpress_boot
 import catalog
 import raspbian
 import json
+import systemd
 import pretty_print
 import qemu
 
@@ -72,6 +73,14 @@ END_OF_CMD""" % raspbian.secondPartitionSector
     vm.exec("sudo resize2fs /dev/mmcblk0p2")
 
 pretty_print.step("install ansible")
+
+# Use cat and then move because `sudo cat` doesn't give priviledge on redirection
+vm.exec("cat > /tmp/system.conf <<END_OF_CMD\n{}\nEND_OF_CMD".format(systemd.system_conf))
+vm.exec("sudo mv /tmp/system.conf /etc/systemd/system.conf")
+
+# Use cat and then move because `sudo cat` doesn't give priviledge on redirection
+vm.exec("cat > /tmp/user.conf <<END_OF_CMD\n{}\nEND_OF_CMD".format(systemd.user_conf))
+vm.exec("sudo mv /tmp/user.conf /etc/systemd/user.conf")
 
 vm.exec("sudo apt-get update")
 vm.exec("sudo apt-get install -y python-pip git python-dev libffi-dev libssl-dev gnutls-bin")
