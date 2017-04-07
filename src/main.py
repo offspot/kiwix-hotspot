@@ -72,7 +72,7 @@ pretty_print.step("install ansible")
 vm.exec("sudo apt-get update")
 vm.exec("sudo apt-get install -y python-pip git python-dev libffi-dev libssl-dev gnutls-bin")
 
-vm.exec("sudo pip install ansible==2.2 markupsafe")
+vm.exec("sudo pip install ansible==2.2.2 markupsafe")
 vm.exec("sudo pip install cryptography --upgrade")
 
 pretty_print.step("clone ansiblecube")
