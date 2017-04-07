@@ -121,13 +121,13 @@ class Qemu:
         self.__boot()
 
     def exec(self, command):
-        print(command)
+        pretty_print.std(command)
         _, stdout, stderr = self.__client.exec_command(command)
         while True:
             line = stdout.readline()
             if line == "":
                 break
-            print(line.replace("\n", ""))
+            pretty_print.std(line.replace("\n", ""))
 
         for line in stderr.readlines():
             pretty_print.err("STDERR: " + line.replace("\n", ""))

@@ -18,8 +18,12 @@ parser.add_argument('-z', "--zim-install", help="install zim", nargs="*")
 parser.add_argument('-r', "--resize", help="resize image in GiB", type=float)
 parser.add_argument('-c', "--catalog", help="build zim catalog and exit", action="store_true")
 parser.add_argument('-s', "--sd", help="sd card device to put the image onto")
+parser.add_argument('-q', "--quiet", help="more quiet", action="store_true")
 
 args = parser.parse_args()
+
+if args.quiet:
+    pretty_print.wget_bar = None
 
 os.makedirs("build", exist_ok=True)
 os.chdir("build")
@@ -153,7 +157,7 @@ if args.sd:
         new_percentage = (100 * current_size) / total_size
         if new_percentage != current_percentage:
             current_percentage = new_percentage
-            print(str(current_percentage) + "%")
+            pretty_print.std(str(current_percentage) + "%")
 
         buf = os.read(image, 4096)
         if buf == b"":

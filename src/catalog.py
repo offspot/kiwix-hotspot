@@ -20,6 +20,6 @@ def make():
 
     os.mkdir(catalog_dir)
     for catalog in catalog_files:
-        wget.download("{}/{}".format(catalog_url_path, catalog), out="{}/{}".format(catalog_dir, catalog))
-        print()
+        wget.download("{}/{}".format(catalog_url_path, catalog), out="{}/{}".format(catalog_dir, catalog), bar=pretty_print.wget_bar)
+        pretty_print.newline()
 

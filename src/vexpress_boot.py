@@ -25,7 +25,7 @@ def make():
 
     if not os.path.isdir(linux_folder):
         pretty_print.step("download linux")
-        raspbianLiteImageZip = wget.download("https://github.com/torvalds/linux/archive/v{}.zip".format(linux_version), out=linux_zip)
+        raspbianLiteImageZip = wget.download("https://github.com/torvalds/linux/archive/v{}.zip".format(linux_version), out=linux_zip, bar=pretty_print.wget_bar)
 
         pretty_print.step("extract linux")
         zipFile = ZipFile(linux_zip)

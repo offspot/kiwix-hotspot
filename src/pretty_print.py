@@ -1,3 +1,5 @@
+import wget
+
 def step(step):
     print("\033[00;34m--> " + step + "\033[00m")
 
@@ -6,3 +8,8 @@ def err(err):
 
 def std(std):
     print(std)
+
+def newline():
+    print()
+
+wget_bar = wget.bar_adaptive

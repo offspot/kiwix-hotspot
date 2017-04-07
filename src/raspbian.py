@@ -16,9 +16,9 @@ def make():
     if not os.path.isfile(image):
         pretty_print.step("download raspbian-lite")
         zipFileName = version + "-raspbian-jessie-lite.zip"
-        raspbianLiteImageZip = wget.download("http://vx2-downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-{}/{}-raspbian-jessie-lite.zip".format(url_dir, version), out=zipFileName)
+        raspbianLiteImageZip = wget.download("http://vx2-downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-{}/{}-raspbian-jessie-lite.zip".format(url_dir, version), out=zipFileName, bar=pretty_print.wget_bar)
 
-        print() # Because wget doesn't return to new line
+        pretty_print.newline() # Because wget doesn't return to new line
         pretty_print.step("extract raspbian-lite")
         zipFile = ZipFile(zipFileName)
         zipFile.extract(image)
