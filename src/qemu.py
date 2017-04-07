@@ -65,7 +65,6 @@ class Qemu:
     # prompt end by ":~$ "
     # sudo doesn't require password
     def __init__(self, kernel, dtb, image):
-        pretty_print.step("launch qemu")
         self.__kernel = kernel
         self.__dtb = dtb
         self.__image = image
@@ -77,6 +76,9 @@ class Qemu:
 
         stdout_reader, stdout_writer = os.pipe()
         stdin_reader, stdin_writer = os.pipe()
+
+        pretty_print.step("launch qemu with ssh on port {}".format(ssh_port))
+
         self.__qemu = subprocess.Popen([
             "qemu-system-arm",
             "-m", "1G",
