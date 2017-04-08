@@ -53,24 +53,23 @@ def resize_image(image, current_size, resize_size):
     subprocess.check_call(["qemu-img", "resize", "-f", "raw", image, "{}G".format(resize_size)])
 
 class Qemu:
-    __image = None
-    __kernel = None
-    __dtb = None
+    _image = None
+    _kernel = None
+    _dtb = None
 
-    __qemu = None
-    __client = None
+    _qemu = None
+    _client = None
 
     # login=pi
     # password=raspberry
     # prompt end by ":~$ "
     # sudo doesn't require password
     def __init__(self, kernel, dtb, image):
-        self.__kernel = kernel
-        self.__dtb = dtb
-        self.__image = image
-        self.__boot()
+        self._kernel = kernel
+        self._dtb = dtb
+        self._image = image
 
-    def __boot(self):
+    def _boot(self):
 
         ssh_port = get_free_port()
 
@@ -79,15 +78,15 @@ class Qemu:
 
         pretty_print.step("launch qemu with ssh on port {}".format(ssh_port))
 
-        self.__qemu = subprocess.Popen([
+        self._qemu = subprocess.Popen([
             "qemu-system-arm",
             "-m", "1G",
             "-M", "vexpress-a9",
-            "-kernel", self.__kernel,
-            "-dtb", self.__dtb,
+            "-kernel", self._kernel,
+            "-dtb", self._dtb,
             "-append", "root=/dev/mmcblk0p2 console=ttyAMA0 console=tty",
             "-serial", "stdio",
-            "-sd", self.__image,
+            "-sd", self._image,
             "-redir", "tcp:%d::22" % ssh_port,
             "-display", "none",
             "-no-reboot",
@@ -103,26 +102,26 @@ class Qemu:
         os.write(stdin_writer, b"exit\r")
         assert(wait_signal(stdout_reader, b"login: ", timeout))
 
-        self.__client = paramiko.SSHClient()
-        self.__client.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())
-        self.__client.connect("localhost", port=ssh_port, username="pi", password="raspberry")
+        self._client = paramiko.SSHClient()
+        self._client.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())
+        self._client.connect("localhost", port=ssh_port, username="pi", password="raspberry")
 
-    def __shutdown(self):
+    def _shutdown(self):
         self.exec("sudo shutdown 0")
-        self.__client.close()
-        self.__qemu.wait()
+        self._client.close()
+        self._qemu.wait()
 
-        self.__client = None
-        self.__qemu = None
+        self._client = None
+        self._qemu = None
 
     def reboot(self):
         pretty_print.step("reboot qemu")
-        self.__shutdown()
-        self.__boot()
+        self._shutdown()
+        self._boot()
 
     def exec(self, command):
         pretty_print.std(command)
-        _, stdout, stderr = self.__client.exec_command(command)
+        _, stdout, stderr = self._client.exec_command(command)
         while True:
             line = stdout.readline()
             if line == "":
@@ -134,5 +133,5 @@ class Qemu:
 
     def close(self):
         pretty_print.step("shutdown")
-        self.__shutdown()
+        self._shutdown()
 
