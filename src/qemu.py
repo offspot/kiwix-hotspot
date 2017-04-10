@@ -162,7 +162,7 @@ class _RunningInstance:
     def _shutdown(self):
         self._exec_cmd("sudo shutdown 0")
         self._client.close()
-        self._qemu.wait()
+        self._qemu.wait(timeout)
 
     def _exec_cmd(self, command):
         pretty_print.std(command)
