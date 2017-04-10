@@ -1,10 +1,10 @@
-import wget
 import pretty_print
 import os
+import urllib.request
 
 catalog_dir = "catalog"
 
-catalog_url_path = "http://catalog.ideascube.org"
+catalog_url_path = "http://catalog.ideascube.org/"
 
 catalog_files = [
         "kiwix.yml",
@@ -12,14 +12,9 @@ catalog_files = [
         "bibliotecamovil.yml",
         ]
 
-def make():
-    pretty_print.step("build zim catalog")
-    if os.path.isdir(catalog_dir):
-        pretty_print.std("nothing to do")
-        return
-
-    os.mkdir(catalog_dir)
-    for catalog in catalog_files:
-        wget.download("{}/{}".format(catalog_url_path, catalog), out="{}/{}".format(catalog_dir, catalog), bar=pretty_print.wget_bar)
-        pretty_print.newline()
-
+def get_catalog():
+    catalog = ""
+    for catalog_file in catalog_files:
+        with urllib.request.urlopen(catalog_url_path + catalog_file) as f:
+            catalog += f.read().decode("utf-8")
+    return catalog
