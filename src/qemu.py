@@ -117,11 +117,20 @@ class _RunningInstance:
         self._emulation = emulation
 
     def __enter__(self):
-        self._boot()
+        try:
+            self._boot()
+        except:
+            self._qemu.kill()
+            raise
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self._shutdown()
+        try:
+            self._shutdown()
+        except:
+            if self._qemu:
+                self._qemu.kill()
+            raise
 
     def _boot(self):
         ssh_port = get_free_port()
