@@ -1,7 +1,7 @@
 import os
 import re
 import subprocess
-import wget
+import urllib
 import pretty_print
 from zipfile import ZipFile
 
@@ -14,6 +14,7 @@ config_path = os.path.join(boot_dir, ".config")
 linux_version = "4.10"
 linux_folder = "linux-" + linux_version
 linux_zip = linux_folder + ".zip"
+url = "https://github.com/torvalds/linux/archive/v{}.zip".format(linux_version)
 
 def make():
     pretty_print.step("make vexpress boot")
@@ -25,7 +26,7 @@ def make():
 
     if not os.path.isdir(linux_folder):
         pretty_print.step("download linux")
-        raspbianLiteImageZip = wget.download("https://github.com/torvalds/linux/archive/v{}.zip".format(linux_version), out=linux_zip, bar=pretty_print.wget_bar)
+        urllib.request.urlretrieve(url, filename=linux_zip, reporthook=pretty_print.ReportHook().reporthook)
 
         pretty_print.step("extract linux")
         zipFile = ZipFile(linux_zip)
