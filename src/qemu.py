@@ -12,6 +12,12 @@ import pretty_print
 import systemd
 from select import select
 
+class QemuWaitSignalTimeoutError(Exception):
+    pass
+
+class QemuInternalError(Exception):
+    pass
+
 def get_free_port():
     with socket.socket() as s:
         s.bind(("",0))
@@ -19,7 +25,6 @@ def get_free_port():
 
     return port
 
-# TODO raise excpetion instead of return bool
 def wait_signal(fd, signal, timeout):
     ring_buf = collections.deque(maxlen=len(signal))
     while True:
@@ -32,9 +37,9 @@ def wait_signal(fd, signal, timeout):
                 pass
             ring_buf.extend(buf)
             if list(ring_buf) == list(signal):
-                return True
+                return
         else:
-            return False
+            raise QemuWaitSignalTimeoutError("signal %s" % signal)
 
 timeout = 60*3
 
@@ -63,7 +68,8 @@ class Emulator:
         pipe_reader.readline()
         size_line = pipe_reader.readline()
         matches = re.findall(r"virtual size: (.*)G", size_line)
-        assert(len(matches) == 1)
+        if len(matches) != 1:
+            raise QemuInternalError("cannot get image %s size from qemu-img info" % self._image)
         return float(matches[0])
 
     def resize_image(self, size):
@@ -139,15 +145,15 @@ class _RunningInstance:
             "-no-reboot",
             ], stdin=stdin_reader, stdout=stdout_writer, stderr=subprocess.STDOUT)
 
-        assert(wait_signal(stdout_reader, b"login: ", timeout))
+        wait_signal(stdout_reader, b"login: ", timeout)
         os.write(stdin_writer, b"pi\r")
-        assert(wait_signal(stdout_reader, b"Password: ", timeout))
+        wait_signal(stdout_reader, b"Password: ", timeout)
         os.write(stdin_writer, b"raspberry\r")
-        assert(wait_signal(stdout_reader, b":~$ ", timeout))
+        wait_signal(stdout_reader, b":~$ ", timeout)
         os.write(stdin_writer, b"sudo systemctl start ssh\r")
-        assert(wait_signal(stdout_reader, b":~$ ", timeout))
+        wait_signal(stdout_reader, b":~$ ", timeout)
         os.write(stdin_writer, b"exit\r")
-        assert(wait_signal(stdout_reader, b"login: ", timeout))
+        wait_signal(stdout_reader, b"login: ", timeout)
 
         self._client = paramiko.SSHClient()
         self._client.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())
