@@ -10,11 +10,6 @@ zip_filename = version + "-raspbian-jessie-lite.zip"
 url_dir_version = "2017-03-03"
 url = "http://vx2-downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-{}/{}".format(url_dir_version, zip_filename)
 
-# TODO: automate computing of offset
-sectorSize = 512
-firstPartitionSector = 8192
-secondPartitionSector = 137216
-
 def make():
     pretty_print.step("make raspbian-lite image")
     if os.path.isfile(image):

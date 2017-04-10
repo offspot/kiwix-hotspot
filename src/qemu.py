@@ -173,33 +173,60 @@ class _RunningInstance:
         self._client.close()
         self._qemu.wait(timeout)
 
-    def _exec_cmd(self, command):
+    def _exec_cmd(self, command, return_stdout=False):
+        if return_stdout:
+            stdout_buffer = ""
+
         pretty_print.std(command)
         _, stdout, stderr = self._client.exec_command(command)
         while True:
             line = stdout.readline()
             if line == "":
                 break
+            if return_stdout:
+                stdout_buffer += line
             pretty_print.std(line.replace("\n", ""))
 
         for line in stderr.readlines():
             pretty_print.err("STDERR: " + line.replace("\n", ""))
 
+        if return_stdout:
+            return stdout_buffer
+
     def resize_fs(self):
         pretty_print.step("resize partition")
 
-        # TODO compute secondPartitionSector here
-        # TODO if not needed then return, use qemu-img secteurs
+        stdout = self._exec_cmd("sudo LANG=C fdisk -l /dev/mmcblk0", return_stdout=True)
+        lines = stdout.splitlines()
 
-        # d  delete partition
-        # 2  second partition
-        # n  create partition
-        # p  primary partition
-        # 2  second partition
-        # %  start of partition
-        #    resize to max
-        # w  write change
-        fdiskCmd = """sudo LANG=C fdisk /dev/mmcblk0 <<END_OF_CMD
+        number_of_sector_match = []
+        second_partition_match = []
+        for line in lines:
+            number_of_sector_match += re.findall(r"^Disk /dev/mmcblk0:.*, (\d+) sectors$", line)
+            second_partition_match += re.findall(r"^/dev/mmcblk0p2 +(\d+) +(\d+) +\d+ +\S+ +\d+ +Linux$", line)
+
+        if len(number_of_sector_match) != 1:
+            raise QemuInternalError("cannot find the number of sector of disk")
+        number_of_sector = int(number_of_sector_match[0])
+
+        if len(second_partition_match) != 1:
+            raise QemuInternalError("cannot find start and/or end of root partition of disk")
+        second_partition_start = int(second_partition_match[0][0])
+        second_partition_end = int(second_partition_match[0][1])
+
+        if second_partition_end + 1 == number_of_sector:
+            pretty_print.std("nothing to do")
+        else:
+
+            # d  delete partition
+            # 2  second partition
+            # n  create partition
+            # p  primary partition
+            # 2  second partition
+            # %  start of partition
+            #    resize to max
+            # w  write change
+            fdiskCmd = """sudo LANG=C fdisk /dev/mmcblk0 <<END_OF_CMD
 d
 2
 n
@@ -208,9 +235,9 @@ p
 %d
 
 w
-END_OF_CMD""" % raspbian.secondPartitionSector
-        self._exec_cmd(fdiskCmd)
-        self._reboot()
+END_OF_CMD""" % second_partition_start
+            self._exec_cmd(fdiskCmd)
+            self._reboot()
 
         pretty_print.step("resize filesystem")
         self._exec_cmd("sudo resize2fs /dev/mmcblk0p2")
