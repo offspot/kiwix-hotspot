@@ -1,11 +1,14 @@
-import wget
+import urllib.request
 import os
 import pretty_print
 from zipfile import ZipFile
 
 version = "2017-03-02"
-url_dir = "2017-03-03"
 image = version + "-raspbian-jessie-lite.img"
+zip_filename = version + "-raspbian-jessie-lite.zip"
+
+url_dir_version = "2017-03-03"
+url = "http://vx2-downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-{}/{}".format(url_dir_version, zip_filename)
 
 # TODO: automate computing of offset
 sectorSize = 512
@@ -13,12 +16,15 @@ firstPartitionSector = 8192
 secondPartitionSector = 137216
 
 def make():
-    if not os.path.isfile(image):
-        pretty_print.step("download raspbian-lite")
-        zipFileName = version + "-raspbian-jessie-lite.zip"
-        raspbianLiteImageZip = wget.download("http://vx2-downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-{}/{}-raspbian-jessie-lite.zip".format(url_dir, version), out=zipFileName, bar=pretty_print.wget_bar)
+    pretty_print.step("make raspbian-lite image")
+    if os.path.isfile(image):
+        pretty_print.step("nothing to do")
+        return
 
-        pretty_print.newline() # Because wget doesn't return to new line
-        pretty_print.step("extract raspbian-lite")
-        zipFile = ZipFile(zipFileName)
-        zipFile.extract(image)
+    pretty_print.step("download raspbian-lite")
+    urllib.request.urlretrieve(url, filename=zip_filename, reporthook=pretty_print.ReportHook().reporthook)
+
+    pretty_print.step("extract raspbian-lite")
+    zipFile = ZipFile(zip_filename)
+    zipFile.extract(image)
+    os.remove(zip_filename)
