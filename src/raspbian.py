@@ -21,8 +21,9 @@ def make():
         pretty_print.step("nothing to do")
         return
 
-    pretty_print.step("download raspbian-lite")
-    urllib.request.urlretrieve(url, filename=zip_filename, reporthook=pretty_print.ReportHook().reporthook)
+    if not os.path.isfile(zip_filename):
+        pretty_print.step("download raspbian-lite")
+        urllib.request.urlretrieve(url, filename=zip_filename, reporthook=pretty_print.ReportHook().reporthook)
 
     pretty_print.step("extract raspbian-lite")
     zipFile = ZipFile(zip_filename)
