@@ -22,6 +22,7 @@ def make():
         assert(os.path.isfile(kernel_path))
         assert(os.path.isfile(dtb_path))
         assert(os.path.isfile(config_path))
+        pretty_print.std("nothing to do")
         return
 
     if not os.path.isdir(linux_folder):

@@ -18,7 +18,7 @@ secondPartitionSector = 137216
 def make():
     pretty_print.step("make raspbian-lite image")
     if os.path.isfile(image):
-        pretty_print.step("nothing to do")
+        pretty_print.std("nothing to do")
         return
 
     if not os.path.isfile(zip_filename):
