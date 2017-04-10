@@ -12,6 +12,8 @@ import pretty_print
 import systemd
 from select import select
 
+timeout = 60*3
+
 class QemuWaitSignalTimeoutError(Exception):
     pass
 
@@ -40,8 +42,6 @@ def wait_signal(fd, signal, timeout):
                 return
         else:
             raise QemuWaitSignalTimeoutError("signal %s" % signal)
-
-timeout = 60*3
 
 class Emulator:
     _image = None
