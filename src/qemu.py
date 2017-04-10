@@ -10,6 +10,7 @@ import json
 import raspbian
 import pretty_print
 import systemd
+import random
 from select import select
 
 timeout = 60*3
@@ -19,6 +20,12 @@ class QemuWaitSignalTimeoutError(Exception):
 
 class QemuInternalError(Exception):
     pass
+
+def generate_random_name():
+    r = ""
+    for _ in range(1,32):
+        r += random.choice("0123456789ABCDEF")
+    return r
 
 def get_free_port():
     with socket.socket() as s:
@@ -242,15 +249,19 @@ END_OF_CMD""" % second_partition_start
         pretty_print.step("resize filesystem")
         self._exec_cmd("sudo resize2fs /dev/mmcblk0p2")
 
+    def _write_file(self, path, content):
+        # Use cat and then move because `sudo cat` doesn't give priviledge on redirection
+        tmp = "/tmp/" + generate_random_name()
+        self._exec_cmd("cat > {} <<END_OF_CMD\n{}\nEND_OF_CMD".format(tmp, content))
+        self._exec_cmd("sudo mv {} '{}'".format(tmp, path))
+
+
+        self._exec_cmd
+
     # TODO split in prepare and run
     def run_ansible(self, name, timezone, wifi_pwd, kalite, zim_install):
-        # Use cat and then move because `sudo cat` doesn't give priviledge on redirection
-        self._exec_cmd("cat > /tmp/system.conf <<END_OF_CMD\n{}\nEND_OF_CMD".format(systemd.system_conf))
-        self._exec_cmd("sudo mv /tmp/system.conf /etc/systemd/system.conf")
-
-        # Use cat and then move because `sudo cat` doesn't give priviledge on redirection
-        self._exec_cmd("cat > /tmp/user.conf <<END_OF_CMD\n{}\nEND_OF_CMD".format(systemd.user_conf))
-        self._exec_cmd("sudo mv /tmp/user.conf /etc/systemd/user.conf")
+        self._write_file("/etc/systemd/system.conf", systemd.system_conf)
+        self._write_file("/etc/systemd/user.conf", systemd.user_conf)
 
         self._exec_cmd("sudo apt-get update")
         self._exec_cmd("sudo apt-get install -y python-pip git python-dev libffi-dev libssl-dev gnutls-bin")
@@ -294,10 +305,7 @@ END_OF_CMD""" % second_partition_start
         facts_path = "/etc/ansible/facts.d"
 
         self._exec_cmd("sudo mkdir --mode 0755 -p %s" % facts_path)
-
-        # Use cat and then move because `sudo cat` doesn't give priviledge on redirection
-        self._exec_cmd("cat > /tmp/device_list.fact <<END_OF_CMD\n{}\nEND_OF_CMD".format(json.dumps(device_list, indent=4)))
-        self._exec_cmd("sudo mv /tmp/device_list.fact {}/device_list.fact".format(facts_path))
+        self._write_file(facts_path, json.dumps(device_list, indent=4))
 
         extra_vars = "ideascube_project_name=%s" % name
         extra_vars += " timezone=%s" % timezone
