@@ -10,4 +10,4 @@ addons:
             gcc-arm-linux-gnueabihf
 install:
     - pip install -r requirements.txt
-script: python src/main.py -z wikiquote.en -r 5 -q
+script: python src/main.py -z wikiquote.en -r 5

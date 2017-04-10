@@ -1,4 +1,3 @@
-import wget
 import sys
 
 def step(step):
@@ -33,5 +32,3 @@ class ReportHook():
         if line != self._last_line:
             self._last_line = line
             sys.stdout.write(line)
-
-wget_bar = wget.bar_adaptive
