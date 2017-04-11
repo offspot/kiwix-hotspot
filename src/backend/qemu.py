@@ -9,7 +9,6 @@ import re
 import json
 import random
 from select import select
-from . import raspbian
 from . import pretty_print
 from . import systemd
 
@@ -88,7 +87,7 @@ class Emulator:
     def copy_image(self, device_name):
         pretty_print.step("copy image to sd card")
 
-        image = os.open(raspbian.image, os.O_RDONLY)
+        image = os.open(self._image, os.O_RDONLY)
         device = os.open(device_name, os.O_WRONLY)
 
         total_size = os.lseek(image, 0, os.SEEK_END)
