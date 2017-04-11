@@ -2,11 +2,11 @@
 
 import os
 import argparse
-import vexpress_boot
-import catalog
-import raspbian
-import pretty_print
-import qemu
+from backend import vexpress_boot
+from backend import catalog
+from backend import raspbian
+from backend import pretty_print
+from backend import qemu
 
 parser = argparse.ArgumentParser(description="ideascube/kiwix installer for raspberrypi.")
 parser.add_argument("-n", "--name", help="name of the box (mybox)", default="mybox")

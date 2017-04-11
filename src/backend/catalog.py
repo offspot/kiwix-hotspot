@@ -1,6 +1,6 @@
-import pretty_print
 import os
 import urllib.request
+from . import pretty_print
 
 catalog_dir = "catalog"
 

@@ -7,11 +7,11 @@ import paramiko
 import select
 import re
 import json
-import raspbian
-import pretty_print
-import systemd
 import random
 from select import select
+from . import raspbian
+from . import pretty_print
+from . import systemd
 
 timeout = 60*3
 

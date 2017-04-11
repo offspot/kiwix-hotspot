@@ -1,7 +1,7 @@
 import urllib.request
 import os
-import pretty_print
 from zipfile import ZipFile
+from . import pretty_print
 
 version = "2017-03-02"
 image = version + "-raspbian-jessie-lite.img"

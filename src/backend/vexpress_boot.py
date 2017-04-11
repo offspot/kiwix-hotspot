@@ -2,8 +2,8 @@ import os
 import re
 import subprocess
 import urllib
-import pretty_print
 from zipfile import ZipFile
+from . import pretty_print
 
 boot_dir = "vexpress-boot"
 
