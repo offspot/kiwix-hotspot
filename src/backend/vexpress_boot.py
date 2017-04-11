@@ -26,13 +26,13 @@ def make():
         return
 
     if not os.path.isdir(linux_folder):
-        if not os.path.isfile(linux_zip):
-            pretty_print.step("download linux")
-            urllib.request.urlretrieve(url, filename=linux_zip, reporthook=pretty_print.ReportHook().reporthook)
+        pretty_print.step("download linux")
+        urllib.request.urlretrieve(url, filename=linux_zip, reporthook=pretty_print.ReportHook().reporthook)
 
         pretty_print.step("extract linux")
         zipFile = ZipFile(linux_zip)
         zipFile.extractall()
+        os.remove(linux_zip)
 
     os.chdir(linux_folder)
 
