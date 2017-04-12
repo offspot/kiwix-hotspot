@@ -27,10 +27,10 @@ if args.catalog:
     print(catalog.get_catalog())
     exit(0)
 
-vexpress_boot.make()
-raspbian.make()
+vexpress_boot.get()
+raspbian.get()
 
-emulator = qemu.Emulator(vexpress_boot.kernel_path, vexpress_boot.dtb_path, raspbian.image)
+emulator = qemu.Emulator(vexpress_boot.kernel_path, vexpress_boot.dtb_path, raspbian.image_path)
 
 if args.resize:
     emulator.resize_image(args.resize)
