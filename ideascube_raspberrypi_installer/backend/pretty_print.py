@@ -21,7 +21,9 @@ class ReportHook():
             self._current_size += chunk_size
 
         avail_dots = self.width-2
-        if self._current_size >= total_size:
+        if total_size == -1:
+            line = "unknown size"
+        elif self._current_size >= total_size:
             line = "[" + "."*avail_dots + "] 100%\n"
         else:
             ratio = min(float(self._current_size) / total_size, 1.)
