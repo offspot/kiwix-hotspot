@@ -16,17 +16,17 @@ make python virtual environment: `python3 -m venv venv`
 
 active virtual environment: `source venv/bin/activate`
 
-install pip dependencies: `python install -r requirements.txt`
+install pip dependencies: `pip3 install -r requirements.txt`
 
-show help: `python src/main.py -h`
+show help: `python3 ideascube_raspberrypi_installer -h`
 
-build catalog: `python src/main.py -c`
+show catalog: `python3 ideascube_raspberrypi_installer -c`
 
 build your image with for example
 
-* an image of 5GiB with wikiquote.en: `python src/main.py -z wikiquote.en -r 5`
+* an image of 5GiB with wikiquote.en: `python3 ideascube_raspberrypi_installer -z wikiquote.en -r 5`
 
-* an image of 5GiB with wikiquote.en written to the sd card: `python src/main.py -z wikiquote.en -r 5 -s dev/sdX`
+* an image of 5GiB with wikiquote.en written to the sd card: `python ideascube_raspberrypi_installer -z wikiquote.en -r 5 -s dev/sdX`
 
   warning: you need write priviledge for the device
 

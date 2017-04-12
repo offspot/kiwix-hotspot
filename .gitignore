@@ -3,4 +3,3 @@ build
 venv
 archive
 launch.sh
-src/test.py
