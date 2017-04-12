@@ -1,7 +1,7 @@
 import os
 import re
 import subprocess
-import urllib
+import urllib.request
 from zipfile import ZipFile
 from . import pretty_print
 
