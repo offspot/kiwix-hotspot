@@ -8,7 +8,6 @@ tested on linux
 
 dependencies:
 
-* gcc-arm-linux-gnueabihf
 * qemu
 * python3
 
@@ -29,6 +28,11 @@ build your image with for example
 * an image of 5GiB with wikiquote.en written to the sd card: `python piboxinstaller -z wikiquote.en -r 5 -s dev/sdX`
 
   warning: you need write priviledge for the device
+
+There is also a script to compile linux kernel for QEMU emulation
+in `make_vexpress_boot` directory.
+
+You need gcc-arm-linux-gnueabihf to compile it
 
 ## Principle
 
