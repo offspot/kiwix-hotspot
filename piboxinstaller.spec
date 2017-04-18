@@ -3,8 +3,8 @@
 block_cipher = None
 
 
-a = Analysis(['ideascube_raspberrypi_installer/__main__.py'],
-             pathex=['/home/thiolliere/developpement/ideascube_raspberrypi_installer'],
+a = Analysis(['piboxinstaller/__main__.py'],
+             pathex=['.'],
              binaries=[('/usr/bin/qemu-system-arm', '.'), ('/usr/bin/qemu-img', '.')],
              datas=[],
              hiddenimports=[],
@@ -21,7 +21,7 @@ exe = EXE(pyz,
           a.binaries,
           a.zipfiles,
           a.datas,
-          name='__main__',
+          name='piboxinstaller',
           debug=False,
           strip=False,
           upx=True,

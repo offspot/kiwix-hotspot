@@ -1,4 +1,4 @@
-# ideascube_raspberrypi_installer
+# piboxinstaller
 
 This installer install ideascube on an SD card for raspberrypi 2 or raspberrypi 3
 
@@ -18,15 +18,15 @@ active virtual environment: `source venv/bin/activate`
 
 install pip dependencies: `pip3 install -r requirements.txt`
 
-show help: `python3 ideascube_raspberrypi_installer -h`
+show help: `python3 piboxinstaller -h`
 
-show catalog: `python3 ideascube_raspberrypi_installer -c`
+show catalog: `python3 piboxinstaller -c`
 
 build your image with for example
 
-* an image of 5GiB with wikiquote.en: `python3 ideascube_raspberrypi_installer -z wikiquote.en -r 5`
+* an image of 5GiB with wikiquote.en: `python3 piboxinstaller -z wikiquote.en -r 5`
 
-* an image of 5GiB with wikiquote.en written to the sd card: `python ideascube_raspberrypi_installer -z wikiquote.en -r 5 -s dev/sdX`
+* an image of 5GiB with wikiquote.en written to the sd card: `python piboxinstaller -z wikiquote.en -r 5 -s dev/sdX`
 
   warning: you need write priviledge for the device
 
