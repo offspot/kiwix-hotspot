@@ -2,11 +2,15 @@
 
 import os
 import argparse
+import sys
 from backend import vexpress_boot
 from backend import catalog
 from backend import raspbian
 from backend import pretty_print
 from backend import qemu
+
+if getattr(sys, "frozen", False):
+    os.environ["PATH"] += ":" + sys._MEIPASS
 
 parser = argparse.ArgumentParser(description="ideascube/kiwix installer for raspberrypi.")
 parser.add_argument("-n", "--name", help="name of the box (mybox)", default="mybox")
