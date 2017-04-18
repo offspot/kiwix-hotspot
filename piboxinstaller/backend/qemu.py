@@ -14,6 +14,13 @@ from . import systemd
 
 timeout = 60*3
 
+if os.name == "nt":
+    qemu_system_arm_exe = "qemu-system-arm.exe"
+    qemu_img_exe = "qemu-img.exe"
+else:
+    qemu_system_arm_exe = "qemu-system-arm"
+    qemu_img_exe = "qemu-img"
+
 class QemuWaitSignalTimeoutError(Exception):
     pass
 
@@ -68,7 +75,7 @@ class Emulator:
 
     def _get_image_size(self):
         pipe_reader, pipe_writer = os.pipe()
-        subprocess.check_call(["qemu-img", "info", "-f", "raw", self._image], stdout=pipe_writer)
+        subprocess.check_call([qemu_img_exe, "info", "-f", "raw", self._image], stdout=pipe_writer)
         pipe_reader = os.fdopen(pipe_reader)
         pipe_reader.readline()
         pipe_reader.readline()
@@ -82,7 +89,7 @@ class Emulator:
         if size < self._get_image_size():
             pretty_print.err("error: cannot decrease image size")
             exit(1)
-        subprocess.check_call(["qemu-img", "resize", "-f", "raw", self._image, "{}G".format(size)])
+        subprocess.check_call([qemu_img_exe, "resize", "-f", "raw", self._image, "{}G".format(size)])
 
     def copy_image(self, device_name):
         pretty_print.step("copy image to sd card")
@@ -147,7 +154,7 @@ class _RunningInstance:
         pretty_print.step("launch qemu with ssh on port {}".format(ssh_port))
 
         self._qemu = subprocess.Popen([
-            "qemu-system-arm",
+            qemu_system_arm_exe,
             "-m", "1G",
             "-M", "vexpress-a9",
             "-kernel", self._emulation._kernel,
