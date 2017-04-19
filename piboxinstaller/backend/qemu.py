@@ -8,7 +8,7 @@ import select
 import re
 import json
 import random
-import multiprocessing
+import threading
 from select import select
 from . import pretty_print
 from . import systemd
@@ -41,36 +41,30 @@ def get_free_port():
 
     return port
 
-def _read_for_signal(fd, signal, data_received, signal_received):
+def wait_signal(reader_fd, writer_fd, signal, timeout):
+    timeout_event = threading.Event()
+
+    def raise_timeout():
+        timeout_event.set()
+        os.write(writer_fd, b"piboxinstaller timeout")
+
     ring_buf = collections.deque(maxlen=len(signal))
     while True:
-        buf = os.read(fd, 1024)
-        data_received.set()
+        timer = threading.Timer(timeout, raise_timeout)
+        timer.start()
+        buf = os.read(reader_fd, 1024)
         try:
             sys.stdout.write(buf.decode("utf-8"))
         except:
             pass
+
+        if timeout_event.is_set():
+            raise QemuWaitSignalTimeoutError("signal %s" % signal)
+
+        timer.cancel()
         ring_buf.extend(buf)
         if list(ring_buf) == list(signal):
-            signal_received.set()
             return
-
-def wait_signal(fd, signal, timeout):
-    data_received = multiprocessing.Event()
-    signal_received = multiprocessing.Event()
-
-    reader = multiprocessing.Process(target=_read_for_signal, args=(fd, signal, data_received, signal_received))
-
-    reader.start()
-    while True:
-        if signal_received.wait(timeout):
-            reader.join()
-            return
-        if data_received.wait(0):
-            data_received.clear()
-        else:
-            reader.terminate()
-            raise QemuWaitSignalTimeoutError("signal %s" % signal)
 
 class Emulator:
     _image = None
@@ -183,15 +177,15 @@ class _RunningInstance:
             "-no-reboot",
             ], stdin=stdin_reader, stdout=stdout_writer, stderr=subprocess.STDOUT)
 
-        wait_signal(stdout_reader, b"login: ", timeout)
+        wait_signal(stdout_reader, stdout_writer, b"login: ", timeout)
         os.write(stdin_writer, b"pi\r")
-        wait_signal(stdout_reader, b"Password: ", timeout)
+        wait_signal(stdout_reader, stdout_writer, b"Password: ", timeout)
         os.write(stdin_writer, b"raspberry\r")
-        wait_signal(stdout_reader, b":~$ ", timeout)
+        wait_signal(stdout_reader, stdout_writer, b":~$ ", timeout)
         os.write(stdin_writer, b"sudo systemctl start ssh\r")
-        wait_signal(stdout_reader, b":~$ ", timeout)
+        wait_signal(stdout_reader, stdout_writer, b":~$ ", timeout)
         os.write(stdin_writer, b"exit\r")
-        wait_signal(stdout_reader, b"login: ", timeout)
+        wait_signal(stdout_reader, stdout_writer, b"login: ", timeout)
 
         self._client = paramiko.SSHClient()
         self._client.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())
