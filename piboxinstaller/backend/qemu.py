@@ -178,13 +178,16 @@ class _RunningInstance:
             ], stdin=stdin_reader, stdout=stdout_writer, stderr=subprocess.STDOUT)
 
         wait_signal(stdout_reader, stdout_writer, b"login: ", timeout)
-        os.write(stdin_writer, b"pi\r")
+        os.write(stdin_writer, b"pi\n")
         wait_signal(stdout_reader, stdout_writer, b"Password: ", timeout)
-        os.write(stdin_writer, b"raspberry\r")
+        os.write(stdin_writer, b"raspberry\n")
         wait_signal(stdout_reader, stdout_writer, b":~$ ", timeout)
-        os.write(stdin_writer, b"sudo systemctl start ssh\r")
-        wait_signal(stdout_reader, stdout_writer, b":~$ ", timeout)
-        os.write(stdin_writer, b"exit\r")
+        # TODO: This is a ugly hack. But writing all once doesn't work
+        os.write(stdin_writer, b"sudo systemctl")
+        wait_signal(stdout_reader, stdout_writer, b"sudo systemctl", timeout)
+        os.write(stdin_writer, b" start ssh;")
+        wait_signal(stdout_reader, stdout_writer, b" start ssh", timeout)
+        os.write(stdin_writer, b" exit\n")
         wait_signal(stdout_reader, stdout_writer, b"login: ", timeout)
 
         self._client = paramiko.SSHClient()
