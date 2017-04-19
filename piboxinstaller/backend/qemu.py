@@ -8,6 +8,7 @@ import select
 import re
 import json
 import random
+import multiprocessing
 from select import select
 from . import pretty_print
 from . import systemd
@@ -40,20 +41,35 @@ def get_free_port():
 
     return port
 
-def wait_signal(fd, signal, timeout):
+def _read_for_signal(fd, signal, data_received, signal_received):
     ring_buf = collections.deque(maxlen=len(signal))
     while True:
-        selected, _, _ = select([fd], [], [], timeout)
-        if fd in selected:
-            buf = os.read(fd, 1024)
-            try:
-                sys.stdout.write(buf.decode("utf-8"))
-            except:
-                pass
-            ring_buf.extend(buf)
-            if list(ring_buf) == list(signal):
-                return
+        buf = os.read(fd, 1024)
+        data_received.set()
+        try:
+            sys.stdout.write(buf.decode("utf-8"))
+        except:
+            pass
+        ring_buf.extend(buf)
+        if list(ring_buf) == list(signal):
+            signal_received.set()
+            return
+
+def wait_signal(fd, signal, timeout):
+    data_received = multiprocessing.Event()
+    signal_received = multiprocessing.Event()
+
+    reader = multiprocessing.Process(target=_read_for_signal, args=(fd, signal, data_received, signal_received))
+
+    reader.start()
+    while True:
+        if signal_received.wait(timeout):
+            reader.join()
+            return
+        if data_received.wait(0):
+            data_received.clear()
         else:
+            reader.terminate()
             raise QemuWaitSignalTimeoutError("signal %s" % signal)
 
 class Emulator:
