@@ -10,7 +10,10 @@ from backend import pretty_print
 from backend import qemu
 
 if getattr(sys, "frozen", False):
-    os.environ["PATH"] += ":" + sys._MEIPASS
+    if os.name == "nt":
+        os.environ["PATH"] += sys._MEIPASS + ";"
+    else:
+        os.environ["PATH"] += ":" + sys._MEIPASS
 
 parser = argparse.ArgumentParser(description="ideascube/kiwix installer for raspberrypi.")
 parser.add_argument("-n", "--name", help="name of the box (mybox)", default="mybox")
