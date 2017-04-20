@@ -48,6 +48,16 @@ Inside the emulator it builds ideascube with ansiblecube.
 * run ansible-pull
 * write image to the device
 
+## build for windows
+
+On a windows machine install python3.5 and QEMU
+
+download piboxinstaller
+
+on a terminal go to piboxinstaller directory and run:
+
+"C:\Program Files\Python35\python.exe" "C:\Program Files\Python35\Scripts\pyinstaller-script.py" piboxinstaller_windows.spec
+
 ## License
 
 Copyright (C) 2016 thiolliere
