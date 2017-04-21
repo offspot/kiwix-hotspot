@@ -285,7 +285,7 @@ END_OF_CMD""" % second_partition_start
         self._exec_cmd("sudo apt-get update")
         self._exec_cmd("sudo apt-get install -y python-pip git python-dev libffi-dev libssl-dev gnutls-bin")
 
-        self._exec_cmd("sudo pip install ansible==2.2.2 markupsafe")
+        self._exec_cmd("sudo pip install ansible==2.1.2 markupsafe")
         self._exec_cmd("sudo pip install cryptography --upgrade")
 
         pretty_print.step("clone ansiblecube")
