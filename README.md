@@ -60,7 +60,7 @@ on a terminal go to pibox-installer directory and run:
 
 ## License
 
-Copyright (C) 2016 thiolliere
+Copyright (C) 2016 Guillaume Thiolliere
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
