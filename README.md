@@ -2,7 +2,13 @@
 
 This installer install ideascube on an SD card for raspberrypi 2 or raspberrypi 3
 
-## How to use it
+## Principle
+
+The installer emulate the architecture armhf in QEMU.
+
+Inside the emulator it builds ideascube with ansiblecube.
+
+## Run it from source
 
 tested on linux
 
@@ -37,20 +43,6 @@ This vexpress boot can be compiled on linux using make-vexpress-boot python3 scr
 requirements: `gcc-arm-linux-gnueabihf` and `zip`
 
 run: `python3 make-vexpress-boot`
-
-## Principle
-
-The installer emulate the architecture armhf in QEMU.
-
-Inside the emulator it builds ideascube with ansiblecube.
-
-## Current state
-
-* build linux to be used in the virtual machine
-* download raspbian-lite
-* resize the image
-* run ansible-pull
-* write image to the device
 
 ## Build for windows
 
