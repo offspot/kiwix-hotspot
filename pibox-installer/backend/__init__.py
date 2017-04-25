@@ -27,7 +27,7 @@ class vexpress_boot:
     dtb_path = os.path.join(boot_dir, dtb_name)
     dtb_zip_path = posixpath.join(boot_dir, dtb_name)
 
-    url = "https://thiolliere.org/public/dev/" + boot_dir + ".zip"
+    url = "http://download.kiwix.org/dev/" + boot_dir + ".zip"
 
     def get():
         pretty_print.step("get vexpress boot")
