@@ -1,4 +1,4 @@
-# piboxinstaller
+# pibox-installer
 
 This installer install ideascube on an SD card for raspberrypi 2 or raspberrypi 3
 
@@ -17,15 +17,15 @@ active virtual environment: `source venv/bin/activate`
 
 install pip dependencies: `pip3 install -r requirements.txt`
 
-show help: `python3 piboxinstaller -h`
+show help: `python3 pibox-installer -h`
 
-show catalog: `python3 piboxinstaller -c`
+show catalog: `python3 pibox-installer -c`
 
 build your image with for example
 
-* an image of 5GiB with wikiquote.en: `python3 piboxinstaller -z wikiquote.en -r 5`
+* an image of 5GiB with wikiquote.en: `python3 pibox-installer -z wikiquote.en -r 5`
 
-* an image of 5GiB with wikiquote.en written to the sd card: `python piboxinstaller -z wikiquote.en -r 5 -s dev/sdX`
+* an image of 5GiB with wikiquote.en written to the sd card: `python pibox-installer -z wikiquote.en -r 5 -s dev/sdX`
 
   warning: you need write priviledge for the device
 
@@ -52,11 +52,11 @@ Inside the emulator it builds ideascube with ansiblecube.
 
 On a windows machine install python3.5 and QEMU
 
-download piboxinstaller
+download pibox-installer
 
-on a terminal go to piboxinstaller directory and run:
+on a terminal go to pibox-installer directory and run:
 
-"C:\Program Files\Python35\python.exe" "C:\Program Files\Python35\Scripts\pyinstaller-script.py" piboxinstaller_windows.spec
+"C:\Program Files\Python35\python.exe" "C:\Program Files\Python35\Scripts\pyinstaller-script.py" pibox-installer-windows.spec
 
 ## License
 

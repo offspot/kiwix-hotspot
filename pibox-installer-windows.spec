@@ -3,7 +3,7 @@
 block_cipher = None
 
 
-a = Analysis(['piboxinstaller/__main__.py'],
+a = Analysis(['pibox-installer/__main__.py'],
              pathex=['.'],
              binaries=[('C:\Program Files\qemu\qemu-system-arm.exe', '.'),
                        ('C:\Program Files\qemu\qemu-img.exe', '.'),
@@ -85,7 +85,7 @@ exe = EXE(pyz,
           a.binaries,
           a.zipfiles,
           a.datas,
-          name='piboxinstaller',
+          name='pibox-installer',
           debug=False,
           strip=False,
           upx=True,
