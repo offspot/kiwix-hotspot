@@ -17,7 +17,7 @@ def _download_and_extract(url, content):
     os.remove(zip_filename)
 
 class vexpress_boot:
-    boot_dir = "vexpress-boot"
+    boot_dir = "pibox-installer-vexpress-boot"
 
     kernel_name = "zImage"
     kernel_path = os.path.join(boot_dir, kernel_name)
