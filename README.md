@@ -29,10 +29,14 @@ build your image with for example
 
   warning: you need write priviledge for the device
 
-There is also a script to compile linux kernel for QEMU emulation
-in `make_vexpress_boot` directory.
+## Build pibox-installer vexpress boot
 
-You need gcc-arm-linux-gnueabihf to compile it
+pibox-installer download a linux kernel for the QEMU emulation of vexpress machine.
+This vexpress boot can be compiled on linux using make-vexpress-boot python3 script.
+
+requirements: `gcc-arm-linux-gnueabihf` and `zip`
+
+run: `python3 make-vexpress-boot`
 
 ## Principle
 
@@ -48,7 +52,7 @@ Inside the emulator it builds ideascube with ansiblecube.
 * run ansible-pull
 * write image to the device
 
-## build for windows
+## Build for windows
 
 On a windows machine install python3.5 and QEMU
 
