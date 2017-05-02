@@ -3,6 +3,7 @@
 import os
 import argparse
 import sys
+import yaml
 from backend import vexpress_boot
 from backend import catalog
 from backend import raspbian
@@ -31,7 +32,8 @@ os.makedirs("build", exist_ok=True)
 os.chdir("build")
 
 if args.catalog:
-    print(catalog.get_catalog())
+    for catalog in catalog.get_catalogs():
+        print(yaml.dump(catalog, default_flow_style=False, default_style=''))
     exit(0)
 
 vexpress_boot.get()
