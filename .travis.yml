@@ -1,13 +1,18 @@
 language: python
 python: 3.5
-dist: trusty
-sudo: required
-addons:
-    apt:
-        packages:
-            qemu
-            qemu-system-arm
-            gcc-arm-linux-gnueabihf
+# dist: trusty
+# sudo: required
+# addons:
+#     apt:
+#         packages:
+#             qemu
+#             qemu-system-arm
+#             gcc-arm-linux-gnueabihf
+os:
+    osx
 install:
-    - pip install -r requirements.txt
-script: python src/main.py -z wikiquote.en -r 5
+    - brew install qemu
+    - pip3 install -r requirements.txt
+    - brew install pygobject3 --with-python3 gtk+3
+    - pip3 install pyinstaller
+    - pyinstaller piboxbox-installer-macos.spec
