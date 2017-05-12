@@ -12,7 +12,7 @@ from backend import qemu
 
 if getattr(sys, "frozen", False):
     if os.name == "nt":
-        os.environ["PATH"] += sys._MEIPASS + ";"
+        os.environ["PATH"] += ";" + sys._MEIPASS
     else:
         os.environ["PATH"] += ":" + sys._MEIPASS
 
