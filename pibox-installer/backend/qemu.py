@@ -186,7 +186,7 @@ class _RunningInstance:
         os.write(stdin_writer, b"sudo systemctl")
         wait_signal(stdout_reader, stdout_writer, b"sudo systemctl", timeout)
         os.write(stdin_writer, b" start ssh;")
-        wait_signal(stdout_reader, stdout_writer, b" start ssh", timeout)
+        wait_signal(stdout_reader, stdout_writer, b" start ssh;", timeout)
         os.write(stdin_writer, b" exit\n")
         wait_signal(stdout_reader, stdout_writer, b"login: ", timeout)
 
