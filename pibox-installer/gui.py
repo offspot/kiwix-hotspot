@@ -17,6 +17,9 @@ if getattr(sys, "frozen", False):
         os.environ["PATH"] += sys._MEIPASS + ";"
     else:
         os.environ["PATH"] += ":" + sys._MEIPASS
+    DATA_DIR = sys._MEIPASS
+else:
+    DATA_DIR = ""
 
 class Component:
     def __init__(self, builder):
@@ -42,7 +45,7 @@ class ConfigurationWindow:
         self.catalog = catalog
 
         builder = Gtk.Builder()
-        builder.add_from_file("ui.glade")
+        builder.add_from_file(os.path.join(DATA_DIR, "ui.glade"))
 
         self.component = Component(builder)
         self.component.window.connect("delete-event", Gtk.main_quit)
@@ -132,7 +135,7 @@ class ConfigurationWindow:
 class ZimChooserWindow:
     def __init__(self, parent, zim_list_store):
         builder = Gtk.Builder()
-        builder.add_from_file("ui.glade")
+        builder.add_from_file(os.path.join(DATA_DIR, "ui.glade"))
 
         self.component = Component(builder)
 
