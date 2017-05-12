@@ -5,11 +5,18 @@ from backend import catalog
 import pytz
 import re
 import os
+import sys
 from backend import vexpress_boot
 from backend import catalog
 from backend import raspbian
 from backend import pretty_print
 from backend import qemu
+
+if getattr(sys, "frozen", False):
+    if os.name == "nt":
+        os.environ["PATH"] += sys._MEIPASS + ";"
+    else:
+        os.environ["PATH"] += ":" + sys._MEIPASS
 
 class Component:
     def __init__(self, builder):
