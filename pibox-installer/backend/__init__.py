@@ -27,7 +27,7 @@ class vexpress_boot:
     dtb_path = os.path.join(boot_dir, dtb_name)
     dtb_zip_path = posixpath.join(boot_dir, dtb_name)
 
-    url = "http://download.kiwix.org/dev/" + boot_dir + ".zip"
+    url = "https://download.kiwix.org/dev/" + boot_dir + ".zip"
 
     def get():
         pretty_print.step("get vexpress boot")
@@ -48,7 +48,7 @@ class raspbian:
 
     zip_filename = version + "-raspbian-jessie-lite.zip"
     url_dir_version = "2017-03-03"
-    url = "http://vx2-downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-{}/{}".format(url_dir_version, zip_filename)
+    url = "https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-{}/{}".format(url_dir_version, zip_filename)
 
     def get():
         pretty_print.step("get raspbian-lite image")
