@@ -8,32 +8,44 @@ The installer emulate the architecture armhf in QEMU.
 
 Inside the emulator it builds ideascube with ansiblecube.
 
-## Run it from source
+## Download
 
-tested on linux
+### GUI application
 
-dependencies:
+TODO
 
-* qemu
-* python3
+### CLI application
 
-make python virtual environment: `python3 -m venv venv`
+TODO
 
-active virtual environment: `source venv/bin/activate`
+## CLI usage
 
-install pip dependencies: `pip3 install -r requirements.txt`
+show help: `pibox-installer-cli -h`
 
-show help: `python3 pibox-installer -h`
-
-show catalog: `python3 pibox-installer -c`
+show catalog: `pibox-installer-cli -c`
 
 build your image with for example
 
-* an image of 5GiB with wikiquote.en: `python3 pibox-installer -z wikiquote.en -r 5`
+* an image of 5GiB with wikiquote.en: `pibox-installer-cli -z wikiquote.en -r 5`
 
-* an image of 5GiB with wikiquote.en written to the sd card: `python pibox-installer -z wikiquote.en -r 5 -s dev/sdX`
+* an image of 5GiB with wikiquote.en written to the sd card: `pibox-installer-cli -z wikiquote.en -r 5 -s dev/sdX`
 
-  warning: you need write priviledge for the device
+  **warning**: you need write priviledge for the device
+
+## Run it from source
+
+you can read build for xxx to get help setting the environment
+
+dependencies:
+
+* [python3](https://www.python.org/downloads/)
+* [qemu](http://www.qemu.org/download/)
+* [pygobject](https://pygobject.readthedocs.io/en/latest/getting_started.html) (for GUI application)
+
+install pip dependencies: `pip3 install -r requirements.txt`
+
+run GUI application: `python3 pibox-installer/gui.py`
+run CLI application: `python3 pibox-installer/cli.py`
 
 ## Build pibox-installer vexpress boot
 
@@ -46,13 +58,44 @@ run: `python3 make-vexpress-boot`
 
 ## Build for windows
 
-On a windows machine install python3.5 and QEMU
+on windows:
 
-download pibox-installer
+* install msys2 and inside run `pacman -S mingw-w64-x86_64-gdk-pixbuf2`
+* add msys64\mingw64\bin to PATH
+* install python 3.4 from there https://www.python.org/downloads/windows/
+  version 3.4 is used because it is the latest supported by pygi-aio
+* install pyinstaller: in an admin terminal: `C:\Python34\python.exe -m pip install pyinstaller`
+* install gobject module with pygi all in one at https://sourceforge.net/projects/pygobjectwin32/
+  * on the first panel of libraries check gtk+ 3.x
+  * on the third panel check GIR
+* make a symbolic link: in an admin terminal: `mklink /D C:\Python34\share C:\Python34\Lib\site-packages\gnome\share`
+* install qemu from http://www.qemu.org/download/
+* install pyinstaller with pypi
+* download pibox-installer repository and run:
+  `"C:\Python34\python.exe" "C:\Python34\Scripts\pyinstaller-script.py" pibox-installer-windows.spec`
 
-on a terminal go to pibox-installer directory and run:
+the script used in appveyor is `appveyor.bk`
 
-"C:\Program Files\Python35\python.exe" "C:\Program Files\Python35\Scripts\pyinstaller-script.py" pibox-installer-windows.spec
+note: we don't msys2 to install pygobject because pyinstaller fails to install on msys2
+
+## Build for macos
+
+on macos:
+
+* install homebrew: https://brew.sh/
+* install python3.5 with zoidbergwill formula: https://github.com/zoidbergwill/homebrew-python
+  version 3.5 is used because it is the latest supported by pyinstaller
+* install pygobject after python3.5 has been installed:
+  `brew install pygobject --with-python3`
+* install pyinstaller with pypi
+* download pibox-installer repository and run:
+  `pyinstaller pibox-installer-macos.spec`
+
+## Build for linux
+
+TODO
+
+note: on debian install the `libgirepository1.0-dev` for pyinstaller for finding gir
 
 ## License
 
