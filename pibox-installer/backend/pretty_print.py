@@ -14,7 +14,7 @@ def newline():
 
 class ReportHook():
     _current_size = 0
-    width = 80
+    width = 60
     _last_line = None
     def reporthook (self, chunk, chunk_size, total_size):
         if chunk != 0:
