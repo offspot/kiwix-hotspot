@@ -303,6 +303,7 @@ END_OF_CMD""" % second_partition_start
 
         self._exec_cmd("sudo hostname %s" % hostname)
 
+        package_management = [{"name": x, "status": "present"} for x in zim_install]
         device_list = {hostname: {
             "kalite": {
                 "activated": kalite != None,
@@ -313,10 +314,7 @@ END_OF_CMD""" % second_partition_start
                 "activated": False,
                 "content_name": [],
             },
-            "zim_install": {
-                "activated": zim_install != None,
-                "name": zim_install or [],
-            },
+            "package_management": package_management,
             "portal": {
                 "activated": True,
             }
