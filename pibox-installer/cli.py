@@ -4,9 +4,8 @@ import os
 import argparse
 import sys
 import yaml
-from backend import vexpress_boot
+from backend.downloads import vexpress_boot, raspbian
 from backend import catalog
-from backend import raspbian
 from backend import pretty_print
 from backend import qemu
 
