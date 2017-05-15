@@ -182,7 +182,7 @@ class _RunningInstance:
         wait_signal(stdout_reader, stdout_writer, b"Password: ", timeout)
         os.write(stdin_writer, b"raspberry\n")
         wait_signal(stdout_reader, stdout_writer, b":~$ ", timeout)
-        # TODO: This is a ugly hack. But writing all once doesn't work
+        # TODO: This is a ugly hack. But writing all at once doesn't work
         os.write(stdin_writer, b"sudo systemctl")
         wait_signal(stdout_reader, stdout_writer, b"sudo systemctl", timeout)
         os.write(stdin_writer, b" start ssh;")
@@ -270,6 +270,7 @@ END_OF_CMD""" % second_partition_start
 
     def _write_file(self, path, content):
         # Use cat and then move because `sudo cat` doesn't give priviledge on redirection
+        # TODO do not force use of sudo: argument: sudo=False
         tmp = "/tmp/" + generate_random_name()
         self._exec_cmd("cat > {} <<END_OF_CMD\n{}\nEND_OF_CMD".format(tmp, content))
         self._exec_cmd("sudo mv {} '{}'".format(tmp, path))
