@@ -18,6 +18,16 @@ TODO
 
 TODO
 
+## GUI usage
+
+launch the application
+
+run the installation
+
+then the image is available in build directory
+
+you will have to copy the image to the sd card and plug it into your raspberrypi.
+
 ## CLI usage
 
 show help: `pibox-installer-cli -h`
