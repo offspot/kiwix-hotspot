@@ -189,6 +189,10 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size):
 
     emulator = qemu.Emulator(vexpress_boot.kernel_path, vexpress_boot.dtb_path, raspbian.image_path)
 
+    if size < emulator.get_image_size():
+        pretty_print.err("error: cannot decrease image size")
+        exit(1)
+
     emulator.resize_image(size)
 
     with emulator.run() as emulation:

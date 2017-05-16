@@ -82,7 +82,7 @@ class Emulator:
     def run(self):
         return _RunningInstance(self)
 
-    def _get_image_size(self):
+    def get_image_size(self):
         pipe_reader, pipe_writer = os.pipe()
         subprocess.check_call([qemu_img_exe, "info", "-f", "raw", self._image], stdout=pipe_writer)
         pipe_reader = os.fdopen(pipe_reader)
@@ -95,9 +95,6 @@ class Emulator:
         return float(matches[0])
 
     def resize_image(self, size):
-        if size < self._get_image_size():
-            pretty_print.err("error: cannot decrease image size")
-            exit(1)
         subprocess.check_call([qemu_img_exe, "resize", "-f", "raw", self._image, "{}G".format(size)])
 
     def copy_image(self, device_name):
