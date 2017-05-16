@@ -45,12 +45,13 @@ if args.resize:
 
 with emulator.run() as emulation:
     emulation.resize_fs()
-    emulation.run_ansible(
-            name=args.name,
-            timezone=args.timezone,
-            wifi_pwd=args.wifi_pwd,
-            kalite=args.kalite,
-            zim_install=args.zim_install)
+    ansiblecube.run(
+            machine=emulation,
+            name=name,
+            timezone=timezone,
+            wifi_pwd=wifi_pwd,
+            kalite=kalite,
+            zim_install=zim_install)
 
 pretty_print.step("image done")
 

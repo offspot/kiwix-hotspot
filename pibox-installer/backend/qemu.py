@@ -11,7 +11,6 @@ import random
 import threading
 from select import select
 from . import pretty_print
-from . import systemd
 
 timeout = 60*3
 
@@ -195,11 +194,11 @@ class _RunningInstance:
         self._client.connect("localhost", port=ssh_port, username="pi", password="raspberry")
 
     def _shutdown(self):
-        self._exec_cmd("sudo shutdown 0")
+        self.exec_cmd("sudo shutdown 0")
         self._client.close()
         self._qemu.wait(timeout)
 
-    def _exec_cmd(self, command, return_stdout=False):
+    def exec_cmd(self, command, return_stdout=False):
         if return_stdout:
             stdout_buffer = ""
 
@@ -222,7 +221,7 @@ class _RunningInstance:
     def resize_fs(self):
         pretty_print.step("resize partition")
 
-        stdout = self._exec_cmd("sudo LANG=C fdisk -l /dev/mmcblk0", return_stdout=True)
+        stdout = self.exec_cmd("sudo LANG=C fdisk -l /dev/mmcblk0", return_stdout=True)
         lines = stdout.splitlines()
 
         number_of_sector_match = []
@@ -262,87 +261,18 @@ p
 
 w
 END_OF_CMD""" % second_partition_start
-            self._exec_cmd(fdiskCmd)
+            self.exec_cmd(fdiskCmd)
             self._reboot()
 
         pretty_print.step("resize filesystem")
-        self._exec_cmd("sudo resize2fs /dev/mmcblk0p2")
+        self.exec_cmd("sudo resize2fs /dev/mmcblk0p2")
 
-    def _write_file(self, path, content):
+    def write_file(self, path, content):
         # Use cat and then move because `sudo cat` doesn't give priviledge on redirection
         # TODO do not force use of sudo: argument: sudo=False
         tmp = "/tmp/" + generate_random_name()
-        self._exec_cmd("cat > {} <<END_OF_CMD\n{}\nEND_OF_CMD".format(tmp, content))
-        self._exec_cmd("sudo mv {} '{}'".format(tmp, path))
-
-
-        self._exec_cmd
-
-    # TODO split in prepare and run
-    def run_ansible(self, name, timezone, wifi_pwd, kalite, zim_install):
-        self._write_file("/etc/systemd/system.conf", systemd.system_conf)
-        self._write_file("/etc/systemd/user.conf", systemd.user_conf)
-
-        self._exec_cmd("sudo apt-get update")
-        self._exec_cmd("sudo apt-get install -y python-pip git python-dev libffi-dev libssl-dev gnutls-bin")
-
-        self._exec_cmd("sudo pip install ansible==2.1.2 markupsafe")
-        self._exec_cmd("sudo pip install cryptography --upgrade")
-
-        pretty_print.step("clone ansiblecube")
-
-        ansiblecube_url = "https://github.com/thiolliere/ansiblecube.git"
-        ansiblecube_path = "/var/lib/ansible/local"
-
-        self._exec_cmd("sudo mkdir --mode 0755 -p %s" % ansiblecube_path)
-        self._exec_cmd("sudo git clone {url} {path}".format(url=ansiblecube_url, path=ansiblecube_path))
-        self._exec_cmd("sudo mkdir --mode 0755 -p /etc/ansible")
-        self._exec_cmd("sudo cp %s/hosts /etc/ansible/hosts" % ansiblecube_path)
-
-        hostname = name.replace("_", "-")
-
-        self._exec_cmd("sudo hostname %s" % hostname)
-
-        package_management = [{"name": x, "status": "present"} for x in zim_install]
-        device_list = {hostname: {
-            "kalite": {
-                "activated": kalite != None,
-                "version": "0.16.9",
-                "language": kalite or [],
-            },
-            "idc_import": {
-                "activated": False,
-                "content_name": [],
-            },
-            "package_management": package_management,
-            "portal": {
-                "activated": True,
-            }
-        }}
-
-        facts_path = "/etc/ansible/facts.d"
-
-        self._exec_cmd("sudo mkdir --mode 0755 -p %s" % facts_path)
-        self._write_file(facts_path, json.dumps(device_list, indent=4))
-
-        extra_vars = "ideascube_project_name=%s" % name
-        extra_vars += " timezone=%s" % timezone
-        if wifi_pwd:
-            extra_vars += " wpa_pass=%s" % wifi_pwd
-        extra_vars += " git_branch=oneUpdateFile"
-        extra_vars += " own_config_file=True"
-        extra_vars += " managed_by_bsf=False"
-
-        ansible_pull_cmd = "sudo /usr/local/bin/ansible-pull"
-        ansible_pull_cmd += " --checkout oneUpdateFile"
-        ansible_pull_cmd += " --directory /var/lib/ansible/local"
-        ansible_pull_cmd += " --inventory hosts"
-        ansible_pull_cmd += " --url https://github.com/thiolliere/ansiblecube.git"
-        ansible_pull_cmd += " --tags master,custom"
-        ansible_pull_cmd += " --extra-vars \"%s\"" % extra_vars
-        ansible_pull_cmd += " main.yml"
-
-        self._exec_cmd(ansible_pull_cmd)
+        self.exec_cmd("cat > {} <<END_OF_CMD\n{}\nEND_OF_CMD".format(tmp, content))
+        self.exec_cmd("sudo mv {} '{}'".format(tmp, path))
 
     def _reboot(self):
         pretty_print.step("reboot qemu")

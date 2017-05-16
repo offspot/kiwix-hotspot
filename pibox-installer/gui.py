@@ -10,6 +10,7 @@ from backend.downloads import vexpress_boot, raspbian
 from backend import catalog
 from backend import pretty_print
 from backend import qemu
+from backend import ansiblecube
 
 if getattr(sys, "frozen", False):
     if os.name == "nt":
@@ -192,7 +193,8 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size):
 
     with emulator.run() as emulation:
         emulation.resize_fs()
-        emulation.run_ansible(
+        ansiblecube.run(
+                machine=emulation,
                 name=name,
                 timezone=timezone,
                 wifi_pwd=wifi_pwd,
