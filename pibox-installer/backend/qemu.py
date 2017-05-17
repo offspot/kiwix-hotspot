@@ -4,13 +4,9 @@ import collections
 import sys
 import socket
 import paramiko
-import select
 import re
-import json
 import random
 import threading
-from select import select
-from . import pretty_print
 
 timeout = 60*3
 
@@ -40,47 +36,24 @@ def get_free_port():
 
     return port
 
-def wait_signal(reader_fd, writer_fd, signal, timeout):
-    timeout_event = threading.Event()
-
-    def raise_timeout():
-        timeout_event.set()
-        os.write(writer_fd, b"piboxinstaller timeout")
-
-    ring_buf = collections.deque(maxlen=len(signal))
-    while True:
-        timer = threading.Timer(timeout, raise_timeout)
-        timer.start()
-        buf = os.read(reader_fd, 1024)
-        try:
-            sys.stdout.write(buf.decode("utf-8"))
-        except:
-            pass
-
-        if timeout_event.is_set():
-            raise QemuWaitSignalTimeoutError("signal %s" % signal)
-
-        timer.cancel()
-        ring_buf.extend(buf)
-        if list(ring_buf) == list(signal):
-            return
-
 class Emulator:
     _image = None
     _kernel = None
     _dtb = None
+    _logger = None
 
     # login=pi
     # password=raspberry
     # prompt end by ":~$ "
     # sudo doesn't require password
-    def __init__(self, kernel, dtb, image):
+    def __init__(self, kernel, dtb, image, logger):
         self._kernel = kernel
         self._dtb = dtb
         self._image = image
+        self._logger = logger
 
     def run(self):
-        return _RunningInstance(self)
+        return _RunningInstance(self, self._logger)
 
     def get_image_size(self):
         pipe_reader, pipe_writer = os.pipe()
@@ -98,7 +71,7 @@ class Emulator:
         subprocess.check_call([qemu_img_exe, "resize", "-f", "raw", self._image, "{}G".format(size)])
 
     def copy_image(self, device_name):
-        pretty_print.step("copy image to sd card")
+        self._logger.step("copy image to sd card")
 
         image = os.open(self._image, os.O_RDONLY)
         device = os.open(device_name, os.O_WRONLY)
@@ -113,7 +86,7 @@ class Emulator:
             new_percentage = (100 * current_size) / total_size
             if new_percentage != current_percentage:
                 current_percentage = new_percentage
-                pretty_print.std(str(current_percentage) + "%")
+                self._logger.std(str(current_percentage) + "%\r")
 
             buf = os.read(image, 4096)
             if buf == b"":
@@ -121,19 +94,19 @@ class Emulator:
             os.write(device, buf)
 
         os.close(image)
-        pretty_print.step("sync")
+        self._logger.step("sync")
         os.fsync(device)
         os.close(device)
-
-        pretty_print.step("done")
 
 class _RunningInstance:
     _emulation = None
     _qemu = None
     _client = None
+    _logger = None
 
-    def __init__(self, emulation):
+    def __init__(self, emulation, logger):
         self._emulation = emulation
+        self._logger = logger
 
     def __enter__(self):
         try:
@@ -151,13 +124,41 @@ class _RunningInstance:
                 self._qemu.kill()
             raise
 
+    def _wait_signal(self, reader_fd, writer_fd, signal, timeout):
+        timeout_event = threading.Event()
+
+        def raise_timeout():
+            timeout_event.set()
+            os.write(writer_fd, b"piboxinstaller timeout")
+
+        ring_buf = collections.deque(maxlen=len(signal))
+        while True:
+            timer = threading.Timer(timeout, raise_timeout)
+            timer.start()
+            buf = os.read(reader_fd, 1024)
+
+            try:
+                decoded_buf = buf.decode("utf-8")
+            except:
+                pass
+            else:
+                self._logger.raw_std(decoded_buf)
+
+            if timeout_event.is_set():
+                raise QemuWaitSignalTimeoutError("signal %s" % signal)
+
+            timer.cancel()
+            ring_buf.extend(buf)
+            if list(ring_buf) == list(signal):
+                return
+
     def _boot(self):
         ssh_port = get_free_port()
 
         stdout_reader, stdout_writer = os.pipe()
         stdin_reader, stdin_writer = os.pipe()
 
-        pretty_print.step("launch qemu with ssh on port {}".format(ssh_port))
+        self._logger.step("launch qemu with ssh on port {}".format(ssh_port))
 
         self._qemu = subprocess.Popen([
             qemu_system_arm_exe,
@@ -173,18 +174,18 @@ class _RunningInstance:
             "-no-reboot",
             ], stdin=stdin_reader, stdout=stdout_writer, stderr=subprocess.STDOUT)
 
-        wait_signal(stdout_reader, stdout_writer, b"login: ", timeout)
+        self._wait_signal(stdout_reader, stdout_writer, b"login: ", timeout)
         os.write(stdin_writer, b"pi\n")
-        wait_signal(stdout_reader, stdout_writer, b"Password: ", timeout)
+        self._wait_signal(stdout_reader, stdout_writer, b"Password: ", timeout)
         os.write(stdin_writer, b"raspberry\n")
-        wait_signal(stdout_reader, stdout_writer, b":~$ ", timeout)
+        self._wait_signal(stdout_reader, stdout_writer, b":~$ ", timeout)
         # TODO: This is a ugly hack. But writing all at once doesn't work
         os.write(stdin_writer, b"sudo systemctl")
-        wait_signal(stdout_reader, stdout_writer, b"sudo systemctl", timeout)
+        self._wait_signal(stdout_reader, stdout_writer, b"sudo systemctl", timeout)
         os.write(stdin_writer, b" start ssh;")
-        wait_signal(stdout_reader, stdout_writer, b" start ssh;", timeout)
+        self._wait_signal(stdout_reader, stdout_writer, b" start ssh;", timeout)
         os.write(stdin_writer, b" exit\n")
-        wait_signal(stdout_reader, stdout_writer, b"login: ", timeout)
+        self._wait_signal(stdout_reader, stdout_writer, b"login: ", timeout)
 
         self._client = paramiko.SSHClient()
         self._client.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())
@@ -199,7 +200,7 @@ class _RunningInstance:
         if return_stdout:
             stdout_buffer = ""
 
-        pretty_print.std(command)
+        self._logger.std(command)
         _, stdout, stderr = self._client.exec_command(command)
         while True:
             line = stdout.readline()
@@ -207,16 +208,16 @@ class _RunningInstance:
                 break
             if return_stdout:
                 stdout_buffer += line
-            pretty_print.std(line.replace("\n", ""))
+            self._logger.std(line.replace("\n", ""))
 
         for line in stderr.readlines():
-            pretty_print.err("STDERR: " + line.replace("\n", ""))
+            self._logger.err("STDERR: " + line.replace("\n", ""))
 
         if return_stdout:
             return stdout_buffer
 
     def resize_fs(self):
-        pretty_print.step("resize partition")
+        self._logger.step("resize partition")
 
         stdout = self.exec_cmd("sudo LANG=C fdisk -l /dev/mmcblk0", return_stdout=True)
         lines = stdout.splitlines()
@@ -237,7 +238,7 @@ class _RunningInstance:
         second_partition_end = int(second_partition_match[0][1])
 
         if second_partition_end + 1 == number_of_sector:
-            pretty_print.std("nothing to do")
+            self._logger.std("nothing to do")
         else:
 
             # d  delete partition
@@ -261,7 +262,7 @@ END_OF_CMD""" % second_partition_start
             self.exec_cmd(fdiskCmd)
             self._reboot()
 
-        pretty_print.step("resize filesystem")
+        self._logger.step("resize filesystem")
         self.exec_cmd("sudo resize2fs /dev/mmcblk0p2")
 
     def write_file(self, path, content):
@@ -272,7 +273,7 @@ END_OF_CMD""" % second_partition_start
         self.exec_cmd("sudo mv {} '{}'".format(tmp, path))
 
     def _reboot(self):
-        pretty_print.step("reboot qemu")
+        self._logger.std("reboot qemu")
         self._shutdown()
         self._boot()
 

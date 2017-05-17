@@ -2,21 +2,17 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 from backend import catalog
+from run_installation import run_installation
+from logger import Logger
+from set_path import set_path
 import pytz
 import re
 import os
 import sys
-from backend.downloads import vexpress_boot, raspbian
-from backend import catalog
-from backend import pretty_print
-from backend import qemu
-from backend import ansiblecube
+
+set_path()
 
 if getattr(sys, "frozen", False):
-    if os.name == "nt":
-        os.environ["PATH"] += ";" + sys._MEIPASS
-    else:
-        os.environ["PATH"] += ":" + sys._MEIPASS
     DATA_DIR = sys._MEIPASS
 else:
     DATA_DIR = ""
@@ -130,7 +126,15 @@ class ConfigurationWindow:
         if all_valid:
             self.component.window.destroy()
             Gtk.main_quit()
-            run_installation(name=project_name, timezone=timezone, wifi_pwd=wifi_pwd, kalite=None, zim_install=zim_install, size=size)
+            run_installation(
+                    name=project_name,
+                    timezone=timezone,
+                    wifi_pwd=wifi_pwd,
+                    kalite=None,
+                    zim_install=zim_install,
+                    size=size,
+                    logger=Logger,
+                    directory="build")
 
 class ZimChooserWindow:
     def __init__(self, parent, zim_list_store):
@@ -153,13 +157,13 @@ class ZimChooserWindow:
         self.component.zim_tree_view.append_column(column_text)
         column_text = Gtk.TreeViewColumn("Name", renderer_text, text=1)
         self.component.zim_tree_view.append_column(column_text)
-        column_text = Gtk.TreeViewColumn("Description", renderer_text, text=3)
-        self.component.zim_tree_view.append_column(column_text)
         column_text = Gtk.TreeViewColumn("Language", renderer_text, text=5)
         self.component.zim_tree_view.append_column(column_text)
         column_text = Gtk.TreeViewColumn("Size", renderer_text, text=4)
         self.component.zim_tree_view.append_column(column_text)
         column_text = Gtk.TreeViewColumn("Type", renderer_text, text=6)
+        self.component.zim_tree_view.append_column(column_text)
+        column_text = Gtk.TreeViewColumn("Description", renderer_text, text=3)
         self.component.zim_tree_view.append_column(column_text)
 
         self.component.zim_language_list_store.append(["all"])
@@ -170,6 +174,7 @@ class ZimChooserWindow:
 
         self.component.zim_window.set_transient_for(parent)
         self.component.zim_window.set_modal(True)
+        self.component.zim_window.set_default_size(1280, 800)
         self.component.zim_window.show()
 
         self.component.zim_window_done_button.connect("clicked", self.done_button_clicked)
@@ -179,31 +184,6 @@ class ZimChooserWindow:
 
     def renderer_radio_toggled(self, widget, path):
         self.component.zim_list_store[path][8] = not self.component.zim_list_store[path][8]
-
-def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size):
-    os.makedirs("build", exist_ok=True)
-    os.chdir("build")
-
-    vexpress_boot.get()
-    raspbian.get()
-
-    emulator = qemu.Emulator(vexpress_boot.kernel_path, vexpress_boot.dtb_path, raspbian.image_path)
-
-    if size < emulator.get_image_size():
-        pretty_print.err("error: cannot decrease image size")
-        exit(1)
-
-    emulator.resize_image(size)
-
-    with emulator.run() as emulation:
-        emulation.resize_fs()
-        ansiblecube.run(
-                machine=emulation,
-                name=name,
-                timezone=timezone,
-                wifi_pwd=wifi_pwd,
-                kalite=kalite,
-                zim_install=zim_install)
 
 catalog = catalog.get_catalogs()
 ConfigurationWindow(catalog)

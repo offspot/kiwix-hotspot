@@ -1,7 +1,6 @@
 import os
 import urllib.request
 import yaml
-from . import pretty_print
 
 catalog_url_path = "http://catalog.ideascube.org/"
 

@@ -197,7 +197,7 @@
                   <object class="GtkLabel">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">SD card : (TODO)</property>
+                    <property name="label" translatable="yes">SD card :</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -206,7 +206,17 @@
                   </packing>
                 </child>
                 <child>
-                  <placeholder/>
+                  <object class="GtkFileChooserButton">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="title" translatable="yes"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="pack_type">end</property>
+                    <property name="position">1</property>
+                  </packing>
                 </child>
               </object>
               <packing>
@@ -438,7 +448,7 @@
                   <object class="GtkLabel">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">-2 GiB</property>
+                    <property name="label" translatable="yes"> 0 GiB</property>
                     <attributes>
                       <attribute name="background" value="#efef29292929"/>
                     </attributes>

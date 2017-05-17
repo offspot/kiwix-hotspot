@@ -1,19 +1,13 @@
-#!/usr/bin/python3
-
 import os
 import argparse
 import sys
 import yaml
-from backend.downloads import vexpress_boot, raspbian
 from backend import catalog
-from backend import pretty_print
-from backend import qemu
+from run_installation import run_installation
+from logger import Logger
+from set_path import set_path
 
-if getattr(sys, "frozen", False):
-    if os.name == "nt":
-        os.environ["PATH"] += ";" + sys._MEIPASS
-    else:
-        os.environ["PATH"] += ":" + sys._MEIPASS
+set_path()
 
 parser = argparse.ArgumentParser(description="ideascube/kiwix installer for raspberrypi.")
 parser.add_argument("-n", "--name", help="name of the box (mybox)", default="mybox")
@@ -27,34 +21,18 @@ parser.add_argument("-s", "--sd", help="sd card device to put the image onto")
 
 args = parser.parse_args()
 
-os.makedirs("build", exist_ok=True)
-os.chdir("build")
-
 if args.catalog:
     for catalog in catalog.get_catalogs():
         print(yaml.dump(catalog, default_flow_style=False, default_style=''))
     exit(0)
 
-vexpress_boot.get()
-raspbian.get()
-
-emulator = qemu.Emulator(vexpress_boot.kernel_path, vexpress_boot.dtb_path, raspbian.image_path)
-
-if args.resize:
-    emulator.resize_image(args.resize)
-
-with emulator.run() as emulation:
-    emulation.resize_fs()
-    ansiblecube.run(
-            machine=emulation,
-            name=name,
-            timezone=timezone,
-            wifi_pwd=wifi_pwd,
-            kalite=kalite,
-            zim_install=zim_install)
-
-pretty_print.step("image done")
-
-if args.sd:
-    emulator.copy_image(args.sd)
-
+run_installation(
+        name=args.name,
+        timezone=args.timezone,
+        wifi_pwd=args.wifi_pwd,
+        kalite=args.kalite,
+        zim_install=args.zim_install,
+        size=args.resize,
+        logger=Logger,
+        directory="build",
+        sd_card=args.sd)
