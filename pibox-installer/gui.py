@@ -64,12 +64,17 @@ class Application:
 
         self.component.window.connect("delete-event", Gtk.main_quit)
 
+        self.component.done_window.set_transient_for(self.component.run_window)
+        self.component.done_window.set_default_size(320, 240)
+        self.component.done_window.set_modal(True)
+        self.component.done_window_ok_button.connect("clicked", self.done_window_ok_button_clicked)
+
         self.cancel_event = CancelEvent()
         self.component.run_window.connect("delete-event", Gtk.main_quit)
         self.component.run_window.connect("delete-event", self.run_install_cancel)
         self.logger = Logger(self.component.run_text_view.get_buffer())
 
-        self.component.run_abort_button.connect("clicked", self.run_abort_button_clicked)
+        self.component.run_abort_done_button.connect("clicked", self.run_abort_done_button_clicked)
 
         # wifi password
         self.component.wifi_password_switch.connect("state-set", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(state))
@@ -162,14 +167,23 @@ class Application:
                         size=size,
                         logger=self.logger,
                         directory="build",
-                        cancel_event=self.cancel_event)
+                        cancel_event=self.cancel_event,
+                        done_callback=lambda : GLib.idle_add(self.installation_done))
 
             self.component.window.destroy()
             self.component.run_window.show()
             threading.Thread(target=target, daemon=True).start()
 
-    def run_abort_button_clicked(self, widget):
+    def run_abort_done_button_clicked(self, widget):
         self.component.run_window.close()
+
+    def done_window_ok_button_clicked(self, widget):
+        self.component.done_window.close()
+
+    def installation_done(self):
+        self.component.done_window.show()
+        self.component.run_abort_done_button.set_label("Close")
+        #TODO change abort label to close
 
 class ZimChooserWindow:
     def __init__(self, parent, zim_list_store):
@@ -212,9 +226,9 @@ class ZimChooserWindow:
         self.component.zim_window.set_default_size(1280, 800)
         self.component.zim_window.show()
 
-        self.component.zim_window_done_button.connect("clicked", self.done_button_clicked)
+        self.component.zim_window_done_button.connect("clicked", self.zim_done_button_clicked)
 
-    def done_button_clicked(self, widget):
+    def zim_done_button_clicked(self, widget):
         self.component.zim_window.close()
 
     def renderer_radio_toggled(self, widget, path):

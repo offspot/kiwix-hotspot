@@ -3,7 +3,7 @@ from backend import ansiblecube
 from backend import qemu
 import os
 
-def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger, directory, cancel_event, sd_card=None):
+def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger, directory, cancel_event, sd_card=None, done_callback=None):
     os.makedirs(directory, exist_ok=True)
     os.chdir(directory)
 
@@ -31,3 +31,6 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
 
     if sd_card:
         emulator.copy_image(sd_card)
+
+    if done_callback:
+        done_callback()
