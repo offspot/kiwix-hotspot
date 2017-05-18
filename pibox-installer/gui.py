@@ -69,6 +69,8 @@ class Application:
         self.component.run_window.connect("delete-event", self.run_install_cancel)
         self.logger = Logger(self.component.run_text_view.get_buffer())
 
+        self.component.run_abort_button.connect("clicked", self.run_abort_button_clicked)
+
         # wifi password
         self.component.wifi_password_switch.connect("state-set", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(state))
 
@@ -165,6 +167,9 @@ class Application:
             self.component.window.destroy()
             self.component.run_window.show()
             threading.Thread(target=target, daemon=True).start()
+
+    def run_abort_button_clicked(self, widget):
+        self.component.run_window.close()
 
 class ZimChooserWindow:
     def __init__(self, parent, zim_list_store):
