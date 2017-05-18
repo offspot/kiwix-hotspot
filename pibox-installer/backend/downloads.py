@@ -3,6 +3,7 @@ import urllib.request
 import posixpath
 import shutil
 from zipfile import ZipFile
+from . import reporthook
 
 class Downloader:
     _logger = None
@@ -13,7 +14,8 @@ class Downloader:
 
     def _download_and_extract(self, url, content):
         self._logger.step("download " + url)
-        (zip_filename, _) = urllib.request.urlretrieve(url, reporthook=self._logger.ReportHook().reporthook)
+        hook = reporthook.ReportHook(self._logger.raw_std).reporthook
+        (zip_filename, _) = urllib.request.urlretrieve(url, reporthook=hook)
 
         with ZipFile(zip_filename) as zipFile:
             for (zip_path, path) in content:

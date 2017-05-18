@@ -6,7 +6,6 @@ from backend import catalog
 from run_installation import run_installation
 from set_path import set_path
 from cancel import CancelEvent
-from reporthook import ReportHook
 
 class Logger:
     def step(step):
@@ -20,9 +19,6 @@ class Logger:
 
     def std(std):
         print(std)
-
-    def ReportHook():
-        return ReportHook(sys.stdout.write)
 
 set_path()
 

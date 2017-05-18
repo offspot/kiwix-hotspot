@@ -3,7 +3,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 from backend import catalog
 from run_installation import run_installation
-from reporthook import ReportHook
 from set_path import set_path
 import pytz
 import re
@@ -20,23 +19,20 @@ else:
     DATA_DIR = ""
 
 class Logger:
-    def write(text):
-        sys.stdout.write(text)
+    def __init__(self, text_buffer):
+        self.text_buffer = text_buffer
 
-    def step(step):
+    def step(self, step):
         print("\033[00;34m--> " + step + "\033[00m")
 
-    def err(err):
+    def err(self, err):
         print("\033[00;31m" + err + "\033[00m")
 
-    def raw_std(std):
+    def raw_std(self, std):
         sys.stdout.write(std)
 
-    def std(std):
+    def std(self, std):
         print(std)
-
-    def ReportHook():
-        return ReportHook(sys.stdout.write)
 
 class Component:
     def __init__(self, builder):
@@ -71,8 +67,7 @@ class Application:
         self.cancel_event = CancelEvent()
         self.component.run_window.connect("delete-event", Gtk.main_quit)
         self.component.run_window.connect("delete-event", self.run_install_cancel)
-        textbuffer = self.component.run_text_view.get_buffer()
-        textbuffer.insert_at_cursor("toto\n",5)
+        self.logger = Logger(self.component.run_text_view.get_buffer())
 
         # wifi password
         self.component.wifi_password_switch.connect("state-set", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(state))
@@ -163,7 +158,7 @@ class Application:
                         kalite=None,
                         zim_install=zim_install,
                         size=size,
-                        logger=Logger,
+                        logger=self.logger,
                         directory="build",
                         cancel_event=self.cancel_event)
 

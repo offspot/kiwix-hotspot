@@ -5,7 +5,7 @@ class ReportHook():
         self._last_line = None
         self._writter = writter
 
-    def reporthook (self, chunk, chunk_size, total_size):
+    def reporthook(self, chunk, chunk_size, total_size):
         if chunk != 0:
             self._current_size += chunk_size
 
