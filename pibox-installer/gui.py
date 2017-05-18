@@ -9,6 +9,8 @@ import pytz
 import re
 import os
 import sys
+import threading
+from cancel import CancelEvent
 
 set_path()
 
@@ -36,7 +38,7 @@ def validate_label(label, condition):
     else:
         label.modify_bg(Gtk.StateFlags.NORMAL, color_invalid)
 
-class ConfigurationWindow:
+class Application:
     def __init__(self, catalog):
         self.catalog = catalog
 
@@ -44,7 +46,14 @@ class ConfigurationWindow:
         builder.add_from_file(os.path.join(DATA_DIR, "ui.glade"))
 
         self.component = Component(builder)
+
         self.component.window.connect("delete-event", Gtk.main_quit)
+
+        self.cancel_event = CancelEvent()
+        self.component.run_window.connect("delete-event", Gtk.main_quit)
+        self.component.run_window.connect("delete-event", self.run_install_cancel)
+        textbuffer = self.component.run_text_view.get_buffer()
+        textbuffer.insert_at_cursor("toto\n",5)
 
         # wifi password
         self.component.wifi_password_switch.connect("state-set", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(state))
@@ -85,6 +94,9 @@ class ConfigurationWindow:
 
         self.component.window.show()
 
+    def run_install_cancel(self, widget, path):
+        self.cancel_event.signal_and_wait_consumed()
+
     def zim_choosen_filter_func(self, model, iter, data):
         return model[iter][8]
 
@@ -124,17 +136,21 @@ class ConfigurationWindow:
                 zim_install.append(zim[0])
 
         if all_valid:
+            def target():
+                run_installation(
+                        name=project_name,
+                        timezone=timezone,
+                        wifi_pwd=wifi_pwd,
+                        kalite=None,
+                        zim_install=zim_install,
+                        size=size,
+                        logger=Logger,
+                        directory="build",
+                        cancel_event=self.cancel_event)
+
             self.component.window.destroy()
-            Gtk.main_quit()
-            run_installation(
-                    name=project_name,
-                    timezone=timezone,
-                    wifi_pwd=wifi_pwd,
-                    kalite=None,
-                    zim_install=zim_install,
-                    size=size,
-                    logger=Logger,
-                    directory="build")
+            self.component.run_window.show()
+            threading.Thread(target=target, daemon=True).start()
 
 class ZimChooserWindow:
     def __init__(self, parent, zim_list_store):
@@ -186,5 +202,5 @@ class ZimChooserWindow:
         self.component.zim_list_store[path][8] = not self.component.zim_list_store[path][8]
 
 catalog = catalog.get_catalogs()
-ConfigurationWindow(catalog)
+Application(catalog)
 Gtk.main()

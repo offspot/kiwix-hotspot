@@ -35,4 +35,5 @@ run_installation(
         size=args.resize,
         logger=Logger,
         directory="build",
+        cancel_event=CancelEvent(),
         sd_card=args.sd)

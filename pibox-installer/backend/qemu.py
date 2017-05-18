@@ -52,8 +52,8 @@ class Emulator:
         self._image = image
         self._logger = logger
 
-    def run(self):
-        return _RunningInstance(self, self._logger)
+    def run(self, cancel_event):
+        return _RunningInstance(self, self._logger, cancel_event)
 
     def get_image_size(self):
         pipe_reader, pipe_writer = os.pipe()
@@ -103,10 +103,27 @@ class _RunningInstance:
     _qemu = None
     _client = None
     _logger = None
+    _qemu_lock = None
+    _cancel_event = None
 
-    def __init__(self, emulation, logger):
+    def cancel_management(self):
+        self._cancel_event.wait()
+        # we don't release the lock so we can't create another
+        # another process once cancel has been raised
+        self._qemu_lock.acquire()
+        if self._qemu is not None:
+            self._qemu.kill()
+        self._cancel_event.consume()
+
+    def __init__(self, emulation, logger, cancel_event):
         self._emulation = emulation
         self._logger = logger
+
+        self._qemu_lock = threading.Lock()
+        self._cancel_event = cancel_event
+        if not cancel_event.subscribe():
+            exit(0)
+        threading.Thread(target=self.cancel_management, daemon=True).start()
 
     def __enter__(self):
         try:
@@ -160,19 +177,20 @@ class _RunningInstance:
 
         self._logger.step("launch qemu with ssh on port {}".format(ssh_port))
 
-        self._qemu = subprocess.Popen([
-            qemu_system_arm_exe,
-            "-m", "1G",
-            "-M", "vexpress-a9",
-            "-kernel", self._emulation._kernel,
-            "-dtb", self._emulation._dtb,
-            "-append", "root=/dev/mmcblk0p2 console=ttyAMA0 console=tty",
-            "-serial", "stdio",
-            "-sd", self._emulation._image,
-            "-redir", "tcp:%d::22" % ssh_port,
-            "-display", "none",
-            "-no-reboot",
-            ], stdin=stdin_reader, stdout=stdout_writer, stderr=subprocess.STDOUT)
+        with self._qemu_lock:
+            self._qemu = subprocess.Popen([
+                qemu_system_arm_exe,
+                "-m", "1G",
+                "-M", "vexpress-a9",
+                "-kernel", self._emulation._kernel,
+                "-dtb", self._emulation._dtb,
+                "-append", "root=/dev/mmcblk0p2 console=ttyAMA0 console=tty",
+                "-serial", "stdio",
+                "-sd", self._emulation._image,
+                "-redir", "tcp:%d::22" % ssh_port,
+                "-display", "none",
+                "-no-reboot",
+                ], stdin=stdin_reader, stdout=stdout_writer, stderr=subprocess.STDOUT)
 
         self._wait_signal(stdout_reader, stdout_writer, b"login: ", timeout)
         os.write(stdin_writer, b"pi\n")

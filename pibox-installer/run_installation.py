@@ -3,7 +3,7 @@ from backend import ansiblecube
 from backend import qemu
 import os
 
-def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger, directory, sd_card=None):
+def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger, directory, cancel_event, sd_card=None):
     os.makedirs(directory, exist_ok=True)
     os.chdir(directory)
 
@@ -19,7 +19,7 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
 
     emulator.resize_image(size)
 
-    with emulator.run() as emulation:
+    with emulator.run(cancel_event) as emulation:
         emulation.resize_fs()
         ansiblecube.run(
                 machine=emulation,
