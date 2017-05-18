@@ -9,9 +9,6 @@ from cancel import CancelEvent
 from reporthook import ReportHook
 
 class Logger:
-    def write(text):
-        sys.stdout.write(text)
-
     def step(step):
         print("\033[00;34m--> " + step + "\033[00m")
 
