@@ -3,7 +3,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 from backend import catalog
 from run_installation import run_installation
-from logger import Logger
+from reporthook import ReportHook
 from set_path import set_path
 import pytz
 import re
@@ -18,6 +18,25 @@ if getattr(sys, "frozen", False):
     DATA_DIR = sys._MEIPASS
 else:
     DATA_DIR = ""
+
+class Logger:
+    def write(text):
+        sys.stdout.write(text)
+
+    def step(step):
+        print("\033[00;34m--> " + step + "\033[00m")
+
+    def err(err):
+        print("\033[00;31m" + err + "\033[00m")
+
+    def raw_std(std):
+        sys.stdout.write(std)
+
+    def std(std):
+        print(std)
+
+    def ReportHook():
+        return ReportHook(sys.stdout.write)
 
 class Component:
     def __init__(self, builder):
