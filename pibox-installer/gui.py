@@ -1,6 +1,6 @@
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk, Gdk, GLib
 from backend import catalog
 from run_installation import run_installation
 from set_path import set_path
@@ -23,16 +23,16 @@ class Logger:
         self.text_buffer = text_buffer
 
     def step(self, step):
-        print("\033[00;34m--> " + step + "\033[00m")
+        GLib.idle_add(self.text_buffer.insert_at_cursor, "\033[00;34m--> " + step + "\033[00m\n")
 
     def err(self, err):
-        print("\033[00;31m" + err + "\033[00m")
+        GLib.idle_add(self.text_buffer.insert_at_cursor, "\033[00;31m" + err + "\033[00m\n")
 
     def raw_std(self, std):
-        sys.stdout.write(std)
+        GLib.idle_add(self.text_buffer.insert_at_cursor, std)
 
     def std(self, std):
-        print(std)
+        GLib.idle_add(self.text_buffer.insert_at_cursor, std + "\n")
 
 class Component:
     def __init__(self, builder):
