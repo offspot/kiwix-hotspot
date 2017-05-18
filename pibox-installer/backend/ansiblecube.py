@@ -41,9 +41,10 @@ def run(machine, name, timezone, wifi_pwd, kalite, zim_install):
         }
     }}
 
-    facts_path = "/etc/ansible/facts.d"
+    facts_dir = "/etc/ansible/facts.d"
+    facts_path = facts_dir + "/device_list.fact"
 
-    machine.exec_cmd("sudo mkdir --mode 0755 -p %s" % facts_path)
+    machine.exec_cmd("sudo mkdir --mode 0755 -p %s" % facts_dir)
     machine.write_file(facts_path, json.dumps(device_list, indent=4))
 
     extra_vars = "ideascube_project_name=%s" % name
