@@ -5,7 +5,6 @@ from backend import catalog
 from run_installation import run_installation
 from set_path import set_path
 import pytz
-import re
 import os
 import sys
 import threading
