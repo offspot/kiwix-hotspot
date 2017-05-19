@@ -19,20 +19,40 @@ else:
     DATA_DIR = ""
 
 class Logger:
-    def __init__(self, text_buffer):
+    def __init__(self, text_buffer, step_label):
         self.text_buffer = text_buffer
+        self.step_label = step_label
+        self.step_tag = text_buffer.create_tag("step", foreground="blue")
+        self.err_tag = text_buffer.create_tag("err", foreground="red")
 
     def step(self, step):
-        GLib.idle_add(self.text_buffer.insert_at_cursor, "\033[00;34m--> " + step + "\033[00m\n")
+        GLib.idle_add(self.main_thread_step, step)
 
     def err(self, err):
-        GLib.idle_add(self.text_buffer.insert_at_cursor, "\033[00;31m" + err + "\033[00m\n")
+        GLib.idle_add(self.main_thread_err, err)
 
     def raw_std(self, std):
-        GLib.idle_add(self.text_buffer.insert_at_cursor, std)
+        GLib.idle_add(self.main_thread_raw_std, std)
 
     def std(self, std):
-        GLib.idle_add(self.text_buffer.insert_at_cursor, std + "\n")
+        GLib.idle_add(self.main_thread_std, std)
+
+    def main_thread_step(self, text):
+        text_iter = self.text_buffer.get_iter_at_offset(-1)
+        self.text_buffer.insert_with_tags(text_iter, text + "\n", self.step_tag)
+        self.step_label.set_text("Step : " + text)
+
+    def main_thread_err(self, text):
+        text_iter = self.text_buffer.get_iter_at_offset(-1)
+        self.text_buffer.insert_with_tags(text_iter, text + "\n", self.err_tag)
+
+    def main_thread_raw_std(self, text):
+        text_iter = self.text_buffer.get_iter_at_offset(-1)
+        self.text_buffer.insert(text_iter, text)
+
+    def main_thread_std(self, text):
+        text_iter = self.text_buffer.get_iter_at_offset(-1)
+        self.text_buffer.insert(text_iter, text + "\n")
 
 class Component:
     def __init__(self, builder):
@@ -72,7 +92,7 @@ class Application:
         self.cancel_event = CancelEvent()
         self.component.run_window.connect("delete-event", Gtk.main_quit)
         self.component.run_window.connect("delete-event", self.run_install_cancel)
-        self.logger = Logger(self.component.run_text_view.get_buffer())
+        self.logger = Logger(self.component.run_text_view.get_buffer(), self.component.run_step_label)
 
         self.component.run_abort_done_button.connect("clicked", self.run_abort_done_button_clicked)
 
