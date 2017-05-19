@@ -32,5 +32,6 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
     if sd_card:
         emulator.copy_image(sd_card)
 
+    logger.step("done")
     if done_callback:
         done_callback()
