@@ -57,6 +57,7 @@ class Emulator:
 
     def get_image_size(self):
         pipe_reader, pipe_writer = os.pipe()
+        # TODO: do not use pip, use check_output instead
         subprocess.check_call([qemu_img_exe, "info", "-f", "raw", self._image], stdout=pipe_writer)
         pipe_reader = os.fdopen(pipe_reader)
         pipe_reader.readline()
