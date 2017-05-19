@@ -1,4 +1,4 @@
-# Set start and stop service to 300s instead of 90s
+# Set start and stop service to 1200s instead of 90s
 
 system_conf="""#  This file is part of systemd.
 #
@@ -34,8 +34,8 @@ system_conf="""#  This file is part of systemd.
 #DefaultTimerAccuracySec=1min
 #DefaultStandardOutput=journal
 #DefaultStandardError=inherit
-DefaultTimeoutStartSec=300s
-DefaultTimeoutStopSec=300s
+DefaultTimeoutStartSec=1200s
+DefaultTimeoutStopSec=1200s
 #DefaultRestartSec=100ms
 #DefaultStartLimitIntervalSec=10s
 #DefaultStartLimitBurst=5
@@ -86,8 +86,8 @@ user_conf="""#  This file is part of systemd.
 #DefaultTimerAccuracySec=1min
 #DefaultStandardOutput=inherit
 #DefaultStandardError=inherit
-DefaultTimeoutStartSec=300s
-DefaultTimeoutStopSec=300s
+DefaultTimeoutStartSec=1200s
+DefaultTimeoutStopSec=1200s
 #DefaultRestartSec=100ms
 #DefaultStartLimitIntervalSec=10s
 #DefaultStartLimitBurst=5
