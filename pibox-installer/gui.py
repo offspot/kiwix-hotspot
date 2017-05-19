@@ -235,12 +235,6 @@ class ZimChooserWindow:
         column_text = Gtk.TreeViewColumn("Description", renderer_text, text=3)
         self.component.zim_tree_view.append_column(column_text)
 
-        self.component.zim_language_list_store.append(["all"])
-        renderer = Gtk.CellRendererText()
-        self.component.zim_language_combobox.pack_start(renderer, True)
-        self.component.zim_language_combobox.add_attribute(renderer, "text", 0)
-        self.component.zim_language_combobox.set_active(0)
-
         self.component.zim_window.set_transient_for(parent)
         self.component.zim_window.set_modal(True)
         self.component.zim_window.set_default_size(1280, 800)
