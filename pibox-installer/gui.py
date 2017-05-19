@@ -203,7 +203,7 @@ class Application:
     def installation_done(self):
         self.component.done_window.show()
         self.component.run_abort_done_button.set_label("Close")
-        #TODO change abort label to close
+        self.component.run_spinner.stop()
 
 class ZimChooserWindow:
     def __init__(self, parent, zim_list_store):
