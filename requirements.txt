@@ -1,6 +1,7 @@
 asn1crypto==0.22.0
 cffi==1.10.0
 cryptography==1.8.1
+dbus-python==1.2.4
 idna==2.5
 packaging==16.8
 paramiko==2.1.2

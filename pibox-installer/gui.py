@@ -9,6 +9,7 @@ import os
 import sys
 import threading
 from cancel import CancelEvent
+import sd_card_list
 
 set_path()
 
@@ -106,6 +107,18 @@ class Application:
         self.component.timezone_combobox.pack_start(renderer, True)
         self.component.timezone_combobox.add_attribute(renderer, "text", 0)
 
+        # disk
+        types = [info["typ"] for info in sd_card_list.informations]
+        self.component.sd_card_list_store = Gtk.ListStore(*types)
+        self.component.sd_card_combobox.set_model(self.component.sd_card_list_store)
+
+        for counter, _ in enumerate(filter(lambda info: info["show"], sd_card_list.informations)):
+            info = Gtk.CellRendererText()
+            self.component.sd_card_combobox.pack_start(info, True)
+            self.component.sd_card_combobox.add_attribute(info, "text", counter)
+
+        self.refresh_disk_list()
+
         # zim content
         self.component.zim_choose_content_button.connect("clicked", self.zim_choose_content_button_clicked)
         self.component.run_installation_button.connect("clicked", self.run_installation_button_clicked)
@@ -133,6 +146,11 @@ class Application:
         self.component.zim_choosen_tree_view.append_column(column_text)
 
         self.component.window.show()
+
+    def refresh_disk_list(self):
+        for device in sd_card_list.get_list():
+            items = [info["typ"](device[info["name"]]) for info in sd_card_list.informations]
+            self.component.sd_card_list_store.append(items)
 
     def run_install_cancel(self, widget, path):
         self.cancel_event.signal_and_wait_consumed()

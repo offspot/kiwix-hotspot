@@ -496,12 +496,6 @@
       </object>
     </child>
   </object>
-  <object class="GtkListStore" id="zim_language_list_store">
-    <columns>
-      <!-- column-name language -->
-      <column type="gchararray"/>
-    </columns>
-  </object>
   <object class="GtkWindow" id="zim_window">
     <property name="can_focus">False</property>
     <child>
