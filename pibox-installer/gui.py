@@ -95,6 +95,7 @@ class Application:
         self.logger = Logger(self.component.run_text_view.get_buffer(), self.component.run_step_label)
 
         self.component.run_abort_done_button.connect("clicked", self.run_abort_done_button_clicked)
+        self.component.run_copy_log_to_clipboard_button.connect("clicked", self.run_copy_log_to_clipboard_button_clicked)
 
         # wifi password
         self.component.wifi_password_switch.connect("state-set", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(state))
@@ -213,6 +214,14 @@ class Application:
 
     def run_abort_done_button_clicked(self, widget):
         self.component.run_window.close()
+
+    def run_copy_log_to_clipboard_button_clicked(self, widget):
+        text_buffer = self.component.run_text_view.get_buffer()
+        start = text_buffer.get_iter_at_offset(0)
+        end = text_buffer.get_iter_at_offset(-1)
+        hidden = True
+        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        clipboard.set_text(text_buffer.get_text(start, end, hidden), -1)
 
     def done_window_ok_button_clicked(self, widget):
         self.component.done_window.close()
