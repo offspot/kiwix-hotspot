@@ -3,6 +3,11 @@ import subprocess
 import os
 import re
 
+def get_device_index():
+    for index, info in enumerate(informations):
+        if info["name"] == "device":
+            return index
+
 if sys.platform == "linux":
     import dbus
     import operator

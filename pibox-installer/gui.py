@@ -199,6 +199,13 @@ class Application:
             if zim[8]:
                 zim_install.append(zim[0])
 
+        sd_card_id = self.component.sd_card_combobox.get_active()
+        if sd_card_id == -1:
+            sd_card = None
+        else:
+            device_index = sd_card_list.get_device_index()
+            sd_card = self.component.sd_card_list_store[sd_card_id][device_index]
+
         if all_valid:
             def target():
                 run_installation(
@@ -211,6 +218,7 @@ class Application:
                         logger=self.logger,
                         directory="build",
                         cancel_event=self.cancel_event,
+                        sd_card=sd_card,
                         done_callback=lambda : GLib.idle_add(self.installation_done))
 
             self.component.window.destroy()
