@@ -75,8 +75,15 @@ class Emulator:
     def copy_image(self, device_name):
         self._logger.step("copy image to sd card")
 
-        image = os.open(self._image, os.O_RDONLY)
-        device = os.open(device_name, os.O_WRONLY)
+        if os.name == "posix":
+            image = os.open(self._image, os.O_RDONLY)
+            device = os.open(device_name, os.O_WRONLY)
+        elif os.name == "nt":
+            image = os.open(self._image, os.O_RDONLY | os.O_BINARY)
+            device = os.open(device_name, os.O_WRONLY | os.O_BINARY)
+        else:
+            self._logger.err("platform not supported")
+            return
 
         total_size = os.lseek(image, 0, os.SEEK_END)
         os.lseek(image, 0, os.SEEK_SET)
