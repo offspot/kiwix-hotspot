@@ -2,6 +2,7 @@ import sys
 import subprocess
 import os
 import re
+from size_converter import human_readable_size
 
 def get_device_index():
     for index, info in enumerate(informations):
@@ -33,11 +34,13 @@ if sys.platform == "linux":
             if info.get('IdUsage') == "" and info.get('Drive') != "/":
                 device = bytes(info.get('PreferredDevice')).decode('utf-8')
 
+                size = info.get('Size')
+                formatted_size = human_readable_size(size)
                 devices.append({
                         "key": key,
                         "device": device,
-                        "size": info.get('Size'),
-                        "formatted_size": info.get('Size'),
+                        "size": size,
+                        "formatted_size": formatted_size,
                         "id_label": info.get('IdLabel'),
                         "drive_key": info.get('Drive'),
                         "id": info.get('Id'),
@@ -79,6 +82,8 @@ elif sys.platform == "darwin":
 
         for name in device_names:
             plist = plistlib.loads(subprocess.check_output(["diskutil", "info", "-plist", name]))
+            size = plist["Size"]
+            formatted_size = human_readable_size(size)
             devices.append({
                 "bus_protocol": plist["BusProtocol"],
                 "device_identifier": plist["DeviceIdentifier"],
@@ -87,8 +92,8 @@ elif sys.platform == "darwin":
                 "media_type": plist["MediaType"],
                 "removable": plist["Removable"],
                 "device": name,
-                "size": plist["Size"],
-                "formatted_size": plist["Size"],
+                "size": size,
+                "formatted_size": formatted_size,
                 "volume_name": plist["VolumeName"],
                 })
 
@@ -120,6 +125,8 @@ elif sys.platform == "win32":
         devices = []
         lines.pop(0)
         for line in filter(lambda l: len(l) is not 0, lines):
+            size = extract_field(column["Size"], line)
+            formatted_size = human_readable_size(size)
             devices.append({
                 "caption": extract_field(column["Caption"], line),
                 "description": extract_field(column["Description"], line),
@@ -127,8 +134,8 @@ elif sys.platform == "win32":
                 "media_type": extract_field(column["MediaType"], line),
                 "model": extract_field(column["Model"], line),
                 "name": extract_field(column["Name"], line),
-                "size": extract_field(column["Size"], line),
-                "formatted_size": extract_field(column["Size"], line),
+                "size": size,
+                "formatted_size": formatted_size,
                 })
 
         return filter(lambda d: d["media_type"] != "Fixed hard disk media", devices)

@@ -10,6 +10,7 @@ import sys
 import threading
 from cancel import CancelEvent
 import sd_card_list
+from size_converter import human_readable_size
 
 set_path()
 
@@ -132,7 +133,7 @@ class Application:
                 name = value["name"]
                 url = value["url"]
                 description = value.get("description") or "none"
-                size = str(value["size"])
+                size = human_readable_size(int(value["size"]))
                 language = value.get("language") or "none"
                 typ = value["type"]
                 version = str(value["version"])
