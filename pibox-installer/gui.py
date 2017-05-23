@@ -119,6 +119,7 @@ class Application:
             self.component.sd_card_combobox.add_attribute(info, "text", counter)
 
         self.refresh_disk_list()
+        self.component.sd_card_refresh_button.connect("clicked", self.sd_card_refresh_button_clicked)
 
         # zim content
         self.component.zim_choose_content_button.connect("clicked", self.zim_choose_content_button_clicked)
@@ -148,7 +149,11 @@ class Application:
 
         self.component.window.show()
 
+    def sd_card_refresh_button_clicked(self, button):
+        self.refresh_disk_list()
+
     def refresh_disk_list(self):
+        self.component.sd_card_list_store.clear()
         for device in sd_card_list.get_list():
             items = [info["typ"](device[info["name"]]) for info in sd_card_list.informations]
             self.component.sd_card_list_store.append(items)
