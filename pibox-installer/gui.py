@@ -127,6 +127,7 @@ class Application:
         self.component.run_installation_button.connect("clicked", self.run_installation_button_clicked)
 
         self.component.zim_list_store = Gtk.ListStore(str, str, str, str, str, str, str, str, bool);
+        self.component.zim_list_store.set_sort_column_id(0, Gtk.SortType.ASCENDING)
 
         for one_catalog in catalog:
             for (key, value) in one_catalog["all"].items():
