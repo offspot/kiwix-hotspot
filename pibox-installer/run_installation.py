@@ -21,6 +21,7 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
 
     with emulator.run(cancel_event) as emulation:
         emulation.resize_fs()
+        logger.step("run ansiblecube")
         ansiblecube.run(
                 machine=emulation,
                 name=name,
