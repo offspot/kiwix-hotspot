@@ -47,7 +47,7 @@ create a virtual a virtual environment that includes pygobject: `python3 -m venv
 
 activate the environment
 
-install pip dependencies: `pip3 install -r requirements.txt`
+install pip dependencies: `pip3 install -r requirements-PLATFORM.txt`
 
 run GUI application: `python3 pibox-installer`
 

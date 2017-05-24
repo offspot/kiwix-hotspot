@@ -18,10 +18,8 @@ dir C:\Python34\Lib\site-packages\gi
 C:\msys64\usr\bin\bash --login -c "pacman -S mingw-w64-x86_64-gdk-pixbuf2 --noconfirm"
 set PATH=%PATH%;C:\msys64\mingw64\bin
 
-
 C:\Python34\python.exe -m pip install pyinstaller
-C:\Python34\python.exe -m pip install -r requirements.txt
-
+C:\Python34\python.exe -m pip install -r requirements-windows.txt
 
 mkdir "C:\Program Files\qemu"
 cd "C:\Program Files\qemu"
@@ -29,3 +27,9 @@ appveyor DownloadFile "https://qemu.weilnetz.de/w64/2017/qemu-w64-setup-20170418
 7z x qemu-w64-setup.exe
 cd "C:\projects\pibox-installer"
 dir "C:\Program Files\qemu\"
+
+
+
+
+C:\Python34\python.exe C:\Python34\Scripts\pyinstaller-script.py pibox-installer-windows.spec
+type build\pibox-installer-windows\warnpibox-installer-windows.txt

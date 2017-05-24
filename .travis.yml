@@ -1,5 +1,5 @@
-language: python
-python: 3.5
+# language: python
+# python: 3.5
 # dist: trusty
 # sudo: required
 # addons:
@@ -12,7 +12,7 @@ os:
     osx
 install:
     - brew install qemu
-    - pip3 install -r requirements.txt
     - brew install pygobject3 --with-python3 gtk+3
-    - pip3 install pyinstaller
-    - pyinstaller piboxbox-installer-macos.spec
+    - python3 -m pip install -r requirements-macos.txt
+    - python3 -m pip install pyinstaller
+    - pyinstaller pibox-installer-macos.spec
