@@ -18,16 +18,6 @@ TODO
 
 TODO
 
-## GUI usage
-
-launch the application
-
-run the installation
-
-then the image is available in build directory
-
-you will have to copy the image to the sd card and plug it into your raspberrypi.
-
 ## CLI usage
 
 show help: `pibox-installer-cli -h`
@@ -42,22 +32,28 @@ build your image with for example
 
   **warning**: you need write priviledge for the device
 
-## Run it from source
+## Run pibox-installer from source
 
-you can read build for xxx to get help setting the environment
+you can read package pibox-installer to get help setting the environment
 
-dependencies:
+install dependencies:
 
 * [python3](https://www.python.org/downloads/)
 * [qemu](http://www.qemu.org/download/)
-* [pygobject](https://pygobject.readthedocs.io/en/latest/getting_started.html) (for GUI application)
+* [pygobject](https://pygobject.readthedocs.io/en/latest/getting_started.html),
+  on windows you can also install it using [pygi-aio](https://sourceforge.net/projects/pygobjectwin32/)
+
+create a virtual a virtual environment that includes pygobject: `python3 -m venv --system-site-packages my_venv`
+
+activate the environment
 
 install pip dependencies: `pip3 install -r requirements.txt`
 
-run GUI application: `python3 pibox-installer/gui.py`
+run GUI application: `python3 pibox-installer`
+
 run CLI application: `python3 pibox-installer/cli.py`
 
-## Build pibox-installer vexpress boot
+## Build pibox-installer-vexpress-boot
 
 pibox-installer download a linux kernel for the QEMU emulation of vexpress machine.
 This vexpress boot can be compiled on linux using make-vexpress-boot python3 script.
@@ -66,9 +62,9 @@ requirements: `gcc-arm-linux-gnueabihf` and `zip`
 
 run: `python3 make-vexpress-boot`
 
-## Build for windows
+## Package pibox-installer
 
-on windows:
+### Windows
 
 * install msys2 and inside run `pacman -S mingw-w64-x86_64-gdk-pixbuf2`
 * add msys64\mingw64\bin to PATH
@@ -88,9 +84,7 @@ the script used in appveyor is `appveyor.bk`
 
 note: we don't msys2 to install pygobject because pyinstaller fails to install on msys2
 
-## Build for macos
-
-on macos:
+### Macos
 
 * install homebrew: https://brew.sh/
 * install python3.5 with zoidbergwill formula: https://github.com/zoidbergwill/homebrew-python
@@ -101,7 +95,7 @@ on macos:
 * download pibox-installer repository and run:
   `pyinstaller pibox-installer-macos.spec`
 
-## Build for linux
+### Linux
 
 TODO
 
