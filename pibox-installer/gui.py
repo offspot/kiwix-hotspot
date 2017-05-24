@@ -191,7 +191,7 @@ class Application:
         validate_label(self.component.size_label, condition)
         all_valid = all_valid and condition
 
-        if self.component.wifi_password_switch.get_state:
+        if self.component.wifi_password_switch.get_state():
             wifi_pwd = self.component.wifi_password_entry.get_text()
         else:
             wifi_pwd = None
