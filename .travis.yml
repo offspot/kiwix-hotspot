@@ -8,10 +8,10 @@
 #             qemu
 #             qemu-system-arm
 #             gcc-arm-linux-gnueabihf
-os:
-    osx
+language: generic
+os: osx
 install:
-    - brew install qemu
+    - brew install qemu zoidbergwill/python/python35
     - brew install pygobject3 --with-python3 gtk+3
     - python3 -m pip install -r requirements-macos.txt
     - python3 -m pip install pyinstaller
