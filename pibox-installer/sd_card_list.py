@@ -11,7 +11,6 @@ def get_device_index():
 
 if sys.platform == "linux":
     import dbus
-    import operator
 
     informations = [
             {"name": "device", "show": True, "typ": str},
