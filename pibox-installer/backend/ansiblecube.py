@@ -3,8 +3,8 @@ import json
 
 # machine must provide write_file and exec_cmd functions
 def run(machine, name, timezone, wifi_pwd, kalite, zim_install):
-    machine.write_file("/etc/systemd/system.conf", systemd.system_conf)
-    machine.write_file("/etc/systemd/user.conf", systemd.user_conf)
+    # machine.write_file("/etc/systemd/system.conf", systemd.system_conf)
+    # machine.write_file("/etc/systemd/user.conf", systemd.user_conf)
 
     machine.exec_cmd("sudo apt-get update")
     machine.exec_cmd("sudo apt-get install -y python-pip git python-dev libffi-dev libssl-dev gnutls-bin")
