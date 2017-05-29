@@ -27,17 +27,17 @@ def run(machine, name, timezone, wifi_pwd, kalite, zim_install):
     package_management = [{"name": x, "status": "present"} for x in zim_install]
     device_list = {hostname: {
         "kalite": {
-            "activated": kalite != None,
+            "activated": str(kalite != None),
             "version": "0.16.9",
             "language": kalite or [],
         },
         "idc_import": {
-            "activated": False,
+            "activated": "False",
             "content_name": [],
         },
         "package_management": package_management,
         "portal": {
-            "activated": True,
+            "activated": "True",
         }
     }}
 
