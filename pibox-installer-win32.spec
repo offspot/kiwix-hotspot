@@ -2,7 +2,6 @@
 
 block_cipher = None
 
-
 a = Analysis(['pibox-installer/__main__.py'],
              pathex=['.'],
              binaries=[('C:\Program Files\qemu\qemu-system-arm.exe', '.'),
@@ -18,7 +17,7 @@ a = Analysis(['pibox-installer/__main__.py'],
                        ('C:\Program Files\qemu\libmenuw6.dll', '.'),
                        ('C:\Program Files\qemu\libssh2-1.dll', '.'),
                        ('C:\Program Files\qemu\libatk-1.0-0.dll', '.'),
-                       ('C:\Program Files\qemu\libgcc_s_seh-1.dll', '.'),
+                       ('C:\Program Files\qemu\libgcc_s_sjlj-1.dll', '.'),
                        ('C:\Program Files\qemu\libgthread-2.0-0.dll', '.'),
                        ('C:\Program Files\qemu\libncurses++w6.dll', '.'),
                        ('C:\Program Files\qemu\libstdc++-6.dll', '.'),

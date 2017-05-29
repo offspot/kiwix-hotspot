@@ -78,7 +78,8 @@ run: `python3 make-vexpress-boot`
 * install qemu from http://www.qemu.org/download/
 * install pyinstaller with pypi
 * download pibox-installer repository and run:
-  `"C:\Python34\python.exe" "C:\Python34\Scripts\pyinstaller-script.py" pibox-installer-windows.spec`
+  `"C:\Python34\python.exe" "C:\Python34\Scripts\pyinstaller-script.py" pibox-installer-win64.spec`
+  or `"C:\Python34\python.exe" "C:\Python34\Scripts\pyinstaller-script.py" pibox-installer-win32.spec`
 
 the script used in appveyor is `appveyor.bk`
 
