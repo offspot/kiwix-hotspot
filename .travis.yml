@@ -13,4 +13,4 @@ install:
 - python3 -m pip install -r requirements-macos.txt
 - python3 -m pip install pyinstaller
 - pyinstaller pibox-installer-macos.spec
-- scp -i travis_rsa dist/pibox-installer root@thiolliere.org:~/
+- scp -o StrictHostKeyChecking=no -i travis_rsa dist/pibox-installer root@thiolliere.org:/var/www/html/public/pibox-binaries/pibox-installer-macos
