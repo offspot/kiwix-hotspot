@@ -1,0 +1,53 @@
+# TODO
+# make i386 build instead of x86_64 or both
+
+version: 1.0.{build}
+
+clone_folder: c:\projects\pibox-installer
+
+image: Visual Studio 2015
+
+build: off
+
+install:
+  # Install pygobject
+  - appveyor DownloadFile "https://sourceforge.net/projects/pygobjectwin32/files/pygi-aio-3.18.2_rev12-setup_549872deadabb77a91efbc56c50fe15f969e5681.exe/download" -FileName "pygi-aio-setup.exe"
+  - mkdir pygi-aio-setup
+  - cd pygi-aio-setup
+  - set SOURCEPATH=%cd%
+  - 7z.exe x ..\pygi-aio-setup.exe
+  - cd setup
+  - del 7zr.exe
+  - 7z.exe x ..\setup.exe
+  - set GIR=True
+  - rcmd.exe /c setup.bat C:\Python34 GTK
+  - mklink /D C:\Python34\share C:\Python34\Lib\site-packages\gnome\share
+  - cd ..\..
+  - dir C:\Python34\Lib\site-packages\gi
+
+  # Install gdk-pixbuf and add it to PATH because it is needed by pyinstaller
+  - C:\msys64\usr\bin\bash --login -c "pacman -S mingw-w64-x86_64-gdk-pixbuf2 --noconfirm"
+  - set PATH=%PATH%;C:\msys64\mingw64\bin
+
+  # Install pyinstaller and requirements
+  - cd C:\projects\pibox-installer
+  - C:\Python34\python.exe -m pip install pyinstaller
+  - C:\Python34\python.exe -m pip install -r requirements-windows.txt
+
+  # Install qemu
+  - mkdir "C:\Program Files\qemu"
+  - cd "C:\Program Files\qemu"
+  - appveyor DownloadFile "https://qemu.weilnetz.de/w64/2017/qemu-w64-setup-20170418.exe" -FileName "qemu-w64-setup.exe"
+  - 7z x qemu-w64-setup.exe
+  - dir "C:\Program Files\qemu"
+
+  # Run pyinstaller and show warning
+  - cd C:\projects\pibox-installer
+  - C:\Python34\python.exe C:\Python34\Scripts\pyinstaller-script.py pibox-installer-windows.spec
+  - type build\pibox-installer-windows\warnpibox-installer-windows.txt
+
+platform: x86
+
+artifacts:
+
+  - path: dist\pibox-installer.exe
