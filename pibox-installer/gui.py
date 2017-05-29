@@ -92,6 +92,7 @@ class Application:
 
         self.cancel_event = CancelEvent()
         self.component.run_window.connect("delete-event", Gtk.main_quit)
+        self.component.run_window.set_default_size(640, 480)
         self.component.run_window.connect("delete-event", self.run_install_cancel)
         self.logger = Logger(self.component.run_text_view.get_buffer(), self.component.run_step_label)
 
