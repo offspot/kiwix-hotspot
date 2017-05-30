@@ -16,9 +16,11 @@ matrix:
     - scp -o StrictHostKeyChecking=no -i travis_rsa dist/pibox-installer root@thiolliere.org:/var/www/html/public/pibox-binaries/pibox-installer-macos
   - os: linux
     language: python
-    python: 3.5
+    python: 3.4
     dist: trusty
     sudo: required
+    virtualenv:
+      system_site_packages: true
     addons:
       apt:
         packages:
@@ -26,10 +28,12 @@ matrix:
           qemu-system-arm
           python3-gi
           python3-gi-cairo
+          python3-cairo
           gir1.2-gtk-3.0
-          python3-dbus
+          libdbus-1-dev
+          libdbus-glib-1-dev
     install:
-    - pip install -r requirements-linux.txt
-    - pip install pyinstaller
+    - pip3 install -r requirements-linux.txt
+    - pip3 install https://github.com/pyinstaller/pyinstaller/archive/develop.zip
     - pyinstaller pibox-installer-linux.spec
     - scp -o StrictHostKeyChecking=no -i travis_rsa dist/pibox-installer root@thiolliere.org:/var/www/html/public/pibox-binaries/pibox-installer-linux
