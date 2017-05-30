@@ -12,7 +12,9 @@ Inside the emulator it builds ideascube with ansiblecube.
 
 ### GUI application
 
-TODO
+temporarily hosted [there](https://thiolliere.org/public/pibox-binaries)
+
+note: for linux you have to run it from source
 
 ### CLI application
 
@@ -99,8 +101,6 @@ note: we don't msys2 to install pygobject because pyinstaller fails to install o
 ### Linux
 
 TODO
-
-note: on debian install the `libgirepository1.0-dev` for pyinstaller for finding gir
 
 ## License
 
