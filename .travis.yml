@@ -36,3 +36,5 @@ matrix:
     - pip3 install https://github.com/pyinstaller/pyinstaller/archive/develop.zip
     - pyinstaller pibox-installer-linux.spec
     - scp -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-linux
+
+    script:
