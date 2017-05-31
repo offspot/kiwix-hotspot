@@ -184,14 +184,6 @@ class Application:
         validate_label(self.component.timezone_label, condition)
         all_valid = all_valid and condition
 
-        try:
-            size = int(self.component.size_entry.get_text())
-        except:
-            size = 0
-        condition = size > 0
-        validate_label(self.component.size_label, condition)
-        all_valid = all_valid and condition
-
         if self.component.wifi_password_switch.get_state():
             wifi_pwd = self.component.wifi_password_entry.get_text()
         else:
@@ -202,12 +194,27 @@ class Application:
             if zim[8]:
                 zim_install.append(zim[0])
 
-        sd_card_id = self.component.sd_card_combobox.get_active()
-        if sd_card_id == -1:
-            sd_card = None
+        if self.component.output_stack.get_visible_child_name() == "sd_card":
+            sd_card_id = self.component.sd_card_combobox.get_active()
+            condition = sd_card_id != -1
+            validate_label(self.component.sd_card_label, condition)
+            all_valid = all_valid and condition
+
+            if sd_card_id == -1:
+                sd_card = None
+            else:
+                device_index = sd_card_list.get_device_index()
+                sd_card = self.component.sd_card_list_store[sd_card_id][device_index]
+            output_file = False
+            size = self.get_output_size()
         else:
-            device_index = sd_card_list.get_device_index()
-            sd_card = self.component.sd_card_list_store[sd_card_id][device_index]
+            sd_card = None
+            output_file = True
+            size = self.get_output_size()
+
+            condition = size > 0
+            validate_label(self.component.size_label, condition)
+            all_valid = all_valid and condition
 
         if all_valid:
             def target():
@@ -219,14 +226,31 @@ class Application:
                         zim_install=zim_install,
                         size=size,
                         logger=self.logger,
-                        directory="build",
                         cancel_event=self.cancel_event,
                         sd_card=sd_card,
+                        output_file=output_file,
                         done_callback=lambda : GLib.idle_add(self.installation_done))
 
             self.component.window.destroy()
             self.component.run_window.show()
             threading.Thread(target=target, daemon=True).start()
+
+
+    def get_output_size(self):
+        if self.component.output_stack.get_visible_child_name() == "sd_card":
+            sd_card_id = self.component.sd_card_combobox.get_active()
+            if sd_card_id == -1:
+                size = -1
+            else:
+                get_size_index = sd_card_list.get_size_index()
+                size = self.component.sd_card_list_store[sd_card_id][get_size_index]
+        else:
+            try:
+                size = int(self.component.size_entry.get_text())
+            except:
+                size = -1
+
+        return size
 
     def run_abort_done_button_clicked(self, widget):
         self.component.run_window.close()

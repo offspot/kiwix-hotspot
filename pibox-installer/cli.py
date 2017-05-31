@@ -47,6 +47,6 @@ run_installation(
         zim_install=args.zim_install,
         size=args.resize,
         logger=Logger,
-        directory="build",
         cancel_event=CancelEvent(),
-        sd_card=args.sd)
+        sd_card=args.sd,
+        output_file=not args.sd)

@@ -9,6 +9,11 @@ def get_device_index():
         if info["name"] == "device":
             return index
 
+def get_size_index():
+    for index, info in enumerate(informations):
+        if info["name"] == "size":
+            return index
+
 if sys.platform == "linux":
     import dbus
 
