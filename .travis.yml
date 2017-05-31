@@ -1,6 +1,6 @@
 before_install:
 - openssl aes-256-cbc -K $encrypted_af8ee76d875e_key -iv $encrypted_af8ee76d875e_iv -in pibox_installer_ci_rsa.travis_enc -out pibox_installer_ci_rsa -d
-- chmod 600 travis_rsa
+- chmod 600 pibox_installer_ci_rsa
 
 matrix:
   include:
