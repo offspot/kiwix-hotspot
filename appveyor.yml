@@ -17,7 +17,7 @@ environment:
 install:
   # decrypt certificate
   - nuget install secure-file -ExcludeVersion
-  - secure-file\tools\secure-file -decrypt pibox_installer_ci_rsa.appveyor_enc -secret %certificate_secret%
+  - secure-file\tools\secure-file -decrypt pibox_installer_ci_rsa.appveyor_enc -secret %certificate_secret% -out pibox_installer_ci_rsa
 
   # Install pygobject
   - appveyor DownloadFile "https://sourceforge.net/projects/pygobjectwin32/files/pygi-aio-3.18.2_rev12-setup_549872deadabb77a91efbc56c50fe15f969e5681.exe/download" -FileName "pygi-aio-setup.exe"
