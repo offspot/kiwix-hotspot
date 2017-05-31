@@ -61,8 +61,8 @@ install:
   - if %platform%==x64 type build\pibox-installer-win64\warnpibox-installer-win64.txt
 
   # Deploy
-  - if %platform%==x86 C:\msys64\usr\bin\scp.exe -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer-win32.exe pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-win32.exe
-  - if %platform%==x64 C:\msys64\usr\bin\scp.exe -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer-win64.exe pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-win64.exe
+  - if %platform%==x86 C:\msys64\usr\bin\scp.exe -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer.exe pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-win32.exe
+  - if %platform%==x64 C:\msys64\usr\bin\scp.exe -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer.exe pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-win64.exe
 
 artifacts:
 
