@@ -10,7 +10,15 @@ platform:
   - x86
   - x64
 
+environment:
+  certificate_secret:
+    secure: /Ephvg5HQQLR0IJmmeBGGpEww+93XqAMjdGAJKZyWsNeNCarAjvBDgcNBO/K1CWzwxpvty5sM0dZiWCFXt9kZcmU8vCPIYjwJE1B5Q5/mAQ=
+
 install:
+  # decrypt certificate
+  - nuget install secure-file -ExcludeVersion
+  - secure-file\tools\secure-file -decrypt pibox_installer_ci_rsa.appveyor_enc -secret %certificate_secret%
+
   # Install pygobject
   - appveyor DownloadFile "https://sourceforge.net/projects/pygobjectwin32/files/pygi-aio-3.18.2_rev12-setup_549872deadabb77a91efbc56c50fe15f969e5681.exe/download" -FileName "pygi-aio-setup.exe"
   - mkdir pygi-aio-setup
@@ -51,6 +59,10 @@ install:
   - if %platform%==x64 C:\Python34\python.exe C:\Python34\Scripts\pyinstaller-script.py pibox-installer-win64.spec
   - if %platform%==x86 type build\pibox-installer-win32\warnpibox-installer-win32.txt
   - if %platform%==x64 type build\pibox-installer-win64\warnpibox-installer-win64.txt
+
+  # Deploy
+  - if %platform%==x86 C:\msys64\usr\bin\scp.exe -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer-win32.exe root@thiolliere.org:/var/www/html/public/pibox-binaries/nightly/pibox-installer-linux
+  - if %platform%==x64 C:\msys64\usr\bin\scp.exe -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer-win64.exe root@thiolliere.org:/var/www/html/public/pibox-binaries/nightly/pibox-installer-linux
 
 artifacts:
 
