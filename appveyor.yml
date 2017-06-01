@@ -61,7 +61,6 @@ install:
   - if %platform%==x64 type build\pibox-installer-win64\warnpibox-installer-win64.txt
 
   # Deploy
-  - for /f "delims=" %a in ('C:\msys64\usr\bin\date.exe +"%Y-%m-%d"') do set formatted_date=%a
   - if %platform%==x86 C:\msys64\usr\bin\bash --login -c "scp -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer.exe pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +'%Y-%m-%d')/pibox-installer-win32.exe"
   - if %platform%==x64 C:\msys64\usr\bin\bash --login -c "scp -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer.exe pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +'%Y-%m-%d')/pibox-installer-win64.exe"
 
