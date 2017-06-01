@@ -47,7 +47,7 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
                 filename = "pibox({}).img".format(increment)
 
         os.rename(os.path.join(build_dir, raspbian_image_path), filename)
-        # shutil.rmtree(build_dir)
+        shutil.rmtree(build_dir)
 
     logger.step("done")
     if done_callback:
