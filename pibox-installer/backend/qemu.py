@@ -63,14 +63,15 @@ class Emulator:
         pipe_reader.readline()
         pipe_reader.readline()
         size_line = pipe_reader.readline()
-        matches = re.findall(r"virtual size: (.*)G", size_line)
+        matches = re.findall(r"virtual size: \S*G \((\d*) bytes\)", size_line)
         if len(matches) != 1:
             raise QemuInternalError("cannot get image %s size from qemu-img info" % self._image)
-        return float(matches[0])
+        return int(matches[0])
 
     def resize_image(self, size):
-        output = subprocess.check_output([qemu_img_exe, "resize", "-f", "raw", self._image, "{}G".format(size)])
-        self._logger.raw_std(output.decode("utf-8", "ignore"))
+        completed_process = subprocess.run([qemu_img_exe, "resize", "-f", "raw", self._image, "{}".format(size)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        self._logger.raw_std(completed_process.stdout.decode("utf-8", "ignore"))
+        return completed_process.returncode
 
     def copy_image(self, device_name):
         self._logger.step("copy image to sd card")
@@ -223,8 +224,8 @@ class _RunningInstance:
         self._client.close()
         self._qemu.wait(timeout)
 
-    def exec_cmd(self, command, return_stdout=False):
-        if return_stdout:
+    def exec_cmd(self, command, capture_stdout=False):
+        if capture_stdout:
             stdout_buffer = ""
 
         self._logger.std(command)
@@ -233,20 +234,25 @@ class _RunningInstance:
             line = stdout.readline()
             if line == "":
                 break
-            if return_stdout:
+            if capture_stdout:
                 stdout_buffer += line
             self._logger.std(line.replace("\n", ""))
 
         for line in stderr.readlines():
             self._logger.err("STDERR: " + line.replace("\n", ""))
 
-        if return_stdout:
-            return stdout_buffer
+        return_code = stdout.channel.recv_exit_status()
+
+        if capture_stdout:
+            return return_code, stdout_buffer
+        else:
+            return return_code
 
     def resize_fs(self):
         self._logger.step("resize partition")
 
-        stdout = self.exec_cmd("sudo LANG=C fdisk -l /dev/mmcblk0", return_stdout=True)
+        code, stdout = self.exec_cmd("sudo LANG=C fdisk -l /dev/mmcblk0", capture_stdout=True)
+
         lines = stdout.splitlines()
 
         number_of_sector_match = []

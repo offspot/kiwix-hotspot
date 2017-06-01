@@ -28,7 +28,7 @@ parser.add_argument("-t", "--timezone", help="timezone (Europe/Paris)", default=
 parser.add_argument("-w", "--wifi-pwd", help="wifi password (Open)")
 parser.add_argument("-k", "--kalite", help="install kalite (fr | en | ar | es)", choices=["fr", "en", "ar", "er"], nargs="*")
 parser.add_argument("-z", "--zim-install", help="install zim", nargs="*")
-parser.add_argument("-r", "--resize", help="resize image in GiB (5)", type=float, default=5)
+parser.add_argument("-r", "--resize", help="resize image in B (5*2**30)", type=float, default=5*2**30)
 parser.add_argument("-c", "--catalog", help="print zim catalog", action="store_true")
 parser.add_argument("-s", "--sd", help="sd card device to put the image onto")
 

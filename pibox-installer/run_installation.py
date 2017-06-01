@@ -19,20 +19,25 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
 
     if size < emulator.get_image_size():
         logger.err("error: cannot decrease image size")
-        exit(1)
+        return done_callback(1)
 
-    emulator.resize_image(size)
+    return_code = emulator.resize_image(size)
+    if return_code != 0:
+        return done_callback(return_code)
 
     with emulator.run(cancel_event) as emulation:
         emulation.resize_fs()
         logger.step("run ansiblecube")
-        ansiblecube.run(
+        ansible_exit_code = ansiblecube.run(
                 machine=emulation,
                 name=name,
                 timezone=timezone,
                 wifi_pwd=wifi_pwd,
                 kalite=kalite,
                 zim_install=zim_install)
+
+    if ansible_exit_code != 0:
+        return done_callback(ansible_exit_code)
 
     if sd_card:
         emulator.copy_image(sd_card)
@@ -51,4 +56,4 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
 
     logger.step("done")
     if done_callback:
-        done_callback()
+        return done_callback(0)

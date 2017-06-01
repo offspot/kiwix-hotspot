@@ -241,7 +241,7 @@ class Application:
                         cancel_event=self.cancel_event,
                         sd_card=sd_card,
                         output_file=output_file,
-                        done_callback=lambda : GLib.idle_add(self.installation_done))
+                        done_callback=lambda code: GLib.idle_add(self.installation_done))
 
             self.component.window.destroy()
             self.component.run_window.show()
