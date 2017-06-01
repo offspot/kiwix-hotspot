@@ -248,6 +248,7 @@ class Application:
             threading.Thread(target=target, daemon=True).start()
 
     def get_free_space(self):
+        # TODO: compute actual space used with empty install
         used_space = 2 * 2**30 # space of raspbian with ideascube without content
         for zim in self.component.zim_list_store:
             if zim[8]:
