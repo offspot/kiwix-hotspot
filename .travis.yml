@@ -12,7 +12,7 @@ matrix:
     - python3 -m pip install -r requirements-macos.txt
     - python3 -m pip install pyinstaller
     - pyinstaller pibox-installer-macos.spec
-    - scp -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-macos
+    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-macos
   - os: linux
     language: python
     python: 3.4
@@ -35,4 +35,4 @@ matrix:
     - pip3 install -r requirements-linux.txt
     - pip3 install https://github.com/pyinstaller/pyinstaller/archive/develop.zip
     - pyinstaller pibox-installer-linux.spec
-    - scp -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-linux
+    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-linux
