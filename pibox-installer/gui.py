@@ -241,7 +241,7 @@ class Application:
                         cancel_event=self.cancel_event,
                         sd_card=sd_card,
                         output_file=output_file,
-                        done_callback=lambda code: GLib.idle_add(self.installation_done))
+                        done_callback=lambda code: GLib.idle_add(self.installation_done, code))
 
             self.component.window.destroy()
             self.component.run_window.show()
@@ -295,7 +295,10 @@ class Application:
     def done_window_ok_button_clicked(self, widget):
         self.component.done_window.close()
 
-    def installation_done(self):
+    def installation_done(self, code):
+        if code != 0:
+            self.component.done_label.set_text("Installation failed: " + str(code))
+            validate_label(self.component.done_label, False)
         self.component.done_window.show()
         self.component.run_abort_done_button.set_label("Close")
         self.component.run_spinner.stop()
