@@ -85,6 +85,10 @@ class Application:
 
         self.component.window.connect("delete-event", Gtk.main_quit)
 
+        # update free space on storage change
+        self.component.size_entry.connect("changed", lambda _: self.update_free_space())
+        self.component.sd_card_combobox.connect("changed", lambda _: self.update_free_space())
+
         self.component.done_window.set_transient_for(self.component.run_window)
         self.component.done_window.set_default_size(320, 240)
         self.component.done_window.set_modal(True)
@@ -127,7 +131,7 @@ class Application:
         self.component.zim_choose_content_button.connect("clicked", self.zim_choose_content_button_clicked)
         self.component.run_installation_button.connect("clicked", self.run_installation_button_clicked)
 
-        self.component.zim_list_store = Gtk.ListStore(str, str, str, str, str, str, str, str, bool);
+        self.component.zim_list_store = Gtk.ListStore(str, str, str, str, str, str, str, str, bool, str);
         self.component.zim_list_store.set_sort_column_id(0, Gtk.SortType.ASCENDING)
 
         for one_catalog in catalog:
@@ -135,12 +139,13 @@ class Application:
                 name = value["name"]
                 url = value["url"]
                 description = value.get("description") or "none"
-                size = human_readable_size(int(value["size"]))
+                formatted_size = human_readable_size(int(value["size"]))
+                size = str(value["size"])
                 language = value.get("language") or "none"
                 typ = value["type"]
                 version = str(value["version"])
 
-                self.component.zim_list_store.append([key, name, url, description, size, language, typ, version, False])
+                self.component.zim_list_store.append([key, name, url, description, formatted_size, language, typ, version, False, size])
 
         self.component.zim_choosen_filter = self.component.zim_list_store.filter_new()
         self.component.zim_choosen_filter.set_visible_func(self.zim_choosen_filter_func)
@@ -150,10 +155,13 @@ class Application:
         column_text = Gtk.TreeViewColumn("Id", renderer_text, text=0)
         self.component.zim_choosen_tree_view.append_column(column_text)
 
+        self.update_free_space()
+
         self.component.window.show()
 
     def sd_card_refresh_button_clicked(self, button):
         self.refresh_disk_list()
+        self.update_free_space()
 
     def refresh_disk_list(self):
         self.component.sd_card_list_store.clear()
@@ -168,7 +176,7 @@ class Application:
         return model[iter][8]
 
     def zim_choose_content_button_clicked(self, button):
-        ZimChooserWindow(self.component.window, self.component.zim_list_store)
+        ZimChooserWindow(self)
 
     def run_installation_button_clicked(self, button):
         all_valid = True
@@ -216,6 +224,10 @@ class Application:
             validate_label(self.component.size_label, condition)
             all_valid = all_valid and condition
 
+        condition = self.update_free_space() >= 0
+        validate_label(self.component.free_space_name_label, condition)
+        all_valid = all_valid and condition
+
         if all_valid:
             def target():
                 run_installation(
@@ -235,6 +247,22 @@ class Application:
             self.component.run_window.show()
             threading.Thread(target=target, daemon=True).start()
 
+    def get_free_space(self):
+        used_space = 2 * 2**30 # space of raspbian with ideascube without content
+        for zim in self.component.zim_list_store:
+            if zim[8]:
+                used_space += int(zim[9])
+        return self.get_output_size() - used_space
+
+    def update_free_space(self):
+        free_space = self.get_free_space()
+        human_readable_free_space = human_readable_size(free_space)
+        self.component.free_space_label1.set_text(human_readable_free_space)
+        self.component.free_space_label2.set_text(human_readable_free_space)
+        condition = free_space >= 0
+        validate_label(self.component.free_space_label1, condition)
+        validate_label(self.component.free_space_label2, condition)
+        return free_space
 
     def get_output_size(self):
         if self.component.output_stack.get_visible_child_name() == "sd_card":
@@ -243,10 +271,10 @@ class Application:
                 size = -1
             else:
                 get_size_index = sd_card_list.get_size_index()
-                size = self.component.sd_card_list_store[sd_card_id][get_size_index]
+                size = int(self.component.sd_card_list_store[sd_card_id][get_size_index])
         else:
             try:
-                size = int(self.component.size_entry.get_text())
+                size = int(self.component.size_entry.get_text()) * 2**30
             except:
                 size = -1
 
@@ -272,13 +300,16 @@ class Application:
         self.component.run_spinner.stop()
 
 class ZimChooserWindow:
-    def __init__(self, parent, zim_list_store):
+    def __init__(self, main_window):
         builder = Gtk.Builder()
         builder.add_from_file(os.path.join(DATA_DIR, "ui.glade"))
 
         self.component = Component(builder)
 
-        self.component.zim_list_store = zim_list_store
+        self.component.zim_list_store = main_window.component.zim_list_store
+        self.main_window = main_window
+        main_window.component.free_space_label2 = self.component.free_space_label2
+        self.main_window.update_free_space()
 
         self.component.zim_tree_view.set_model(self.component.zim_list_store)
 
@@ -301,7 +332,7 @@ class ZimChooserWindow:
         column_text = Gtk.TreeViewColumn("Description", renderer_text, text=3)
         self.component.zim_tree_view.append_column(column_text)
 
-        self.component.zim_window.set_transient_for(parent)
+        self.component.zim_window.set_transient_for(main_window.component.window)
         self.component.zim_window.set_modal(True)
         self.component.zim_window.set_default_size(1280, 800)
         self.component.zim_window.show()
@@ -313,6 +344,7 @@ class ZimChooserWindow:
 
     def renderer_radio_toggled(self, widget, path):
         self.component.zim_list_store[path][8] = not self.component.zim_list_store[path][8]
+        self.main_window.update_free_space()
 
 catalog = catalog.get_catalogs()
 Application(catalog)
