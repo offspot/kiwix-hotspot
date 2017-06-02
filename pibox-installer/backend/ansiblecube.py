@@ -61,5 +61,4 @@ def run(machine, name, timezone, wifi_pwd, kalite, zim_install):
     ansible_pull_cmd += " --extra-vars \"%s\"" % extra_vars
     ansible_pull_cmd += " main.yml"
 
-    code = machine.exec_cmd(ansible_pull_cmd)
-    return code
+    machine.exec_cmd(ansible_pull_cmd)

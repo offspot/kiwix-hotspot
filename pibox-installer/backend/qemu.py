@@ -17,11 +17,9 @@ else:
     qemu_system_arm_exe = "qemu-system-arm"
     qemu_img_exe = "qemu-img"
 
-class QemuWaitSignalTimeoutError(Exception):
-    pass
-
-class QemuInternalError(Exception):
-    pass
+class QemuException(Exception):
+    def __init__(self, msg):
+        Exception(self, msg)
 
 def generate_random_name():
     r = ""
@@ -65,13 +63,12 @@ class Emulator:
         size_line = pipe_reader.readline()
         matches = re.findall(r"virtual size: \S*G \((\d*) bytes\)", size_line)
         if len(matches) != 1:
-            raise QemuInternalError("cannot get image %s size from qemu-img info" % self._image)
+            raise QemuException("cannot get image %s size from qemu-img info" % self._image)
         return int(matches[0])
 
     def resize_image(self, size):
-        completed_process = subprocess.run([qemu_img_exe, "resize", "-f", "raw", self._image, "{}".format(size)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        self._logger.raw_std(completed_process.stdout.decode("utf-8", "ignore"))
-        return completed_process.returncode
+        output = subprocess.check_output([qemu_img_exe, "resize", "-f", "raw", self._image, "{}".format(size)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        self._logger.raw_std(output.decode("utf-8", "ignore"))
 
     def copy_image(self, device_name):
         self._logger.step("copy image to sd card")
@@ -172,7 +169,7 @@ class _RunningInstance:
                 self._logger.raw_std(decoded_buf)
 
             if timeout_event.is_set():
-                raise QemuWaitSignalTimeoutError("signal %s" % signal)
+                raise QemuException("wait signal timeout: %s" % signal)
 
             timer.cancel()
             ring_buf.extend(buf)
@@ -241,17 +238,17 @@ class _RunningInstance:
         for line in stderr.readlines():
             self._logger.err("STDERR: " + line.replace("\n", ""))
 
-        return_code = stdout.channel.recv_exit_status()
+        exit_status = stdout.channel.recv_exit_status();
+        if exit_status != 0:
+            raise QemuException("ssh command failed with status {}. cmd: {}".format(exit_status, command))
 
         if capture_stdout:
-            return return_code, stdout_buffer
-        else:
-            return return_code
+            return stdout_buffer
 
     def resize_fs(self):
         self._logger.step("resize partition")
 
-        code, stdout = self.exec_cmd("sudo LANG=C fdisk -l /dev/mmcblk0", capture_stdout=True)
+        stdout = self.exec_cmd("sudo LANG=C fdisk -l /dev/mmcblk0", capture_stdout=True)
 
         lines = stdout.splitlines()
 
@@ -262,11 +259,11 @@ class _RunningInstance:
             second_partition_match += re.findall(r"^/dev/mmcblk0p2 +(\d+) +(\d+) +\d+ +\S+ +\d+ +Linux$", line)
 
         if len(number_of_sector_match) != 1:
-            raise QemuInternalError("cannot find the number of sector of disk")
+            raise QemuException("cannot find the number of sector of disk")
         number_of_sector = int(number_of_sector_match[0])
 
         if len(second_partition_match) != 1:
-            raise QemuInternalError("cannot find start and/or end of root partition of disk")
+            raise QemuException("cannot find start and/or end of root partition of disk")
         second_partition_start = int(second_partition_match[0][0])
         second_partition_end = int(second_partition_match[0][1])
 

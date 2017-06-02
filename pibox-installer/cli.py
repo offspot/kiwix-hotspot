@@ -39,7 +39,7 @@ if args.catalog:
         print(yaml.dump(catalog, default_flow_style=False, default_style=''))
     exit(0)
 
-run_installation(
+error = run_installation(
         name=args.name,
         timezone=args.timezone,
         wifi_pwd=args.wifi_pwd,
@@ -50,3 +50,5 @@ run_installation(
         cancel_event=CancelEvent(),
         sd_card=args.sd,
         output_file=not args.sd)
+
+print("ERRROR: " + str(error))
