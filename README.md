@@ -10,9 +10,9 @@ Inside the emulator it builds ideascube with ansiblecube.
 
 ## Download
 
-temporarily hosted [there](https://thiolliere.org/public/pibox-binaries)
+[**repos.ideascube.org/pibox/**](http://repos.ideascube.org/pibox/)
 
-note: for linux you have to run it from source
+note: binaries for linux don't work, you have to run it from source
 
 ## CLI usage
 
