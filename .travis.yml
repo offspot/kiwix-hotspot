@@ -13,7 +13,7 @@ matrix:
     - python3 -m pip install -r requirements-macos.txt
     - python3 -m pip install pyinstaller
     - pyinstaller pibox-installer-macos.spec
-    - codesign -s pibox-installer dist/pibox-installer.app
+    - codesign -s pibox-installer --keychain pibox-installer.p12 dist/pibox-installer.app
     - zip pibox-installer.zip dist/pibox-installer.app
     - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer.zip pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-macos.zip
   - os: linux
