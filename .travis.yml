@@ -1,5 +1,6 @@
 before_install:
-- openssl aes-256-cbc -K $encrypted_af8ee76d875e_key -iv $encrypted_af8ee76d875e_iv -in pibox_installer_ci_rsa.travis_enc -out pibox_installer_ci_rsa -d
+- openssl aes-256-cbc -K $encrypted_af8ee76d875e_key -iv $encrypted_af8ee76d875e_iv -in travis_secrets.tar.enc -out travis_secrets.tar -d
+- tar xvf travis_secrets.tar
 - chmod 600 pibox_installer_ci_rsa
 
 matrix:
@@ -12,6 +13,7 @@ matrix:
     - python3 -m pip install -r requirements-macos.txt
     - python3 -m pip install pyinstaller
     - pyinstaller pibox-installer-macos.spec
+    - codesign -s pibox-installer dist/pibox-installer.app
     - zip pibox-installer.zip dist/pibox-installer.app
     - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer.zip pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-macos.zip
   - os: linux
