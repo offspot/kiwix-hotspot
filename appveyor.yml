@@ -65,7 +65,3 @@ install:
   - move C:\projects\pibox-installer\dist\pibox-installer.exe C:\msys64\home\appveyor\
   - if %platform%==x86 C:\msys64\usr\bin\bash --login -c "scp -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer.exe pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +'%%Y-%%m-%%d')/pibox-installer-win32.exe"
   - if %platform%==x64 C:\msys64\usr\bin\bash --login -c "scp -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer.exe pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +'%%Y-%%m-%%d')/pibox-installer-win64.exe"
-
-artifacts:
-
-  - path: dist\pibox-installer.exe
