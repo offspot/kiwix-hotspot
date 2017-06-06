@@ -6,6 +6,9 @@ before_install:
 matrix:
   include:
   - os: osx
+    env:
+      global:
+        secure: JhgvCgaYaXjL+FSY38y/LUGO5jx6d6TW3nt4y0mt4GIo1Cp/8PRF8CQZiX/RpkRgvYUnIU7z6mo5GKYu4akOG3ZR4or2odk2WNOXUROZeJqwOKKY0reT5pd2n1ygZ71q36MODuFiPr5nJYPo9Gw6zZaWNhhanZzHtkkdU4dUhs/atgfrSfhYQGUGVI+qPa3ffsOvo7Lq/KWhUVsTidxPA2VWqXG4Hm/bhyIcaDw6hIHUeTIM7SlWZ/fhBCCdDo+UDuRs35DWhp0a52hTw6x4RD+JbG0NJigkQGQuZYqwt5nxYsITJfzwor6XDTHAs/kA47QWe1we0KyTJekgMvrJWIN9j/yqr2D1OiPWUNYkpd/P+Y4eTdRrHEShmpJc3lUgH9AIk5cyjMejJP70ukT6DXqxvgH0IZdeBc3bexblh9fIr2Eb+VAe8T0BRRXb2L4ucvx8LoiOA7lyFpUghQswKB1TSE8DP+wKdsDqTp7mGu6SFvQESaXuJ0SXEXgqV2WO+TusfvGDbd/ovbGmIBWUoE2VSzEWgSw6u7ynHdMqAlBlp+rMAGW4e4KbgWT8dvA+AoPap3RcMscnH/Pwimj6V+k0vHJVM8EX5MoATy8jFDFXOG0re4FPmlNJ1eIdquIXc5/e6zc9n5c6iybj/PHbVvgHlpPjJlntSCZpOytNF+s=
     language: generic
     install:
     - brew install qemu zoidbergwill/python/python35
@@ -13,7 +16,13 @@ matrix:
     - python3 -m pip install -r requirements-macos.txt
     - python3 -m pip install pyinstaller
     - pyinstaller pibox-installer-macos.spec
-    - codesign -s pibox-installer --keychain pibox-installer.p12 dist/pibox-installer.app
+
+    - security create-keychain -p mysecretpassword build.keychain
+    - security default-keychain -s build.keychain
+    - security unlock-keychain -p mysecretpassword build.keychain
+    - security import pibox-installer.p12 -k build.keychain -P $MACOS_CERTIFICATE_PASSWORD -T /usr/bin/codesign
+    - codesign -s pibox-installer dist/pibox-installer.app
+
     - zip pibox-installer.zip dist/pibox-installer.app
     - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer.zip pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-macos.zip
   - os: linux
