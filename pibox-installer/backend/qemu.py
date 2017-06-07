@@ -221,7 +221,7 @@ class _RunningInstance:
         self._client.close()
         self._qemu.wait(timeout)
 
-    def exec_cmd(self, command, capture_stdout=False):
+    def exec_cmd(self, command, capture_stdout=False, check=True):
         if capture_stdout:
             stdout_buffer = ""
 
@@ -239,7 +239,7 @@ class _RunningInstance:
             self._logger.err("STDERR: " + line.replace("\n", ""))
 
         exit_status = stdout.channel.recv_exit_status();
-        if exit_status != 0:
+        if exit_status != 0 and check:
             raise QemuException("ssh command failed with status {}. cmd: {}".format(exit_status, command))
 
         if capture_stdout:
@@ -289,7 +289,7 @@ p
 
 w
 END_OF_CMD""" % second_partition_start
-            self.exec_cmd(fdiskCmd)
+            self.exec_cmd(fdiskCmd, check=False)
             self._reboot()
 
         self._logger.step("resize filesystem")
