@@ -35,7 +35,7 @@ class Downloader:
         dtb_path = os.path.join(boot_dir, dtb_name)
         dtb_zip_path = posixpath.join(boot_dir, dtb_name)
 
-        url = "http://download.kiwix.org/dev/" + boot_dir + ".zip"
+        url = "http://mirror.download.kiwix.org/dev/" + boot_dir + ".zip"
 
         self._logger.step("get vexpress boot")
         os.makedirs(boot_dir, exist_ok=True)
