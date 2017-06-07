@@ -56,7 +56,7 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
         error = None
 
     os.chdir(current_working_dir)
-    shutil.rmtree(build_dir)
+    #TODO: delete in main and add argument build_dir to run_install. shutil.rmtree(build_dir)
 
     if done_callback:
         done_callback(error)
