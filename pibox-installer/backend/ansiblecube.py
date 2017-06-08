@@ -1,4 +1,3 @@
-from . import systemd
 import json
 
 # machine must provide write_file and exec_cmd functions
