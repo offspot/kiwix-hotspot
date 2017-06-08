@@ -62,7 +62,9 @@ install:
 
 
   # Deploy
-  - 7z.exe a -r C:\projects\pibox-installer\dist\pibox-installer.zip C:\projects\pibox-installer\dist\pibox-installer
+  - move C:\projects\pibox-installer\dist\pibox-installer binary
+  - echo binary\pibox-installer.exe > run.bat
+  - 7z.exe a -r C:\projects\pibox-installer\dist\pibox-installer.zip binary run.bat
 
   - move C:\projects\pibox-installer\dist\pibox-installer.zip C:\msys64\home\appveyor\
   - move C:\projects\pibox-installer\pibox_installer_ci_rsa C:\msys64\home\appveyor\
