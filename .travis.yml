@@ -21,8 +21,10 @@ matrix:
     # - codesign -s pibox-installer dist/pibox-installer.app
     - codesign -s - dist/pibox-installer.app
 
-    - zip pibox-installer.zip dist/pibox-installer.app
-    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer.zip pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-macos.zip
+    - cd dist
+    - zip -r pibox-installer.zip pibox-installer.app
+    - cd ..
+    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer.zip pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-macos.zip
   # - os: linux
   #   language: python
   #   python: 3.4
