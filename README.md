@@ -44,6 +44,7 @@ create a virtual a virtual environment that includes pygobject: `python3 -m venv
 activate the environment
 
 install pip dependencies: `pip3 install -r requirements-PLATFORM.txt`
+(note: on linux you may need some distribution packges, see package pibox-installer for more information)
 
 run GUI application: `python3 pibox-installer`
 
@@ -94,7 +95,9 @@ note: we don't msys2 to install pygobject because pyinstaller fails to install o
 
 ### Linux
 
-TODO
+to install the python requirements you may need to install some packages
+
+* on Debian and Ubuntu: `sudo apt-get install build-essential libssl-dev libffi-dev python-dev libdbus-glib-1-dev`
 
 ## License
 
