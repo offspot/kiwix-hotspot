@@ -11,6 +11,7 @@ import threading
 from util import CancelEvent
 import sd_card_list
 from util import human_readable_size
+from datetime import datetime
 
 frozen_set_path()
 
@@ -217,8 +218,16 @@ class Application:
             size = self.get_output_size()
         else:
             sd_card = None
-            output_file = True
             size = self.get_output_size()
+            today = datetime.today()
+            filename = "image-{}-{}-{}-{}-{}-{}.img".format(
+                    today.year,
+                    today.month,
+                    today.day,
+                    today.hour,
+                    today.minute,
+                    today.second)
+            output_file = os.path.join(os.path.expanduser('~'), 'Desktop', filename)
 
             condition = size > 0
             validate_label(self.component.size_label, condition)

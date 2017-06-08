@@ -2,11 +2,15 @@ from backend.downloads import Downloader
 from backend import ansiblecube
 from backend import qemu
 import os
+import sys
 import shutil
 
 def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger, cancel_event, sd_card, output_file, done_callback=None):
     current_working_dir = os.getcwd()
-    build_dir = "build" # TODO: make it unique
+    if getattr(sys, "frozen", False):
+        build_dir = os.path.join(sys._MEIPASS, "build")
+    else:
+        build_dir = "build"
 
     os.makedirs(build_dir, exist_ok=True)
     os.chdir(build_dir)
@@ -39,14 +43,7 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
             emulator.copy_image(sd_card)
 
         if output_file:
-            filename = "pibox.img"
-            if os.path.exists(path.os.join(current_working_dir, filename)):
-                increment = 0
-                while os.path.exists(path.os.join(current_working_dir, filename)):
-                    increment += 1
-                    filename = "pibox({}).img".format(increment)
-
-            os.rename(raspbian_image_path, path.os.join(current_working_dir, filename))
+            os.rename(raspbian_image_path, output_file)
 
     except Exception as e:
         logger.step("failed")
@@ -54,9 +51,6 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
     else:
         logger.step("done")
         error = None
-
-    os.chdir(current_working_dir)
-    #TODO: delete in main and add argument build_dir to run_install. shutil.rmtree(build_dir)
 
     if done_callback:
         done_callback(error)
