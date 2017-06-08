@@ -1,5 +1,15 @@
+import os
+import sys
+import math
 import threading
 from queue import Queue
+
+def frozen_set_path():
+    if getattr(sys, "frozen", False):
+        if os.name == "nt":
+            os.environ["PATH"] += ";" + sys._MEIPASS
+        else:
+            os.environ["PATH"] += ":" + sys._MEIPASS
 
 class CancelEvent:
     def __init__(self):
@@ -24,4 +34,16 @@ class CancelEvent:
 
     def consume(self):
         self.cancel_queue.task_done()
+
+def human_readable_size(size):
+    size = int(size)
+    if size == 0:
+        return '0B'
+    if size < 0:
+        return "- " + human_readable_size(-size)
+    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+    i = int(math.floor(math.log(size,1024)))
+    p = math.pow(1024,i)
+    s = round(size/p,2)
+    return '%s %s' % (s,size_name[i])
 

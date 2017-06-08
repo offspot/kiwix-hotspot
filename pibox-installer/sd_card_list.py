@@ -2,7 +2,7 @@ import sys
 import subprocess
 import os
 import re
-from size_converter import human_readable_size
+from util import human_readable_size
 
 def get_device_index():
     for index, info in enumerate(informations):

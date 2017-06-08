@@ -4,8 +4,8 @@ import sys
 import yaml
 from backend import catalog
 from run_installation import run_installation
-from set_path import set_path
-from cancel import CancelEvent
+from util import frozen_set_path
+from util import CancelEvent
 
 class Logger:
     def step(step):
@@ -20,7 +20,7 @@ class Logger:
     def std(std):
         print(std)
 
-set_path()
+frozen_set_path()
 
 parser = argparse.ArgumentParser(description="ideascube/kiwix installer for raspberrypi.")
 parser.add_argument("-n", "--name", help="name of the box (mybox)", default="mybox")
