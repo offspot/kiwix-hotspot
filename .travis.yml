@@ -36,8 +36,8 @@ matrix:
     addons:
       apt:
         packages:
-          qemu
-          qemu-system-arm
+          # qemu
+          # qemu-system-arm
           python3-gi
           python3-gi-cairo
           python3-cairo
@@ -52,4 +52,5 @@ matrix:
     - pip3 install -r requirements-linux.txt
     - pip3 install https://github.com/pyinstaller/pyinstaller/archive/develop.zip
     - pyinstaller pibox-installer-linux.spec
+    - cat build/pibox-installer-linux/warnpibox-installer-linux.txt
     - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-linux
