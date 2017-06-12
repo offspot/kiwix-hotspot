@@ -67,8 +67,9 @@ class Emulator:
         return int(matches[0])
 
     def resize_image(self, size):
-        output = subprocess.check_output([qemu_img_exe, "resize", "-f", "raw", self._image, "{}".format(size)], stderr=subprocess.STDOUT)
-        self._logger.raw_std(output.decode("utf-8", "ignore"))
+        process = subprocess.run([qemu_img_exe, "resize", "-f", "raw", self._image, "{}".format(size)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        self._logger.raw_std(process.stdout.decode("utf-8", "ignore"))
+        process.check_returncode()
 
     def copy_image(self, device_name):
         self._logger.step("copy image to sd card")
