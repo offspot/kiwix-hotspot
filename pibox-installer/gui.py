@@ -227,7 +227,10 @@ class Application:
                     today.hour,
                     today.minute,
                     today.second)
-            output_file = os.path.join(os.path.expanduser('~'), 'Desktop', filename)
+            output_dir = os.path.join(os.path.expanduser('~'), 'Desktop')
+            if not os.path.isdir(output_dir):
+                output_dir = os.path.expanduser('~')
+            output_file = os.path.join(output_dir, filename)
 
             condition = size > 0
             validate_label(self.component.size_label, condition)
