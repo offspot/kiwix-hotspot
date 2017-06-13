@@ -41,8 +41,8 @@ matrix:
     addons:
       apt:
         packages:
-          # qemu
-          # qemu-system-arm
+          qemu
+          qemu-system-arm
           python3-gi
           python3-gi-cairo
           python3-cairo
