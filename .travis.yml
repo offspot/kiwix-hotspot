@@ -57,4 +57,9 @@ matrix:
     - pip3 install https://github.com/pyinstaller/pyinstaller/archive/develop.zip
     - pyinstaller pibox-installer-linux.spec
     - cat build/pibox-installer-linux/warnpibox-installer-linux.txt
-    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-linux
+
+    - cd dist
+    - zip -r pibox-installer.zip pibox-installer
+    - cd ..
+
+    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer.zip pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-linux.zip
