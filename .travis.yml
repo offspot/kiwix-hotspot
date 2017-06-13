@@ -26,10 +26,9 @@ matrix:
     # Install create-dmg
     - npm install --global create-dmg
     - create-dmg dist/pibox-installer.app
-    - mv pibox-installer-0.0.0.dmg pibox-installer-nightly.dmg
 
     # Send dmg
-    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-nightly.dmg pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-macos.zip
+    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-0.0.0.dmg pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-macos.dmg
 
   - os: linux
     language: python
