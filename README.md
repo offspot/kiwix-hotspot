@@ -12,6 +12,7 @@ Inside the emulator it builds ideascube with ansiblecube.
 
 [**repos.ideascube.org/pibox/**](http://repos.ideascube.org/pibox/)
 
+note: binaries for windows and macos are not signed, to open on windows just click for more information and you are able to run it. To open on macos right click on the application and click Open.
 note: binaries for linux don't work, you have to run it from source
 
 ## CLI usage
