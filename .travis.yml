@@ -8,12 +8,14 @@ matrix:
   - os: osx
     language: generic
     install:
+    # Package pibox-installer
     - brew install qemu zoidbergwill/python/python35
     - brew install pygobject3 --with-python3 gtk+3
     - python3 -m pip install -r requirements-macos.txt
     - python3 -m pip install pyinstaller
     - pyinstaller pibox-installer-macos.spec
 
+    # Sign application
     # - security create-keychain -p mysecretpassword build.keychain
     # - security default-keychain -s build.keychain
     # - security unlock-keychain -p mysecretpassword build.keychain
@@ -21,10 +23,13 @@ matrix:
     # - codesign -s pibox-installer dist/pibox-installer.app
     - codesign -s - dist/pibox-installer.app
 
-    - cd dist
-    - zip -r pibox-installer.zip pibox-installer.app
-    - cd ..
-    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer.zip pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-macos.zip
+    # Install create-dmg
+    - npm install --global create-dmg
+    - create-dmg dist/pibox-installer.app
+    - mv pibox-installer-0.0.0.dmg pibox-installer-nightly.dmg
+
+    # Send dmg
+    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-nightly.dmg pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-macos.zip
 
   - os: linux
     language: python
