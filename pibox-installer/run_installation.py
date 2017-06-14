@@ -39,6 +39,7 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
 
     except Exception as e:
         logger.step("failed")
+        logger.err(str(e))
         error = e
     else:
         logger.step("done")
