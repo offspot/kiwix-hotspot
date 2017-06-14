@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Generated with glade 3.20.0 -->
 <interface>
-  <requires lib="gtk+" version="3.18"/>
+  <requires lib="gtk+" version="3.10"/>
   <object class="GtkWindow" id="done_window">
     <property name="can_focus">False</property>
     <child>
@@ -104,7 +104,6 @@
                 <property name="can_focus">True</property>
                 <property name="editable">False</property>
                 <property name="cursor_visible">False</property>
-                <property name="monospace">True</property>
               </object>
             </child>
           </object>
@@ -369,7 +368,6 @@
               <object class="GtkStack" id="output_stack">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="vhomogeneous">False</property>
                 <property name="transition_type">slide-left-right</property>
                 <child>
                   <object class="GtkBox">
