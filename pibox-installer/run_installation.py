@@ -6,14 +6,6 @@ import sys
 import shutil
 
 def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger, cancel_event, sd_card, output_file, done_callback=None):
-    current_working_dir = os.getcwd()
-    if getattr(sys, "frozen", False):
-        build_dir = os.path.join(sys._MEIPASS, "build")
-    else:
-        build_dir = "build"
-
-    os.makedirs(build_dir, exist_ok=True)
-    os.chdir(build_dir)
 
     try:
         downloader = Downloader(logger)

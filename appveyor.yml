@@ -60,8 +60,16 @@ install:
   - if %platform%==x86 type build\pibox-installer-win32\warnpibox-installer-win32.txt
   - if %platform%==x64 type build\pibox-installer-win64\warnpibox-installer-win64.txt
 
+
   # Deploy
+  - cd C:\projects\pibox-installer\dist\pibox-installer
+  - 7z.exe a -m0=Copy pibox-installer.7z *
+  - move pibox-installer.7z C:\projects\pibox-installer\windows_bundle
+  - cd C:\projects\pibox-installer\windows_bundle
+  - copy /b 7zS.sfx + config.txt + pibox-installer.7z pibox-installer.exe
+
+  - move C:\projects\pibox-installer\windows_bundle\pibox-installer.exe C:\msys64\home\appveyor\
   - move C:\projects\pibox-installer\pibox_installer_ci_rsa C:\msys64\home\appveyor\
-  - move C:\projects\pibox-installer\dist\pibox-installer.exe C:\msys64\home\appveyor\
+
   - if %platform%==x86 C:\msys64\usr\bin\bash --login -c "scp -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer.exe pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +'%%Y-%%m-%%d')/pibox-installer-win32.exe"
   - if %platform%==x64 C:\msys64\usr\bin\bash --login -c "scp -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer.exe pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +'%%Y-%%m-%%d')/pibox-installer-win64.exe"

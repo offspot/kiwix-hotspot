@@ -1,0 +1,4 @@
+;!@Install@!UTF-8!
+Title="Pibox installer"
+RunProgram="launcher.exe"
+;!@InstallEnd@!
