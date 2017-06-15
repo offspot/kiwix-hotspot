@@ -99,7 +99,7 @@ note: we don't msys2 to install pygobject because pyinstaller fails to install o
 
 to install the python requirements you may need to install some packages
 
-* on Debian and Ubuntu: `sudo apt-get install build-essential libssl-dev libffi-dev python-dev libdbus-glib-1-dev`
+* on Debian and Ubuntu: `sudo apt-get install build-essential libssl-dev libffi-dev libdbus-glib-1-dev libgdk-pixbuf2.0-dev`
 
 ## License
 
