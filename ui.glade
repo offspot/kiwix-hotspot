@@ -5,7 +5,7 @@
   <object class="GtkWindow" id="done_window">
     <property name="can_focus">False</property>
     <child>
-      <object class="GtkBox">
+      <object class="GtkBox" id="no_id_1">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
@@ -40,12 +40,12 @@
   <object class="GtkWindow" id="run_window">
     <property name="can_focus">False</property>
     <child>
-      <object class="GtkBox">
+      <object class="GtkBox" id="no_id_2">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
         <child>
-          <object class="GtkBox">
+          <object class="GtkBox" id="no_id_3">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
@@ -94,7 +94,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkScrolledWindow">
+          <object class="GtkScrolledWindow" id="no_id_4">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="shadow_type">in</property>
@@ -114,7 +114,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkBox">
+          <object class="GtkBox" id="no_id_5">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
@@ -150,12 +150,12 @@
   <object class="GtkWindow" id="window">
     <property name="can_focus">False</property>
     <child>
-      <object class="GtkBox">
+      <object class="GtkBox" id="no_id_6">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
         <child>
-          <object class="GtkLabel">
+          <object class="GtkLabel" id="no_id_7">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="margin_top">16</property>
@@ -173,14 +173,14 @@
           </packing>
         </child>
         <child>
-          <object class="GtkBox">
+          <object class="GtkBox" id="no_id_8">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="margin_left">60</property>
             <property name="margin_right">60</property>
             <property name="orientation">vertical</property>
             <child>
-              <object class="GtkBox">
+              <object class="GtkBox" id="no_id_9">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
@@ -216,11 +216,11 @@
               </packing>
             </child>
             <child>
-              <object class="GtkBox">
+              <object class="GtkBox" id="no_id_10">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkLabel">
+                  <object class="GtkLabel" id="no_id_11">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">Set a wifi password :</property>
@@ -255,11 +255,11 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkBox">
+                  <object class="GtkBox" id="no_id_12">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkLabel">
+                      <object class="GtkLabel" id="no_id_13">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Wifi password :</property>
@@ -293,7 +293,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkBox">
+              <object class="GtkBox" id="no_id_14">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
@@ -329,7 +329,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkBox">
+              <object class="GtkBox" id="no_id_15">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
@@ -345,7 +345,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkStackSwitcher">
+                  <object class="GtkStackSwitcher" id="no_id_16">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="stack">output_stack</property>
@@ -370,7 +370,7 @@
                 <property name="can_focus">False</property>
                 <property name="transition_type">slide-left-right</property>
                 <child>
-                  <object class="GtkBox">
+                  <object class="GtkBox" id="no_id_17">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
@@ -386,7 +386,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="no_id_18">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
@@ -428,7 +428,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkBox">
+                  <object class="GtkBox" id="no_id_19">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
@@ -470,7 +470,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkBox">
+              <object class="GtkBox" id="no_id_20">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
@@ -506,11 +506,11 @@
               </packing>
             </child>
             <child>
-              <object class="GtkBox">
+              <object class="GtkBox" id="no_id_21">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkLabel">
+                  <object class="GtkLabel" id="no_id_22">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">Zim content :</property>
@@ -522,7 +522,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkBox">
+                  <object class="GtkBox" id="no_id_23">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
@@ -544,7 +544,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <child internal-child="selection">
-                          <object class="GtkTreeSelection"/>
+                          <object class="GtkTreeSelection" id="no_id_29"/>
                         </child>
                       </object>
                       <packing>
@@ -595,16 +595,16 @@
   <object class="GtkWindow" id="zim_window">
     <property name="can_focus">False</property>
     <child>
-      <object class="GtkBox">
+      <object class="GtkBox" id="no_id_24">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
         <child>
-          <object class="GtkBox">
+          <object class="GtkBox" id="no_id_25">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkLabel">
+              <object class="GtkLabel" id="no_id_26">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Free space : </property>
@@ -635,7 +635,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkScrolledWindow">
+          <object class="GtkScrolledWindow" id="no_id_27">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="shadow_type">in</property>
@@ -644,7 +644,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <child internal-child="selection">
-                  <object class="GtkTreeSelection"/>
+                  <object class="GtkTreeSelection" id="no_id_30"/>
                 </child>
               </object>
             </child>
@@ -656,7 +656,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkBox">
+          <object class="GtkBox" id="no_id_28">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
