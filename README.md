@@ -14,8 +14,6 @@ Inside the emulator it builds ideascube with ansiblecube.
 
 note: binaries for windows and macos are not signed, to open on windows just click for more information and you are able to run it. To open on macos right click on the application and click Open.
 
-note: binaries for linux may not be executable. if so run `chmod +x pibox-installer-linux`
-
 ## CLI usage
 
 show help: `pibox-installer-cli -h`
