@@ -60,4 +60,8 @@ matrix:
     - pyinstaller pibox-installer-linux.spec
     - cat build/pibox-installer-linux/warnpibox-installer-linux.txt
 
-    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-linux
+    - cd dist
+    - tar czvf pibox-installer.tar.gz pibox-installer
+    - cd ..
+
+    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer.tar.gz pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-linux.tar.gz
