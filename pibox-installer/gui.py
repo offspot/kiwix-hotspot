@@ -105,7 +105,7 @@ class Application:
         self.component.run_copy_log_to_clipboard_button.connect("clicked", self.run_copy_log_to_clipboard_button_clicked)
 
         # wifi password
-        self.component.wifi_password_switch.connect("state-set", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(state))
+        self.component.wifi_password_switch.connect("notify::active", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(switch.get_active()))
 
         # timezone
         for timezone in pytz.common_timezones:
