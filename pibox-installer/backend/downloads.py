@@ -55,7 +55,7 @@ class Downloader:
 
         zip_filename = version + "-raspbian-jessie-lite.zip"
         url_dir_version = "2017-03-03"
-        url = "https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-{}/{}".format(url_dir_version, zip_filename)
+        url = "http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-{}/{}".format(url_dir_version, zip_filename)
 
         self._logger.step("get raspbian-lite image")
         if os.path.isfile(image_path):
