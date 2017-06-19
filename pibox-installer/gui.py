@@ -108,12 +108,16 @@ class Application:
         self.component.wifi_password_switch.connect("notify::active", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(switch.get_active()))
 
         # timezone
-        for timezone in pytz.common_timezones:
+        utc_id = -1
+        for id, timezone in enumerate(pytz.common_timezones):
+            if timezone == "UTC":
+                utc_id = id
             self.component.timezone_tree_store.append(None, [timezone])
 
         renderer = Gtk.CellRendererText()
         self.component.timezone_combobox.pack_start(renderer, True)
         self.component.timezone_combobox.add_attribute(renderer, "text", 0)
+        self.component.timezone_combobox.set_active(utc_id)
 
         # disk
         types = [info["typ"] for info in sd_card_list.informations]
