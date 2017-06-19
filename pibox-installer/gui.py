@@ -132,6 +132,8 @@ class Application:
         self.refresh_disk_list()
         self.component.sd_card_refresh_button.connect("clicked", self.sd_card_refresh_button_clicked)
 
+        self.component.output_stack.connect("notify::visible-child", lambda switch, state: self.update_free_space())
+
         # zim content
         self.component.zim_choose_content_button.connect("clicked", self.zim_choose_content_button_clicked)
         self.component.run_installation_button.connect("clicked", self.run_installation_button_clicked)
