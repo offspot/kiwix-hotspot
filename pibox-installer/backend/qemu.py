@@ -13,9 +13,29 @@ timeout = 60*3
 if os.name == "nt":
     qemu_system_arm_exe = "qemu-system-arm.exe"
     qemu_img_exe = "qemu-img.exe"
+    subprocess_env = os.environ
+    subprocess_startup_info = subprocess.STARTUPINFO()
+    subprocess_startup_info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 else:
     qemu_system_arm_exe = "qemu-system-arm"
     qemu_img_exe = "qemu-img"
+    subprocess_env = None
+    subprocess_startup_info = None
+
+def subprocess_args():
+    if hasattr(subprocess, 'STARTUPINFO'):
+        # On Windows, subprocess calls will pop up a command window by default
+        # when run from Pyinstaller with the ``--noconsole`` option. Avoid this
+        # distraction.
+        si = subprocess.STARTUPINFO()
+        si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        # Windows doesn't search the path by default. Pass it an environment so
+        # it will.
+        env = os.environ
+    else:
+        si = None
+        env = None
+    return {'startupinfo': si, 'env': env}
 
 class QemuException(Exception):
     def __init__(self, msg):
@@ -56,7 +76,7 @@ class Emulator:
     def get_image_size(self):
         pipe_reader, pipe_writer = os.pipe()
         # TODO: do not use pip, use check_output instead
-        subprocess.check_call([qemu_img_exe, "info", "-f", "raw", self._image], stdout=pipe_writer)
+        subprocess.check_call([qemu_img_exe, "info", "-f", "raw", self._image], stdout=pipe_writer, **subprocess_args())
         pipe_reader = os.fdopen(pipe_reader)
         pipe_reader.readline()
         pipe_reader.readline()
@@ -68,7 +88,7 @@ class Emulator:
 
     def resize_image(self, size):
         # We should use subprocess.run but it is not available in python3.4
-        process = subprocess.Popen([qemu_img_exe, "resize", "-f", "raw", self._image, "{}".format(size)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        process = subprocess.Popen([qemu_img_exe, "resize", "-f", "raw", self._image, "{}".format(size)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **subprocess_args())
         process.wait()
         for line in process.stdout.readlines():
             self._logger.std(line.decode("utf-8", "ignore"))
@@ -96,7 +116,7 @@ class Emulator:
             os.close(w)
             self._logger.std("diskpart select disk % and clean" % device_number)
 
-            output = subprocess.check_output(["diskpart"], stdin=r, stderr=subprocess.STDOUT)
+            output = subprocess.check_output(["diskpart"], stdin=r, stderr=subprocess.STDOUT, **subprocess_args())
             self._logger.raw_std(output)
         else:
             self._logger.err("platform not supported")
@@ -216,7 +236,7 @@ class _RunningInstance:
                 "-redir", "tcp:%d::22" % ssh_port,
                 "-display", "none",
                 "-no-reboot",
-                ], stdin=stdin_reader, stdout=stdout_writer, stderr=subprocess.STDOUT)
+                ], stdin=stdin_reader, stdout=stdout_writer, stderr=subprocess.STDOUT, **subprocess_args())
 
         self._wait_signal(stdout_reader, stdout_writer, b"login: ", timeout)
         os.write(stdin_writer, b"pi\n")
