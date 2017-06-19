@@ -3,7 +3,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib
 from backend import catalog
 from run_installation import run_installation
-from util import frozen_set_path
 import pytz
 import os
 import sys
@@ -12,8 +11,6 @@ from util import CancelEvent
 import sd_card_list
 from util import human_readable_size
 from datetime import datetime
-
-frozen_set_path()
 
 if getattr(sys, "frozen", False):
     DATA_DIR = sys._MEIPASS

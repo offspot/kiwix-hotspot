@@ -4,13 +4,6 @@ import math
 import threading
 from queue import Queue
 
-def frozen_set_path():
-    if getattr(sys, "frozen", False):
-        if os.name == "nt":
-            os.environ["PATH"] = sys._MEIPASS + ";" + os.environ["PATH"]
-        else:
-            os.environ["PATH"] = sys._MEIPASS + ":" + os.environ["PATH"]
-
 class CancelEvent:
     def __init__(self):
         self.cancel_event = threading.Event()

@@ -4,7 +4,6 @@ import sys
 import yaml
 from backend import catalog
 from run_installation import run_installation
-from util import frozen_set_path
 from util import CancelEvent
 
 class Logger:
@@ -19,8 +18,6 @@ class Logger:
 
     def std(std):
         print(std)
-
-frozen_set_path()
 
 parser = argparse.ArgumentParser(description="ideascube/kiwix installer for raspberrypi.")
 parser.add_argument("-n", "--name", help="name of the box (mybox)", default="mybox")
