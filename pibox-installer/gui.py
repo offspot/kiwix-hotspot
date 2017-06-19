@@ -389,10 +389,21 @@ class Application:
         self.update_free_space()
 
     def refresh_disk_list(self):
+        active_id = self.component.sd_card_combobox.get_active()
+        if active_id != -1:
+            selected_device = self.component.sd_card_list_store[active_id]
+            selected_device = selected_device[sd_card_list.get_device_index()]
+        else:
+            selected_device = None
+
         self.component.sd_card_list_store.clear()
-        for device in sd_card_list.get_list():
+
+        for id, device in enumerate(sd_card_list.get_list()):
             items = [info["typ"](device[info["name"]]) for info in sd_card_list.informations]
             self.component.sd_card_list_store.append(items)
+            device_name = str(device['device']).rstrip('\0')
+            if device_name == selected_device:
+                self.component.sd_card_combobox.set_active(id)
 
     def zim_choose_content_button_clicked(self, button):
         self.component.zim_window.show()
