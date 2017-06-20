@@ -34,9 +34,9 @@ you can read package pibox-installer to get help setting the environment
 
 install dependencies:
 
-* [python3](https://www.python.org/downloads/)
-* [qemu](http://www.qemu.org/download/)
-* [pygobject](https://pygobject.readthedocs.io/en/latest/getting_started.html),
+* [python3](https://www.python.org/downloads/): version >= 3.4
+* [qemu](http://www.qemu.org/download/): version >= 2.8
+* [pygobject](https://pygobject.readthedocs.io/en/latest/getting_started.html):
   on windows you can also install it using [pygi-aio](https://sourceforge.net/projects/pygobjectwin32/)
 
 create a virtual a virtual environment that includes pygobject: `python3 -m venv --system-site-packages my_venv`
@@ -61,43 +61,7 @@ run: `python3 make-vexpress-boot`
 
 ## Package pibox-installer
 
-### Windows
-
-* install msys2 and inside run `pacman -S mingw-w64-x86_64-gdk-pixbuf2`
-* add msys64\mingw64\bin to PATH
-* install python 3.4 from there https://www.python.org/downloads/windows/
-  version 3.4 is used because it is the latest supported by pygi-aio
-* install pyinstaller: in an admin terminal: `C:\Python34\python.exe -m pip install pyinstaller`
-* install gobject module with pygi all in one at https://sourceforge.net/projects/pygobjectwin32/
-  * on the first panel of libraries check gtk+ 3.x
-  * on the third panel check GIR
-* make a symbolic link: in an admin terminal: `mklink /D C:\Python34\share C:\Python34\Lib\site-packages\gnome\share`
-* install qemu from http://www.qemu.org/download/
-* install pyinstaller with pypi
-* download pibox-installer repository and run:
-  `"C:\Python34\python.exe" "C:\Python34\Scripts\pyinstaller-script.py" pibox-installer-win64.spec`
-  or `"C:\Python34\python.exe" "C:\Python34\Scripts\pyinstaller-script.py" pibox-installer-win32.spec`
-
-the script used in appveyor is `appveyor.bk`
-
-note: we don't msys2 to install pygobject because pyinstaller fails to install on msys2
-
-### Macos
-
-* install homebrew: https://brew.sh/
-* install python3.5 with zoidbergwill formula: https://github.com/zoidbergwill/homebrew-python
-  version 3.5 is used because it is the latest supported by pyinstaller
-* install pygobject after python3.5 has been installed:
-  `brew install pygobject --with-python3`
-* install pyinstaller with pypi
-* download pibox-installer repository and run:
-  `pyinstaller pibox-installer-macos.spec`
-
-### Linux
-
-to install the python requirements you may need to install some packages
-
-* on Debian and Ubuntu: `sudo apt-get install build-essential libssl-dev libffi-dev libdbus-glib-1-dev libgdk-pixbuf2.0-dev`
+see [appveyor.yml](appveyor.yml) for windows and [.travis.yml](.travis.yml) for mac and linux
 
 ## License
 

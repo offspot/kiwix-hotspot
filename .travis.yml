@@ -9,6 +9,7 @@ matrix:
     language: generic
     install:
     # Package pibox-installer
+    # note: we use python35 because pyinstaller do not support 3.6 yet
     - brew install qemu zoidbergwill/python/python35
     - brew install pygobject3 --with-python3 gtk+3
     - python3 -m pip install -r requirements-macos.txt
@@ -56,6 +57,7 @@ matrix:
           libgdk-pixbuf2.0-dev
     script:
     - pip3 install -r requirements-linux.txt
+    # note: we use mgautierfr version because it resolves packaging pygobject
     - pip3 install https://github.com/mgautierfr/pyinstaller/archive/xlib_hook.zip
     - pyinstaller --log-level=DEBUG pibox-installer-linux.spec
     - cat build/pibox-installer-linux/warnpibox-installer-linux.txt
