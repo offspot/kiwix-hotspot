@@ -13,7 +13,7 @@ matrix:
     - brew install pygobject3 --with-python3 gtk+3
     - python3 -m pip install -r requirements-macos.txt
     - python3 -m pip install pyinstaller
-    - pyinstaller pibox-installer-macos.spec
+    - pyinstaller --log-level=DEBUG pibox-installer-macos.spec
 
     # Sign application
     # - security create-keychain -p mysecretpassword build.keychain
@@ -57,7 +57,7 @@ matrix:
     script:
     - pip3 install -r requirements-linux.txt
     - pip3 install https://github.com/mgautierfr/pyinstaller/archive/xlib_hook.zip
-    - pyinstaller pibox-installer-linux.spec
+    - pyinstaller --log-level=DEBUG pibox-installer-linux.spec
     - cat build/pibox-installer-linux/warnpibox-installer-linux.txt
 
     - cd dist

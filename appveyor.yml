@@ -55,8 +55,8 @@ install:
 
   # Run pyinstaller and show warning
   - cd C:\projects\pibox-installer
-  - if %platform%==x86 C:\Python34\python.exe C:\Python34\Scripts\pyinstaller-script.py pibox-installer-win32.spec
-  - if %platform%==x64 C:\Python34\python.exe C:\Python34\Scripts\pyinstaller-script.py pibox-installer-win64.spec
+  - if %platform%==x86 C:\Python34\python.exe C:\Python34\Scripts\pyinstaller-script.py --log-level=DEBUG pibox-installer-win32.spec
+  - if %platform%==x64 C:\Python34\python.exe C:\Python34\Scripts\pyinstaller-script.py --log-level=DEBUG pibox-installer-win64.spec
   - if %platform%==x86 type build\pibox-installer-win32\warnpibox-installer-win32.txt
   - if %platform%==x64 type build\pibox-installer-win64\warnpibox-installer-win64.txt
 
