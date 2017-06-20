@@ -78,14 +78,16 @@ class Emulator:
         return _RunningInstance(self, self._logger, cancel_event)
 
     def get_image_size(self):
-        pipe_reader, pipe_writer = os.pipe()
-        # TODO: do not use pip, use check_output instead
-        subprocess.check_call([qemu_img_exe_path, "info", "-f", "raw", self._image], stdout=pipe_writer, **startup_info_args())
-        pipe_reader = os.fdopen(pipe_reader)
-        pipe_reader.readline()
-        pipe_reader.readline()
-        size_line = pipe_reader.readline()
-        matches = re.findall(r"virtual size: \S*G \((\d*) bytes\)", size_line)
+        # We should use subprocess.run but it is not available in python3.4
+        process = subprocess.Popen([qemu_img_exe_path, "info", "-f", "raw", self._image], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **startup_info_args())
+        self._logger.std("Call: " + str(process.args))
+        process.wait()
+        matches = []
+        for line_number, line in enumerate(process.stdout.readlines()):
+            self._logger.raw_std(line.decode("utf-8", "ignore"))
+            if line_number == 2:
+                matches = re.findall(b"virtual size: \S*G \((\d*) bytes\)", line)
+
         if len(matches) != 1:
             raise QemuException("cannot get image %s size from qemu-img info" % self._image)
         return int(matches[0])
@@ -93,9 +95,10 @@ class Emulator:
     def resize_image(self, size):
         # We should use subprocess.run but it is not available in python3.4
         process = subprocess.Popen([qemu_img_exe_path, "resize", "-f", "raw", self._image, "{}".format(size)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **startup_info_args())
+        self._logger.std("Call: " + str(process.args))
         process.wait()
         for line in process.stdout.readlines():
-            self._logger.std(line.decode("utf-8", "ignore"))
+            self._logger.raw_std(line.decode("utf-8", "ignore"))
         if process.returncode != 0:
             raise QemuException("cannot resize image %s" % self._image)
 
