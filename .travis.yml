@@ -41,8 +41,7 @@ matrix:
     addons:
       apt:
         packages:
-          qemu
-          qemu-system-arm
+          # Some package may not be required
           python3-gi
           python3-gi-cairo
           python3-cairo
@@ -56,6 +55,7 @@ matrix:
           python3-dev
           libgdk-pixbuf2.0-dev
     script:
+    - ./make-qemu-static.sh
     - pip3 install -r requirements-linux.txt
     # note: we use mgautierfr version because it resolves packaging pygobject
     - pip3 install https://github.com/mgautierfr/pyinstaller/archive/xlib_hook.zip
