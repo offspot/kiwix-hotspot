@@ -14,6 +14,24 @@ matrix:
     - brew install pygobject3 --with-python3 gtk+3
     - python3 -m pip install -r requirements-macos.txt
     - python3 -m pip install pyinstaller
+
+    # Bundle QEMU
+    - git clone https://github.com/auriamg/macdylibbundler/
+    - cd macdylibbundler/
+    - make
+    - cd ..
+    - mkdir qemu
+    - cd qemu
+    - cp /usr/local/bin/qemu-img .
+    - cp /usr/local/bin/qemu-system-arm .
+    - chmod u+w qemu-img
+    - chmod u+w qemu-system-arm
+    - ../macdylibbundler/dylibbundler -d . -p @loader_path/ -b -x ./qemu-system-arm  -x ./qemu-img
+    - chmod u-w qemu-img
+    - chmod u-w qemu-system-arm
+    - cd ..
+
+    # Run PyInstaller
     - pyinstaller --log-level=DEBUG pibox-installer-macos.spec
 
     # Sign application
@@ -29,7 +47,7 @@ matrix:
     - create-dmg dist/pibox-installer.app || true
 
     # Send dmg
-    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-0.0.0.dmg pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-macos.dmg
+    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-0.0.0.dmg pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-macos-qemu-deps.dmg
 
   - os: linux
     language: python
