@@ -1,11 +1,14 @@
 # -*- mode: python -*-
+import subprocess
+
+output = subprocess.check_output(["ls", "qemu"])
+files = output.decode('utf-8').splitlines()
 
 block_cipher = None
 
-
 a = Analysis(['pibox-installer/__main__.py'],
              pathex=['.'],
-             binaries=[('/usr/local/bin/qemu-system-arm', '.'), ('/usr/local/bin/qemu-img', '.')],
+             binaries=[("qemu/" + file, '.') for file in files],
              datas=[('ui.glade', '.')],
              hiddenimports=[],
              hookspath=[],
