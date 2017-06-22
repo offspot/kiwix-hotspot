@@ -18,6 +18,7 @@ matrix:
     # Bundle QEMU
     - git clone https://github.com/auriamg/macdylibbundler/
     - cd macdylibbundler/
+    - git checkout 3c79be6efb0867775bd0571011331946f76f36a6
     - make
     - cd ..
     - mkdir qemu
