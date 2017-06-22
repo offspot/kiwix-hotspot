@@ -42,7 +42,7 @@ matrix:
     # - codesign -s pibox-installer dist/pibox-installer.app
     - codesign -s - dist/pibox-installer.app
 
-    # Install create-dmg
+    # Install and run create-dmg
     - npm install --global create-dmg
     - create-dmg dist/pibox-installer.app || true
 
@@ -72,16 +72,45 @@ matrix:
           python-dev
           python3-dev
           libgdk-pixbuf2.0-dev
+    env:
+    - QEMU_VERSION=2.9.0
+    - QEMU_DIR=qemu-$QEMU_VERSION
+    - QEMU_ARCHIVE=$QEMU_DIR.tar.xz
     script:
-    - ./make-qemu-static.sh
+    # Compile QEMU statically
+    - wget http://download.qemu-project.org/$QEMU_ARCHIVE
+    - tar -xf $QEMU_ARCHIVE
+    - rm $QEMU_ARCHIVE
+
+    - cd $QEMU_DIR
+    - ./configure
+        --target-list=arm-softmmu
+        --static
+        --disable-gtk
+        --disable-cocoa
+        --disable-libusb
+        --disable-glusterfs
+        --disable-smartcard
+        --disable-usb-redir
+        --python=python2
+    - make
+    - cp arm-softmmu/qemu-system-arm ..
+    - cp qemu-img ..
+    - cd ..
+
+    # Install python dependancies
     - pip3 install -r requirements-linux.txt
+
+    # Install and run pyinstaller
     # note: we use mgautierfr version because it resolves packaging pygobject
     - pip3 install https://github.com/mgautierfr/pyinstaller/archive/xlib_hook.zip
     - pyinstaller --log-level=DEBUG pibox-installer-linux.spec
     - cat build/pibox-installer-linux/warnpibox-installer-linux.txt
 
+    # Archive
     - cd dist
     - tar czvf pibox-installer.tar.gz pibox-installer
     - cd ..
 
+    # Deploy
     - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer.tar.gz pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-linux.tar.gz
