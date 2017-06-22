@@ -4,6 +4,7 @@ from gi.repository import Gtk, Gdk, GLib
 from backend import catalog
 from run_installation import run_installation
 import pytz
+import tzlocal
 import os
 import sys
 import threading
@@ -105,16 +106,19 @@ class Application:
         self.component.wifi_password_switch.connect("notify::active", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(switch.get_active()))
 
         # timezone
-        utc_id = -1
+        default_id = -1
+        local_tz = tzlocal.get_localzone()
         for id, timezone in enumerate(pytz.common_timezones):
-            if timezone == "UTC":
-                utc_id = id
+            if timezone == "UTC" and default_id == -1:
+                default_id = id
+            if pytz.timezone(timezone) == local_tz:
+                default_id = id
             self.component.timezone_tree_store.append(None, [timezone])
 
         renderer = Gtk.CellRendererText()
         self.component.timezone_combobox.pack_start(renderer, True)
         self.component.timezone_combobox.add_attribute(renderer, "text", 0)
-        self.component.timezone_combobox.set_active(utc_id)
+        self.component.timezone_combobox.set_active(default_id)
 
         # disk
         types = [info["typ"] for info in sd_card_list.informations]

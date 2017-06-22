@@ -1,3 +1,4 @@
+tzlocal==1.4
 asn1crypto==0.22.0
 cffi==1.10.0
 cryptography==1.8.1
