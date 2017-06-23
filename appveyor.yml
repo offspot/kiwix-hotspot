@@ -53,8 +53,8 @@ install:
   # Install qemu
   - mkdir "C:\Program Files\qemu"
   - cd "C:\Program Files\qemu"
-  - if %platform%==x86 appveyor DownloadFile "https://qemu.weilnetz.de/w32/2017/qemu-w32-setup-20170418.exe" -FileName "qemu-setup.exe"
-  - if %platform%==x64 appveyor DownloadFile "https://qemu.weilnetz.de/w64/2017/qemu-w64-setup-20170418.exe" -FileName "qemu-setup.exe"
+  - if %platform%==x86 appveyor DownloadFile "https://qemu.weilnetz.de/w32/2017/qemu-w32-setup-20170420.exe" -FileName "qemu-setup.exe"
+  - if %platform%==x64 appveyor DownloadFile "https://qemu.weilnetz.de/w64/2017/qemu-w64-setup-20170420.exe" -FileName "qemu-setup.exe"
   - 7z x qemu-setup.exe
   - dir "C:\Program Files\qemu"
 
