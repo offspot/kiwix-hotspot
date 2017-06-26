@@ -226,14 +226,8 @@ class Application:
         else:
             sd_card = None
             size = self.get_output_size()
-            today = datetime.today()
-            filename = "image-{}-{}-{}-{}-{}-{}.img".format(
-                    today.year,
-                    today.month,
-                    today.day,
-                    today.hour,
-                    today.minute,
-                    today.second)
+            today = datetime.today().strftime('%Y_%m_%d-%H_%M_%S')
+            filename = "pibox-{}.img".format(today)
             output_dir = os.path.join(os.path.expanduser('~'), 'Desktop')
             if not os.path.isdir(output_dir):
                 output_dir = os.path.expanduser('~')
