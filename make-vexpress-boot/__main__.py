@@ -47,7 +47,10 @@ with open(".config", "w") as config:
         config.write(line)
 
     # Enable IPV6
-    config.write("CONFIG_IPV6=y")
+    config.write("\nCONFIG_IPV6=y\n")
+
+    # Enable NET_NS
+    config.write("\nCONFIG_NET_NS=y\n")
 
     # Enable netfilter
     config.write(NETFILTER_CONF)
