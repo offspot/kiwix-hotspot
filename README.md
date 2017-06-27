@@ -63,6 +63,41 @@ run: `python3 make-vexpress-boot`
 
 see [appveyor.yml](appveyor.yml) for windows and [.travis.yml](.travis.yml) for mac and linux
 
+## Contribute
+
+some notes about how the project is structured:
+
+pibox-installer is a python3 (tested on 3.4 and 3.5) application that use PyGobject for GUI and QEMU for emulating ARM machine.
+
+how it works:
+* ask user for configuration
+* download raspbian-lite and a Linux kernel compiled with make-vexpress-boot
+* resize the raspbian-lite image
+* emulate vexpress ARM machine with pibox-installer-vexpress-boot and raspbian-lite image
+* run ansiblecube inside the emulation
+* write output to SD card
+
+make-vexpress-boot is a python3 script that compiles linux with options required by ansiblecube such as IPV6, network userspace and network filtering.
+
+insert_id_to_class_glade.py is a python3 script that insert id to class in glade file in order to be gtk3.10 compatible
+
+how the application is packaged:
+
+* on windows:
+
+  we use a self extracting archive 7zS.sfx because pyinstaller in onefile on windows
+  fails to give admin rights and also there was an issue if we set no console.
+
+  assets are in windows_bundle
+
+* on linux:
+
+  qemu is build statically
+
+* on macos:
+
+  qemu is build dynamically and bundling is made with macdylibbundler
+
 ## License
 
 Copyright (C) 2016 Guillaume Thiolliere
