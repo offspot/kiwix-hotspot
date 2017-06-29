@@ -15,6 +15,10 @@ matrix:
     - python3 -m pip install -r requirements-macos.txt
     - python3 -m pip install pyinstaller==3.2.1
 
+    # Download pibox-installer-vexpress-boot
+    - wget http://download.kiwix.org/dev/pibox-installer-vexpress-boot.zip
+    - unzip pibox-installer-vexpress-boot.zip
+
     # Bundle QEMU
     - git clone https://github.com/auriamg/macdylibbundler/
     - cd macdylibbundler/
@@ -79,6 +83,10 @@ matrix:
     - QEMU_DIR=qemu-$QEMU_VERSION
     - QEMU_ARCHIVE=$QEMU_DIR.tar.xz
     script:
+    # Download pibox-installer-vexpress-boot
+    - wget http://download.kiwix.org/dev/pibox-installer-vexpress-boot.zip
+    - unzip pibox-installer-vexpress-boot.zip
+
     # Compile QEMU statically
     - wget http://download.qemu-project.org/$QEMU_ARCHIVE
     - tar -xf $QEMU_ARCHIVE

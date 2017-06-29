@@ -4,6 +4,7 @@ from backend import qemu
 import os
 import sys
 import shutil
+import data
 
 def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger, cancel_event, sd_card, output_file, done_callback=None):
 
@@ -19,10 +20,9 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
 
     try:
         downloader = Downloader(logger)
-        vexpress_boot_kernel_path, vexpress_boot_dtb_path = downloader.download_vexpress_boot()
         raspbian_image_path = downloader.download_raspbian()
 
-        emulator = qemu.Emulator(vexpress_boot_kernel_path, vexpress_boot_dtb_path, raspbian_image_path, logger)
+        emulator = qemu.Emulator(data.vexpress_boot_kernel, data.vexpress_boot_dtb, raspbian_image_path, logger)
 
         if size < emulator.get_image_size():
             logger.err("cannot decrease image size")

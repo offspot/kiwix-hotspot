@@ -35,9 +35,10 @@ you can read package pibox-installer to get help setting the environment
 install dependencies:
 
 * [python3](https://www.python.org/downloads/): version >= 3.4
-* [qemu](http://www.qemu.org/download/): version >= 2.8
+* [qemu](http://www.qemu.org/download/): version >= 2.8, qemu-img and qemu-system-arm must be present in the directory (symlink or install there)
 * [pygobject](https://pygobject.readthedocs.io/en/latest/getting_started.html):
   on windows you can also install it using [pygi-aio](https://sourceforge.net/projects/pygobjectwin32/)
+* [pibox-installer-vexpress-boot]("http://download.kiwix.org/dev/pibox-installer-vexpress-boot.zip"): unzip in the directory
 
 create a virtual a virtual environment that includes pygobject: `python3 -m venv --system-site-packages my_venv`
 
@@ -52,7 +53,7 @@ run CLI application: `python3 pibox-installer/cli.py`
 
 ## Build pibox-installer-vexpress-boot
 
-pibox-installer download a linux kernel for the QEMU emulation of vexpress machine.
+pibox-installer use a linux kernel for the QEMU emulation of vexpress machine.
 This vexpress boot can be compiled on linux using make-vexpress-boot python3 script.
 
 requirements: `gcc-arm-linux-gnueabihf` and `zip`

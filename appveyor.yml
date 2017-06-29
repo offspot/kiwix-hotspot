@@ -19,6 +19,10 @@ install:
   - nuget install secure-file -ExcludeVersion
   - secure-file\tools\secure-file -decrypt pibox_installer_ci_rsa.appveyor_enc -secret %certificate_secret% -out pibox_installer_ci_rsa
 
+  # Download pibox-installer-vexpress-boot
+  - appveyor DownloadFile "http://download.kiwix.org/dev/pibox-installer-vexpress-boot.zip"
+  - 7z.exe x pibox-installer-vexpress-boot.zip
+
   # Install pygobject
   # pygi-aio provides a way to install from cmd even if it is not documented
   # the only package to install is GTK with GIR

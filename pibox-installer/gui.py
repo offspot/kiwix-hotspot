@@ -12,11 +12,7 @@ from util import CancelEvent
 import sd_card_list
 from util import human_readable_size
 from datetime import datetime
-
-if getattr(sys, "frozen", False):
-    DATA_DIR = sys._MEIPASS
-else:
-    DATA_DIR = ""
+import data
 
 class Logger:
     def __init__(self, text_buffer, step_label):
@@ -78,7 +74,7 @@ class Application:
         self.catalog = catalog
 
         builder = Gtk.Builder()
-        builder.add_from_file(os.path.join(DATA_DIR, "ui.glade"))
+        builder.add_from_file(data.ui_glade)
 
         self.component = Component(builder)
 
