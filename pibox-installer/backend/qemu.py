@@ -91,20 +91,6 @@ class Emulator:
         elif os.name == "nt":
             image = os.open(self._image, os.O_RDONLY | os.O_BINARY)
             device = os.open(device_name, os.O_WRONLY | os.O_BINARY)
-
-            matches = re.findall(r"\\\\.\\PHYSICALDRIVE(\d*)", device_name)
-            if len(matches) != 1:
-                raise ValueError("Error while getting physical drive number")
-            device_number = matches[0]
-
-            r,w = os.pipe()
-            os.write(w, str.encode("select disk {}\n".format(device_number)))
-            os.write(w, b"clean\n")
-            os.close(w)
-            self._logger.std("diskpart select disk % and clean" % device_number)
-
-            output = subprocess.check_output(["diskpart"], stdin=r, stderr=subprocess.STDOUT, **startup_info_args())
-            self._logger.raw_std(output)
         else:
             self._logger.err("platform not supported")
             return
