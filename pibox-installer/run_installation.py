@@ -24,6 +24,9 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
             if sys.platform == "linux":
                 #TODO restore sd_card mod
                 subprocess_pretty_check_call(["pkexec", "chmod", "-c", "o+w", sd_card], logger)
+            if sys.platform == "darwin":
+                #TODO restore sd_card mod
+                subprocess_pretty_check_call(["osascript", "-e", "do shell script \"diskutil unmountDisk {0} && chmod -v o+w {0}\" with administrator privileges".format(sd_card)], logger)
 
         downloader = Downloader(logger)
         raspbian_image_path = downloader.download_raspbian()
