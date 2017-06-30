@@ -7,6 +7,8 @@ import paramiko
 import re
 import random
 import threading
+from .util import startup_info_args
+from .util import subprocess_pretty_check_call
 
 timeout = 60*3
 
@@ -29,17 +31,6 @@ else:
 
 qemu_system_arm_exe_path = os.path.join(bin_path, qemu_system_arm_exe)
 qemu_img_exe_path = os.path.join(bin_path, qemu_img_exe)
-
-def startup_info_args():
-    if hasattr(subprocess, 'STARTUPINFO'):
-        # On Windows, subprocess calls will pop up a command window by default
-        # when run from Pyinstaller with the ``--noconsole`` option. Avoid this
-        # distraction.
-        si = subprocess.STARTUPINFO()
-        si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-    else:
-        si = None
-    return {'startupinfo': si}
 
 class QemuException(Exception):
     def __init__(self, msg):
@@ -78,13 +69,9 @@ class Emulator:
         return _RunningInstance(self, self._logger, cancel_event)
 
     def get_image_size(self):
-        # We should use subprocess.run but it is not available in python3.4
-        process = subprocess.Popen([qemu_img_exe_path, "info", "-f", "raw", self._image], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **startup_info_args())
-        self._logger.std("Call: " + str(process.args))
-        process.wait()
+        output = subprocess_pretty_check_call([qemu_img_exe_path, "info", "-f", "raw", self._image], self._logger)
         matches = []
-        for line_number, line in enumerate(process.stdout.readlines()):
-            self._logger.raw_std(line.decode("utf-8", "ignore"))
+        for line_number, line in enumerate(output):
             if line_number == 2:
                 matches = re.findall(b"virtual size: \S*G \((\d*) bytes\)", line)
 
@@ -93,14 +80,7 @@ class Emulator:
         return int(matches[0])
 
     def resize_image(self, size):
-        # We should use subprocess.run but it is not available in python3.4
-        process = subprocess.Popen([qemu_img_exe_path, "resize", "-f", "raw", self._image, "{}".format(size)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **startup_info_args())
-        self._logger.std("Call: " + str(process.args))
-        process.wait()
-        for line in process.stdout.readlines():
-            self._logger.raw_std(line.decode("utf-8", "ignore"))
-        if process.returncode != 0:
-            raise QemuException("cannot resize image %s" % self._image)
+        subprocess_pretty_check_call([qemu_img_exe_path, "resize", "-f", "raw", self._image, "{}".format(size)], self._logger)
 
     def copy_image(self, device_name):
         self._logger.step("copy image to sd card")
