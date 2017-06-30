@@ -95,7 +95,6 @@ elif sys.platform == "darwin":
                 "media_name": plist["MediaName"],
                 "media_type": plist["MediaType"],
                 "removable": plist["Removable"],
-                "device": name,
                 "size": size,
                 "formatted_size": formatted_size,
                 "volume_name": plist["VolumeName"],
