@@ -315,7 +315,7 @@ class Application:
 class ZimChooserWindow:
     def __init__(self, main_window):
         builder = Gtk.Builder()
-        builder.add_from_file(os.path.join(DATA_DIR, "ui.glade"))
+        builder.add_from_file(data.ui_glade)
 
         self.component = Component(builder)
 
