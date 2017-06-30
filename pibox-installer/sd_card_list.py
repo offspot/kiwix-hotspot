@@ -59,7 +59,7 @@ if sys.platform == "linux":
                     block["drive_id"] = info.get('Id')
                     block["drive_connection_bus"] = info.get('ConnectionBus')
 
-        return filter(lambda d: d["drive_removable"], devices)
+        return filter(lambda d: d["drive_removable"] and d["size"] != 0, devices)
 
 elif sys.platform == "darwin":
     import plistlib
@@ -101,7 +101,7 @@ elif sys.platform == "darwin":
                 "volume_name": plist["VolumeName"],
                 })
 
-        return filter(lambda d: d["removable"], devices)
+        return filter(lambda d: d["removable"] and d["size"] != 0, devices)
 
 elif sys.platform == "win32":
     informations = [
@@ -142,7 +142,7 @@ elif sys.platform == "win32":
                 "formatted_size": formatted_size,
                 })
 
-        return filter(lambda d: d["media_type"] != "Fixed hard disk media", devices)
+        return filter(lambda d: d["media_type"] != "Fixed hard disk media" and d["size"] != 0, devices)
 
 else:
     print("platform not supported")
