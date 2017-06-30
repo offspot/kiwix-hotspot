@@ -5,6 +5,7 @@ import os
 import sys
 import shutil
 import data
+from backend.util import subprocess_pretty_check_call
 
 def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger, cancel_event, sd_card, output_file, done_callback=None):
 
@@ -19,6 +20,11 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
     os.chdir(build_dir)
 
     try:
+        if sd_card:
+            if sys.platform == "linux":
+                #TODO restore sd_card mod
+                subprocess_pretty_check_call(["pkexec", "chmod", "-c", "o+w", sd_card], logger)
+
         downloader = Downloader(logger)
         raspbian_image_path = downloader.download_raspbian()
 
