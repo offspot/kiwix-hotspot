@@ -15,39 +15,49 @@ from datetime import datetime
 import data
 
 class Logger:
-    def __init__(self, text_buffer, step_label):
-        self.text_buffer = text_buffer
+    def __init__(self, text_view, step_label):
+        self.text_view = text_view
+        self.text_buffer = text_view.get_buffer()
         self.step_label = step_label
-        self.step_tag = text_buffer.create_tag("step", foreground="blue")
-        self.err_tag = text_buffer.create_tag("err", foreground="red")
+        self.step_tag = self.text_buffer.create_tag("step", foreground="blue")
+        self.err_tag = self.text_buffer.create_tag("err", foreground="red")
+
+    def scroll_down(self):
+        end = self.text_buffer.get_end_iter()
+        end.backward_line()
+        self.text_view.scroll_to_iter(end, 0, True, 0, 1.)
 
     def step(self, step):
         GLib.idle_add(self.main_thread_step, step)
+        GLib.idle_add(self.scroll_down)
 
     def err(self, err):
         GLib.idle_add(self.main_thread_err, err)
+        GLib.idle_add(self.scroll_down)
 
     def raw_std(self, std):
         GLib.idle_add(self.main_thread_raw_std, std)
+        GLib.idle_add(self.scroll_down)
 
     def std(self, std):
         GLib.idle_add(self.main_thread_std, std)
+        GLib.idle_add(self.scroll_down)
 
     def main_thread_step(self, text):
-        text_iter = self.text_buffer.get_iter_at_offset(-1)
+        text_iter = self.text_buffer.get_end_iter()
         self.text_buffer.insert_with_tags(text_iter, text + "\n", self.step_tag)
         self.step_label.set_text("Step : " + text)
 
     def main_thread_err(self, text):
-        text_iter = self.text_buffer.get_iter_at_offset(-1)
+        text_iter = self.text_buffer.get_end_iter()
         self.text_buffer.insert_with_tags(text_iter, text + "\n", self.err_tag)
 
     def main_thread_raw_std(self, text):
-        text_iter = self.text_buffer.get_iter_at_offset(-1)
+        text_iter = self.text_buffer.get_end_iter()
         self.text_buffer.insert(text_iter, text)
 
     def main_thread_std(self, text):
-        text_iter = self.text_buffer.get_iter_at_offset(-1)
+        text_iter = self.text_buffer.get_end_iter()
         self.text_buffer.insert(text_iter, text + "\n")
 
 class Component:
@@ -93,7 +103,7 @@ class Application:
         self.component.run_window.connect("delete-event", Gtk.main_quit)
         self.component.run_window.set_default_size(640, 480)
         self.component.run_window.connect("delete-event", self.run_install_cancel)
-        self.logger = Logger(self.component.run_text_view.get_buffer(), self.component.run_step_label)
+        self.logger = Logger(self.component.run_text_view, self.component.run_step_label)
 
         self.component.run_abort_done_button.connect("clicked", self.run_abort_done_button_clicked)
         self.component.run_copy_log_to_clipboard_button.connect("clicked", self.run_copy_log_to_clipboard_button_clicked)
@@ -295,8 +305,8 @@ class Application:
 
     def run_copy_log_to_clipboard_button_clicked(self, widget):
         text_buffer = self.component.run_text_view.get_buffer()
-        start = text_buffer.get_iter_at_offset(0)
-        end = text_buffer.get_iter_at_offset(-1)
+        start = text_buffer.get_start_iter()
+        end = text_buffer.get_end_iter()
         hidden = True
         clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         clipboard.set_text(text_buffer.get_text(start, end, hidden), -1)
