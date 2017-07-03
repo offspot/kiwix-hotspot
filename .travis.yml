@@ -31,7 +31,7 @@ matrix:
     - cp /usr/local/bin/qemu-system-arm .
     - chmod u+w qemu-img
     - chmod u+w qemu-system-arm
-    - ../macdylibbundler/dylibbundler -d . -p @loader_path/ -b -x ./qemu-system-arm  -x ./qemu-img
+    - ../macdylibbundler/dylibbundler -d . -p @executable_path/ -b -x ./qemu-system-arm  -x ./qemu-img
     - chmod u-w qemu-img
     - chmod u-w qemu-system-arm
     - cd ..
