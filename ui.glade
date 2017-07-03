@@ -9,7 +9,12 @@
       <object class="GtkBox" id="no_id_1">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="margin_left">5</property>
+        <property name="margin_right">5</property>
+        <property name="margin_top">5</property>
+        <property name="margin_bottom">5</property>
         <property name="orientation">vertical</property>
+        <property name="spacing">5</property>
         <child>
           <object class="GtkLabel" id="done_label">
             <property name="visible">True</property>
@@ -45,7 +50,12 @@
       <object class="GtkBox" id="no_id_2">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="margin_left">5</property>
+        <property name="margin_right">5</property>
+        <property name="margin_top">5</property>
+        <property name="margin_bottom">5</property>
         <property name="orientation">vertical</property>
+        <property name="spacing">5</property>
         <child>
           <object class="GtkBox" id="no_id_3">
             <property name="visible">True</property>
@@ -156,7 +166,12 @@
       <object class="GtkBox" id="no_id_6">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="margin_left">5</property>
+        <property name="margin_right">5</property>
+        <property name="margin_top">5</property>
+        <property name="margin_bottom">5</property>
         <property name="orientation">vertical</property>
+        <property name="spacing">5</property>
         <child>
           <object class="GtkLabel" id="no_id_7">
             <property name="visible">True</property>
@@ -179,9 +194,8 @@
           <object class="GtkBox" id="no_id_8">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">60</property>
-            <property name="margin_right">60</property>
             <property name="orientation">vertical</property>
+            <property name="spacing">5</property>
             <child>
               <object class="GtkBox" id="no_id_9">
                 <property name="visible">True</property>
@@ -602,7 +616,12 @@
       <object class="GtkBox" id="no_id_24">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="margin_left">5</property>
+        <property name="margin_right">5</property>
+        <property name="margin_top">5</property>
+        <property name="margin_bottom">5</property>
         <property name="orientation">vertical</property>
+        <property name="spacing">5</property>
         <child>
           <object class="GtkBox" id="no_id_25">
             <property name="visible">True</property>
