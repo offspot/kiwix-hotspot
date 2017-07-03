@@ -174,7 +174,7 @@ class Application:
             self.component.sd_card_list_store.append(items)
 
     def run_install_cancel(self, widget, path):
-        self.cancel_event.signal_and_wait_consumed()
+        self.cancel_event.cancel()
 
     def zim_choosen_filter_func(self, model, iter, data):
         return model[iter][8]

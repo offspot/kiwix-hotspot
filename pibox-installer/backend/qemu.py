@@ -122,33 +122,19 @@ class _RunningInstance:
     _qemu = None
     _client = None
     _logger = None
-    _qemu_lock = None
     _cancel_event = None
-
-    def cancel_management(self):
-        self._cancel_event.wait()
-        # we don't release the lock so we can't create another
-        # another process once cancel has been raised
-        self._qemu_lock.acquire()
-        if self._qemu is not None:
-            self._qemu.kill()
-        self._cancel_event.consume()
 
     def __init__(self, emulation, logger, cancel_event):
         self._emulation = emulation
         self._logger = logger
-
-        self._qemu_lock = threading.Lock()
         self._cancel_event = cancel_event
-        if not cancel_event.subscribe():
-            exit(0)
-        threading.Thread(target=self.cancel_management, daemon=True).start()
 
     def __enter__(self):
         try:
             self._boot()
         except:
-            self._qemu.kill()
+            if self._qemu:
+                self._qemu.kill()
             raise
         return self
 
@@ -196,7 +182,7 @@ class _RunningInstance:
 
         self._logger.step("launch qemu with ssh on port {}".format(ssh_port))
 
-        with self._qemu_lock:
+        with self._cancel_event.lock() as cancel_register:
             self._qemu = subprocess.Popen([
                 qemu_system_arm_exe_path,
                 "-m", "1G",
@@ -210,6 +196,7 @@ class _RunningInstance:
                 "-display", "none",
                 "-no-reboot",
                 ], stdin=stdin_reader, stdout=stdout_writer, stderr=subprocess.STDOUT, **startup_info_args())
+            cancel_register.register(self._qemu.pid)
 
         self._wait_signal(stdout_reader, stdout_writer, b"login: ", timeout)
         os.write(stdin_writer, b"pi\n")
@@ -232,6 +219,10 @@ class _RunningInstance:
         self.exec_cmd("sudo shutdown 0")
         self._client.close()
         self._qemu.wait(timeout)
+        with self._cancel_event.lock() as cancel_register:
+            cancel_register.unregister(self._qemu.pid)
+        self._qemu = None
+
 
     def exec_cmd(self, command, capture_stdout=False, check=True):
         if capture_stdout:
