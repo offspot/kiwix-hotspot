@@ -4,6 +4,7 @@
   <requires lib="gtk+" version="3.10"/>
   <object class="GtkWindow" id="done_window">
     <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Pibox installer</property>
     <child>
       <object class="GtkBox" id="no_id_1">
         <property name="visible">True</property>
@@ -39,6 +40,7 @@
   </object>
   <object class="GtkWindow" id="run_window">
     <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Pibox installer</property>
     <child>
       <object class="GtkBox" id="no_id_2">
         <property name="visible">True</property>
@@ -149,6 +151,7 @@
   </object>
   <object class="GtkWindow" id="window">
     <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Pibox installer</property>
     <child>
       <object class="GtkBox" id="no_id_6">
         <property name="visible">True</property>
@@ -160,7 +163,7 @@
             <property name="can_focus">False</property>
             <property name="margin_top">16</property>
             <property name="margin_bottom">16</property>
-            <property name="label" translatable="yes">Welcome to Pibox installer</property>
+            <property name="label" translatable="yes">Pibox installer</property>
             <attributes>
               <attribute name="font-desc" value="&lt;Saisir une valeur&gt; 20"/>
               <attribute name="weight" value="bold"/>
@@ -594,6 +597,7 @@
   </object>
   <object class="GtkWindow" id="zim_window">
     <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Pibox installer</property>
     <child>
       <object class="GtkBox" id="no_id_24">
         <property name="visible">True</property>
