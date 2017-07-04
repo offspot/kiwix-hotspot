@@ -15,14 +15,9 @@ timeout = 60*3
 if os.name == "nt":
     qemu_system_arm_exe = "qemu-system-arm.exe"
     qemu_img_exe = "qemu-img.exe"
-    subprocess_env = os.environ
-    subprocess_startup_info = subprocess.STARTUPINFO()
-    subprocess_startup_info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 else:
     qemu_system_arm_exe = "qemu-system-arm"
     qemu_img_exe = "qemu-img"
-    subprocess_env = None
-    subprocess_startup_info = None
 
 if getattr(sys, "frozen", False):
     bin_path = sys._MEIPASS
