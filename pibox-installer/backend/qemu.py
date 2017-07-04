@@ -13,8 +13,8 @@ from .util import subprocess_pretty_check_call
 timeout = 60*3
 
 if os.name == "nt":
-    qemu_system_arm_exe = "qemu-system-arm.exe"
-    qemu_img_exe = "qemu-img.exe"
+    qemu_system_arm_exe = "qemu\qemu-system-arm.exe"
+    qemu_img_exe = "qemu\qemu-img.exe"
 else:
     qemu_system_arm_exe = "qemu-system-arm"
     qemu_img_exe = "qemu-img"
