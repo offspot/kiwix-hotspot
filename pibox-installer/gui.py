@@ -46,7 +46,7 @@ class Logger:
     def main_thread_step(self, text):
         text_iter = self.text_buffer.get_end_iter()
         self.text_buffer.insert_with_tags(text_iter, text + "\n", self.step_tag)
-        self.step_label.set_text("Step : " + text)
+        self.step_label.set_text(text)
 
     def main_thread_err(self, text):
         text_iter = self.text_buffer.get_end_iter()

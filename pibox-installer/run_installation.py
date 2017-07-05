@@ -54,7 +54,7 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
 
         with emulator.run(cancel_event) as emulation:
             emulation.resize_fs()
-            logger.step("run ansiblecube")
+            logger.step("Run ansiblecube")
             ansible_exit_code = ansiblecube.run(
                     machine=emulation,
                     name=name,
@@ -70,11 +70,11 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
             os.rename(raspbian_image_path, output_file)
 
     except Exception as e:
-        logger.step("failed")
+        logger.step("Failed")
         logger.err(str(e))
         error = e
     else:
-        logger.step("done")
+        logger.step("Done")
         error = None
 
     if done_callback:

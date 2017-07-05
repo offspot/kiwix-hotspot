@@ -13,13 +13,13 @@ class Downloader:
 
 
     def _download_and_extract(self, url, content):
-        self._logger.step("download " + url)
+        self._logger.std("download " + url)
         hook = reporthook.ReportHook(self._logger.raw_std).reporthook
         (zip_filename, _) = urllib.request.urlretrieve(url, reporthook=hook)
 
         with ZipFile(zip_filename) as zipFile:
             for (zip_path, path) in content:
-                self._logger.step("extract " + zip_path)
+                self._logger.std("extract " + zip_path)
                 extraction = zipFile.extract(zip_path)
                 shutil.move(extraction, path)
         os.remove(zip_filename)
@@ -33,7 +33,7 @@ class Downloader:
         url_dir_version = "2017-03-03"
         url = "http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-{}/{}".format(url_dir_version, zip_filename)
 
-        self._logger.step("get raspbian-lite image")
+        self._logger.step("Download Raspbian-lite image")
         if os.path.isfile(image_path):
             self._logger.std("nothing to do")
         else:

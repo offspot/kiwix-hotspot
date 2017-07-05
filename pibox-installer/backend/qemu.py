@@ -78,7 +78,7 @@ class Emulator:
         subprocess_pretty_check_call([qemu_img_exe_path, "resize", "-f", "raw", self._image, "{}".format(size)], self._logger)
 
     def copy_image(self, device_name):
-        self._logger.step("copy image to sd card")
+        self._logger.step("Copy image to sd card")
 
         if os.name == "posix":
             image = os.open(self._image, os.O_RDONLY)
@@ -108,7 +108,7 @@ class Emulator:
             os.write(device, buf)
 
         os.close(image)
-        self._logger.step("sync")
+        self._logger.step("Sync")
         os.fsync(device)
         os.close(device)
 
@@ -175,7 +175,8 @@ class _RunningInstance:
         stdout_reader, stdout_writer = os.pipe()
         stdin_reader, stdin_writer = os.pipe()
 
-        self._logger.step("launch qemu with ssh on port {}".format(ssh_port))
+        self._logger.step("Launch qemu")
+        self._logger.std("ssh on port {}".format(ssh_port))
 
         with self._cancel_event.lock() as cancel_register:
             self._qemu = subprocess.Popen([
@@ -244,7 +245,7 @@ class _RunningInstance:
             return stdout_buffer
 
     def resize_fs(self):
-        self._logger.step("resize partition")
+        self._logger.step("Resize partition")
 
         stdout = self.exec_cmd("sudo LANG=C fdisk -l /dev/mmcblk0", capture_stdout=True)
 
@@ -290,7 +291,7 @@ END_OF_CMD""" % second_partition_start
             self.exec_cmd(fdiskCmd, check=False)
             self._reboot()
 
-        self._logger.step("resize filesystem")
+        self._logger.step("Resize filesystem")
         self.exec_cmd("sudo resize2fs /dev/mmcblk0p2")
 
     def write_file(self, path, content):
