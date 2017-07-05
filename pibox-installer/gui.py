@@ -15,33 +15,23 @@ from datetime import datetime
 import data
 
 class Logger:
-    def __init__(self, text_view, step_label):
-        self.text_view = text_view
-        self.text_buffer = text_view.get_buffer()
+    def __init__(self, text_buffer, step_label):
+        self.text_buffer = text_buffer
         self.step_label = step_label
         self.step_tag = self.text_buffer.create_tag("step", foreground="blue")
         self.err_tag = self.text_buffer.create_tag("err", foreground="red")
 
-    def scroll_down(self):
-        end = self.text_buffer.get_end_iter()
-        end.backward_line()
-        self.text_view.scroll_to_iter(end, 0, True, 0, 1.)
-
     def step(self, step):
         GLib.idle_add(self.main_thread_step, step)
-        GLib.idle_add(self.scroll_down)
 
     def err(self, err):
         GLib.idle_add(self.main_thread_err, err)
-        GLib.idle_add(self.scroll_down)
 
     def raw_std(self, std):
         GLib.idle_add(self.main_thread_raw_std, std)
-        GLib.idle_add(self.scroll_down)
 
     def std(self, std):
         GLib.idle_add(self.main_thread_std, std)
-        GLib.idle_add(self.scroll_down)
 
     def main_thread_step(self, text):
         text_iter = self.text_buffer.get_end_iter()
@@ -103,7 +93,8 @@ class Application:
         self.component.run_window.connect("delete-event", Gtk.main_quit)
         self.component.run_window.set_default_size(640, 480)
         self.component.run_window.connect("delete-event", self.run_install_cancel)
-        self.logger = Logger(self.component.run_text_view, self.component.run_step_label)
+        self.logger = Logger(self.component.run_text_view.get_buffer(), self.component.run_step_label)
+        self.component.run_text_view.get_buffer().connect("modified-changed", self.scroll_down)
 
         self.component.run_abort_done_button.connect("clicked", self.run_abort_done_button_clicked)
         self.component.run_copy_log_to_clipboard_button.connect("clicked", self.run_copy_log_to_clipboard_button_clicked)
@@ -178,6 +169,16 @@ class Application:
         self.update_free_space()
 
         self.component.window.show()
+
+    def scroll_down(self, widget):
+        text_buffer = self.component.run_text_view.get_buffer()
+        text_buffer.set_modified(False)
+
+        end = text_buffer.get_end_iter()
+        end = self.component.run_text_view.get_buffer().get_end_iter()
+        end.backward_line()
+
+        self.component.run_text_view.scroll_to_iter(end, 0, True, 0, 1.)
 
     def sd_card_refresh_button_clicked(self, button):
         self.refresh_disk_list()
