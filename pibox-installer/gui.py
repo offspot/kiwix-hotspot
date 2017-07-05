@@ -1,6 +1,6 @@
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk, GLib
+from gi.repository import Gtk, Gdk, GLib, GdkPixbuf
 from backend import catalog
 from run_installation import run_installation
 import pytz
@@ -13,6 +13,9 @@ import sd_card_list
 from util import human_readable_size
 from datetime import datetime
 import data
+
+HEX_RED = 0xFF757500
+HEX_GREEN = 0x75FF7500
 
 class Logger:
     def __init__(self, text_buffer, step_label):
@@ -136,7 +139,7 @@ class Application:
         self.component.zim_choose_content_button.connect("clicked", self.zim_choose_content_button_clicked)
         self.component.run_installation_button.connect("clicked", self.run_installation_button_clicked)
 
-        self.component.zim_list_store = Gtk.ListStore(str, str, str, str, str, str, str, str, bool, str, bool);
+        self.component.zim_list_store = Gtk.ListStore(str, str, str, str, str, str, str, str, bool, str, bool, GdkPixbuf.Pixbuf);
         self.component.zim_list_store.set_sort_column_id(0, Gtk.SortType.ASCENDING)
 
         self.languages_filter = {}
@@ -151,8 +154,10 @@ class Application:
                 language = value.get("language") or "none"
                 typ = value["type"]
                 version = str(value["version"])
+                fit = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, False, 8, 32, 16)
+                fit.fill(HEX_GREEN)
 
-                self.component.zim_list_store.append([key, name, url, description, formatted_size, language, typ, version, False, size, True])
+                self.component.zim_list_store.append([key, name, url, description, formatted_size, language, typ, version, False, size, True, fit])
                 self.languages_filter[language] = True
 
         self.component.zim_choosen_filter = self.component.zim_list_store.filter_new()
@@ -286,6 +291,11 @@ class Application:
         condition = free_space >= 0
         validate_label(self.component.free_space_label1, condition)
         validate_label(self.component.free_space_label2, condition)
+        for row in self.component.zim_list_store:
+            if free_space - int(row[9]) >= 0:
+                row[11].fill(HEX_GREEN)
+            else:
+                row[11].fill(HEX_RED)
         return free_space
 
     def get_output_size(self):
@@ -346,6 +356,10 @@ class ZimChooserWindow:
         self.component.choosen_zim_tree_view.connect("row-activated", self.choosen_zim_clicked)
 
         # zim tree view
+        renderer_pixbuf = Gtk.CellRendererPixbuf().new()
+        column_pixbuf = Gtk.TreeViewColumn("Fit", renderer_pixbuf, pixbuf=11)
+        self.component.zim_tree_view.append_column(column_pixbuf)
+
         renderer_text = Gtk.CellRendererText()
         column_text = Gtk.TreeViewColumn("Name", renderer_text, text=1)
         self.component.zim_tree_view.append_column(column_text)
