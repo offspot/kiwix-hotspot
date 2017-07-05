@@ -316,7 +316,7 @@ class Application:
 
     def installation_done(self, error):
         if error != None:
-            self.component.done_label.set_text("Installation failed: " + str(error))
+            self.component.done_label.set_text("Installation failed")
             validate_label(self.component.done_label, False)
         self.component.done_window.show()
         self.component.run_abort_done_button.set_label("Close")
