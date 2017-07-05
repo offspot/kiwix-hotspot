@@ -136,11 +136,10 @@ class Application:
         self.component.zim_choose_content_button.connect("clicked", self.zim_choose_content_button_clicked)
         self.component.run_installation_button.connect("clicked", self.run_installation_button_clicked)
 
-        self.component.zim_list_store = Gtk.ListStore(str, str, str, str, str, str, str, str, bool, str, bool, bool);
+        self.component.zim_list_store = Gtk.ListStore(str, str, str, str, str, str, str, str, bool, str, bool);
         self.component.zim_list_store.set_sort_column_id(0, Gtk.SortType.ASCENDING)
 
         self.languages_filter = {}
-        self.types_filter = {}
 
         for one_catalog in catalog:
             for (key, value) in one_catalog["all"].items():
@@ -153,10 +152,8 @@ class Application:
                 typ = value["type"]
                 version = str(value["version"])
 
-                self.component.zim_list_store.append([key, name, url, description, formatted_size, language, typ, version, False, size, True, True])
+                self.component.zim_list_store.append([key, name, url, description, formatted_size, language, typ, version, False, size, True])
                 self.languages_filter[language] = True
-                self.types_filter[typ] = True
-
 
         self.component.zim_choosen_filter = self.component.zim_list_store.filter_new()
         self.component.zim_choosen_filter.set_visible_func(self.zim_choosen_filter_func)
@@ -340,55 +337,52 @@ class ZimChooserWindow:
         main_window.component.free_space_label2 = self.component.free_space_label2
         self.main_window.update_free_space()
 
-        self.component.zim_filter_toggle_button.connect("toggled", lambda button: self.component.zim_filter_renderer.set_reveal_child(button.get_active()))
+        self.component.zim_list_store = main_window.component.zim_list_store
+
+        self.component.zim_tree_view.set_model(self.component.zim_list_store)
+        self.component.choosen_zim_tree_view.set_model(self.component.zim_list_store)
+
+        self.component.zim_tree_view.connect("row-activated", self.available_zim_clicked)
+        self.component.choosen_zim_tree_view.connect("row-activated", self.choosen_zim_clicked)
 
         # zim tree view
-        self.component.zim_list_store = main_window.component.zim_list_store
-        self.component.zim_tree_view.set_model(self.component.zim_list_store)
-
-        renderer_radio = Gtk.CellRendererToggle()
-        column_radio = Gtk.TreeViewColumn("Radio", renderer_radio, active=8)
-        self.component.zim_tree_view.append_column(column_radio)
-        renderer_radio.connect("toggled", self.renderer_radio_toggled)
-
         renderer_text = Gtk.CellRendererText()
-        column_text = Gtk.TreeViewColumn("Id", renderer_text, text=0)
-        self.component.zim_tree_view.append_column(column_text)
         column_text = Gtk.TreeViewColumn("Name", renderer_text, text=1)
-        self.component.zim_tree_view.append_column(column_text)
-        column_text = Gtk.TreeViewColumn("Language", renderer_text, text=5)
         self.component.zim_tree_view.append_column(column_text)
         column_text = Gtk.TreeViewColumn("Size", renderer_text, text=4)
         self.component.zim_tree_view.append_column(column_text)
-        column_text = Gtk.TreeViewColumn("Type", renderer_text, text=6)
-        self.component.zim_tree_view.append_column(column_text)
         column_text = Gtk.TreeViewColumn("Description", renderer_text, text=3)
         self.component.zim_tree_view.append_column(column_text)
+
+        # choosen zim tree view
+        renderer_text = Gtk.CellRendererText()
+        column_text = Gtk.TreeViewColumn("Name", renderer_text, text=1)
+        self.component.choosen_zim_tree_view.append_column(column_text)
+        column_text = Gtk.TreeViewColumn("Size", renderer_text, text=4)
+        self.component.choosen_zim_tree_view.append_column(column_text)
+        column_text = Gtk.TreeViewColumn("Description", renderer_text, text=3)
+        self.component.choosen_zim_tree_view.append_column(column_text)
+
 
         # language check buttons
         for language in sorted(main_window.languages_filter.keys()):
             button = Gtk.CheckButton.new_with_label(language)
             button.set_active(True)
 
-            button.connect("toggled", self.toggle_column(5, language))
+            button.connect("toggled", self.toggle_column(5, 10, language))
             self.component.zim_languages_box.pack_start(button, False, True, 0)
 
         self.component.zim_languages_box.show_all()
 
-        # type check buttons
-        for typ in sorted(main_window.types_filter.keys()):
-            button = Gtk.CheckButton.new_with_label(typ)
-            button.set_active(True)
-
-            button.connect("toggled", self.toggle_column(6, typ))
-            self.component.zim_types_box.pack_start(button, False, True, 0)
-
-        self.component.zim_types_box.show_all()
-
         # zim filter
-        self.component.zim_filter = self.component.zim_list_store.filter_new()
-        self.component.zim_filter.set_visible_func(self.zim_filter_func)
-        self.component.zim_tree_view.set_model(self.component.zim_filter)
+        zim_filter = self.component.zim_list_store.filter_new()
+        zim_filter.set_visible_func(self.zim_filter_func)
+        self.component.zim_tree_view.set_model(zim_filter)
+
+        # choosen zim filter
+        choosen_zim_filter = self.component.zim_list_store.filter_new()
+        choosen_zim_filter.set_visible_func(self.choosen_zim_filter_func)
+        self.component.choosen_zim_tree_view.set_model(choosen_zim_filter)
 
         # zim window
         self.component.zim_window.set_transient_for(main_window.component.window)
@@ -398,22 +392,29 @@ class ZimChooserWindow:
 
         self.component.zim_window_done_button.connect("clicked", self.zim_done_button_clicked)
 
-    def toggle_column(self, column, name):
+    def toggle_column(self, name_column, filter_column, name):
         def toggle(button):
             for item in self.component.zim_list_store:
-                if item[column] == name:
-                    item[11] = button.get_active()
+                if item[name_column] == name:
+                    item[filter_column] = button.get_active()
         return toggle
+
+    def available_zim_clicked(self, tree_view, path, column):
+        tree_view.get_model()[path][8] = True
+        self.main_window.update_free_space()
+
+    def choosen_zim_clicked(self, tree_view, path, column):
+        tree_view.get_model()[path][8] = False
+        self.main_window.update_free_space()
 
     def zim_done_button_clicked(self, widget):
         self.component.zim_window.close()
 
-    def renderer_radio_toggled(self, widget, path):
-        self.component.zim_list_store[path][8] = not self.component.zim_list_store[path][8]
-        self.main_window.update_free_space()
-
     def zim_filter_func(self, model, iter, data):
-        return model[iter][10] and model[iter][11]
+        return model[iter][10] and not model[iter][8]
+
+    def choosen_zim_filter_func(self, model, iter, data):
+        return model[iter][8]
 
 catalog = catalog.get_catalogs()
 Application(catalog)
