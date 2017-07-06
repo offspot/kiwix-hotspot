@@ -140,7 +140,7 @@ class Application:
         self.component.run_installation_button.connect("clicked", self.run_installation_button_clicked)
 
         self.component.zim_list_store = Gtk.ListStore(str, str, str, str, str, str, str, str, bool, str, bool, GdkPixbuf.Pixbuf);
-        self.component.zim_list_store.set_sort_column_id(0, Gtk.SortType.ASCENDING)
+        self.component.zim_list_store.set_sort_column_id(1, Gtk.SortType.ASCENDING)
 
         self.languages_filter = {}
 
@@ -163,6 +163,7 @@ class Application:
         self.component.zim_choosen_filter = self.component.zim_list_store.filter_new()
         self.component.zim_choosen_filter.set_visible_func(self.zim_choosen_filter_func)
         self.component.zim_choosen_tree_view.set_model(self.component.zim_choosen_filter)
+        self.component.zim_choosen_tree_view.get_selection().set_mode(Gtk.SelectionMode(0))
 
         renderer_text = Gtk.CellRendererText()
         column_text = Gtk.TreeViewColumn("Id", renderer_text, text=0)
