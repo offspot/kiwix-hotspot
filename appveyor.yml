@@ -72,10 +72,7 @@ install:
 
   # Deploy
   - cd C:\projects\pibox-installer\dist\pibox-installer
-  - 7z.exe a -m0=Copy pibox-installer.7z *
-  - move pibox-installer.7z C:\projects\pibox-installer\windows_bundle
-  - cd C:\projects\pibox-installer\windows_bundle
-  - copy /b 7zS.sfx + config.txt + pibox-installer.7z pibox-installer.exe
+  - 7z.exe a -m0=Copy C:\projects\pibox-installer\windows_bundle\pibox-installer.exe *
 
   - move C:\projects\pibox-installer\windows_bundle\pibox-installer.exe C:\msys64\home\appveyor\
   - move C:\projects\pibox-installer\pibox_installer_ci_rsa C:\msys64\home\appveyor\
