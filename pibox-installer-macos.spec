@@ -32,5 +32,5 @@ exe = EXE(pyz,
           console=False)
 app = BUNDLE(exe,
              name='pibox-installer.app',
-             icon=None,
+             icon='pibox-installer-logo.icns',
              bundle_identifier='org.ideascube.pibox')
