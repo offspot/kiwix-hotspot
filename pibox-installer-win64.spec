@@ -88,6 +88,7 @@ exe = EXE(pyz,
           strip=False,
           upx=True,
           console=False,
+          icon='pibox-installer-logo.ico',
           uac_admin=True)
 coll = COLLECT(exe,
                a.binaries,
