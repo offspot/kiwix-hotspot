@@ -13,6 +13,7 @@ import sd_card_list
 from util import human_readable_size
 from datetime import datetime
 import data
+import langcodes
 
 HEX_RED = 0xFF757500
 HEX_GREEN = 0x75FF7500
@@ -146,7 +147,7 @@ class Application:
         self.component.zim_list_store = Gtk.ListStore(str, str, str, str, str, str, str, str, bool, str, bool, GdkPixbuf.Pixbuf);
         self.component.zim_list_store.set_sort_column_id(1, Gtk.SortType.ASCENDING)
 
-        self.languages_filter = {}
+        languages = set()
 
         for one_catalog in catalog:
             for (key, value) in one_catalog["all"].items():
@@ -155,14 +156,14 @@ class Application:
                 description = value.get("description") or "none"
                 formatted_size = human_readable_size(int(value["size"]))
                 size = str(value["size"])
-                language = value.get("language") or "none"
+                language = langcodes.Language.get(value.get("language") or "none").language_name()
                 typ = value["type"]
                 version = str(value["version"])
                 fit = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, False, 8, 32, 16)
                 fit.fill(HEX_GREEN)
 
                 self.component.zim_list_store.append([key, name, url, description, formatted_size, language, typ, version, False, size, True, fit])
-                self.languages_filter[language] = True
+                languages.add(language)
 
         self.component.zim_choosen_filter = self.component.zim_list_store.filter_new()
         self.component.zim_choosen_filter.set_visible_func(self.zim_choosen_filter_func)
@@ -217,7 +218,7 @@ class Application:
         self.component.choosen_zim_tree_view.set_model(choosen_zim_filter)
 
         # zim window language check buttons
-        for language in sorted(self.languages_filter.keys()):
+        for language in sorted(languages):
             button = Gtk.CheckButton.new_with_label(language)
             button.set_active(True)
 
