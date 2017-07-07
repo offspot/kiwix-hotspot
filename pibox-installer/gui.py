@@ -17,6 +17,13 @@ import data
 HEX_RED = 0xFF757500
 HEX_GREEN = 0x75FF7500
 
+KALITE_SIZES = {
+    "ar": 0, # TODO: determine used space
+    "fr": 10737418240,
+    "es": 19327352832,
+    "en": 41875931136,
+}
+
 class Logger:
     def __init__(self, text_buffer, step_label):
         self.text_buffer = text_buffer
@@ -219,10 +226,21 @@ class Application:
 
         self.component.zim_languages_box.show_all()
 
+        # kalite
+        self.component.kalite_switch.connect("notify::active", lambda switch, state: self.component.kalite_revealer.set_reveal_child(switch.get_active()))
+        for lang, button in self.iter_kalite_check_button():
+            button.connect("toggled", lambda button: self.update_free_space())
+
         self.refresh_disk_list()
         self.update_free_space()
 
         self.component.window.show()
+
+    def iter_kalite_check_button(self):
+        return [("fr", self.component.kalite_fr_check_button),
+                ("en", self.component.kalite_en_check_button),
+                ("es", self.component.kalite_es_check_button),
+                ("ar", self.component.kalite_ar_check_button)]
 
     def done_window_ok_button_clicked(self, widget):
         self.component.done_window.hide()
@@ -315,13 +333,21 @@ class Application:
         validate_label(self.component.free_space_name_label, condition)
         all_valid = all_valid and condition
 
+        if self.component.kalite_switch.get_state():
+            kalite = []
+            for lang, button in self.iter_kalite_check_button():
+                kalite.append(lang)
+        else:
+            kalite = None
+
+
         if all_valid:
             def target():
                 run_installation(
                         name=project_name,
                         timezone=timezone,
                         wifi_pwd=wifi_pwd,
-                        kalite=None,
+                        kalite=kalite,
                         zim_install=zim_install,
                         size=size,
                         logger=self.logger,
@@ -356,6 +382,10 @@ class Application:
         for zim in self.component.zim_list_store:
             if zim[8]:
                 used_space += int(zim[9])
+        if self.component.kalite_switch.get_state():
+            for lang, button in self.iter_kalite_check_button():
+                if button.get_active():
+                    used_space += KALITE_SIZES[lang]
         return self.get_output_size() - used_space
 
     def update_free_space(self):
