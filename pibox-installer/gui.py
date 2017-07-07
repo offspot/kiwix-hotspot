@@ -80,27 +80,11 @@ class Application:
         builder.add_from_file(data.ui_glade)
 
         self.component = Component(builder)
-
-        self.component.window.connect("delete-event", Gtk.main_quit)
-
-        # update free space on storage change
-        self.component.size_entry.connect("changed", lambda _: self.update_free_space())
-        self.component.sd_card_combobox.connect("changed", lambda _: self.update_free_space())
-
-        self.component.done_window.set_transient_for(self.component.run_window)
-        self.component.done_window.set_default_size(320, 240)
-        self.component.done_window.set_modal(True)
-        self.component.done_window_ok_button.connect("clicked", self.done_window_ok_button_clicked)
-
         self.cancel_event = CancelEvent()
-        self.component.run_window.connect("delete-event", Gtk.main_quit)
-        self.component.run_window.set_default_size(640, 480)
-        self.component.run_window.connect("delete-event", self.run_install_cancel)
         self.logger = Logger(self.component.run_text_view.get_buffer(), self.component.run_step_label)
-        self.component.run_text_view.get_buffer().connect("modified-changed", self.scroll_down)
 
-        self.component.run_abort_done_button.connect("clicked", self.run_abort_done_button_clicked)
-        self.component.run_copy_log_to_clipboard_button.connect("clicked", self.run_copy_log_to_clipboard_button_clicked)
+        # main window
+        self.component.window.connect("delete-event", Gtk.main_quit)
 
         # wifi password
         self.component.wifi_password_switch.connect("notify::active", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(switch.get_active()))
@@ -120,7 +104,12 @@ class Application:
         self.component.timezone_combobox.add_attribute(renderer, "text", 0)
         self.component.timezone_combobox.set_active(default_id)
 
-        # disk
+        # output
+        self.component.sd_card_combobox.connect("changed", lambda _: self.update_free_space())
+        self.component.sd_card_refresh_button.connect("clicked", self.sd_card_refresh_button_clicked)
+        self.component.output_stack.connect("notify::visible-child", lambda switch, state: self.update_free_space())
+        self.component.size_entry.connect("changed", lambda _: self.update_free_space())
+
         types = [info["typ"] for info in sd_card_list.informations]
         self.component.sd_card_list_store = Gtk.ListStore(*types)
         self.component.sd_card_combobox.set_model(self.component.sd_card_list_store)
@@ -130,14 +119,22 @@ class Application:
             self.component.sd_card_combobox.pack_start(info, True)
             self.component.sd_card_combobox.add_attribute(info, "text", counter)
 
-        self.refresh_disk_list()
-        self.component.sd_card_refresh_button.connect("clicked", self.sd_card_refresh_button_clicked)
+        # done window
+        self.component.done_window.set_transient_for(self.component.run_window)
+        self.component.done_window.set_default_size(320, 240)
+        self.component.done_window.set_modal(True)
+        self.component.done_window_ok_button.connect("clicked", self.done_window_ok_button_clicked)
 
-        self.component.output_stack.connect("notify::visible-child", lambda switch, state: self.update_free_space())
+        # run window
+        self.component.run_installation_button.connect("clicked", self.run_installation_button_clicked)
+        self.component.run_window.connect("delete-event", self.run_window_delete_event)
+        self.component.run_window.set_default_size(640, 480)
+        self.component.run_text_view.get_buffer().connect("modified-changed", self.run_text_view_scroll_down)
+        self.component.run_abort_done_button.connect("clicked", self.run_abort_done_button_clicked)
+        self.component.run_copy_log_to_clipboard_button.connect("clicked", self.run_copy_log_to_clipboard_button_clicked)
 
         # zim content
         self.component.zim_choose_content_button.connect("clicked", self.zim_choose_content_button_clicked)
-        self.component.run_installation_button.connect("clicked", self.run_installation_button_clicked)
 
         self.component.zim_list_store = Gtk.ListStore(str, str, str, str, str, str, str, str, bool, str, bool, GdkPixbuf.Pixbuf);
         self.component.zim_list_store.set_sort_column_id(1, Gtk.SortType.ASCENDING)
@@ -169,14 +166,18 @@ class Application:
         column_text = Gtk.TreeViewColumn("Id", renderer_text, text=0)
         self.component.zim_choosen_tree_view.append_column(column_text)
 
-        # ZIM window
-        self.component.zim_tree_view.set_model(self.component.zim_list_store)
-        self.component.choosen_zim_tree_view.set_model(self.component.zim_list_store)
+        # zim window
+        self.component.zim_window.set_transient_for(self.component.window)
+        self.component.zim_window.set_modal(True)
+        self.component.zim_window.set_default_size(1280, 800)
 
+        self.component.zim_window_done_button.connect("clicked", self.zim_done_button_clicked)
         self.component.zim_tree_view.connect("row-activated", self.available_zim_clicked)
         self.component.choosen_zim_tree_view.connect("row-activated", self.choosen_zim_clicked)
 
-        # zim tree view
+        ## zim window available tree view
+        self.component.zim_tree_view.set_model(self.component.zim_list_store)
+
         renderer_pixbuf = Gtk.CellRendererPixbuf().new()
         column_pixbuf = Gtk.TreeViewColumn("Fit", renderer_pixbuf, pixbuf=11)
         self.component.zim_tree_view.append_column(column_pixbuf)
@@ -189,7 +190,13 @@ class Application:
         column_text = Gtk.TreeViewColumn("Description", renderer_text, text=3)
         self.component.zim_tree_view.append_column(column_text)
 
-        # choosen zim tree view
+        zim_filter = self.component.zim_list_store.filter_new()
+        zim_filter.set_visible_func(self.zim_filter_func)
+        self.component.zim_tree_view.set_model(zim_filter)
+
+        # zim window choosen tree view
+        self.component.choosen_zim_tree_view.set_model(self.component.zim_list_store)
+
         renderer_text = Gtk.CellRendererText()
         column_text = Gtk.TreeViewColumn("Name", renderer_text, text=1)
         self.component.choosen_zim_tree_view.append_column(column_text)
@@ -198,7 +205,11 @@ class Application:
         column_text = Gtk.TreeViewColumn("Description", renderer_text, text=3)
         self.component.choosen_zim_tree_view.append_column(column_text)
 
-        # language check buttons
+        choosen_zim_filter = self.component.zim_list_store.filter_new()
+        choosen_zim_filter.set_visible_func(self.choosen_zim_filter_func)
+        self.component.choosen_zim_tree_view.set_model(choosen_zim_filter)
+
+        # zim window language check buttons
         for language in sorted(self.languages_filter.keys()):
             button = Gtk.CheckButton.new_with_label(language)
             button.set_active(True)
@@ -208,28 +219,23 @@ class Application:
 
         self.component.zim_languages_box.show_all()
 
-        # zim filter
-        zim_filter = self.component.zim_list_store.filter_new()
-        zim_filter.set_visible_func(self.zim_filter_func)
-        self.component.zim_tree_view.set_model(zim_filter)
-
-        # choosen zim filter
-        choosen_zim_filter = self.component.zim_list_store.filter_new()
-        choosen_zim_filter.set_visible_func(self.choosen_zim_filter_func)
-        self.component.choosen_zim_tree_view.set_model(choosen_zim_filter)
-
-        # zim window
-        self.component.zim_window.set_transient_for(self.component.window)
-        self.component.zim_window.set_modal(True)
-        self.component.zim_window.set_default_size(1280, 800)
-
-        self.component.zim_window_done_button.connect("clicked", self.zim_done_button_clicked)
-
+        self.refresh_disk_list()
         self.update_free_space()
 
         self.component.window.show()
 
-    def scroll_down(self, widget):
+    def done_window_ok_button_clicked(self, widget):
+        self.component.done_window.hide()
+
+    def installation_done(self, error):
+        if error != None:
+            self.component.done_label.set_text("Installation failed")
+            validate_label(self.component.done_label, False)
+        self.component.done_window.show()
+        self.component.run_abort_done_button.set_label("Back")
+        self.component.run_spinner.stop()
+
+    def run_text_view_scroll_down(self, widget):
         text_buffer = self.component.run_text_view.get_buffer()
         text_buffer.set_modified(False)
 
@@ -239,24 +245,20 @@ class Application:
 
         self.component.run_text_view.scroll_to_iter(end, 0, True, 0, 1.)
 
-    def sd_card_refresh_button_clicked(self, button):
-        self.refresh_disk_list()
-        self.update_free_space()
-
-    def refresh_disk_list(self):
-        self.component.sd_card_list_store.clear()
-        for device in sd_card_list.get_list():
-            items = [info["typ"](device[info["name"]]) for info in sd_card_list.informations]
-            self.component.sd_card_list_store.append(items)
-
-    def run_install_cancel(self, widget, path):
+    def run_window_delete_event(self, widget, path):
         self.cancel_event.cancel()
+        Gtk.main_quit()
 
-    def zim_choosen_filter_func(self, model, iter, data):
-        return model[iter][8]
+    def run_abort_done_button_clicked(self, widget):
+        self.component.run_window.close()
 
-    def zim_choose_content_button_clicked(self, button):
-        self.component.zim_window.show()
+    def run_copy_log_to_clipboard_button_clicked(self, widget):
+        text_buffer = self.component.run_text_view.get_buffer()
+        start = text_buffer.get_start_iter()
+        end = text_buffer.get_end_iter()
+        hidden = True
+        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        clipboard.set_text(text_buffer.get_text(start, end, hidden), -1)
 
     def run_installation_button_clicked(self, button):
         all_valid = True
@@ -332,6 +334,22 @@ class Application:
             self.component.run_window.show()
             threading.Thread(target=target, daemon=True).start()
 
+    def sd_card_refresh_button_clicked(self, button):
+        self.refresh_disk_list()
+        self.update_free_space()
+
+    def refresh_disk_list(self):
+        self.component.sd_card_list_store.clear()
+        for device in sd_card_list.get_list():
+            items = [info["typ"](device[info["name"]]) for info in sd_card_list.informations]
+            self.component.sd_card_list_store.append(items)
+
+    def zim_choose_content_button_clicked(self, button):
+        self.component.zim_window.show()
+
+    def zim_choosen_filter_func(self, model, iter, data):
+        return model[iter][8]
+
     def get_free_space(self):
         # TODO: compute actual space used with empty install
         used_space = 2 * 2**30 # space of raspbian with ideascube without content
@@ -370,28 +388,6 @@ class Application:
                 size = -1
 
         return size
-
-    def run_abort_done_button_clicked(self, widget):
-        self.component.run_window.close()
-
-    def run_copy_log_to_clipboard_button_clicked(self, widget):
-        text_buffer = self.component.run_text_view.get_buffer()
-        start = text_buffer.get_start_iter()
-        end = text_buffer.get_end_iter()
-        hidden = True
-        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
-        clipboard.set_text(text_buffer.get_text(start, end, hidden), -1)
-
-    def done_window_ok_button_clicked(self, widget):
-        self.component.done_window.close()
-
-    def installation_done(self, error):
-        if error != None:
-            self.component.done_label.set_text("Installation failed")
-            validate_label(self.component.done_label, False)
-        self.component.done_window.show()
-        self.component.run_abort_done_button.set_label("Back")
-        self.component.run_spinner.stop()
 
     def toggle_column(self, name_column, filter_column, name):
         def toggle(button):
