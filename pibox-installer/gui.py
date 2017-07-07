@@ -169,6 +169,62 @@ class Application:
         column_text = Gtk.TreeViewColumn("Id", renderer_text, text=0)
         self.component.zim_choosen_tree_view.append_column(column_text)
 
+        # ZIM window
+        self.component.zim_tree_view.set_model(self.component.zim_list_store)
+        self.component.choosen_zim_tree_view.set_model(self.component.zim_list_store)
+
+        self.component.zim_tree_view.connect("row-activated", self.available_zim_clicked)
+        self.component.choosen_zim_tree_view.connect("row-activated", self.choosen_zim_clicked)
+
+        # zim tree view
+        renderer_pixbuf = Gtk.CellRendererPixbuf().new()
+        column_pixbuf = Gtk.TreeViewColumn("Fit", renderer_pixbuf, pixbuf=11)
+        self.component.zim_tree_view.append_column(column_pixbuf)
+
+        renderer_text = Gtk.CellRendererText()
+        column_text = Gtk.TreeViewColumn("Name", renderer_text, text=1)
+        self.component.zim_tree_view.append_column(column_text)
+        column_text = Gtk.TreeViewColumn("Size", renderer_text, text=4)
+        self.component.zim_tree_view.append_column(column_text)
+        column_text = Gtk.TreeViewColumn("Description", renderer_text, text=3)
+        self.component.zim_tree_view.append_column(column_text)
+
+        # choosen zim tree view
+        renderer_text = Gtk.CellRendererText()
+        column_text = Gtk.TreeViewColumn("Name", renderer_text, text=1)
+        self.component.choosen_zim_tree_view.append_column(column_text)
+        column_text = Gtk.TreeViewColumn("Size", renderer_text, text=4)
+        self.component.choosen_zim_tree_view.append_column(column_text)
+        column_text = Gtk.TreeViewColumn("Description", renderer_text, text=3)
+        self.component.choosen_zim_tree_view.append_column(column_text)
+
+        # language check buttons
+        for language in sorted(self.languages_filter.keys()):
+            button = Gtk.CheckButton.new_with_label(language)
+            button.set_active(True)
+
+            button.connect("toggled", self.toggle_column(5, 10, language))
+            self.component.zim_languages_box.pack_start(button, False, True, 0)
+
+        self.component.zim_languages_box.show_all()
+
+        # zim filter
+        zim_filter = self.component.zim_list_store.filter_new()
+        zim_filter.set_visible_func(self.zim_filter_func)
+        self.component.zim_tree_view.set_model(zim_filter)
+
+        # choosen zim filter
+        choosen_zim_filter = self.component.zim_list_store.filter_new()
+        choosen_zim_filter.set_visible_func(self.choosen_zim_filter_func)
+        self.component.choosen_zim_tree_view.set_model(choosen_zim_filter)
+
+        # zim window
+        self.component.zim_window.set_transient_for(self.component.window)
+        self.component.zim_window.set_modal(True)
+        self.component.zim_window.set_default_size(1280, 800)
+
+        self.component.zim_window_done_button.connect("clicked", self.zim_done_button_clicked)
+
         self.update_free_space()
 
         self.component.window.show()
@@ -200,7 +256,7 @@ class Application:
         return model[iter][8]
 
     def zim_choose_content_button_clicked(self, button):
-        ZimChooserWindow(self)
+        self.component.zim_window.show()
 
     def run_installation_button_clicked(self, button):
         all_valid = True
@@ -272,7 +328,7 @@ class Application:
                         output_file=output_file,
                         done_callback=lambda error: GLib.idle_add(self.installation_done, error))
 
-            self.component.window.destroy()
+            self.component.window.hide()
             self.component.run_window.show()
             threading.Thread(target=target, daemon=True).start()
 
@@ -334,78 +390,8 @@ class Application:
             self.component.done_label.set_text("Installation failed")
             validate_label(self.component.done_label, False)
         self.component.done_window.show()
-        self.component.run_abort_done_button.set_label("Close")
+        self.component.run_abort_done_button.set_label("Back")
         self.component.run_spinner.stop()
-
-class ZimChooserWindow:
-    def __init__(self, main_window):
-        builder = Gtk.Builder()
-        builder.add_from_file(data.ui_glade)
-
-        self.component = Component(builder)
-
-        self.main_window = main_window
-        main_window.component.free_space_label2 = self.component.free_space_label2
-        self.main_window.update_free_space()
-
-        self.component.zim_list_store = main_window.component.zim_list_store
-
-        self.component.zim_tree_view.set_model(self.component.zim_list_store)
-        self.component.choosen_zim_tree_view.set_model(self.component.zim_list_store)
-
-        self.component.zim_tree_view.connect("row-activated", self.available_zim_clicked)
-        self.component.choosen_zim_tree_view.connect("row-activated", self.choosen_zim_clicked)
-
-        # zim tree view
-        renderer_pixbuf = Gtk.CellRendererPixbuf().new()
-        column_pixbuf = Gtk.TreeViewColumn("Fit", renderer_pixbuf, pixbuf=11)
-        self.component.zim_tree_view.append_column(column_pixbuf)
-
-        renderer_text = Gtk.CellRendererText()
-        column_text = Gtk.TreeViewColumn("Name", renderer_text, text=1)
-        self.component.zim_tree_view.append_column(column_text)
-        column_text = Gtk.TreeViewColumn("Size", renderer_text, text=4)
-        self.component.zim_tree_view.append_column(column_text)
-        column_text = Gtk.TreeViewColumn("Description", renderer_text, text=3)
-        self.component.zim_tree_view.append_column(column_text)
-
-        # choosen zim tree view
-        renderer_text = Gtk.CellRendererText()
-        column_text = Gtk.TreeViewColumn("Name", renderer_text, text=1)
-        self.component.choosen_zim_tree_view.append_column(column_text)
-        column_text = Gtk.TreeViewColumn("Size", renderer_text, text=4)
-        self.component.choosen_zim_tree_view.append_column(column_text)
-        column_text = Gtk.TreeViewColumn("Description", renderer_text, text=3)
-        self.component.choosen_zim_tree_view.append_column(column_text)
-
-
-        # language check buttons
-        for language in sorted(main_window.languages_filter.keys()):
-            button = Gtk.CheckButton.new_with_label(language)
-            button.set_active(True)
-
-            button.connect("toggled", self.toggle_column(5, 10, language))
-            self.component.zim_languages_box.pack_start(button, False, True, 0)
-
-        self.component.zim_languages_box.show_all()
-
-        # zim filter
-        zim_filter = self.component.zim_list_store.filter_new()
-        zim_filter.set_visible_func(self.zim_filter_func)
-        self.component.zim_tree_view.set_model(zim_filter)
-
-        # choosen zim filter
-        choosen_zim_filter = self.component.zim_list_store.filter_new()
-        choosen_zim_filter.set_visible_func(self.choosen_zim_filter_func)
-        self.component.choosen_zim_tree_view.set_model(choosen_zim_filter)
-
-        # zim window
-        self.component.zim_window.set_transient_for(main_window.component.window)
-        self.component.zim_window.set_modal(True)
-        self.component.zim_window.set_default_size(1280, 800)
-        self.component.zim_window.show()
-
-        self.component.zim_window_done_button.connect("clicked", self.zim_done_button_clicked)
 
     def toggle_column(self, name_column, filter_column, name):
         def toggle(button):
@@ -416,14 +402,14 @@ class ZimChooserWindow:
 
     def available_zim_clicked(self, tree_view, path, column):
         tree_view.get_model()[path][8] = True
-        self.main_window.update_free_space()
+        self.update_free_space()
 
     def choosen_zim_clicked(self, tree_view, path, column):
         tree_view.get_model()[path][8] = False
-        self.main_window.update_free_space()
+        self.update_free_space()
 
     def zim_done_button_clicked(self, widget):
-        self.component.zim_window.close()
+        self.component.zim_window.hide()
 
     def zim_filter_func(self, model, iter, data):
         return model[iter][10] and not model[iter][8]
