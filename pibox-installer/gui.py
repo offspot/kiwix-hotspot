@@ -19,7 +19,6 @@ HEX_RED = 0xFF757500
 HEX_GREEN = 0x75FF7500
 
 KALITE_SIZES = {
-    "ar": 0, # TODO: determine used space
     "fr": 10737418240,
     "es": 19327352832,
     "en": 41875931136,
@@ -240,8 +239,7 @@ class Application:
     def iter_kalite_check_button(self):
         return [("fr", self.component.kalite_fr_check_button),
                 ("en", self.component.kalite_en_check_button),
-                ("es", self.component.kalite_es_check_button),
-                ("ar", self.component.kalite_ar_check_button)]
+                ("es", self.component.kalite_es_check_button)]
 
     def done_window_ok_button_clicked(self, widget):
         self.component.done_window.hide()
