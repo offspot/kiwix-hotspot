@@ -176,7 +176,7 @@ class Application:
         # zim window
         self.component.zim_window.set_transient_for(self.component.window)
         self.component.zim_window.set_modal(True)
-        self.component.zim_window.set_default_size(1280, 800)
+        self.component.zim_window.set_default_size(1024, 650)
 
         self.component.zim_window_done_button.connect("clicked", self.zim_done_button_clicked)
         self.component.zim_tree_view.connect("row-activated", self.available_zim_clicked)
