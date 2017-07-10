@@ -2,50 +2,11 @@
 <!-- Generated with glade 3.20.0 -->
 <interface>
   <requires lib="gtk+" version="3.10"/>
-  <object class="GtkWindow" id="done_window">
-    <property name="can_focus">False</property>
-    <property name="title" translatable="yes">Pibox installer</property>
-    <child>
-      <object class="GtkBox" id="no_id_1">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="margin_left">5</property>
-        <property name="margin_right">5</property>
-        <property name="margin_top">5</property>
-        <property name="margin_bottom">5</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">5</property>
-        <child>
-          <object class="GtkLabel" id="done_label">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Installation done</property>
-          </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkButton" id="done_window_ok_button">
-            <property name="label" translatable="yes">OK</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
-      </object>
-    </child>
-  </object>
   <object class="GtkWindow" id="run_window">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">Pibox installer</property>
+    <property name="default_width">640</property>
+    <property name="default_height">480</property>
     <child>
       <object class="GtkBox" id="no_id_2">
         <property name="visible">True</property>
@@ -148,6 +109,51 @@
             <property name="expand">False</property>
             <property name="fill">True</property>
             <property name="position">2</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkWindow" id="done_window">
+    <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Pibox installer</property>
+    <property name="modal">True</property>
+    <property name="default_width">320</property>
+    <property name="default_height">240</property>
+    <property name="transient_for">run_window</property>
+    <child>
+      <object class="GtkBox" id="no_id_1">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="margin_left">5</property>
+        <property name="margin_right">5</property>
+        <property name="margin_top">5</property>
+        <property name="margin_bottom">5</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">5</property>
+        <child>
+          <object class="GtkLabel" id="done_label">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Installation done</property>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="done_window_ok_button">
+            <property name="label" translatable="yes">OK</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
           </packing>
         </child>
       </object>
@@ -690,6 +696,10 @@
   <object class="GtkWindow" id="zim_window">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">Pibox installer</property>
+    <property name="modal">True</property>
+    <property name="default_width">1025</property>
+    <property name="default_height">640</property>
+    <property name="transient_for">window</property>
     <child>
       <object class="GtkBox" id="no_id_24">
         <property name="visible">True</property>

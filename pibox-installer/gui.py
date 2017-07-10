@@ -127,15 +127,11 @@ class Application:
             self.component.sd_card_combobox.add_attribute(info, "text", counter)
 
         # done window
-        self.component.done_window.set_transient_for(self.component.run_window)
-        self.component.done_window.set_default_size(320, 240)
-        self.component.done_window.set_modal(True)
         self.component.done_window_ok_button.connect("clicked", self.done_window_ok_button_clicked)
 
         # run window
         self.component.run_installation_button.connect("clicked", self.run_installation_button_clicked)
         self.component.run_window.connect("delete-event", self.run_window_delete_event)
-        self.component.run_window.set_default_size(640, 480)
         self.component.run_text_view.get_buffer().connect("modified-changed", self.run_text_view_scroll_down)
         self.component.run_abort_done_button.connect("clicked", self.run_abort_done_button_clicked)
         self.component.run_copy_log_to_clipboard_button.connect("clicked", self.run_copy_log_to_clipboard_button_clicked)
@@ -174,10 +170,6 @@ class Application:
         self.component.zim_choosen_tree_view.append_column(column_text)
 
         # zim window
-        self.component.zim_window.set_transient_for(self.component.window)
-        self.component.zim_window.set_modal(True)
-        self.component.zim_window.set_default_size(1024, 650)
-
         self.component.zim_window_done_button.connect("clicked", self.zim_done_button_clicked)
         self.component.zim_tree_view.connect("row-activated", self.available_zim_clicked)
         self.component.choosen_zim_tree_view.connect("row-activated", self.choosen_zim_clicked)
