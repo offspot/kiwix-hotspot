@@ -11,6 +11,7 @@ import threading
 from util import CancelEvent
 import sd_card_list
 from util import human_readable_size
+from util import get_free_space
 from datetime import datetime
 import data
 import langcodes
@@ -228,6 +229,9 @@ class Application:
 
         self.component.window.show()
 
+        # space error window
+        self.component.space_error_window_ok_button.connect("clicked", self.space_error_window_ok_button_clicked)
+
     def iter_kalite_check_button(self):
         return [("fr", self.component.kalite_fr_check_button),
                 ("en", self.component.kalite_en_check_button),
@@ -235,6 +239,9 @@ class Application:
 
     def done_window_ok_button_clicked(self, widget):
         self.component.done_window.hide()
+
+    def space_error_window_ok_button_clicked(self, widget):
+        self.component.space_error_window.hide()
 
     def installation_done(self, error):
         if error != None:
@@ -331,6 +338,25 @@ class Application:
         else:
             kalite = None
 
+        build_path = os.path.abspath(".")
+        free_space = get_free_space(".")
+        remaining_space = free_space - size
+        if remaining_space < 0:
+
+            text = """There is not enough space to create image on disk :
+
+image location : {}
+total space required : {}
+space available : {}
+space missing: {}""".format(
+        build_path,
+        human_readable_size(size),
+        human_readable_size(free_space),
+        human_readable_size(-remaining_space))
+
+            self.component.space_error_label.set_text(text)
+            self.component.space_error_window.show()
+            all_valid = False
 
         if all_valid:
             def target():
