@@ -161,6 +161,11 @@ class Application:
                 self.component.zim_list_store.append([key, name, url, description, formatted_size, language, typ, version, False, size, True, fit])
                 languages.add(language)
 
+        self.component.zim_language_list_store = Gtk.ListStore(str)
+        self.component.zim_language_list_store.set_sort_column_id(0, Gtk.SortType.ASCENDING)
+        for language in languages:
+            self.component.zim_language_list_store.append([language])
+
         self.component.zim_choosen_filter = self.component.zim_list_store.filter_new()
         self.component.zim_choosen_filter.set_visible_func(self.zim_choosen_filter_func)
         self.component.zim_choosen_tree_view.set_model(self.component.zim_choosen_filter)
@@ -209,16 +214,6 @@ class Application:
         choosen_zim_filter.set_visible_func(self.choosen_zim_filter_func)
         self.component.choosen_zim_tree_view.set_model(choosen_zim_filter)
 
-        # zim window language check buttons
-        for language in sorted(languages):
-            button = Gtk.CheckButton.new_with_label(language)
-            button.set_active(True)
-
-            button.connect("toggled", self.toggle_column(5, 10, language))
-            self.component.zim_languages_box.pack_start(button, False, True, 0)
-
-        self.component.zim_languages_box.show_all()
-
         # kalite
         self.component.kalite_switch.connect("notify::active", lambda switch, state: self.component.kalite_revealer.set_reveal_child(switch.get_active()))
         for lang, button in self.iter_kalite_check_button():
@@ -231,6 +226,17 @@ class Application:
 
         # space error window
         self.component.space_error_window_ok_button.connect("clicked", self.space_error_window_ok_button_clicked)
+
+        # language tree view
+        renderer_text = Gtk.CellRendererText()
+        column_text = Gtk.TreeViewColumn("Language", renderer_text, text=0)
+        self.component.zim_language_tree_view.append_column(column_text)
+
+        self.component.zim_language_tree_view.get_selection().set_mode(Gtk.SelectionMode(3))
+        self.component.zim_language_tree_view.set_model(self.component.zim_language_list_store)
+        self.component.zim_language_tree_view.get_selection().select_all()
+        self.component.zim_language_tree_view.get_selection().connect("changed", self.zim_language_selection_changed)
+
 
     def iter_kalite_check_button(self):
         return [("fr", self.component.kalite_fr_check_button),
@@ -436,12 +442,15 @@ space missing: {}""".format(
 
         return size
 
-    def toggle_column(self, name_column, filter_column, name):
-        def toggle(button):
-            for item in self.component.zim_list_store:
-                if item[name_column] == name:
-                    item[filter_column] = button.get_active()
-        return toggle
+    def zim_language_selection_changed(self, selection):
+        model, rows = selection.get_selected_rows()
+
+        selected_languages = set()
+        for row in rows:
+            selected_languages.add(model[row][0])
+
+        for zim in self.component.zim_list_store:
+            zim[10] = zim[5] in selected_languages
 
     def available_zim_clicked(self, tree_view, path, column):
         tree_view.get_model()[path][8] = True
