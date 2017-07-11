@@ -220,11 +220,6 @@ class Application:
         for lang, button in self.iter_kalite_check_button():
             button.connect("toggled", lambda button: self.update_free_space())
 
-        self.refresh_disk_list()
-        self.update_free_space()
-
-        self.component.window.show()
-
         # space error window
         self.component.space_error_window_ok_button.connect("clicked", self.space_error_window_ok_button_clicked)
 
@@ -238,6 +233,10 @@ class Application:
         self.component.zim_language_tree_view.get_selection().select_all()
         self.component.zim_language_tree_view.get_selection().connect("changed", self.zim_language_selection_changed)
 
+        self.refresh_disk_list()
+        self.update_free_space()
+
+        self.component.window.show()
 
     def iter_kalite_check_button(self):
         return [("fr", self.component.kalite_fr_check_button),
