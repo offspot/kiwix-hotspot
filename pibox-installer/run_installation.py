@@ -13,9 +13,9 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
     current_working_dir = os.getcwd()
 
     if getattr(sys, "frozen", False):
-        build_dir = os.path.join(sys._MEIPASS, "build")
+        build_dir = os.path.join(sys._MEIPASS, "build-pibox")
     else:
-        build_dir = "build"
+        build_dir = "build-pibox"
 
     os.makedirs(build_dir, exist_ok=True)
     os.chdir(build_dir)
