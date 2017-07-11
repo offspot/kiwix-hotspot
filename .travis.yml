@@ -43,12 +43,12 @@ matrix:
     - pyinstaller --log-level=DEBUG pibox-installer-macos.spec
 
     # Sign application
-    # - security create-keychain -p mysecretpassword build.keychain
-    # - security default-keychain -s build.keychain
-    # - security unlock-keychain -p mysecretpassword build.keychain
-    # - security import pibox-installer.p12 -k build.keychain -P $MACOS_CERTIFICATE_PASSWORD -T /usr/bin/codesign
-    # - codesign -s pibox-installer dist/pibox-installer.app
-    - codesign -s - dist/pibox-installer.app
+    - security create-keychain -p mysecretpassword build.keychain
+    - security default-keychain -s build.keychain
+    - security unlock-keychain -p mysecretpassword build.keychain
+    - security import pibox-installer.p12 -k build.keychain -P $MACOS_CERTIFICATE_PASSWORD -T /usr/bin/codesign
+    - security find-identity -v
+    - "codesign -s \"Mac Developer: Guillaume Thiolliere (224XBGG4F3)\" dist/pibox-installer.app"
 
     # Install and run create-dmg
     - npm install --global create-dmg@1.3.0
