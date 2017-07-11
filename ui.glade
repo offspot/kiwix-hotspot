@@ -77,9 +77,22 @@
           <object class="GtkBox" id="no_id_5">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="spacing">5</property>
+            <child>
+              <object class="GtkButton" id="run_copy_log_to_clipboard_button">
+                <property name="label" translatable="yes">Copy log</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
             <child>
               <object class="GtkButton" id="run_abort_done_button">
-                <property name="label" translatable="yes">Abort</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -92,15 +105,23 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="run_copy_log_to_clipboard_button">
-                <property name="label" translatable="yes">Copy log</property>
+              <object class="GtkRevealer" id="run_new_install_button_revealer">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
+                <property name="can_focus">False</property>
+                <property name="transition_type">none</property>
+                <child>
+                  <object class="GtkButton" id="run_new_install_button">
+                    <property name="label" translatable="yes">New install</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                  </object>
+                </child>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
+                <property name="pack_type">end</property>
                 <property name="position">1</property>
               </packing>
             </child>
@@ -135,7 +156,6 @@
           <object class="GtkLabel" id="done_label">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Installation done</property>
           </object>
           <packing>
             <property name="expand">True</property>

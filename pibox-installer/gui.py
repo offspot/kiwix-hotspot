@@ -136,6 +136,7 @@ class Application:
         self.component.run_text_view.get_buffer().connect("modified-changed", self.run_text_view_scroll_down)
         self.component.run_abort_done_button.connect("clicked", self.run_abort_done_button_clicked)
         self.component.run_copy_log_to_clipboard_button.connect("clicked", self.run_copy_log_to_clipboard_button_clicked)
+        self.component.run_new_install_button.connect("clicked", self.run_new_install_button_clicked)
 
         # zim content
         self.component.zim_choose_content_button.connect("clicked", self.zim_choose_content_button_clicked)
@@ -250,12 +251,17 @@ class Application:
         self.component.space_error_window.hide()
 
     def installation_done(self, error):
-        if error != None:
+        ok = error == None
+        validate_label(self.component.done_label, ok)
+        if ok:
+            self.component.done_label.set_text("Installation done")
+        else:
             self.component.done_label.set_text("Installation failed")
-            validate_label(self.component.done_label, False)
+
         self.component.done_window.show()
-        self.component.run_abort_done_button.set_label("Back")
+        self.component.run_abort_done_button.set_label("Quit")
         self.component.run_spinner.stop()
+        self.component.run_new_install_button_revealer.set_reveal_child(True)
 
     def run_text_view_scroll_down(self, widget):
         text_buffer = self.component.run_text_view.get_buffer()
@@ -273,6 +279,16 @@ class Application:
 
     def run_abort_done_button_clicked(self, widget):
         self.component.run_window.close()
+
+    def run_new_install_button_clicked(self, widget):
+        self.component.run_window.hide()
+        self.component.window.show()
+
+    def reset_run_window(self):
+        self.component.run_new_install_button_revealer.set_reveal_child(False)
+        self.component.run_text_view.get_buffer().set_text("")
+        self.component.run_spinner.start()
+        self.component.run_abort_done_button.set_label("Abort")
 
     def run_copy_log_to_clipboard_button_clicked(self, widget):
         text_buffer = self.component.run_text_view.get_buffer()
@@ -380,6 +396,7 @@ space missing: {}""".format(
                         done_callback=lambda error: GLib.idle_add(self.installation_done, error))
 
             self.component.window.hide()
+            self.reset_run_window()
             self.component.run_window.show()
             threading.Thread(target=target, daemon=True).start()
 
