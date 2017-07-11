@@ -77,6 +77,9 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
         logger.step("Done")
         error = None
 
+    os.chdir(current_working_dir)
+    shutil.rmtree(build_dir)
+
     if done_callback:
         done_callback(error)
 
