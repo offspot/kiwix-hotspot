@@ -70,7 +70,7 @@ elif sys.platform == "darwin":
             {"name": "device_identifier", "show": True, "typ": str},
             {"name": "media_name", "show": True, "typ": str},
             {"name": "media_type", "show": True, "typ": str},
-            {"name": "removable", "show": True, "typ": str},
+            {"name": "removable", "show": False, "typ": str},
             {"name": "formatted_size", "show": True, "typ": str},
             {"name": "volume_name", "show": True, "typ": str},
             {"name": "size", "show": False, "typ": str},
@@ -105,13 +105,13 @@ elif sys.platform == "darwin":
 
 elif sys.platform == "win32":
     informations = [
-            {"name": "device", "show": True, "typ": str},
+            {"name": "media_type", "show": True, "typ": str},
+            {"name": "name", "show": True, "typ": str},
             {"name": "caption", "show": True, "typ": str},
             {"name": "description", "show": True, "typ": str},
-            {"name": "media_type", "show": True, "typ": str},
-            {"name": "model", "show": True, "typ": str},
-            {"name": "name", "show": True, "typ": str},
             {"name": "formatted_size", "show": True, "typ": str},
+            {"name": "device", "show": False, "typ": str},
+            {"name": "model", "show": False, "typ": str},
             {"name": "size", "show": False, "typ": str},
             ]
 
