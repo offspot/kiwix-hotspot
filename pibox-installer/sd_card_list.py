@@ -3,6 +3,7 @@ import subprocess
 import os
 import re
 from util import human_readable_size
+from backend.util import startup_info_args
 
 def get_device_index():
     for index, info in enumerate(informations):
@@ -118,7 +119,7 @@ elif sys.platform == "win32":
        return line[match.start():match.end()].strip()
 
     def get_list():
-        lines = subprocess.check_output(["wmic", "diskdrive"]).decode('utf-8').splitlines()
+        lines = subprocess.check_output(["wmic", "diskdrive"], **startup_info_args()).decode('utf-8').splitlines()
 
         column = {}
         matches = re.finditer(r"(\w+\W+)", lines[0])
