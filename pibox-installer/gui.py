@@ -141,10 +141,10 @@ class Application:
         # zim content
         self.component.zim_choose_content_button.connect("clicked", self.zim_choose_content_button_clicked)
 
-        self.component.zim_list_store = Gtk.ListStore(str, str, str, str, str, str, str, str, bool, str, bool, GdkPixbuf.Pixbuf);
+        self.component.zim_list_store = Gtk.ListStore(str, str, str, str, str, object, str, str, bool, str, bool, GdkPixbuf.Pixbuf);
         self.component.zim_list_store.set_sort_column_id(1, Gtk.SortType.ASCENDING)
 
-        languages = set()
+        all_languages = set()
 
         for one_catalog in catalog:
             for (key, value) in one_catalog["all"].items():
@@ -153,18 +153,19 @@ class Application:
                 description = value.get("description") or "none"
                 formatted_size = human_readable_size(int(value["size"]))
                 size = str(value["size"])
-                language = langcodes.Language.get(value.get("language") or "none").language_name()
+                languages_iso = (value.get("language") or "Unkown language").split(",")
+                languages = set(map(lambda l: langcodes.Language.get(l).language_name(), languages_iso))
                 typ = value["type"]
                 version = str(value["version"])
                 fit = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, False, 8, 32, 16)
                 fit.fill(HEX_GREEN)
 
-                self.component.zim_list_store.append([key, name, url, description, formatted_size, language, typ, version, False, size, True, fit])
-                languages.add(language)
+                self.component.zim_list_store.append([key, name, url, description, formatted_size, languages, typ, version, False, size, True, fit])
+                all_languages |= languages
 
         self.component.zim_language_list_store = Gtk.ListStore(str)
         self.component.zim_language_list_store.set_sort_column_id(0, Gtk.SortType.ASCENDING)
-        for language in languages:
+        for language in all_languages:
             self.component.zim_language_list_store.append([language])
 
         self.component.zim_choosen_filter = self.component.zim_list_store.filter_new()
@@ -466,7 +467,7 @@ space missing: {}""".format(
             selected_languages.add(model[row][0])
 
         for zim in self.component.zim_list_store:
-            zim[10] = zim[5] in selected_languages
+            zim[10] = len(zim[5] & selected_languages) != 0
 
     def available_zim_clicked(self, tree_view, path, column):
         tree_view.get_model()[path][8] = True
