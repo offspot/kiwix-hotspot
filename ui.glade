@@ -825,13 +825,24 @@
                 <property name="orientation">vertical</property>
                 <property name="spacing">5</property>
                 <child>
-                  <object class="GtkLabel" id="no_id_32">
+                  <object class="GtkBox" id="no_id_44">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">Languages</property>
-                    <attributes>
-                      <attribute name="weight" value="bold"/>
-                    </attributes>
+                    <child>
+                      <object class="GtkLabel" id="no_id_32">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Languages</property>
+                        <attributes>
+                          <attribute name="weight" value="bold"/>
+                        </attributes>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -884,7 +895,7 @@
                       <object class="GtkLabel" id="no_id_35">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Available :</property>
+                        <property name="label" translatable="yes">Available</property>
                         <attributes>
                           <attribute name="weight" value="bold"/>
                           <attribute name="variant" value="normal"/>
@@ -935,7 +946,7 @@
                       <object class="GtkLabel" id="no_id_38">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Selected :</property>
+                        <property name="label" translatable="yes">Selected</property>
                         <attributes>
                           <attribute name="weight" value="bold"/>
                         </attributes>
