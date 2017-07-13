@@ -465,10 +465,12 @@ space missing: {}""".format(
 
     def available_zim_clicked(self, tree_view, path, column):
         tree_view.get_model()[path][8] = True
+        tree_view.get_selection().unselect_all()
         self.update_free_space()
 
     def choosen_zim_clicked(self, tree_view, path, column):
         tree_view.get_model()[path][8] = False
+        tree_view.get_selection().unselect_all()
         self.update_free_space()
 
     def zim_done_button_clicked(self, widget):
