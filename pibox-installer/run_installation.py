@@ -8,17 +8,19 @@ import data
 from backend.util import subprocess_pretty_check_call
 import re
 
+if getattr(sys, "frozen", False):
+    BUILD_DIR_DIR = sys._MEIPASS
+else:
+    BUILD_DIR_DIR = "."
+
+BUILD_DIR = os.path.join(BUILD_DIR_DIR, "build-pibox")
+
 def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger, cancel_event, sd_card, output_file, done_callback=None):
 
     current_working_dir = os.getcwd()
 
-    if getattr(sys, "frozen", False):
-        build_dir = os.path.join(sys._MEIPASS, "build-pibox")
-    else:
-        build_dir = "build-pibox"
-
-    os.makedirs(build_dir, exist_ok=True)
-    os.chdir(build_dir)
+    os.makedirs(BUILD_DIR, exist_ok=True)
+    os.chdir(BUILD_DIR)
 
     try:
         if sd_card:
@@ -78,7 +80,7 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
         error = None
 
     os.chdir(current_working_dir)
-    shutil.rmtree(build_dir)
+    shutil.rmtree(BUILD_DIR)
 
     if done_callback:
         done_callback(error)

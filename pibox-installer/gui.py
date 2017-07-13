@@ -3,6 +3,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib, GdkPixbuf
 from backend import catalog
 from run_installation import run_installation
+from run_installation import BUILD_DIR_DIR
 import pytz
 import tzlocal
 import os
@@ -361,8 +362,8 @@ class Application:
         else:
             kalite = None
 
-        build_path = os.path.abspath(".")
-        free_space = get_free_space(".")
+        build_path = os.path.abspath(BUILD_DIR_DIR)
+        free_space = get_free_space(BUILD_DIR_DIR)
         remaining_space = free_space - size
         if remaining_space < 0:
 
