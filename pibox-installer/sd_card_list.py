@@ -142,7 +142,7 @@ elif sys.platform == "win32":
                 "formatted_size": formatted_size,
                 })
 
-        return filter(lambda d: d["media_type"] != "Fixed hard disk media" and d["size"] != 0, devices)
+        return filter(lambda d: d["media_type"] != "Fixed hard disk media" and d["size"] is not '', devices)
 
 else:
     print("platform not supported")

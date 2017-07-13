@@ -50,7 +50,11 @@ class _CancelEventRegister:
         self._pids.remove(pid)
 
 def human_readable_size(size):
-    size = int(size)
+    try:
+        size = int(size)
+    except:
+        return 'NaN'
+
     if size == 0:
         return '0B'
     if size < 0:
