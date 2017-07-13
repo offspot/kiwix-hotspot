@@ -16,8 +16,8 @@ from datetime import datetime
 import data
 import langcodes
 
-HEX_RED = 0xFF757500
-HEX_GREEN = 0x75FF7500
+VALID_RGBA = Gdk.RGBA(0., 0., 0., 0.)
+INVALID_RGBA = Gdk.RGBA(1, 0.5, 0.5, 1.)
 
 KALITE_SIZES = {
     "fr": 10737418240,
@@ -74,11 +74,10 @@ class Component:
         raise AttributeError(key)
 
 def validate_label(label, condition):
-    color_invalid = Gdk.Color(65535, 30000, 30000)
     if condition:
         label.modify_bg(Gtk.StateFlags.NORMAL)
     else:
-        label.modify_bg(Gtk.StateFlags.NORMAL, color_invalid)
+        label.modify_bg(Gtk.StateFlags.NORMAL, INVALID_RGBA.to_color())
 
 class Application:
     def __init__(self, catalog):
@@ -141,7 +140,7 @@ class Application:
         # zim content
         self.component.zim_choose_content_button.connect("clicked", self.zim_choose_content_button_clicked)
 
-        self.component.zim_list_store = Gtk.ListStore(str, str, str, str, str, object, str, str, bool, str, bool, GdkPixbuf.Pixbuf);
+        self.component.zim_list_store = Gtk.ListStore(str, str, str, str, str, object, str, str, bool, str, bool, Gdk.RGBA);
         self.component.zim_list_store.set_sort_column_id(1, Gtk.SortType.ASCENDING)
 
         all_languages = set()
@@ -157,10 +156,8 @@ class Application:
                 languages = set(map(lambda l: langcodes.Language.get(l).language_name(), languages_iso))
                 typ = value["type"]
                 version = str(value["version"])
-                fit = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, False, 8, 32, 16)
-                fit.fill(HEX_GREEN)
 
-                self.component.zim_list_store.append([key, name, url, description, formatted_size, languages, typ, version, False, size, True, fit])
+                self.component.zim_list_store.append([key, name, url, description, formatted_size, languages, typ, version, False, size, True, VALID_RGBA])
                 all_languages |= languages
 
         self.component.zim_language_list_store = Gtk.ListStore(str)
@@ -185,10 +182,6 @@ class Application:
         ## zim window available tree view
         self.component.zim_tree_view.set_model(self.component.zim_list_store)
 
-        renderer_pixbuf = Gtk.CellRendererPixbuf().new()
-        column_pixbuf = Gtk.TreeViewColumn("Fit", renderer_pixbuf, pixbuf=11)
-        self.component.zim_tree_view.append_column(column_pixbuf)
-
         renderer_text = Gtk.CellRendererText()
         column_text = Gtk.TreeViewColumn("Name", renderer_text, text=1)
         self.component.zim_tree_view.append_column(column_text)
@@ -196,6 +189,7 @@ class Application:
         self.component.zim_tree_view.append_column(column_text)
         column_text = Gtk.TreeViewColumn("Description", renderer_text, text=3)
         self.component.zim_tree_view.append_column(column_text)
+        column_text.add_attribute(renderer_text, "cell_background_rgba", 11)
 
         zim_filter = self.component.zim_list_store.filter_new()
         zim_filter.set_visible_func(self.zim_filter_func)
@@ -438,9 +432,9 @@ space missing: {}""".format(
         validate_label(self.component.free_space_label2, condition)
         for row in self.component.zim_list_store:
             if free_space - int(row[9]) >= 0:
-                row[11].fill(HEX_GREEN)
+                row[11] = VALID_RGBA
             else:
-                row[11].fill(HEX_RED)
+                row[11] = INVALID_RGBA
         return free_space
 
     def get_output_size(self):
