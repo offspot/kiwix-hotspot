@@ -25,6 +25,10 @@ KALITE_SIZES = {
     "en": 41875931136,
 }
 
+def hide_on_delete(widget, event):
+    widget.hide()
+    return True
+
 class Logger:
     def __init__(self, text_buffer, step_label):
         self.text_buffer = text_buffer
@@ -128,6 +132,11 @@ class Application:
 
         # done window
         self.component.done_window_ok_button.connect("clicked", self.done_window_ok_button_clicked)
+        self.component.done_window.connect("delete-event", hide_on_delete)
+
+        # space error window
+        self.component.space_error_window_ok_button.connect("clicked", self.space_error_window_ok_button_clicked)
+        self.component.space_error_window.connect("delete-event", hide_on_delete)
 
         # run window
         self.component.run_installation_button.connect("clicked", self.run_installation_button_clicked)
@@ -176,6 +185,7 @@ class Application:
 
         # zim window
         self.component.zim_window_done_button.connect("clicked", self.zim_done_button_clicked)
+        self.component.zim_window.connect("delete-event", hide_on_delete)
         self.component.zim_tree_view.connect("row-activated", self.available_zim_clicked)
         self.component.choosen_zim_tree_view.connect("row-activated", self.choosen_zim_clicked)
 
@@ -214,9 +224,6 @@ class Application:
         self.component.kalite_switch.connect("notify::active", lambda switch, state: self.component.kalite_revealer.set_reveal_child(switch.get_active()))
         for lang, button in self.iter_kalite_check_button():
             button.connect("toggled", lambda button: self.update_free_space())
-
-        # space error window
-        self.component.space_error_window_ok_button.connect("clicked", self.space_error_window_ok_button_clicked)
 
         # language tree view
         renderer_text = Gtk.CellRendererText()
