@@ -1,12 +1,16 @@
 # Pibox installer
 
-This installer install ideascube on an SD card for raspberrypi 2 or raspberrypi 3
+This installer install [Ideascube](https://framagit.org/ideascube/ideascube) on an SD card for raspberrypi 2 or raspberrypi 3.
+
+Ideascube is a solution to serve offline content from the web such as Wikipedia, the Gutenberg library, TED talks.
+
+Pibox installer configure the RaspberryPi into a hotspot WiFi with Ideascube server and offline contents.
 
 ## Principle
 
-The installer emulate the architecture armhf in QEMU.
+The installer emulate the rasbperrypi architecture armhf in QEMU.
 
-Inside the emulator it builds ideascube with ansiblecube.
+Inside the emulator it builds [Ideascube](https://framagit.org/ideascube/ideascube) with [Ansiblecube](https://github.com/ideascube/ansiblecube).
 
 ## Download
 
