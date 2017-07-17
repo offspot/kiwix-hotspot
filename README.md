@@ -1,4 +1,4 @@
-# pibox-installer
+# Pibox installer
 
 This installer install ideascube on an SD card for raspberrypi 2 or raspberrypi 3
 
