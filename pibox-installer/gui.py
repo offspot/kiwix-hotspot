@@ -99,7 +99,7 @@ class Application:
         self.component.window.connect("delete-event", Gtk.main_quit)
 
         # wifi password
-        self.component.wifi_password_switch.connect("notify::active", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(switch.get_active()))
+        self.component.wifi_password_switch.connect("notify::active", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(not switch.get_active()))
 
         # timezone
         default_id = -1

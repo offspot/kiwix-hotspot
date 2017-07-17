@@ -205,7 +205,7 @@
               <object class="GtkLabel" id="project_name_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Project name :</property>
+                <property name="label" translatable="yes">Pibox name :</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -241,7 +241,7 @@
               <object class="GtkLabel" id="no_id_11">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Set a wifi password :</property>
+                <property name="label" translatable="yes">Open WiFi</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -253,6 +253,7 @@
               <object class="GtkSwitch" id="wifi_password_switch">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="active">True</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -280,7 +281,7 @@
                   <object class="GtkLabel" id="no_id_13">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">Wifi password :</property>
+                    <property name="label" translatable="yes">WiFi Password :</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -531,7 +532,7 @@
               <object class="GtkLabel" id="no_id_22">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Zim content :</property>
+                <property name="label" translatable="yes">Static content</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -546,7 +547,7 @@
                 <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkButton" id="zim_choose_content_button">
-                    <property name="label" translatable="yes">choose content</property>
+                    <property name="label" translatable="yes">Select</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
