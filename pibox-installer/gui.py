@@ -222,7 +222,6 @@ class Application:
         self.component.choosen_zim_tree_view.set_model(choosen_zim_filter)
 
         # kalite
-        self.component.kalite_switch.connect("notify::active", lambda switch, state: self.component.kalite_revealer.set_reveal_child(switch.get_active()))
         for lang, button in self.iter_kalite_check_button():
             button.connect("toggled", lambda button: self.update_free_space())
 
@@ -355,7 +354,7 @@ class Application:
         validate_label(self.component.free_space_name_label, condition)
         all_valid = all_valid and condition
 
-        if self.component.kalite_switch.get_state():
+        if len(self.iter_kalite_check_button()) != 0:
             kalite = []
             for lang, button in self.iter_kalite_check_button():
                 kalite.append(lang)
@@ -424,10 +423,9 @@ space missing: {}""".format(
         for zim in self.component.zim_list_store:
             if zim[8]:
                 used_space += int(zim[9])
-        if self.component.kalite_switch.get_state():
-            for lang, button in self.iter_kalite_check_button():
-                if button.get_active():
-                    used_space += KALITE_SIZES[lang]
+        for lang, button in self.iter_kalite_check_button():
+            if button.get_active():
+                used_space += KALITE_SIZES[lang]
         return self.get_output_size() - used_space
 
     def update_free_space(self):
