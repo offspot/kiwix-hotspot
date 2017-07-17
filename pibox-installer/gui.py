@@ -175,15 +175,6 @@ class Application:
         for language in all_languages:
             self.component.zim_language_list_store.append([language])
 
-        self.component.zim_choosen_filter = self.component.zim_list_store.filter_new()
-        self.component.zim_choosen_filter.set_visible_func(self.zim_choosen_filter_func)
-        self.component.zim_choosen_tree_view.set_model(self.component.zim_choosen_filter)
-        self.component.zim_choosen_tree_view.get_selection().set_mode(Gtk.SelectionMode(0))
-
-        renderer_text = Gtk.CellRendererText()
-        column_text = Gtk.TreeViewColumn("Id", renderer_text, text=0)
-        self.component.zim_choosen_tree_view.append_column(column_text)
-
         # zim window
         self.component.zim_window_done_button.connect("clicked", self.zim_done_button_clicked)
         self.component.zim_window.connect("delete-event", hide_on_delete)
@@ -405,9 +396,6 @@ class Application:
 
     def zim_choose_content_button_clicked(self, button):
         self.component.zim_window.show()
-
-    def zim_choosen_filter_func(self, model, iter, data):
-        return model[iter][8]
 
     def get_free_space(self):
         # TODO: compute actual space used with empty install
