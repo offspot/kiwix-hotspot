@@ -146,7 +146,7 @@ class _RunningInstance:
 
         def raise_timeout():
             timeout_event.set()
-            os.write(writer_fd, b"piboxinstaller timeout")
+            os.write(writer_fd, b"\nPibox installer: QEMU boot timeout\n")
 
         ring_buf = collections.deque(maxlen=len(signal))
         while True:
