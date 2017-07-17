@@ -365,19 +365,11 @@ class Application:
         free_space = get_free_space(BUILD_DIR_DIR)
         remaining_space = free_space - size
         if remaining_space < 0:
+            self.component.space_error_image_location_label.set_text(build_path)
+            self.component.space_error_total_space_required_label.set_text(human_readable_size(size))
+            self.component.space_error_space_available_label.set_text(human_readable_size(free_space))
+            self.component.space_error_space_missing_label.set_text(human_readable_size(-remaining_space))
 
-            text = """There is not enough space to create image on disk :
-
-image location : {}
-total space required : {}
-space available : {}
-space missing: {}""".format(
-        build_path,
-        human_readable_size(size),
-        human_readable_size(free_space),
-        human_readable_size(-remaining_space))
-
-            self.component.space_error_label.set_text(text)
             self.component.space_error_window.show()
             all_valid = False
 
