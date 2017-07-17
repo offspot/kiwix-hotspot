@@ -18,14 +18,15 @@ def get_size_index():
 if sys.platform == "linux":
     import dbus
 
+    visible_informations = 3
     informations = [
-            {"name": "device", "show": True, "typ": str},
-            {"name": "formatted_size", "show": True, "typ": str},
-            {"name": "id_label", "show": True, "typ": str},
-            {"name": "id", "show": True, "typ": str},
-            {"name": "drive_id", "show": True, "typ": str},
-            {"name": "drive_connection_bus", "show": True, "typ": str},
-            {"name": "size", "show": False, "typ": str},
+            {"name": "device", "typ": str},
+            {"name": "formatted_size", "typ": str},
+            {"name": "drive_id", "typ": str},
+            {"name": "id_label", "typ": str},
+            {"name": "id", "typ": str},
+            {"name": "drive_connection_bus", "typ": str},
+            {"name": "size", "typ": str},
             ]
 
     def get_list():
@@ -65,16 +66,18 @@ if sys.platform == "linux":
 elif sys.platform == "darwin":
     import plistlib
 
+    visible_informations = 3
     informations = [
-            {"name": "bus_protocol", "show": True, "typ": str},
-            {"name": "device_identifier", "show": True, "typ": str},
-            {"name": "media_name", "show": True, "typ": str},
-            {"name": "media_type", "show": True, "typ": str},
-            {"name": "removable", "show": False, "typ": str},
-            {"name": "formatted_size", "show": True, "typ": str},
-            {"name": "volume_name", "show": True, "typ": str},
-            {"name": "size", "show": False, "typ": str},
-            {"name": "device", "show": False, "typ": str},
+            {"name": "device_identifier", "typ": str},
+            {"name": "formatted_size", "typ": str},
+            {"name": "io_registry_entry_name", "typ": str},
+            {"name": "media_name", "typ": str},
+            {"name": "volume_name", "typ": str},
+            {"name": "removable", "typ": str},
+            {"name": "size", "typ": str},
+            {"name": "device", "typ": str},
+            {"name": "bus_protocol", "typ": str},
+            {"name": "media_type", "typ": str},
             ]
 
     def get_list():
@@ -93,6 +96,7 @@ elif sys.platform == "darwin":
                 "bus_protocol": plist["BusProtocol"],
                 "device_identifier": plist["DeviceIdentifier"],
                 "device": plist["DeviceNode"],
+                "io_registry_entry_name": plist["IORegistryEntryName"],
                 "media_name": plist["MediaName"],
                 "media_type": plist["MediaType"],
                 "removable": plist["Removable"],
@@ -104,15 +108,17 @@ elif sys.platform == "darwin":
         return filter(lambda d: d["removable"] and d["size"] != 0, devices)
 
 elif sys.platform == "win32":
+
+    visible_informations = 3
     informations = [
-            {"name": "media_type", "show": True, "typ": str},
-            {"name": "name", "show": True, "typ": str},
-            {"name": "caption", "show": True, "typ": str},
-            {"name": "description", "show": True, "typ": str},
-            {"name": "formatted_size", "show": True, "typ": str},
-            {"name": "device", "show": False, "typ": str},
-            {"name": "model", "show": False, "typ": str},
-            {"name": "size", "show": False, "typ": str},
+            {"name": "name", "typ": str},
+            {"name": "formatted_size", "typ": str},
+            {"name": "caption", "typ": str},
+            {"name": "description", "typ": str},
+            {"name": "media_type", "typ": str},
+            {"name": "device", "typ": str},
+            {"name": "model", "typ": str},
+            {"name": "size", "typ": str},
             ]
 
     def extract_field(match, line):

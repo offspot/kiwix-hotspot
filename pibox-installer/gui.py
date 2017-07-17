@@ -126,10 +126,10 @@ class Application:
         self.component.sd_card_list_store = Gtk.ListStore(*types)
         self.component.sd_card_combobox.set_model(self.component.sd_card_list_store)
 
-        for counter, _ in enumerate(filter(lambda info: info["show"], sd_card_list.informations)):
-            info = Gtk.CellRendererText()
-            self.component.sd_card_combobox.pack_start(info, True)
-            self.component.sd_card_combobox.add_attribute(info, "text", counter)
+        for counter in range(0, sd_card_list.visible_informations):
+            cell_renderer = Gtk.CellRendererText()
+            self.component.sd_card_combobox.pack_start(cell_renderer, True)
+            self.component.sd_card_combobox.add_attribute(cell_renderer, "text", counter)
 
         # done window
         self.component.done_window_ok_button.connect("clicked", self.done_window_ok_button_clicked)
