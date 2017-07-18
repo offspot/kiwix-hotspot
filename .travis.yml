@@ -57,7 +57,7 @@ matrix:
     # Send dmg
     - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-0.0.0.dmg pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-macos.dmg
 
-    - PIBOX_RELEASE=$(git tag -l --points-at HEAD | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*')
+    - PIBOX_RELEASE=$(git tag -l --points-at HEAD | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*') || true
     - if [ $PIBOX_RELEASE ]; then scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-0.0.0.dmg pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/pibox-installer-$PIBOX_RELEASE-macos.dmg; fi
 
   - os: linux
@@ -131,5 +131,5 @@ matrix:
     # Deploy
     - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer.tar.gz pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-linux.tar.gz
 
-    - PIBOX_RELEASE=$(git tag -l --points-at HEAD | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*')
+    - PIBOX_RELEASE=$(git tag -l --points-at HEAD | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*') || true
     - if [ $PIBOX_RELEASE ]; then scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer.tar.gz pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/pibox-installer-$PIBOX_RELEASE-linux.tar.gz; fi
