@@ -105,7 +105,7 @@ elif sys.platform == "darwin":
                 "volume_name": plist["VolumeName"],
                 })
 
-        return filter(lambda d: d["removable"] and d["size"] != 0, devices)
+        return filter(lambda d: d["removable"] and d["size"] != 0 and d["bus_protocol"] != "Disk Image", devices)
 
 elif sys.platform == "win32":
 
