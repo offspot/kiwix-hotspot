@@ -260,7 +260,6 @@ class Application:
         text_buffer.set_modified(False)
 
         end = text_buffer.get_end_iter()
-        end = self.component.run_text_view.get_buffer().get_end_iter()
         end.backward_line()
 
         self.component.run_text_view.scroll_to_iter(end, 0, True, 0, 1.)
