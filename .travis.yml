@@ -53,12 +53,13 @@ matrix:
     # Install and run create-dmg
     - npm install --global create-dmg@1.3.0
     - create-dmg dist/pibox-installer.app || true
+    - mv pibox-installer-0.0.0.dmg pibox-installer-macos.dmg
 
     # Send dmg
-    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-0.0.0.dmg pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-macos.dmg
+    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-macos.dmg pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/
 
     - PIBOX_RELEASE=$(git tag -l --points-at HEAD | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*') || true
-    - if [ $PIBOX_RELEASE ]; then scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-0.0.0.dmg pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/pibox-installer-$PIBOX_RELEASE-macos.dmg; fi
+    - if [ $PIBOX_RELEASE ]; then mkdir -p releases/$PIBOX_RELEASE; mv pibox-installer-macos.dmg releases/$PIBOX_RELEASE/; scp -r -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/; fi
 
   - os: linux
     language: python
@@ -125,11 +126,11 @@ matrix:
 
     # Archive
     - cd dist
-    - tar czvf pibox-installer.tar.gz pibox-installer
+    - tar czvf pibox-installer-linux.tar.gz pibox-installer
     - cd ..
 
     # Deploy
-    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer.tar.gz pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-linux.tar.gz
+    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer-linux.tar.gz pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/
 
     - PIBOX_RELEASE=$(git tag -l --points-at HEAD | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*') || true
-    - if [ $PIBOX_RELEASE ]; then scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer.tar.gz pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/pibox-installer-$PIBOX_RELEASE-linux.tar.gz; fi
+    - if [ $PIBOX_RELEASE ]; then mkdir -p releases/$PIBOX_RELEASE; mv dist/pibox-installer-linux.tar.gz releases/$PIBOX_RELEASE; scp -r -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/; fi
