@@ -40,7 +40,7 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
                 os.write(w, str.encode("select disk {}\n".format(device_number)))
                 os.write(w, b"clean\n")
                 os.close(w)
-                logger.std("diskpart select disk % and clean" % device_number)
+                logger.std("diskpart select disk {} and clean".format(device_number))
                 subprocess_pretty_check_call(["diskpart"], logger, stdin=r)
 
         downloader = Downloader(logger)
