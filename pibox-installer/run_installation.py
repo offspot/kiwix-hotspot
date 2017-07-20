@@ -65,6 +65,19 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
                     kalite=kalite,
                     zim_install=zim_install)
 
+            with open(data.pibox_ideascube_conf, "r") as f:
+                pibox_ideascube_conf = f.read()
+            emulation.write_file("/opt/venvs/ideascube/lib/python3.4/site-packages/ideascube/conf/pibox.py", pibox_ideascube_conf)
+
+            extra_app_cards = []
+            if kalite != None:
+                extra_app_cards.append('khanacademy')
+            conf = """from .pibox import *  # pragma: no flakes
+
+EXTRA_APP_CARDS = {}""".format(extra_app_cards)
+
+            machine.write_file("/opt/venvs/ideascube/lib/python3.4/site-packages/ideascube/conf/kb.py", conf)
+
         if sd_card:
             emulator.copy_image(sd_card)
 
