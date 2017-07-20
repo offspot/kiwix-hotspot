@@ -98,6 +98,9 @@ class Application:
         # main window
         self.component.window.connect("delete-event", Gtk.main_quit)
 
+        # menu bar
+        self.component.menu_quit.connect("activate", lambda widget: self.component.window.close())
+
         # wifi password
         self.component.wifi_password_switch.connect("notify::active", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(not switch.get_active()))
 
