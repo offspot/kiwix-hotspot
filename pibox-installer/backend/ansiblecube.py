@@ -47,12 +47,12 @@ def run(machine, name, timezone, wifi_pwd, kalite, zim_install):
     extra_vars += " timezone=%s" % timezone
     if wifi_pwd:
         extra_vars += " wpa_pass=%s" % wifi_pwd
-    extra_vars += " git_branch=oneUpdateFile"
+    extra_vars += " git_branch=oneUpdateFile0.2"
     extra_vars += " own_config_file=True"
     extra_vars += " managed_by_bsf=False"
 
     ansible_pull_cmd = "sudo /usr/local/bin/ansible-pull"
-    ansible_pull_cmd += " --checkout oneUpdateFile"
+    ansible_pull_cmd += " --checkout oneUpdateFile0.2"
     ansible_pull_cmd += " --directory /var/lib/ansible/local"
     ansible_pull_cmd += " --inventory hosts"
     ansible_pull_cmd += " --url https://github.com/thiolliere/ansiblecube.git"
