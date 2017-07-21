@@ -135,7 +135,7 @@ class Application:
             self.component.sd_card_combobox.add_attribute(cell_renderer, "text", counter)
 
         # done window
-        self.component.done_window_ok_button.connect("clicked", self.done_window_ok_button_clicked)
+        self.component.done_window_ok_button.connect("clicked", lambda widget: self.component.done_window.hide())
         self.component.done_window.connect("delete-event", hide_on_delete)
 
         # space error window
@@ -238,9 +238,6 @@ class Application:
         return [("fr", self.component.kalite_fr_check_button),
                 ("en", self.component.kalite_en_check_button),
                 ("es", self.component.kalite_es_check_button)]
-
-    def done_window_ok_button_clicked(self, widget):
-        self.component.done_window.hide()
 
     def space_error_window_ok_button_clicked(self, widget):
         self.component.space_error_window.hide()
