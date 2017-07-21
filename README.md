@@ -20,6 +20,8 @@ note: binaries for windows and macos are not signed, to open on windows just cli
 
 ## CLI usage
 
+note: CLI is currently not packaged, you have to run it from source
+
 show help: `pibox-installer-cli -h`
 
 show catalog: `pibox-installer-cli -c`
