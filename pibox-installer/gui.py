@@ -3,7 +3,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib, GdkPixbuf
 from backend import catalog
 from run_installation import run_installation
-from run_installation import BUILD_DIR_DIR
 import pytz
 import tzlocal
 import os
@@ -13,7 +12,6 @@ from util import CancelEvent
 import sd_card_list
 from util import human_readable_size
 from util import get_free_space
-from datetime import datetime
 import data
 import langcodes
 
@@ -322,6 +320,7 @@ class Application:
             if zim[8]:
                 zim_install.append(zim[0])
 
+        output_size = self.get_output_size()
         if self.component.output_stack.get_visible_child_name() == "sd_card":
             sd_card_id = self.component.sd_card_combobox.get_active()
             condition = sd_card_id != -1
@@ -333,19 +332,9 @@ class Application:
             else:
                 device_index = sd_card_list.get_device_index()
                 sd_card = self.component.sd_card_list_store[sd_card_id][device_index]
-            output_file = False
-            size = self.get_output_size()
         else:
             sd_card = None
-            size = self.get_output_size()
-            today = datetime.today().strftime('%Y_%m_%d-%H_%M_%S')
-            filename = "pibox-{}.img".format(today)
-            output_dir = os.path.join(os.path.expanduser('~'), 'Desktop')
-            if not os.path.isdir(output_dir):
-                output_dir = os.path.expanduser('~')
-            output_file = os.path.join(output_dir, filename)
-
-            condition = size > 0
+            condition = output_size > 0
             validate_label(self.component.size_label, condition)
             all_valid = all_valid and condition
 
@@ -360,17 +349,23 @@ class Application:
         else:
             kalite = None
 
-        build_path = os.path.abspath(BUILD_DIR_DIR)
-        free_space = get_free_space(BUILD_DIR_DIR)
-        remaining_space = free_space - size
-        if remaining_space < 0:
-            self.component.space_error_image_location_label.set_text(build_path)
-            self.component.space_error_total_space_required_label.set_text(human_readable_size(size))
-            self.component.space_error_space_available_label.set_text(human_readable_size(free_space))
-            self.component.space_error_space_missing_label.set_text(human_readable_size(-remaining_space))
+        build_dir = self.component.build_path_chooser.get_filename()
+        condition = build_dir != None
+        validate_label(self.component.build_path_chooser_label, condition)
+        all_valid = all_valid and condition
 
-            self.component.space_error_window.show()
-            all_valid = False
+        # Check if there is enough space in build_dir to build image
+        if build_dir != None:
+            free_space = get_free_space(build_dir)
+            remaining_space = free_space - output_size
+            if remaining_space < 0:
+                self.component.space_error_image_location_label.set_text(build_path)
+                self.component.space_error_total_space_required_label.set_text(human_readable_size(output_size))
+                self.component.space_error_space_available_label.set_text(human_readable_size(free_space))
+                self.component.space_error_space_missing_label.set_text(human_readable_size(-remaining_space))
+
+                self.component.space_error_window.show()
+                all_valid = False
 
         if all_valid:
             def target():
@@ -380,11 +375,11 @@ class Application:
                         wifi_pwd=wifi_pwd,
                         kalite=kalite,
                         zim_install=zim_install,
-                        size=size,
+                        size=output_size,
                         logger=self.logger,
                         cancel_event=self.cancel_event,
                         sd_card=sd_card,
-                        output_file=output_file,
+                        build_dir=build_dir,
                         done_callback=lambda error: GLib.idle_add(self.installation_done, error))
 
             self.component.window.hide()

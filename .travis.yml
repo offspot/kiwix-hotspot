@@ -13,7 +13,7 @@ matrix:
     - brew install qemu zoidbergwill/python/python35
     - brew install pygobject3 --with-python3 gtk+3 adwaita-icon-theme
     - python3 -m pip install -r requirements-macos.txt
-    - python3 -m pip install pyinstaller==3.2.1
+    - python3 -m pip install https://github.com/thiolliere/pyinstaller/archive/develop.zip
 
     # Download pibox-installer-vexpress-boot
     - wget http://download.kiwix.org/dev/pibox-installer-vexpress-boot.zip
