@@ -45,7 +45,6 @@ error = run_installation(
         size=args.resize,
         logger=Logger,
         cancel_event=CancelEvent(),
-        sd_card=args.sd,
-        output_file=not args.sd)
+        sd_card=args.sd)
 
 print("ERRROR: " + str(error))
