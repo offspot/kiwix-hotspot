@@ -41,8 +41,8 @@ install dependencies:
 * [python3](https://www.python.org/downloads/): version >= 3.4
 * [qemu](http://www.qemu.org/download/): version >= 2.8, qemu-img and qemu-system-arm must be present in the directory (symlink or install there)
 * [pygobject](https://pygobject.readthedocs.io/en/latest/getting_started.html):
-  on windows you can also install it using [pygi-aio](https://sourceforge.net/projects/pygobjectwin32/)
-* [pibox-installer-vexpress-boot]("http://download.kiwix.org/dev/pibox-installer-vexpress-boot.zip"): unzip in the directory
+  on Windows you can also install it using [pygi-aio](https://sourceforge.net/projects/pygobjectwin32/)
+* [pibox-installer-vexpress-boot](http://download.kiwix.org/dev/pibox-installer-vexpress-boot.zip): unzip in the directory
 
 create a virtual a virtual environment that includes pygobject: `python3 -m venv --system-site-packages my_venv`
 
