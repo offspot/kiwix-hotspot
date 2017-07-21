@@ -100,6 +100,7 @@ class Application:
 
         # menu bar
         self.component.menu_quit.connect("activate", lambda widget: self.component.window.close())
+        self.component.menu_about.connect("activate", self.activate_menu_about)
 
         # wifi password
         self.component.wifi_password_switch.connect("notify::active", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(not switch.get_active()))
@@ -133,6 +134,9 @@ class Application:
             cell_renderer = Gtk.CellRendererText()
             self.component.sd_card_combobox.pack_start(cell_renderer, True)
             self.component.sd_card_combobox.add_attribute(cell_renderer, "text", counter)
+
+        # about dialog
+        self.component.about_dialog.set_logo(GdkPixbuf.Pixbuf.new_from_file_at_scale(data.pibox_logo, 200, -1, True))
 
         # done window
         self.component.done_window_ok_button.connect("clicked", lambda widget: self.component.done_window.hide())
@@ -241,6 +245,11 @@ class Application:
 
     def space_error_window_ok_button_clicked(self, widget):
         self.component.space_error_window.hide()
+
+    def activate_menu_about(self, widget):
+        response = self.component.about_dialog.run()
+        if response == Gtk.ResponseType.DELETE_EVENT or response == Gtk.ResponseType.CANCEL:
+            self.component.about_dialog.hide()
 
     def installation_done(self, error):
         ok = error == None
