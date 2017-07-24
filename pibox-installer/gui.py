@@ -359,7 +359,7 @@ class Application:
             free_space = get_free_space(build_dir)
             remaining_space = free_space - output_size
             if remaining_space < 0:
-                self.component.space_error_image_location_label.set_text(build_path)
+                self.component.space_error_image_location_label.set_text(build_dir)
                 self.component.space_error_total_space_required_label.set_text(human_readable_size(output_size))
                 self.component.space_error_space_available_label.set_text(human_readable_size(free_space))
                 self.component.space_error_space_missing_label.set_text(human_readable_size(-remaining_space))
