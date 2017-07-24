@@ -119,8 +119,8 @@ matrix:
     - pip3 install -r requirements-linux.txt
 
     # Install and run pyinstaller
-    # note: we use mgautierfr version because it resolves packaging pygobject
-    - pip3 install https://github.com/mgautierfr/pyinstaller/archive/xlib_hook.zip
+    # note: we temporary use a fork that resolves pygobject issues
+    - pip3 install https://github.com/thiolliere/pyinstaller/archive/develop.zip
     - pyinstaller --log-level=DEBUG pibox-installer-linux.spec
     - cat build/pibox-installer-linux/warnpibox-installer-linux.txt
 
