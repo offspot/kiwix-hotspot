@@ -10,7 +10,7 @@ import threading
 from .util import startup_info_args
 from .util import subprocess_pretty_check_call
 
-timeout = 60*10
+timeout = 60*30
 
 if os.name == "nt":
     qemu_system_arm_exe = "qemu\qemu-system-arm.exe"
