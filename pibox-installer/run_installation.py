@@ -48,7 +48,7 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
         (zip_filename, _) = urllib.request.urlretrieve(data.raspbian_url, reporthook=hook)
         with ZipFile(zip_filename) as zipFile:
             logger.std("extract " + data.raspbian_zip_path)
-            extraction = zipFile.extract(data.raspbian_zip_path)
+            extraction = zipFile.extract(data.raspbian_zip_path, build_dir)
             shutil.move(extraction, image_building_path)
         os.remove(zip_filename)
 
