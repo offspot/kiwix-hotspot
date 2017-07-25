@@ -14,6 +14,7 @@ from util import human_readable_size
 from util import get_free_space
 import data
 import langcodes
+import string
 
 VALID_RGBA = Gdk.RGBA(0., 0., 0., 0.)
 INVALID_RGBA = Gdk.RGBA(1, 0.5, 0.5, 1.)
@@ -300,8 +301,10 @@ class Application:
         all_valid = True
 
         project_name = self.component.project_name_entry.get_text()
-        condition = project_name != ""
+        allowed_chars = set(string.ascii_uppercase + string.ascii_lowercase + string.digits + '-')
+        condition = len(project_name) >= 1 and len(project_name) <= 64 and set(project_name) <= allowed_chars
         validate_label(self.component.project_name_label, condition)
+        self.component.project_name_constraints_revealer.set_reveal_child(not condition)
         all_valid = all_valid and condition
 
         timezone_id = self.component.timezone_combobox.get_active()
