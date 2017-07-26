@@ -294,13 +294,6 @@ END_OF_CMD""" % second_partition_start
         self._logger.step("Resize filesystem")
         self.exec_cmd("sudo resize2fs /dev/mmcblk0p2")
 
-    def write_file(self, path, content):
-        # Use cat and then move because `sudo cat` doesn't give priviledge on redirection
-        # TODO do not force use of sudo: argument: sudo=False
-        tmp = "/tmp/" + generate_random_name()
-        self.exec_cmd("cat > {} <<END_OF_CMD\n{}\nEND_OF_CMD".format(tmp, content))
-        self.exec_cmd("sudo mv {} '{}'".format(tmp, path))
-
     def _reboot(self):
         self._logger.std("reboot qemu")
         self._shutdown()

@@ -42,7 +42,7 @@ def run(machine, name, timezone, wifi_pwd, kalite, zim_install):
     facts_path = facts_dir + "/device_list.fact"
 
     machine.exec_cmd("sudo mkdir --mode 0755 -p %s" % facts_dir)
-    machine.write_file(facts_path, json.dumps(device_list, indent=4))
+    machine.exec_cmd("sudo sh -c 'cat > {} <<END_OF_CMD3267\n{}\nEND_OF_CMD3267'".format(facts_path, json.dumps(device_list, indent=4)))
 
     extra_vars = "ideascube_project_name=%s" % name
     extra_vars += " timezone=%s" % timezone
