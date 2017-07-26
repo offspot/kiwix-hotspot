@@ -314,9 +314,14 @@ class Application:
         all_valid = all_valid and condition
 
         if self.component.wifi_password_switch.get_state():
-            wifi_pwd = self.component.wifi_password_entry.get_text()
-        else:
             wifi_pwd = None
+            condition = True
+        else:
+            wifi_pwd = self.component.wifi_password_entry.get_text()
+            condition = len(wifi_pwd) <= 31 and set(wifi_pwd) <= set(string.ascii_uppercase + string.ascii_lowercase + string.digits)
+        self.component.wifi_password_constraints_revealer.set_reveal_child(not condition)
+        validate_label(self.component.wifi_password_label, condition)
+        all_valid = all_valid and condition
 
         zim_install = []
         for zim in self.component.zim_list_store:
