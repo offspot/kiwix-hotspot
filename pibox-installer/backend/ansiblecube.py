@@ -19,7 +19,7 @@ def run(machine, name, timezone, wifi_pwd, kalite, zim_install):
     hostname = name.replace("_", "-")
 
     machine.exec_cmd("sudo hostname %s" % hostname)
-    machine.exec_cmd("sudo echo \"127.0.0.1   %s\" >> /etc/hosts" % hostname)
+    machine.exec_cmd("sudo sh -c 'echo \"127.0.0.1   %s\" >> /etc/hosts'" % hostname)
 
     package_management = [{"name": x, "status": "present"} for x in zim_install]
     device_list = {hostname: {
