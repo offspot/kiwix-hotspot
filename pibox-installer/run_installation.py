@@ -80,16 +80,23 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
             # Write ideascube configuration
             with open(data.pibox_ideascube_conf, "r") as f:
                 pibox_ideascube_conf = f.read()
-            emulation.write_file("/opt/venvs/ideascube/lib/python3.4/site-packages/ideascube/conf/pibox.py", pibox_ideascube_conf)
+
+            pibox_ideascube_conf_fmt = pibox_ideascube_conf.replace("'", "'\\''")
+            pibox_conf_path = "/opt/venvs/ideascube/lib/python3.4/site-packages/ideascube/conf/pibox.py"
+            emulation.exec_cmd("sudo sh -c 'cat > {} <<END_OF_CMD3267\n{}\nEND_OF_CMD3267'".format(pibox_conf_path, pibox_ideascube_conf_fmt))
+            emulation.exec_cmd("sudo chown ideascube:ideascube {}".format(pibox_conf_path))
 
             extra_app_cards = []
             if kalite != None:
                 extra_app_cards.append('khanacademy')
-            conf = """from .pibox import *  # pragma: no flakes
+            kb_conf = """from .pibox import *  # pragma: no flakes
 
 EXTRA_APP_CARDS = {}""".format(extra_app_cards)
 
-            machine.write_file("/opt/venvs/ideascube/lib/python3.4/site-packages/ideascube/conf/kb.py", conf)
+            kb_conf_fmt = kb_conf.replace("'", "'\\''")
+            kb_conf_path = "/opt/venvs/ideascube/lib/python3.4/site-packages/ideascube/conf/kb.py"
+            emulation.exec_cmd("sudo sh -c 'cat > {} <<END_OF_CMD3267\n{}\nEND_OF_CMD3267'".format(kb_conf_path, kb_conf_fmt))
+            emulation.exec_cmd("sudo chown ideascube:ideascube {}".format(kb_conf_path))
 
         # Write image to SD Card
         if sd_card:
