@@ -9,9 +9,7 @@ matrix:
     language: generic
     install:
     # Package pibox-installer
-    # note: we use python35 because pyinstaller do not support 3.6 yet
-    - brew install qemu zoidbergwill/python/python35
-    - brew install pygobject3 --with-python3 gtk+3 adwaita-icon-theme
+    - brew install qemu pygobject3 --with-python3 gtk+3 adwaita-icon-theme
     - python3 -m pip install -r requirements-macos.txt
     - python3 -m pip install https://github.com/pyinstaller/pyinstaller/archive/93eec04eb2fbfc714d2c3453e04fd126e6a86f52.zip
 
