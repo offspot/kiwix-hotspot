@@ -350,10 +350,9 @@ class Application:
         validate_label(self.component.free_space_name_label, condition)
         all_valid = all_valid and condition
 
-        if len(self.iter_kalite_check_button()) != 0:
-            kalite = []
-            for lang, button in self.iter_kalite_check_button():
-                kalite.append(lang)
+        active_buttons = [lang for lang, button in self.iter_kalite_check_button() if button.get_active()]
+        if len(active_buttons) != 0:
+            kalite = active_buttons
         else:
             kalite = None
 
