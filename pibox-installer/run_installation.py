@@ -11,7 +11,7 @@ import data
 import sys
 import re
 
-def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger, cancel_event, sd_card, done_callback=None, build_dir="."):
+def run_installation(name, timezone, wifi_pwd, kalite, aflatoun, zim_install, size, logger, cancel_event, sd_card, done_callback=None, build_dir="."):
 
     try:
         # Prepare SD Card
@@ -75,6 +75,7 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
                     timezone=timezone,
                     wifi_pwd=wifi_pwd,
                     kalite=kalite,
+                    aflatoun=aflatoun,
                     zim_install=zim_install)
 
             # Write ideascube configuration
@@ -89,9 +90,24 @@ def run_installation(name, timezone, wifi_pwd, kalite, zim_install, size, logger
             extra_app_cards = []
             if kalite != None:
                 extra_app_cards.append('khanacademy')
+
+            custom_cards = []
+            if aflatoun == True:
+                custom_cards.append({
+                    'category': 'learn',
+                    'url': 'http://aflatoun.koombook.lan',
+                    'title': 'Aflatoun',
+                    'description': 'Social and Financial Education for Children and Young People',
+                    'fa': 'book',
+                    'is_staff': False
+                    })
+
             kb_conf = """from .pibox import *  # pragma: no flakes
 
-EXTRA_APP_CARDS = {}""".format(extra_app_cards)
+EXTRA_APP_CARDS = {}
+
+CUSTOM_CARDS = {}
+""".format(extra_app_cards, custom_cards)
 
             kb_conf_fmt = kb_conf.replace("'", "'\\''")
             kb_conf_path = "/opt/venvs/ideascube/lib/python3.4/site-packages/ideascube/conf/kb.py"

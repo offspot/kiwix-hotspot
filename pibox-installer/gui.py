@@ -25,6 +25,12 @@ KALITE_SIZES = {
     "en": 41875931136,
 }
 
+# This size is 5G but actual final size on disk is 3.9
+# We use 8G because we need space to build aflatoun
+# TODO: 5G is not enough
+# TODO: 8G may not be enough
+AFLATOUN_SIZE = 8589934592;
+
 def hide_on_delete(widget, event):
     widget.hide()
     return True
@@ -227,6 +233,9 @@ class Application:
             button.set_label("{} ({})".format(button.get_label(), human_readable_size(KALITE_SIZES[lang])))
             button.connect("toggled", lambda button: self.update_free_space())
 
+        # aflatoun
+        self.component.aflatoun_switch.connect("notify::active", lambda switch, state: self.update_free_space())
+
         # language tree view
         renderer_text = Gtk.CellRendererText()
         column_text = Gtk.TreeViewColumn("Language", renderer_text, text=0)
@@ -361,6 +370,8 @@ class Application:
         else:
             kalite = None
 
+        aflatoun = self.component.aflatoun_switch.get_active()
+
         build_dir = self.component.build_path_chooser.get_filename()
         condition = build_dir != None
         validate_label(self.component.build_path_chooser_label, condition)
@@ -386,6 +397,7 @@ class Application:
                         timezone=timezone,
                         wifi_pwd=wifi_pwd,
                         kalite=kalite,
+                        aflatoun=aflatoun,
                         zim_install=zim_install,
                         size=output_size,
                         logger=self.logger,
@@ -432,6 +444,9 @@ class Application:
         for lang, button in self.iter_kalite_check_button():
             if button.get_active():
                 used_space += KALITE_SIZES[lang]
+        if self.component.aflatoun_switch.get_active():
+            used_space += AFLATOUN_SIZE
+
         return self.get_output_size() - used_space
 
     def update_free_space(self):
