@@ -1,7 +1,7 @@
 import json
 
 # machine must provide write_file and exec_cmd functions
-def run(machine, name, timezone, wifi_pwd, kalite, aflatoun, zim_install):
+def run(machine, name, timezone, wifi_pwd, edupi, aflatoun, kalite, zim_install):
     machine.exec_cmd("sudo apt-get update")
     machine.exec_cmd("sudo apt-get install -y python-pip git python-dev libffi-dev libssl-dev gnutls-bin")
 
@@ -30,6 +30,9 @@ def run(machine, name, timezone, wifi_pwd, kalite, aflatoun, zim_install):
         },
         "aflatoun": {
             "activated": aflatoun,
+        },
+        "edupi": {
+            "activated": edupi,
         },
         "idc_import": {
             "activated": "False",

@@ -11,7 +11,7 @@ import data
 import sys
 import re
 
-def run_installation(name, timezone, wifi_pwd, kalite, aflatoun, zim_install, size, logger, cancel_event, sd_card, done_callback=None, build_dir="."):
+def run_installation(name, timezone, wifi_pwd, kalite, aflatoun, edupi, zim_install, size, logger, cancel_event, sd_card, done_callback=None, build_dir="."):
 
     try:
         # Prepare SD Card
@@ -75,6 +75,7 @@ def run_installation(name, timezone, wifi_pwd, kalite, aflatoun, zim_install, si
                     timezone=timezone,
                     wifi_pwd=wifi_pwd,
                     kalite=kalite,
+                    edupi=edupi,
                     aflatoun=aflatoun,
                     zim_install=zim_install)
 
@@ -99,6 +100,15 @@ def run_installation(name, timezone, wifi_pwd, kalite, aflatoun, zim_install, si
                     'title': 'Aflatoun',
                     'description': 'Social and Financial Education for Children and Young People',
                     'fa': 'book',
+                    'is_staff': False
+                    })
+            if edupi == True:
+                custom_cards.append({
+                    'category': 'manage',
+                    'url': 'http://edupi.koombook.lan',
+                    'title': 'Edupi',
+                    'description': 'content management application',
+                    'fa': 'folder',
                     'is_staff': False
                     })
 

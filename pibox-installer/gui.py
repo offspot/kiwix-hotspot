@@ -31,6 +31,10 @@ KALITE_SIZES = {
 # TODO: 8G may not be enough
 AFLATOUN_SIZE = 8589934592;
 
+# TODO: 100 MB may be enough
+# TODO: use 200 MB for now
+EDUPI_SIZE = 2097152;
+
 def hide_on_delete(widget, event):
     widget.hide()
     return True
@@ -236,6 +240,9 @@ class Application:
         # aflatoun
         self.component.aflatoun_switch.connect("notify::active", lambda switch, state: self.update_free_space())
 
+        # edupi
+        self.component.edupi_switch.connect("notify::active", lambda switch, state: self.update_free_space())
+
         # language tree view
         renderer_text = Gtk.CellRendererText()
         column_text = Gtk.TreeViewColumn("Language", renderer_text, text=0)
@@ -372,6 +379,8 @@ class Application:
 
         aflatoun = self.component.aflatoun_switch.get_active()
 
+        edupi = self.component.edupi_switch.get_active()
+
         build_dir = self.component.build_path_chooser.get_filename()
         condition = build_dir != None
         validate_label(self.component.build_path_chooser_label, condition)
@@ -398,6 +407,7 @@ class Application:
                         wifi_pwd=wifi_pwd,
                         kalite=kalite,
                         aflatoun=aflatoun,
+                        edupi=edupi,
                         zim_install=zim_install,
                         size=output_size,
                         logger=self.logger,
@@ -446,6 +456,8 @@ class Application:
                 used_space += KALITE_SIZES[lang]
         if self.component.aflatoun_switch.get_active():
             used_space += AFLATOUN_SIZE
+        if self.component.edupi_switch.get_active():
+            used_space += EDUPI_SIZE
 
         return self.get_output_size() - used_space
 
