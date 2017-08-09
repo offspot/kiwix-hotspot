@@ -219,6 +219,15 @@ class _RunningInstance:
             cancel_register.unregister(self._qemu.pid)
         self._qemu = None
 
+    def put_file(self, localpath, remotepath):
+        # We first copy to a temporary path we have right on
+        # then we copy to final path with sudo call
+        sftp_client = self._client.open_sftp()
+        tmppath = "/tmp/" + generate_random_name()
+        self._logger.std("copy local file {} to tmp file {}".format(localpath, tmppath))
+        sftp_client.put(localpath, tmppath)
+        sftp_client.close()
+        self.exec_cmd("sudo mv {} {}".format(tmppath, remotepath))
 
     def exec_cmd(self, command, capture_stdout=False, check=True):
         if capture_stdout:

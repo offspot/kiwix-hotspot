@@ -35,6 +35,20 @@ AFLATOUN_SIZE = 8589934592
 # TODO: use 200 MB for now
 EDUPI_SIZE = 2097152
 
+DEFAULT_LANGUAGE = 3
+LANGUAGES = [
+        ('am', u'አማርኛ'),
+        ('ar', u'\u0627\u0644\u0639\u0631\u0628\u064a\u0651\u0629'),
+        ('bm', 'Bambara'),
+        ('en', u'English'),
+        ('es', u'Espa\xf1ol'),
+        ('fa-ir', 'فارسی'),
+        ('fr', u'Fran\xe7ais'),
+        ('ku', 'Kurdî'),
+        ('so', u'Af-soomaali'),
+        ('sw', u'Kiswahili')
+        ]
+
 def hide_on_delete(widget, event):
     widget.hide()
     return True
@@ -113,6 +127,15 @@ class Application:
 
         # wifi password
         self.component.wifi_password_switch.connect("notify::active", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(not switch.get_active()))
+
+        # ideascube language
+        for code, language in LANGUAGES:
+            self.component.language_tree_store.append([code, language])
+
+        renderer = Gtk.CellRendererText()
+        self.component.language_combobox.pack_start(renderer, True)
+        self.component.language_combobox.add_attribute(renderer, "text", 1)
+        self.component.language_combobox.set_active(DEFAULT_LANGUAGE)
 
         # timezone
         default_id = -1
@@ -328,6 +351,12 @@ class Application:
         self.component.project_name_constraints_revealer.set_reveal_child(not condition)
         all_valid = all_valid and condition
 
+        language_id = self.component.language_combobox.get_active()
+        language = LANGUAGES[language_id][0]
+        condition = language_id != -1
+        validate_label(self.component.language_label, condition)
+        all_valid = all_valid and condition
+
         timezone_id = self.component.timezone_combobox.get_active()
         timezone = self.component.timezone_tree_store[timezone_id][0]
         condition = timezone_id != -1
@@ -381,6 +410,9 @@ class Application:
 
         edupi = self.component.edupi_switch.get_active()
 
+        logo = self.component.logo_chooser.get_filename()
+        favicon = self.component.favicon_chooser.get_filename()
+
         build_dir = self.component.build_path_chooser.get_filename()
         condition = build_dir != None
         validate_label(self.component.build_path_chooser_label, condition)
@@ -404,6 +436,7 @@ class Application:
                 run_installation(
                         name=project_name,
                         timezone=timezone,
+                        language=language,
                         wifi_pwd=wifi_pwd,
                         kalite=kalite,
                         aflatoun=aflatoun,
@@ -413,6 +446,8 @@ class Application:
                         logger=self.logger,
                         cancel_event=self.cancel_event,
                         sd_card=sd_card,
+                        logo=logo,
+                        favicon=favicon,
                         build_dir=build_dir,
                         done_callback=lambda error: GLib.idle_add(self.installation_done, error))
 

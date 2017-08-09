@@ -11,7 +11,7 @@ import data
 import sys
 import re
 
-def run_installation(name, timezone, wifi_pwd, kalite, aflatoun, edupi, zim_install, size, logger, cancel_event, sd_card, done_callback=None, build_dir="."):
+def run_installation(name, timezone, language, wifi_pwd, kalite, aflatoun, edupi, zim_install, size, logger, cancel_event, sd_card, favicon, logo, done_callback=None, build_dir="."):
 
     try:
         # Prepare SD Card
@@ -117,12 +117,22 @@ def run_installation(name, timezone, wifi_pwd, kalite, aflatoun, edupi, zim_inst
 EXTRA_APP_CARDS = {}
 
 CUSTOM_CARDS = {}
-""".format(extra_app_cards, custom_cards)
+
+LANGUAGE_CODE = '{}'
+""".format(extra_app_cards, custom_cards, language)
 
             kb_conf_fmt = kb_conf.replace("'", "'\\''")
             kb_conf_path = "/opt/venvs/ideascube/lib/python3.4/site-packages/ideascube/conf/kb.py"
             emulation.exec_cmd("sudo sh -c 'cat > {} <<END_OF_CMD3267\n{}\nEND_OF_CMD3267'".format(kb_conf_path, kb_conf_fmt))
             emulation.exec_cmd("sudo chown ideascube:ideascube {}".format(kb_conf_path))
+
+            if logo is not None:
+                emulation.put_file(logo, "/usr/share/ideascube/static/branding/header-logo.png")
+
+            if favicon is not None:
+                emulation.put_file(logo, "/usr/share/ideascube/static/branding/favicon.png")
+
+            # TODO run ideascube collect static ? how does ansiblecube does it ?
 
         # Write image to SD Card
         if sd_card:
