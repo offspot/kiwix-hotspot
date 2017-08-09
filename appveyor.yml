@@ -79,6 +79,6 @@ install:
   - move C:\projects\pibox-installer\pibox_installer_ci_rsa C:\msys64\home\appveyor\
 
   - if %platform%==x86 C:\msys64\usr\bin\bash --login -c "scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-win32.exe pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +'%%Y-%%m-%%d')/pibox-installer-win32.exe"
-  - if %platform%==x64 C:\msys64\usr\bin\bash --login -c "scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-win64.exe pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +'%%Y-%%m-%%d')/pibox-insatller-win64.exe"
+  - if %platform%==x64 C:\msys64\usr\bin\bash --login -c "scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-win64.exe pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +'%%Y-%%m-%%d')/pibox-installer-win64.exe"
 
   - C:\msys64\usr\bin\bash --login -c "PIBOX_RELEASE=$((cd /c/projects/pibox-installer/; git tag -l --points-at HEAD) | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*') || true; if [ $PIBOX_RELEASE ]; then mkdir -p releases/$PIBOX_RELEASE/; mv pibox-installer-win*.exe releases/$PIBOX_RELEASE/; scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/; fi"
