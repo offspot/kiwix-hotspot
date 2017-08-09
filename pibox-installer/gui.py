@@ -220,6 +220,7 @@ class Application:
 
         # kalite
         for lang, button in self.iter_kalite_check_button():
+            button.set_label("{} ({})".format(button.get_label(), human_readable_size(KALITE_SIZES[lang])))
             button.connect("toggled", lambda button: self.update_free_space())
 
         # language tree view
