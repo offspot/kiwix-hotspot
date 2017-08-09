@@ -29,11 +29,11 @@ KALITE_SIZES = {
 # We use 8G because we need space to build aflatoun
 # TODO: 5G is not enough
 # TODO: 8G may not be enough
-AFLATOUN_SIZE = 8589934592;
+AFLATOUN_SIZE = 8589934592
 
 # TODO: 100 MB may be enough
 # TODO: use 200 MB for now
-EDUPI_SIZE = 2097152;
+EDUPI_SIZE = 2097152
 
 def hide_on_delete(widget, event):
     widget.hide()
