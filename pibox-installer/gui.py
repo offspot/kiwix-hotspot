@@ -166,12 +166,16 @@ class Application:
                 name = value["name"]
                 url = value["url"]
                 description = value.get("description") or "none"
-                formatted_size = human_readable_size(int(value["size"]))
-                size = str(value["size"])
+                # We double indicated size because in ideascube throught ansiblecube
+                # will first download the zip file and then extract the content
+                # TODO: an improvment would be to delete zip file after extraction and
+                # compute a temporar space needed that is max of all installed size
+                size = str(value["size"]*2)
                 languages_iso = (value.get("language") or "Unkown language").split(",")
                 languages = set(map(lambda l: langcodes.Language.get(l).language_name(), languages_iso))
                 typ = value["type"]
                 version = str(value["version"])
+                formatted_size = human_readable_size(int(size))
 
                 self.component.zim_list_store.append([key, name, url, description, formatted_size, languages, typ, version, False, size, True, VALID_RGBA])
                 all_languages |= languages
