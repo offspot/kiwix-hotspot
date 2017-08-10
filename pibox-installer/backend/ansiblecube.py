@@ -1,18 +1,13 @@
 import json
 
 # machine must provide write_file and exec_cmd functions
-def run(machine, name, timezone, wifi_pwd, edupi, aflatoun, kalite, zim_install):
+def run(machine, name, timezone, wifi_pwd, edupi, aflatoun, kalite, zim_install, ansiblecube_path):
     machine.exec_cmd("sudo apt-get update")
     machine.exec_cmd("sudo apt-get install -y python-pip git python-dev libffi-dev libssl-dev gnutls-bin")
 
     machine.exec_cmd("sudo pip install ansible==2.2.0 markupsafe")
     machine.exec_cmd("sudo pip install cryptography --upgrade")
 
-    ansiblecube_url = "https://github.com/thiolliere/ansiblecube.git"
-    ansiblecube_path = "/var/lib/ansible/local"
-
-    machine.exec_cmd("sudo mkdir --mode 0755 -p %s" % ansiblecube_path)
-    machine.exec_cmd("sudo git clone {url} {path}".format(url=ansiblecube_url, path=ansiblecube_path))
     machine.exec_cmd("sudo mkdir --mode 0755 -p /etc/ansible")
     machine.exec_cmd("sudo cp %s/hosts /etc/ansible/hosts" % ansiblecube_path)
 
@@ -58,13 +53,11 @@ def run(machine, name, timezone, wifi_pwd, edupi, aflatoun, kalite, zim_install)
     extra_vars += " own_config_file=True"
     extra_vars += " managed_by_bsf=False"
 
-    ansible_pull_cmd = "sudo /usr/local/bin/ansible-pull"
-    ansible_pull_cmd += " --checkout oneUpdateFile0.3"
-    ansible_pull_cmd += " --directory /var/lib/ansible/local"
-    ansible_pull_cmd += " --inventory hosts"
-    ansible_pull_cmd += " --url https://github.com/thiolliere/ansiblecube.git"
-    ansible_pull_cmd += " --tags master,custom"
-    ansible_pull_cmd += " --extra-vars \"%s\"" % extra_vars
-    ansible_pull_cmd += " main.yml"
+    ansible_args = "--inventory hosts"
+    ansible_args += " --tags master,custom"
+    ansible_args += " --extra-vars \"%s\"" % extra_vars
+    ansible_args += " main.yml"
+
+    ansible_pull_cmd = "sudo sh -c 'cd {} && /usr/local/bin/ansible-playbook {}'".format(ansiblecube_path, ansible_args)
 
     machine.exec_cmd(ansible_pull_cmd)

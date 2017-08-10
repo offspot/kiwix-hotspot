@@ -23,6 +23,11 @@ install:
   - appveyor DownloadFile "http://download.kiwix.org/dev/pibox-installer-vexpress-boot.zip"
   - 7z.exe x pibox-installer-vexpress-boot.zip
 
+  # Download playbook
+  - appveyor DownloadFile "https://github.com/thiolliere/ansiblecube/archive/oneUpdateFile0.3.zip"
+  - 7z.exe x oneUpdateFile0.3.zip
+  - move ansiblecube-oneUpdateFile0.3 ansiblecube
+
   # Install pygobject
   # pygi-aio provides a way to install from cmd even if it is not documented
   # the only package to install is GTK with GIR

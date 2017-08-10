@@ -1,6 +1,7 @@
 from backend import ansiblecube
 from backend import qemu
 from backend.util import subprocess_pretty_check_call
+import data
 from util import ReportHook
 from datetime import datetime
 import os
@@ -67,6 +68,10 @@ def run_installation(name, timezone, language, wifi_pwd, kalite, aflatoun, edupi
             # Resize filesystem
             emulation.resize_fs()
 
+            ansiblecube_emulation_path = "/var/lib/ansible/local"
+            emulation.exec_cmd("sudo mkdir --mode 0755 -p /var/lib/ansible/")
+            emulation.put_dir(data.ansiblecube_path, ansiblecube_emulation_path)
+
             # Run ansiblecube
             logger.step("Run ansiblecube")
             ansiblecube.run(
@@ -77,6 +82,7 @@ def run_installation(name, timezone, language, wifi_pwd, kalite, aflatoun, edupi
                     kalite=kalite,
                     edupi=edupi,
                     aflatoun=aflatoun,
+                    ansiblecube_path=ansiblecube_emulation_path,
                     zim_install=zim_install)
 
             # Write ideascube configuration
@@ -131,8 +137,6 @@ LANGUAGE_CODE = '{}'
 
             if favicon is not None:
                 emulation.put_file(logo, "/usr/share/ideascube/static/branding/favicon.png")
-
-            # TODO run ideascube collect static ? how does ansiblecube does it ?
 
         # Write image to SD Card
         if sd_card:

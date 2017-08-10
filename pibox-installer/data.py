@@ -17,3 +17,5 @@ pibox_logo = os.path.join(data_dir, "pibox-installer-logo.png")
 
 raspbian_url = "http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2017-03-03/2017-03-02-raspbian-jessie-lite.zip"
 raspbian_zip_path = "2017-03-02-raspbian-jessie-lite.img"
+
+ansiblecube_path = os.path.join(data_dir, "ansiblecube")
