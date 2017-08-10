@@ -7,6 +7,7 @@ import paramiko
 import re
 import random
 import threading
+import posixpath
 from .util import startup_info_args
 from .util import subprocess_pretty_check_call
 
@@ -219,15 +220,42 @@ class _RunningInstance:
             cancel_register.unregister(self._qemu.pid)
         self._qemu = None
 
-    def put_file(self, localpath, remotepath):
+    # The remote path must not exist
+    def put_dir(self, localpath, remotepath):
         # We first copy to a temporary path we have right on
         # then we copy to final path with sudo call
         sftp_client = self._client.open_sftp()
-        tmppath = "/tmp/" + generate_random_name()
-        self._logger.std("copy local file {} to tmp file {}".format(localpath, tmppath))
-        sftp_client.put(localpath, tmppath)
+        tmpremotepath = "/tmp/" + generate_random_name()
+        sftp_client.mkdir(tmpremotepath)
+        self._logger.std("copy local dir {} to tmp dir {}".format(localpath, tmpremotepath))
+
+        old_cwd = os.getcwd()
+        os.chdir(localpath)
+        for localdirpath, dirnames, filenames in os.walk("."):
+            remotedirpath = posixpath.join(*os.path.split(localdirpath))
+
+            for dirname in dirnames:
+                sftp_client.mkdir(posixpath.join(tmpremotepath, remotedirpath, dirname))
+
+            for filename in filenames:
+                file_local_path = os.path.join(localpath, localdirpath, filename)
+                file_remote_path = posixpath.join(tmpremotepath, remotedirpath, filename)
+                sftp_client.put(file_local_path, file_remote_path)
         sftp_client.close()
-        self.exec_cmd("sudo mv {} {}".format(tmppath, remotepath))
+        os.chdir(old_cwd)
+
+        self.exec_cmd("sudo mv -nT {} {}".format(tmpremotepath, remotepath))
+
+    # The remote path must not exist
+    def put_file(self, localpath, remotepath):
+        # We first copy to a temporary path we have right on
+        # then we move to final path with sudo call
+        sftp_client = self._client.open_sftp()
+        tmpremotepath = "/tmp/" + generate_random_name()
+        self._logger.std("copy local file {} to tmp file {}".format(localpath, tmpremotepath))
+        sftp_client.put(localpath, tmpremotepath)
+        sftp_client.close()
+        self.exec_cmd("sudo mv -nT {} {}".format(tmpremotepath, remotepath))
 
     def exec_cmd(self, command, capture_stdout=False, check=True):
         if capture_stdout:
