@@ -244,9 +244,9 @@ class _RunningInstance:
         sftp_client.close()
         os.chdir(old_cwd)
 
-        self.exec_cmd("sudo mv -nT {} {}".format(tmpremotepath, remotepath))
+        self.exec_cmd("sudo mv -T {} {}".format(tmpremotepath, remotepath))
 
-    # The remote path must not exist
+    # The remote path must be a file
     def put_file(self, localpath, remotepath):
         # We first copy to a temporary path we have right on
         # then we move to final path with sudo call
@@ -255,7 +255,7 @@ class _RunningInstance:
         self._logger.std("copy local file {} to tmp file {}".format(localpath, tmpremotepath))
         sftp_client.put(localpath, tmpremotepath)
         sftp_client.close()
-        self.exec_cmd("sudo mv -nT {} {}".format(tmpremotepath, remotepath))
+        self.exec_cmd("sudo mv -T {} {}".format(tmpremotepath, remotepath))
 
     def exec_cmd(self, command, capture_stdout=False, check=True):
         if capture_stdout:
