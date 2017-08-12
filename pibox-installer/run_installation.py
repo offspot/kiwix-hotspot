@@ -133,10 +133,14 @@ LANGUAGE_CODE = '{}'
             emulation.exec_cmd("sudo chown ideascube:ideascube {}".format(kb_conf_path))
 
             if logo is not None:
-                emulation.put_file(logo, "/usr/share/ideascube/static/branding/header-logo.png")
+                logo_emulation_path = "/usr/share/ideascube/static/branding/header-logo.png"
+                emulation.put_file(logo, logo_emulation_path)
+                emulation.exec_cmd("sudo chown ideascube:ideascube {}".format(logo_emulation_path))
 
             if favicon is not None:
-                emulation.put_file(logo, "/usr/share/ideascube/static/branding/favicon.png")
+                favicon_emulation_path = "/usr/share/ideascube/static/branding/favicon.png"
+                emulation.put_file(logo, favicon_emulation_path)
+                emulation.exec_cmd("sudo chown ideascube:ideascube {}".format(favicon_emulation_path))
 
         # Write image to SD Card
         if sd_card:
