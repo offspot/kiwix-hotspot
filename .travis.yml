@@ -18,9 +18,9 @@ matrix:
     - unzip pibox-installer-vexpress-boot.zip
 
     # Download playbook
-    - wget https://github.com/thiolliere/ansiblecube/archive/oneUpdateFile0.3.zip
-    - unzip oneUpdateFile0.3.zip
-    - mv ansiblecube-oneUpdateFile0.3 ansiblecube
+    - wget https://github.com/thiolliere/ansiblecube/archive/oneUpdateFile0.4.zip
+    - unzip oneUpdateFile0.4.zip
+    - mv ansiblecube-oneUpdateFile0.4 ansiblecube
 
     # Bundle QEMU
     - git clone https://github.com/auriamg/macdylibbundler/
@@ -98,9 +98,9 @@ matrix:
     - unzip pibox-installer-vexpress-boot.zip
 
     # Download playbook
-    - wget https://github.com/thiolliere/ansiblecube/archive/oneUpdateFile0.3.zip
-    - unzip oneUpdateFile0.3.zip
-    - mv ansiblecube-oneUpdateFile0.3 ansiblecube
+    - wget https://github.com/thiolliere/ansiblecube/archive/oneUpdateFile0.4.zip
+    - unzip oneUpdateFile0.4.zip
+    - mv ansiblecube-oneUpdateFile0.4 ansiblecube
 
     # Compile QEMU statically
     - wget http://download.qemu-project.org/$QEMU_ARCHIVE

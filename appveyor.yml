@@ -24,9 +24,9 @@ install:
   - 7z.exe x pibox-installer-vexpress-boot.zip
 
   # Download playbook
-  - appveyor DownloadFile "https://github.com/thiolliere/ansiblecube/archive/oneUpdateFile0.3.zip"
-  - 7z.exe x oneUpdateFile0.3.zip
-  - move ansiblecube-oneUpdateFile0.3 ansiblecube
+  - appveyor DownloadFile "https://github.com/thiolliere/ansiblecube/archive/oneUpdateFile0.4.zip"
+  - 7z.exe x oneUpdateFile0.4.zip
+  - move ansiblecube-oneUpdateFile0.4 ansiblecube
 
   # Install pygobject
   # pygi-aio provides a way to install from cmd even if it is not documented
