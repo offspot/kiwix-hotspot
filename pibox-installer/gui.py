@@ -49,6 +49,17 @@ LANGUAGES = [
         ('sw', u'Kiswahili')
         ]
 
+class AbortDialog(Gtk.Dialog):
+    def __init__(self, parent):
+        Gtk.Dialog.__init__(self, "Abort dialog", parent, 0,
+            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+             Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        self.set_default_size(150, 100)
+        label = Gtk.Label("Are you sure you want to abort the installation ?\nyou will not be able to resume.")
+        box = self.get_content_area()
+        box.add(label)
+        self.show_all()
+
 def hide_on_delete(widget, event):
     widget.hide()
     return True
@@ -321,7 +332,13 @@ class Application:
         Gtk.main_quit()
 
     def run_abort_done_button_clicked(self, widget):
-        self.component.run_window.close()
+        dialog = AbortDialog(self.component.window)
+        response = dialog.run()
+
+        if response == Gtk.ResponseType.OK:
+            self.component.run_window.close()
+
+        dialog.destroy()
 
     def run_new_install_button_clicked(self, widget):
         self.component.run_window.hide()
