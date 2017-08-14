@@ -44,7 +44,8 @@ if sys.platform == "linux":
                 formatted_size = human_readable_size(size)
                 devices.append({
                         "key": key,
-                        "device": device,
+                        # Because device name ends with \x00
+                        "device": device.replace("\x00", ""),
                         "size": size,
                         "formatted_size": formatted_size,
                         "id_label": info.get('IdLabel'),
