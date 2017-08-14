@@ -6,7 +6,7 @@ import sys
 import ctypes
 import platform
 
-def get_free_space(dirname):
+def get_free_space_in_dir(dirname):
     """Return folder/drive free space."""
     if platform.system() == 'Windows':
         free_bytes = ctypes.c_ulonglong(0)

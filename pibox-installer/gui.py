@@ -11,7 +11,7 @@ import threading
 from util import CancelEvent
 import sd_card_info
 from util import human_readable_size
-from util import get_free_space
+from util import get_free_space_in_dir
 import data
 import langcodes
 import string
@@ -459,7 +459,7 @@ class Application:
 
         # Check if there is enough space in build_dir to build image
         if build_dir != None:
-            free_space = get_free_space(build_dir)
+            free_space = get_free_space_in_dir(build_dir)
             remaining_space = free_space - output_size
             if remaining_space < 0:
                 self.component.space_error_image_location_label.set_text(build_dir)
