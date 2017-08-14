@@ -1383,7 +1383,6 @@ and digits '0' to '9'</property>
                       <object class="GtkTreeView" id="zim_tree_view">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="activate_on_single_click">True</property>
                         <child internal-child="selection">
                           <object class="GtkTreeSelection" id="no_id_36"/>
                         </child>
@@ -1431,7 +1430,6 @@ and digits '0' to '9'</property>
                       <object class="GtkTreeView" id="choosen_zim_tree_view">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="activate_on_single_click">True</property>
                         <child internal-child="selection">
                           <object class="GtkTreeSelection" id="no_id_39"/>
                         </child>
