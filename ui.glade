@@ -874,8 +874,8 @@ and digits '0' to '9'</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkCheckButton" id="kalite_fr_check_button">
-                        <property name="label" translatable="yes">French</property>
+                      <object class="GtkCheckButton" id="kalite_en_check_button">
+                        <property name="label" translatable="yes">English</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
@@ -888,8 +888,8 @@ and digits '0' to '9'</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkCheckButton" id="kalite_en_check_button">
-                        <property name="label" translatable="yes">English</property>
+                      <object class="GtkCheckButton" id="kalite_fr_check_button">
+                        <property name="label" translatable="yes">French</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
