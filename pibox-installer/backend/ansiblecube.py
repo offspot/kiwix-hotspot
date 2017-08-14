@@ -1,7 +1,7 @@
 import json
 
 # machine must provide write_file and exec_cmd functions
-def run(machine, name, timezone, wifi_pwd, edupi, aflatoun, kalite, zim_install, ansiblecube_path):
+def run(machine, name, timezone, wifi_pwd, edupi, wikifundi, aflatoun, kalite, zim_install, ansiblecube_path):
     machine.exec_cmd("sudo apt-get update")
     machine.exec_cmd("sudo apt-get install -y python-pip python-yaml python-jinja2 python-httplib2 python-paramiko python-pkg-resources libffi-dev libssl-dev git lsb-release")
     machine.exec_cmd("sudo pip install ansible==2.2.0")
@@ -20,6 +20,10 @@ def run(machine, name, timezone, wifi_pwd, edupi, aflatoun, kalite, zim_install,
             "activated": str(kalite != None),
             "version": "0.16.9",
             "language": kalite or [],
+        },
+        "wikifundi": {
+            "activated": str(wikifundi != None),
+            "language": wikifundi or [],
         },
         "aflatoun": {
             "activated": aflatoun,

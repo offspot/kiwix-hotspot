@@ -12,7 +12,7 @@ import data
 import sys
 import re
 
-def run_installation(name, timezone, language, wifi_pwd, kalite, aflatoun, edupi, zim_install, size, logger, cancel_event, sd_card, favicon, logo, done_callback=None, build_dir="."):
+def run_installation(name, timezone, language, wifi_pwd, kalite, aflatoun, wikifundi, edupi, zim_install, size, logger, cancel_event, sd_card, favicon, logo, done_callback=None, build_dir="."):
 
     try:
         # Prepare SD Card
@@ -80,6 +80,7 @@ def run_installation(name, timezone, language, wifi_pwd, kalite, aflatoun, edupi
                     timezone=timezone,
                     wifi_pwd=wifi_pwd,
                     kalite=kalite,
+                    wikifundi=wikifundi,
                     edupi=edupi,
                     aflatoun=aflatoun,
                     ansiblecube_path=ansiblecube_emulation_path,
@@ -106,6 +107,24 @@ def run_installation(name, timezone, language, wifi_pwd, kalite, aflatoun, edupi
                     'title': 'Aflatoun',
                     'description': 'Social and Financial Education for Children and Young People',
                     'fa': 'book',
+                    'is_staff': False
+                    })
+            if "en" in wikifundi:
+                custom_cards.append({
+                    'category': 'create',
+                    'url': 'http://en.wikifundi.koombook.lan',
+                    'title': 'Wikifundi',
+                    'description': 'Offline editable environment that provides a similar experience to editing Wikipedia online',
+                    'fa': 'wikipedia-w',
+                    'is_staff': False
+                    })
+            if "fr" in wikifundi:
+                custom_cards.append({
+                    'category': 'create',
+                    'url': 'http://fr.wikifundi.koombook.lan',
+                    'title': 'Wikifundi',
+                    'description': 'Environnement qui vous permet de créer des articles Wikipédia hors-ligne',
+                    'fa': 'wikipedia-w',
                     'is_staff': False
                     })
             if edupi == True:

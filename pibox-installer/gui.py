@@ -25,6 +25,13 @@ KALITE_SIZES = {
     "en": 41875931136,
 }
 
+# Those size correspond to 2017_01 packages.
+# It must be updated as africapack are updated.
+WIKIFUNDI_SIZES = {
+    "fr": 0,
+    "en": 0,
+}
+
 # This size is 5G but actual final size on disk is 3.9
 # We use 8G because we need space to build aflatoun
 # TODO: 5G is not enough
@@ -271,6 +278,11 @@ class Application:
             button.set_label("{} ({})".format(button.get_label(), human_readable_size(KALITE_SIZES[lang])))
             button.connect("toggled", lambda button: self.update_free_space())
 
+        # wikifundi
+        for lang, button in self.iter_wikifundi_check_button():
+            button.set_label("{} ({})".format(button.get_label(), human_readable_size(WIKIFUNDI_SIZES[lang])))
+            button.connect("toggled", lambda button: self.update_free_space())
+
         # aflatoun
         self.component.aflatoun_switch.connect("notify::active", lambda switch, state: self.update_free_space())
 
@@ -296,6 +308,10 @@ class Application:
         return [("fr", self.component.kalite_fr_check_button),
                 ("en", self.component.kalite_en_check_button),
                 ("es", self.component.kalite_es_check_button)]
+
+    def iter_wikifundi_check_button(self):
+        return [("fr", self.component.wikifundi_fr_check_button),
+                ("en", self.component.wikifundi_en_check_button)]
 
     def space_error_window_ok_button_clicked(self, widget):
         self.component.space_error_window.hide()
@@ -417,11 +433,17 @@ class Application:
         validate_label(self.component.free_space_name_label, condition)
         all_valid = all_valid and condition
 
-        active_buttons = [lang for lang, button in self.iter_kalite_check_button() if button.get_active()]
-        if len(active_buttons) != 0:
-            kalite = active_buttons
+        kalit_active_buttons = [lang for lang, button in self.iter_kalite_check_button() if button.get_active()]
+        if len(kalit_active_buttons) != 0:
+            kalite = kalit_active_buttons
         else:
             kalite = None
+
+        wikifundi_active_buttons = [lang for lang, button in self.iter_wikifundi_check_button() if button.get_active()]
+        if len(wikifundi_active_buttons) != 0:
+            wikifundi = wikifundi_active_buttons
+        else:
+            wikifundi = None
 
         aflatoun = self.component.aflatoun_switch.get_active()
 
@@ -456,6 +478,7 @@ class Application:
                         language=language,
                         wifi_pwd=wifi_pwd,
                         kalite=kalite,
+                        wikifundi=wikifundi,
                         aflatoun=aflatoun,
                         edupi=edupi,
                         zim_install=zim_install,
@@ -506,6 +529,9 @@ class Application:
         for lang, button in self.iter_kalite_check_button():
             if button.get_active():
                 used_space += KALITE_SIZES[lang]
+        for lang, button in self.iter_wikifundi_check_button():
+            if button.get_active():
+                used_space += WIKIFUNDI_SIZES[lang]
         if self.component.aflatoun_switch.get_active():
             used_space += AFLATOUN_SIZE
         if self.component.edupi_switch.get_active():
