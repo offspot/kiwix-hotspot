@@ -9,7 +9,7 @@ import os
 import sys
 import threading
 from util import CancelEvent
-import sd_card_list
+import sd_card_info
 from util import human_readable_size
 from util import get_free_space
 import data
@@ -176,11 +176,11 @@ class Application:
         self.component.output_stack.connect("notify::visible-child", lambda switch, state: self.update_free_space())
         self.component.size_entry.connect("changed", lambda _: self.update_free_space())
 
-        types = [info["typ"] for info in sd_card_list.informations]
+        types = [info["typ"] for info in sd_card_info.informations]
         self.component.sd_card_list_store = Gtk.ListStore(*types)
         self.component.sd_card_combobox.set_model(self.component.sd_card_list_store)
 
-        for counter in range(0, sd_card_list.visible_informations):
+        for counter in range(0, sd_card_info.visible_informations):
             cell_renderer = Gtk.CellRendererText()
             self.component.sd_card_combobox.pack_start(cell_renderer, True)
             self.component.sd_card_combobox.add_attribute(cell_renderer, "text", counter)
@@ -421,7 +421,7 @@ class Application:
             if sd_card_id == -1:
                 sd_card = None
             else:
-                device_index = sd_card_list.get_device_index()
+                device_index = sd_card_info.get_device_index()
                 sd_card = self.component.sd_card_list_store[sd_card_id][device_index]
         else:
             sd_card = None
@@ -504,14 +504,14 @@ class Application:
         active_id = self.component.sd_card_combobox.get_active()
         if active_id != -1:
             selected_device = self.component.sd_card_list_store[active_id]
-            selected_device = selected_device[sd_card_list.get_device_index()]
+            selected_device = selected_device[sd_card_info.get_device_index()]
         else:
             selected_device = None
 
         self.component.sd_card_list_store.clear()
 
-        for id, device in enumerate(sd_card_list.get_list()):
-            items = [info["typ"](device[info["name"]]) for info in sd_card_list.informations]
+        for id, device in enumerate(sd_card_info.get_iterator()):
+            items = [info["typ"](device[info["name"]]) for info in sd_card_info.informations]
             self.component.sd_card_list_store.append(items)
             device_name = str(device['device']).rstrip('\0')
             if device_name == selected_device:
@@ -560,7 +560,7 @@ class Application:
             if sd_card_id == -1:
                 size = -1
             else:
-                get_size_index = sd_card_list.get_size_index()
+                get_size_index = sd_card_info.get_size_index()
                 size = int(self.component.sd_card_list_store[sd_card_id][get_size_index])
         else:
             try:

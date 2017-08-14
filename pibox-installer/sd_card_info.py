@@ -29,7 +29,7 @@ if sys.platform == "linux":
             {"name": "size", "typ": str},
             ]
 
-    def get_list():
+    def get_iterator():
         devices = []
         bus = dbus.SystemBus()
         udisk = bus.get_object('org.freedesktop.UDisks2', '/org/freedesktop/UDisks2')
@@ -80,7 +80,7 @@ elif sys.platform == "darwin":
             {"name": "media_type", "typ": str},
             ]
 
-    def get_list():
+    def get_iterator():
         devices = []
         plist = plistlib.loads(subprocess.check_output(["diskutil", "list", "-plist"]))
 
@@ -124,7 +124,7 @@ elif sys.platform == "win32":
     def extract_field(match, line):
        return line[match.start():match.end()].strip()
 
-    def get_list():
+    def get_iterator():
         lines = subprocess.check_output(["wmic", "diskdrive"], **startup_info_args()).decode('utf-8').splitlines()
 
         column = {}
