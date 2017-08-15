@@ -21,7 +21,13 @@ class Logger:
     def std(std):
         print(std)
 
-catalogs = catalog.get_catalogs()
+try:
+    catalogs = catalog.get_catalogs()
+except Exception as exception:
+    print(exception, file=sys.stderr)
+    print("Catalog downloads failed, you may check your internet connection")
+    exit(2)
+
 zim_choices = []
 for catalog in catalogs:
     for (key, value) in catalog["all"].items():

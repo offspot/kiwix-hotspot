@@ -42,6 +42,15 @@ AFLATOUN_SIZE = 8589934592
 # TODO: use 200 MB for now
 EDUPI_SIZE = 2097152
 
+class ShortDialog(Gtk.Dialog):
+    def __init__(self, parent, buttons, msg):
+        Gtk.Dialog.__init__(self, "Abort dialog", parent, 0, buttons)
+        self.set_default_size(150, 100)
+        label = Gtk.Label(msg)
+        box = self.get_content_area()
+        box.add(label)
+        self.show_all()
+
 class AbortDialog(Gtk.Dialog):
     def __init__(self, parent):
         Gtk.Dialog.__init__(self, "Abort dialog", parent, 0,
@@ -590,6 +599,14 @@ class Application:
     def choosen_zim_filter_func(self, model, iter, data):
         return model[iter][8]
 
-catalog = catalog.get_catalogs()
+try:
+    catalog = catalog.get_catalogs()
+except Exception as exception:
+    dialog = ShortDialog(None, (Gtk.STOCK_OK, Gtk.ResponseType.OK), "Catalog downloads failed, you may check your internet connection")
+    dialog.run()
+    print(exception, file=sys.stderr)
+    dialog.destroy()
+    exit(1)
+
 Application(catalog)
 Gtk.main()
