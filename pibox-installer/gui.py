@@ -44,20 +44,9 @@ EDUPI_SIZE = 2097152
 
 class ShortDialog(Gtk.Dialog):
     def __init__(self, parent, buttons, msg):
-        Gtk.Dialog.__init__(self, "Abort dialog", parent, 0, buttons)
+        Gtk.Dialog.__init__(self, "pibox installer - dialog", parent, 0, buttons)
         self.set_default_size(150, 100)
         label = Gtk.Label(msg)
-        box = self.get_content_area()
-        box.add(label)
-        self.show_all()
-
-class AbortDialog(Gtk.Dialog):
-    def __init__(self, parent):
-        Gtk.Dialog.__init__(self, "Abort dialog", parent, 0,
-            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-             Gtk.STOCK_OK, Gtk.ResponseType.OK))
-        self.set_default_size(150, 100)
-        label = Gtk.Label("Are you sure you want to abort the installation ?\nyou will not be able to resume.")
         box = self.get_content_area()
         box.add(label)
         self.show_all()
@@ -348,7 +337,7 @@ class Application:
         Gtk.main_quit()
 
     def run_abort_done_button_clicked(self, widget):
-        dialog = AbortDialog(self.component.window)
+        dialog = ShortDialog(self.component.window, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK), "Are you sure you want to abort the installation ?\nyou will not be able to resume.")
         response = dialog.run()
 
         if response == Gtk.ResponseType.OK:
