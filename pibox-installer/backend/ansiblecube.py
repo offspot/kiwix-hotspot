@@ -3,10 +3,9 @@ import json
 # machine must provide write_file and exec_cmd functions
 def run(machine, name, timezone, wifi_pwd, kalite, zim_install):
     machine.exec_cmd("sudo apt-get update")
-    machine.exec_cmd("sudo apt-get install -y python-pip git python-dev libffi-dev libssl-dev gnutls-bin")
 
-    machine.exec_cmd("sudo pip install ansible==2.2.0 markupsafe")
-    machine.exec_cmd("sudo pip install cryptography --upgrade")
+    machine.exec_cmd("sudo apt-get install -y python-pip python-yaml python-jinja2 python-httplib2 python-paramiko python-pkg-resources libffi-dev libssl-dev git lsb-release")
+    machine.exec_cmd("sudo pip install ansible==2.2.0")
 
     ansiblecube_url = "https://github.com/thiolliere/ansiblecube.git"
     ansiblecube_path = "/var/lib/ansible/local"
