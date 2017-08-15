@@ -19,32 +19,61 @@ class Logger:
     def std(std):
         print(std)
 
+catalogs = catalog.get_catalogs()
+zim_choices = []
+for catalog in catalogs:
+    for (key, value) in catalog["all"].items():
+        zim_choices.append(key)
+
 parser = argparse.ArgumentParser(description="ideascube/kiwix installer for raspberrypi.")
-parser.add_argument("-n", "--name", help="name of the box (mybox)", default="mybox")
-parser.add_argument("-t", "--timezone", help="timezone (Europe/Paris)", default="Europe/Paris")
-parser.add_argument("-w", "--wifi-pwd", help="wifi password (Open)")
-parser.add_argument("-k", "--kalite", help="install kalite (fr | en | ar | es)", choices=["fr", "en", "ar", "er"], nargs="*")
-parser.add_argument("-z", "--zim-install", help="install zim", nargs="*")
-parser.add_argument("-r", "--resize", help="resize image in B (5*2**30)", type=float, default=5*2**30)
-parser.add_argument("-c", "--catalog", help="print zim catalog", action="store_true")
-parser.add_argument("-s", "--sd", help="sd card device to put the image onto")
+parser.add_argument("--name", help="name of the box (mybox)", default="mybox")
+parser.add_argument("--timezone", help="timezone (Europe/Paris)", default="Europe/Paris")
+parser.add_argument("--language", help="language (en)", default="en")
+parser.add_argument("--wifi-pwd", help="wifi password (Open)")
+parser.add_argument("--kalite", help="install kalite", choices=["fr", "en", "er"], nargs="*")
+parser.add_argument("--aflatoun", help="install aflatoun", action="store_true")
+parser.add_argument("--wikifundi", help="install wikifundi", choices=["fr", "en"], nargs="*")
+parser.add_argument("--edupi", help="install edupi", action="store_true")
+parser.add_argument("--zim-install", help="install zim", choices=zim_choices, nargs="*")
+parser.add_argument("--size", help="resize image in B (5*2**30)", type=float, default=5*2**30)
+parser.add_argument("--sd-card", help="sd card device to put the image onto")
+parser.add_argument("--favicon", help="set favicon")
+parser.add_argument("--logo", help="set logo")
+parser.add_argument("--build-dir", help="set build directory (default current)", default=".")
+parser.add_argument("--catalog", help="show catalog and exit", action="store_true")
 
 args = parser.parse_args()
 
 if args.catalog:
-    for catalog in catalog.get_catalogs():
+    for catalog in catalogs:
         print(yaml.dump(catalog, default_flow_style=False, default_style=''))
     exit(0)
 
-error = run_installation(
-        name=args.name,
-        timezone=args.timezone,
-        wifi_pwd=args.wifi_pwd,
-        kalite=args.kalite,
-        zim_install=args.zim_install,
-        size=args.resize,
-        logger=Logger,
-        cancel_event=CancelEvent(),
-        sd_card=args.sd)
+# TODO: check available spaces in sd card and build dir
 
-print("ERRROR: " + str(error))
+cancel_event = CancelEvent()
+try:
+    error = run_installation(
+            name=args.name,
+            timezone=args.timezone,
+            language=args.language,
+            wifi_pwd=args.wifi_pwd,
+            kalite=args.kalite,
+            wikifundi=args.wikifundi,
+            aflatoun=args.aflatoun,
+            edupi=args.edupi,
+            zim_install=args.zim_install,
+            size=args.size,
+            logger=Logger,
+            cancel_event=cancel_event,
+            sd_card=args.sd_card,
+            logo=args.logo,
+            favicon=args.favicon,
+            build_dir=args.build_dir)
+except:
+    cancel_event.cancel()
+else:
+    if error:
+        print("Installation failed: " + str(error), file=sys.stderr)
+    else:
+        print("Installation succeded")
