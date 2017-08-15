@@ -42,20 +42,6 @@ AFLATOUN_SIZE = 8589934592
 # TODO: use 200 MB for now
 EDUPI_SIZE = 2097152
 
-DEFAULT_LANGUAGE = 3
-LANGUAGES = [
-        ('am', u'አማርኛ'),
-        ('ar', u'\u0627\u0644\u0639\u0631\u0628\u064a\u0651\u0629'),
-        ('bm', 'Bambara'),
-        ('en', u'English'),
-        ('es', u'Espa\xf1ol'),
-        ('fa-ir', 'فارسی'),
-        ('fr', u'Fran\xe7ais'),
-        ('ku', 'Kurdî'),
-        ('so', u'Af-soomaali'),
-        ('sw', u'Kiswahili')
-        ]
-
 class AbortDialog(Gtk.Dialog):
     def __init__(self, parent):
         Gtk.Dialog.__init__(self, "Abort dialog", parent, 0,
@@ -147,13 +133,18 @@ class Application:
         self.component.wifi_password_switch.connect("notify::active", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(not switch.get_active()))
 
         # ideascube language
-        for code, language in LANGUAGES:
+        for code, language in data.ideascube_languages:
             self.component.language_tree_store.append([code, language])
 
         renderer = Gtk.CellRendererText()
         self.component.language_combobox.pack_start(renderer, True)
         self.component.language_combobox.add_attribute(renderer, "text", 1)
-        self.component.language_combobox.set_active(DEFAULT_LANGUAGE)
+
+        index = -1
+        for i, (code, language) in enumerate(data.ideascube_languages):
+            if code == 'en':
+                index = i
+        self.component.language_combobox.set_active(index)
 
         # timezone
         default_id = -1
@@ -385,7 +376,7 @@ class Application:
         all_valid = all_valid and condition
 
         language_id = self.component.language_combobox.get_active()
-        language = LANGUAGES[language_id][0]
+        language = data.ideascube_languages[language_id][0]
         condition = language_id != -1
         validate_label(self.component.language_label, condition)
         all_valid = all_valid and condition

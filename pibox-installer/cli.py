@@ -2,6 +2,7 @@ import os
 import argparse
 import sys
 import yaml
+import data
 from backend import catalog
 from run_installation import run_installation
 from util import CancelEvent
@@ -26,10 +27,12 @@ for catalog in catalogs:
     for (key, value) in catalog["all"].items():
         zim_choices.append(key)
 
+languages = [code for code, language in data.ideascube_languages]
+
 parser = argparse.ArgumentParser(description="ideascube/kiwix installer for raspberrypi.")
 parser.add_argument("--name", help="name of the box (mybox)", default="mybox")
 parser.add_argument("--timezone", help="timezone (Europe/Paris)", default="Europe/Paris")
-parser.add_argument("--language", help="language (en)", default="en")
+parser.add_argument("--language", help="language (en)", choices=languages, default="en")
 parser.add_argument("--wifi-pwd", help="wifi password (Open)")
 parser.add_argument("--kalite", help="install kalite", choices=["fr", "en", "er"], nargs="*")
 parser.add_argument("--aflatoun", help="install aflatoun", action="store_true")

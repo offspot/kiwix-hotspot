@@ -19,3 +19,16 @@ raspbian_url = "http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_l
 raspbian_zip_path = "2017-03-02-raspbian-jessie-lite.img"
 
 ansiblecube_path = os.path.join(data_dir, "ansiblecube")
+
+ideascube_languages = [
+        ('am', u'አማርኛ'),
+        ('ar', u'\u0627\u0644\u0639\u0631\u0628\u064a\u0651\u0629'),
+        ('bm', 'Bambara'),
+        ('en', u'English'),
+        ('es', u'Espa\xf1ol'),
+        ('fa-ir', 'فارسی'),
+        ('fr', u'Fran\xe7ais'),
+        ('ku', 'Kurdî'),
+        ('so', u'Af-soomaali'),
+        ('sw', u'Kiswahili')
+        ]
