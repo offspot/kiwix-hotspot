@@ -5,6 +5,7 @@ import yaml
 from backend import catalog
 from run_installation import run_installation
 from util import CancelEvent
+from util import get_free_space_in_dir
 
 class Logger:
     def step(step):
@@ -36,7 +37,6 @@ parser.add_argument("--wikifundi", help="install wikifundi", choices=["fr", "en"
 parser.add_argument("--edupi", help="install edupi", action="store_true")
 parser.add_argument("--zim-install", help="install zim", choices=zim_choices, nargs="*")
 parser.add_argument("--size", help="resize image in B (5*2**30)", type=float, default=5*2**30)
-parser.add_argument("--sd-card", help="sd card device to put the image onto")
 parser.add_argument("--favicon", help="set favicon")
 parser.add_argument("--logo", help="set logo")
 parser.add_argument("--build-dir", help="set build directory (default current)", default=".")
@@ -49,7 +49,12 @@ if args.catalog:
         print(yaml.dump(catalog, default_flow_style=False, default_style=''))
     exit(0)
 
-# TODO: check available spaces in sd card and build dir
+build_free_space = get_free_space_in_dir(args.build_dir)
+if build_free_space < args.size:
+    print("Not enough space available at {} to build image".format(args.build_dir), file=sys.stderr)
+    exit(1)
+
+# TODO: check available spaces on the sd card
 
 cancel_event = CancelEvent()
 try:
@@ -66,7 +71,7 @@ try:
             size=args.size,
             logger=Logger,
             cancel_event=cancel_event,
-            sd_card=args.sd_card,
+            sd_card=None,
             logo=args.logo,
             favicon=args.favicon,
             build_dir=args.build_dir)
