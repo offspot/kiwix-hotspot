@@ -11,7 +11,7 @@ import posixpath
 from .util import startup_info_args
 from .util import subprocess_pretty_check_call
 
-timeout = 60*30
+timeout = 5*60
 
 if os.name == "nt":
     qemu_system_arm_exe = "qemu\qemu-system-arm.exe"
@@ -142,8 +142,11 @@ class _RunningInstance:
                 self._qemu.kill()
             raise
 
-    def _wait_signal(self, reader_fd, writer_fd, signal, timeout):
+    def _wait_signal(self, reader_fd, writer_fd, signal, timeout, return_buf_states_on_timeout=False):
         timeout_event = threading.Event()
+
+        if return_buf_states_on_timeout:
+            buf_states = []
 
         def raise_timeout():
             timeout_event.set()
@@ -155,6 +158,10 @@ class _RunningInstance:
             timer.start()
             buf = os.read(reader_fd, 1024)
 
+            ring_buf.extend(buf)
+            if return_buf_states_on_timeout:
+                buf_states.append(buf)
+
             try:
                 decoded_buf = buf.decode("utf-8")
             except:
@@ -163,10 +170,13 @@ class _RunningInstance:
                 self._logger.raw_std(decoded_buf)
 
             if timeout_event.is_set():
-                raise QemuException("wait signal timeout: %s" % signal)
+                if return_buf_states_on_timeout:
+                    return buf_states
+                else:
+                    raise QemuException("wait signal timeout: %s" % signal)
 
             timer.cancel()
-            ring_buf.extend(buf)
+
             if list(ring_buf) == list(signal):
                 return
 
@@ -197,7 +207,22 @@ class _RunningInstance:
 
         self._wait_signal(stdout_reader, stdout_writer, b"login: ", timeout)
         os.write(stdin_writer, b"pi\n")
-        self._wait_signal(stdout_reader, stdout_writer, b"Password: ", timeout)
+
+        tries = 0
+        while True:
+            signal = b"Password: "
+            buf_states = self._wait_signal(stdout_reader, stdout_writer, signal, timeout, True)
+
+            if not buf_states:
+                break
+
+            self._logger.err(str(buf_states))
+            self._logger.err("internal error: please report this log to pibox-installer")
+            if tries > 3:
+                raise QemuException("wait signal timeout: %s" % signal)
+            os.write(stdin_writer, b"pi\n")
+            tries += 1
+
         os.write(stdin_writer, b"raspberry\n")
         self._wait_signal(stdout_reader, stdout_writer, b":~$ ", timeout)
         # TODO: This is a ugly hack. But writing all at once doesn't work
