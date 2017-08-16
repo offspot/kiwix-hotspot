@@ -252,9 +252,11 @@ class Application:
 
         # aflatoun
         self.component.aflatoun_switch.connect("notify::active", lambda switch, state: self.update_free_space())
+        self.component.aflatoun_label.set_label("{} ({})".format(self.component.aflatoun_label.get_label(), human_readable_size(data.aflatoun_size)))
 
         # edupi
         self.component.edupi_switch.connect("notify::active", lambda switch, state: self.update_free_space())
+        self.component.edupi_label.set_label("{} ({})".format(self.component.edupi_label.get_label(), human_readable_size(data.edupi_size)))
 
         # language tree view
         renderer_text = Gtk.CellRendererText()

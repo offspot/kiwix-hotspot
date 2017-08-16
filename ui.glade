@@ -995,14 +995,14 @@ and digits '0' to '9'</property>
               </packing>
             </child>
             <child>
-              <object class="GtkBox" id="no_id_29">
+              <object class="GtkBox" id="no_id_13">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkLabel" id="no_id_64">
+                  <object class="GtkLabel" id="aflatoun_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">Edupi :</property>
+                    <property name="label" translatable="yes">Aflatoun :</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -1011,7 +1011,7 @@ and digits '0' to '9'</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSwitch" id="edupi_switch">
+                  <object class="GtkSwitch" id="aflatoun_switch">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                   </object>
@@ -1030,14 +1030,14 @@ and digits '0' to '9'</property>
               </packing>
             </child>
             <child>
-              <object class="GtkBox" id="no_id_13">
+              <object class="GtkBox" id="no_id_29">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkLabel" id="no_id_25">
+                  <object class="GtkLabel" id="edupi_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">Aflatoun :</property>
+                    <property name="label" translatable="yes">Edupi :</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -1046,7 +1046,7 @@ and digits '0' to '9'</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSwitch" id="aflatoun_switch">
+                  <object class="GtkSwitch" id="edupi_switch">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                   </object>
