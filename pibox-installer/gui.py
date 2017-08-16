@@ -12,35 +12,13 @@ from util import CancelEvent
 import sd_card_info
 from util import human_readable_size
 from util import get_free_space_in_dir
+from util import compute_space_required
 import data
 import langcodes
 import string
 
 VALID_RGBA = Gdk.RGBA(0., 0., 0., 0.)
 INVALID_RGBA = Gdk.RGBA(1, 0.5, 0.5, 1.)
-
-KALITE_SIZES = {
-    "fr": 10737418240,
-    "es": 19327352832,
-    "en": 41875931136,
-}
-
-# Those size correspond to 2017_01 packages.
-# It must be updated as africapack are updated.
-WIKIFUNDI_SIZES = {
-    "fr": 0,
-    "en": 0,
-}
-
-# This size is 5G but actual final size on disk is 3.9
-# We use 8G because we need space to build aflatoun
-# TODO: 5G is not enough
-# TODO: 8G may not be enough
-AFLATOUN_SIZE = 8589934592
-
-# TODO: 100 MB may be enough
-# TODO: use 200 MB for now
-EDUPI_SIZE = 2097152
 
 class ShortDialog(Gtk.Dialog):
     def __init__(self, parent, buttons, msg):
@@ -264,12 +242,12 @@ class Application:
 
         # kalite
         for lang, button in self.iter_kalite_check_button():
-            button.set_label("{} ({})".format(button.get_label(), human_readable_size(KALITE_SIZES[lang])))
+            button.set_label("{} ({})".format(button.get_label(), human_readable_size(data.kalite_sizes[lang])))
             button.connect("toggled", lambda button: self.update_free_space())
 
         # wikifundi
         for lang, button in self.iter_wikifundi_check_button():
-            button.set_label("{} ({})".format(button.get_label(), human_readable_size(WIKIFUNDI_SIZES[lang])))
+            button.set_label("{} ({})".format(button.get_label(), human_readable_size(data.wikifundi_sizes[lang])))
             button.connect("toggled", lambda button: self.update_free_space())
 
         # aflatoun
@@ -510,21 +488,31 @@ class Application:
         self.component.zim_window.show()
 
     def get_free_space(self):
-        # TODO: compute actual space used with empty install
-        used_space = 2 * 2**30 # space of raspbian with ideascube without content
+        zim_list = []
         for zim in self.component.zim_list_store:
             if zim[8]:
-                used_space += int(zim[9])
+                zim_list.append(zim[0])
+
+        kalite = []
         for lang, button in self.iter_kalite_check_button():
             if button.get_active():
-                used_space += KALITE_SIZES[lang]
+                kalite.append(lang)
+
+        wikifundi = []
         for lang, button in self.iter_wikifundi_check_button():
             if button.get_active():
-                used_space += WIKIFUNDI_SIZES[lang]
-        if self.component.aflatoun_switch.get_active():
-            used_space += AFLATOUN_SIZE
-        if self.component.edupi_switch.get_active():
-            used_space += EDUPI_SIZE
+                wikifundi.append(lang)
+
+        aflatoun = self.component.aflatoun_switch.get_active()
+        edupi = self.component.edupi_switch.get_active()
+
+        used_space = compute_space_required(
+                catalog=self.catalog,
+                zim_list=zim_list,
+                kalite=kalite,
+                wikifundi=wikifundi,
+                aflatoun=aflatoun,
+                edupi=edupi)
 
         return self.get_output_size() - used_space
 

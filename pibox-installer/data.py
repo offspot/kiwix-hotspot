@@ -32,3 +32,26 @@ ideascube_languages = [
         ('so', u'Af-soomaali'),
         ('sw', u'Kiswahili')
         ]
+
+kalite_sizes = {
+    "fr": 10737418240,
+    "es": 19327352832,
+    "en": 41875931136,
+}
+
+# Those size correspond to 2017_01 packages.
+# It must be updated as africapack are updated.
+wikifundi_sizes = {
+    "fr": 0,
+    "en": 0,
+}
+
+# This size is 5G but actual final size on disk is 3.9
+# We use 8G because we need space to build aflatoun
+# TODO: 5G is not enough
+# TODO: 8G may not be enough
+aflatoun_size = 8589934592
+
+# TODO: 100 MB may be enough
+# TODO: use 200 MB for now
+edupi_size = 2097152

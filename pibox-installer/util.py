@@ -5,6 +5,30 @@ import signal
 import sys
 import ctypes
 import platform
+import data
+
+def compute_space_required(catalog, zim_list, kalite, wikifundi, aflatoun, edupi):
+    # TODO: compute actual space used with empty install
+    used_space = 2 * 2**30 # space of raspbian with ideascube without content
+    zim_space_required = {}
+    for one_catalog in catalog:
+        for (key, value) in one_catalog["all"].items():
+            if zim_space_required.get(key):
+                raise ValueError("same key in two catalogs")
+            zim_space_required[key] = value["size"]*2
+
+    for zim in zim_list:
+        used_space += zim_space_required[zim]
+    for lang in kalite:
+        used_space += data.kalite_sizes[lang]
+    for lang in wikifundi:
+        used_space += data.wikifundi_sizes[lang]
+    if aflatoun:
+        used_space += data.aflatoun_size
+    if edupi:
+        used_space += data.edupi_size
+
+    return used_space
 
 def get_free_space_in_dir(dirname):
     """Return folder/drive free space."""
