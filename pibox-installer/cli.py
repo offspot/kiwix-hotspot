@@ -7,6 +7,7 @@ from backend import catalog
 from run_installation import run_installation
 from util import CancelEvent
 from util import get_free_space_in_dir
+from util import compute_space_required
 
 class Logger:
     def step(step):
@@ -40,11 +41,11 @@ parser.add_argument("--name", help="name of the box (mybox)", default="mybox")
 parser.add_argument("--timezone", help="timezone (Europe/Paris)", default="Europe/Paris")
 parser.add_argument("--language", help="language (en)", choices=languages, default="en")
 parser.add_argument("--wifi-pwd", help="wifi password (Open)")
-parser.add_argument("--kalite", help="install kalite", choices=["fr", "en", "er"], nargs="*")
+parser.add_argument("--kalite", help="install kalite", choices=["fr", "en", "er"], nargs="+")
 parser.add_argument("--aflatoun", help="install aflatoun", action="store_true")
-parser.add_argument("--wikifundi", help="install wikifundi", choices=["fr", "en"], nargs="*")
+parser.add_argument("--wikifundi", help="install wikifundi", choices=["fr", "en"], nargs="+")
 parser.add_argument("--edupi", help="install edupi", action="store_true")
-parser.add_argument("--zim-install", help="install zim", choices=zim_choices, nargs="*")
+parser.add_argument("--zim-install", help="install zim", choices=zim_choices, nargs="+")
 parser.add_argument("--size", help="resize image in B (5*2**30)", type=float, default=5*2**30)
 parser.add_argument("--favicon", help="set favicon")
 parser.add_argument("--logo", help="set logo")
@@ -63,7 +64,16 @@ if build_free_space < args.size:
     print("Not enough space available at {} to build image".format(args.build_dir), file=sys.stderr)
     exit(1)
 
-# TODO: check available spaces on the sd card
+space_required = compute_space_required(
+                catalog=catalogs,
+                zim_list=args.zim_install,
+                kalite=args.kalite,
+                wikifundi=args.wikifundi,
+                aflatoun=args.aflatoun,
+                edupi=args.edupi)
+if args.size < space_required:
+    print("image size ({}) is not large enough for the content ({})".format(args.size, space_required), file=sys.stderr)
+    exit(3)
 
 cancel_event = CancelEvent()
 try:
