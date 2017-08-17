@@ -132,7 +132,7 @@ def run_installation(name, timezone, language, wifi_pwd, kalite, aflatoun, wikif
                     'category': 'manage',
                     'url': 'http://edupi.koombook.lan',
                     'title': 'Edupi',
-                    'description': 'content management application',
+                    'description': 'Content management application',
                     'fa': 'folder',
                     'is_staff': False
                     })

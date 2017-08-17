@@ -280,6 +280,7 @@
                   <object class="GtkLabel" id="project_name_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">Machine and WiFi name</property>
                     <property name="label" translatable="yes">Pibox name :</property>
                   </object>
                   <packing>
@@ -340,6 +341,7 @@ and digits '0' to '9' and hyphen '-'</property>
                   <object class="GtkLabel" id="favicon_chooser_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">Favicon</property>
                     <property name="label" translatable="yes">Favion :</property>
                   </object>
                   <packing>
@@ -374,6 +376,7 @@ and digits '0' to '9' and hyphen '-'</property>
               <object class="GtkBox" id="no_id_65">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Top left logo</property>
                 <property name="spacing">5</property>
                 <child>
                   <object class="GtkLabel" id="logo_chooser_label">
@@ -418,6 +421,7 @@ and digits '0' to '9' and hyphen '-'</property>
                   <object class="GtkLabel" id="language_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">Default language</property>
                     <property name="label" translatable="yes">Language :</property>
                   </object>
                   <packing>
@@ -454,6 +458,7 @@ and digits '0' to '9' and hyphen '-'</property>
                   <object class="GtkLabel" id="no_id_11">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">An open WiFi doesn't require password to connect on</property>
                     <property name="label" translatable="yes">Open WiFi :</property>
                   </object>
                   <packing>
@@ -495,6 +500,7 @@ and digits '0' to '9' and hyphen '-'</property>
                       <object class="GtkLabel" id="wifi_password_label">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">WiFi password</property>
                         <property name="label" translatable="yes">WiFi Password :</property>
                       </object>
                       <packing>
@@ -556,6 +562,7 @@ and digits '0' to '9'</property>
                   <object class="GtkLabel" id="timezone_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">Machine timezone</property>
                     <property name="label" translatable="yes">Timezone :</property>
                   </object>
                   <packing>
@@ -593,6 +600,7 @@ and digits '0' to '9'</property>
                   <object class="GtkLabel" id="build_path_chooser_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">The path where the image is build</property>
                     <property name="label" translatable="yes">Build path :</property>
                   </object>
                   <packing>
@@ -630,6 +638,9 @@ and digits '0' to '9'</property>
                   <object class="GtkLabel" id="output_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">In SD card mode the image is created at build path and then written to the SD card
+In File mode the image is created at build path, you can choose the size
+/!\ Some SD card may have less available space than specified</property>
                     <property name="label" translatable="yes">Output :</property>
                   </object>
                   <packing>
@@ -672,6 +683,7 @@ and digits '0' to '9'</property>
                       <object class="GtkLabel" id="sd_card_label">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">SD card</property>
                         <property name="label" translatable="yes">SD card :</property>
                       </object>
                       <packing>
@@ -742,6 +754,7 @@ and digits '0' to '9'</property>
                       <object class="GtkLabel" id="size_label">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">Size of the image to build</property>
                         <property name="label" translatable="yes">File size (GiB) :</property>
                       </object>
                       <packing>
@@ -772,6 +785,7 @@ and digits '0' to '9'</property>
                   <object class="GtkLabel" id="free_space_name_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">Space still available on the SD card</property>
                     <property name="label" translatable="yes">Free space :</property>
                   </object>
                   <packing>
@@ -808,6 +822,7 @@ and digits '0' to '9'</property>
                   <object class="GtkLabel" id="no_id_22">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">Static content to put on the image</property>
                     <property name="label" translatable="yes">Static content</property>
                   </object>
                   <packing>
@@ -861,6 +876,7 @@ and digits '0' to '9'</property>
                   <object class="GtkLabel" id="no_id_30">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">An offline version of Khan Academy</property>
                     <property name="label" translatable="yes">KA Lite :</property>
                   </object>
                   <packing>
@@ -939,6 +955,7 @@ and digits '0' to '9'</property>
                   <object class="GtkLabel" id="no_id_69">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">Offline editable environment that provides a similar experience to editing Wikipedia online</property>
                     <property name="label" translatable="yes">Wikifundi :</property>
                   </object>
                   <packing>
@@ -1002,6 +1019,7 @@ and digits '0' to '9'</property>
                   <object class="GtkLabel" id="aflatoun_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">Social and Financial Education for Children and Young People</property>
                     <property name="label" translatable="yes">Aflatoun :</property>
                   </object>
                   <packing>
@@ -1037,6 +1055,7 @@ and digits '0' to '9'</property>
                   <object class="GtkLabel" id="edupi_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">Content management application</property>
                     <property name="label" translatable="yes">Edupi :</property>
                   </object>
                   <packing>
