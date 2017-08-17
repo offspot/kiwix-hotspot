@@ -42,8 +42,8 @@ kalite_sizes = {
 # Those size correspond to 2017_01 packages.
 # It must be updated as africapack are updated.
 wikifundi_sizes = {
-    "fr": 0,
-    "en": 0,
+    "fr": 11811160000, #11GiB
+    "en": 12884900000, #12GiB
 }
 
 # This size is 5G but actual final size on disk is 3.9
