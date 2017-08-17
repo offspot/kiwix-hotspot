@@ -6,33 +6,29 @@ Ideascube is a solution to serve offline content from the web such as Wikipedia,
 
 Pibox installer configure the RaspberryPi into a hotspot WiFi with Ideascube server and offline contents.
 
+## Download
+
+[**repos.ideascube.org/pibox/**](http://repos.ideascube.org/pibox/)
+
+note: binaries for windows are not signed, to open on windows just click for more information and you are able to run it.
+
 ## Principle
 
 The installer emulate the rasbperrypi architecture armhf in QEMU.
 
 Inside the emulator it builds [Ideascube](https://framagit.org/ideascube/ideascube) with [Ansiblecube](https://github.com/ideascube/ansiblecube).
 
-## Download
-
-[**repos.ideascube.org/pibox/**](http://repos.ideascube.org/pibox/)
-
-note: binaries for windows and macos are not signed, to open on windows just click for more information and you are able to run it. To open on macos right click on the application and click Open.
+presentation of the projet at Potsdam [Slides](http://wiki.kiwix.org/w/images/4/43/Pibox_installer_potsdam_2017_presentation.pdf)
 
 ## CLI usage
 
 note: CLI is currently not packaged, you have to run it from source
 
-show help: `pibox-installer-cli -h`
+run cli mode: `pibox-installer cli`
 
-show catalog: `pibox-installer-cli -c`
+show help: `pibox-installer cli -h`
 
-build your image with for example
-
-* an image of 5GiB with wikiquote.en: `pibox-installer-cli -z wikiquote.en -r 5`
-
-* an image of 5GiB with wikiquote.en written to the sd card: `pibox-installer-cli -z wikiquote.en -r 5 -s dev/sdX`
-
-  **warning**: you need write priviledge for the device
+show catalog: `pibox-installer cli --catalog`
 
 ## Run pibox-installer from source
 
@@ -72,6 +68,8 @@ run: `python3 make-vexpress-boot`
 see [appveyor.yml](appveyor.yml) for windows and [.travis.yml](.travis.yml) for mac and linux
 
 ## Contribute
+
+presentation of the projet at Potsdam [Slides](http://wiki.kiwix.org/w/images/4/43/Pibox_installer_potsdam_2017_presentation.pdf)
 
 some notes about how the project is structured:
 
