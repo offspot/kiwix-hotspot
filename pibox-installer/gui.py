@@ -167,7 +167,8 @@ class Application:
         self.component.run_installation_button.connect("clicked", self.run_installation_button_clicked)
         self.component.run_window.connect("delete-event", self.run_window_delete_event)
         self.component.run_text_view.get_buffer().connect("modified-changed", self.run_text_view_scroll_down)
-        self.component.run_abort_done_button.connect("clicked", self.run_abort_done_button_clicked)
+        self.component.run_quit_button.connect("clicked", self.run_quit_button_clicked)
+        self.component.run_abort_button.connect("clicked", self.run_abort_button_clicked)
         self.component.run_copy_log_to_clipboard_button.connect("clicked", self.run_copy_log_to_clipboard_button_clicked)
         self.component.run_new_install_button.connect("clicked", self.run_new_install_button_clicked)
 
@@ -299,9 +300,9 @@ class Application:
             self.component.done_label.set_text("Installation failed")
 
         self.component.done_window.show()
-        self.component.run_abort_done_button.set_label("Quit")
         self.component.run_spinner.stop()
-        self.component.run_new_install_button_revealer.set_reveal_child(True)
+        self.component.run_install_running_buttons_revealer.set_reveal_child(False)
+        self.component.run_install_done_buttons_revealer.set_reveal_child(True)
 
     def run_text_view_scroll_down(self, widget):
         text_buffer = self.component.run_text_view.get_buffer()
@@ -316,7 +317,10 @@ class Application:
         self.cancel_event.cancel()
         Gtk.main_quit()
 
-    def run_abort_done_button_clicked(self, widget):
+    def run_quit_button_clicked(self, widget):
+        self.component.run_window.close()
+
+    def run_abort_button_clicked(self, widget):
         dialog = ShortDialog(self.component.window, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK), "Are you sure you want to abort the installation ?\nyou will not be able to resume.")
         response = dialog.run()
 
@@ -330,10 +334,10 @@ class Application:
         self.component.window.show()
 
     def reset_run_window(self):
-        self.component.run_new_install_button_revealer.set_reveal_child(False)
+        self.component.run_install_done_buttons_revealer.set_reveal_child(False)
+        self.component.run_install_running_buttons_revealer.set_reveal_child(True)
         self.component.run_text_view.get_buffer().set_text("")
         self.component.run_spinner.start()
-        self.component.run_abort_done_button.set_label("Abort")
 
     def run_copy_log_to_clipboard_button_clicked(self, widget):
         text_buffer = self.component.run_text_view.get_buffer()
