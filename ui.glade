@@ -342,7 +342,7 @@ and digits '0' to '9' and hyphen '-'</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="tooltip_text" translatable="yes">Favicon</property>
-                    <property name="label" translatable="yes">Favion :</property>
+                    <property name="label" translatable="yes">Favicon :</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -1012,42 +1012,6 @@ In File mode the image is created at build path, you can choose the size
               </packing>
             </child>
             <child>
-              <object class="GtkBox" id="no_id_13">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <child>
-                  <object class="GtkLabel" id="aflatoun_label">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="tooltip_text" translatable="yes">Social and Financial Education for Children and Young People</property>
-                    <property name="label" translatable="yes">Aflatoun :</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkSwitch" id="aflatoun_switch">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="pack_type">end</property>
-                    <property name="position">1</property>
-                  </packing>
-                </child>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">15</property>
-              </packing>
-            </child>
-            <child>
               <object class="GtkBox" id="no_id_29">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -1066,6 +1030,42 @@ In File mode the image is created at build path, you can choose the size
                 </child>
                 <child>
                   <object class="GtkSwitch" id="edupi_switch">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="pack_type">end</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">15</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox" id="no_id_13">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <child>
+                  <object class="GtkLabel" id="aflatoun_label">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">Social and Financial Education for Children and Young People</property>
+                    <property name="label" translatable="yes">Aflatoun :</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkSwitch" id="aflatoun_switch">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                   </object>
