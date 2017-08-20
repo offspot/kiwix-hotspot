@@ -260,11 +260,14 @@ class _RunningInstance:
             remotedirpath = posixpath.join(*os.path.split(localdirpath))
 
             for dirname in dirnames:
-                sftp_client.mkdir(posixpath.join(tmpremotepath, remotedirpath, dirname))
+                dir_remote_path = posixpath.join(tmpremotepath, remotedirpath, dirname)
+                self._logger.std("make remote dir {}".format(dir_remote_path))
+                sftp_client.mkdir(dir_remote_path)
 
             for filename in filenames:
                 file_local_path = os.path.join(localpath, localdirpath, filename)
                 file_remote_path = posixpath.join(tmpremotepath, remotedirpath, filename)
+                self._logger.std("copy local file {} to tmp file {}".format(file_local_path, file_remote_path))
                 sftp_client.put(file_local_path, file_remote_path)
         sftp_client.close()
         os.chdir(old_cwd)
