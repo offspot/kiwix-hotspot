@@ -257,7 +257,12 @@ class _RunningInstance:
         old_cwd = os.getcwd()
         os.chdir(localpath)
         for localdirpath, dirnames, filenames in os.walk("."):
-            remotedirpath = posixpath.join(*os.path.split(localdirpath))
+            remotedirpath = ''
+            remotedirpath_unformatted = localdirpath
+
+            while remotedirpath_unformatted is not '':
+                remotedirpath_unformatted, tail = os.path.split(remotedirpath_unformatted)
+                remotedirpath = posixpath.join(tail, remotedirpath)
 
             for dirname in dirnames:
                 dir_remote_path = posixpath.join(tmpremotepath, remotedirpath, dirname)
