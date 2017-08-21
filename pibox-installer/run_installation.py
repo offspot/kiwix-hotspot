@@ -158,7 +158,7 @@ LANGUAGE_CODE = '{}'
 
             if favicon is not None:
                 favicon_emulation_path = "/usr/share/ideascube/static/branding/favicon.png"
-                emulation.put_file(logo, favicon_emulation_path)
+                emulation.put_file(favicon, favicon_emulation_path)
                 emulation.exec_cmd("sudo chown ideascube:ideascube {}".format(favicon_emulation_path))
 
         # Write image to SD Card
