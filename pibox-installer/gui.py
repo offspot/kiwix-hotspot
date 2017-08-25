@@ -406,15 +406,15 @@ class Application:
         validate_label(self.component.free_space_name_label, condition)
         all_valid = all_valid and condition
 
-        kalit_active_buttons = [lang for lang, button in self.iter_kalite_check_button() if button.get_active()]
-        if len(kalit_active_buttons) != 0:
-            kalite = kalit_active_buttons
+        kalite_active_langs = [lang for lang, button in self.iter_kalite_check_button() if button.get_active()]
+        if len(kalite_active_langs) != 0:
+            kalite = kalite_active_langs
         else:
             kalite = None
 
-        wikifundi_active_buttons = [lang for lang, button in self.iter_wikifundi_check_button() if button.get_active()]
-        if len(wikifundi_active_buttons) != 0:
-            wikifundi = wikifundi_active_buttons
+        wikifundi_active_langs = [lang for lang, button in self.iter_wikifundi_check_button() if button.get_active()]
+        if len(wikifundi_active_langs) != 0:
+            wikifundi = wikifundi_active_langs
         else:
             wikifundi = None
 

@@ -109,24 +109,25 @@ def run_installation(name, timezone, language, wifi_pwd, kalite, aflatoun, wikif
                     'fa': 'book',
                     'is_staff': False
                     })
-            if "en" in wikifundi:
-                custom_cards.append({
-                    'category': 'create',
-                    'url': 'http://en.wikifundi.koombook.lan',
-                    'title': 'Wikifundi',
-                    'description': 'Offline editable environment that provides a similar experience to editing Wikipedia online',
-                    'fa': 'wikipedia-w',
-                    'is_staff': False
-                    })
-            if "fr" in wikifundi:
-                custom_cards.append({
-                    'category': 'create',
-                    'url': 'http://fr.wikifundi.koombook.lan',
-                    'title': 'Wikifundi',
-                    'description': 'Environnement qui vous permet de créer des articles Wikipédia hors-ligne',
-                    'fa': 'wikipedia-w',
-                    'is_staff': False
-                    })
+            if wikifundi != None:
+                if "en" in wikifundi:
+                    custom_cards.append({
+                        'category': 'create',
+                        'url': 'http://en.wikifundi.koombook.lan',
+                        'title': 'Wikifundi',
+                        'description': 'Offline editable environment that provides a similar experience to editing Wikipedia online',
+                        'fa': 'wikipedia-w',
+                        'is_staff': False
+                        })
+                if "fr" in wikifundi:
+                    custom_cards.append({
+                        'category': 'create',
+                        'url': 'http://fr.wikifundi.koombook.lan',
+                        'title': 'Wikifundi',
+                        'description': 'Environnement qui vous permet de créer des articles Wikipédia hors-ligne',
+                        'fa': 'wikipedia-w',
+                        'is_staff': False
+                        })
             if edupi == True:
                 custom_cards.append({
                     'category': 'manage',
