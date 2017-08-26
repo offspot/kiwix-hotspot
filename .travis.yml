@@ -62,7 +62,7 @@ matrix:
     - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-macos.dmg pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/
 
     - PIBOX_RELEASES=$(git tag -l --points-at HEAD | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*\(-rc[[:digit:]]\+\)\?') || true
-    - for PIBOX_RELEASE in $PIBOX_RELEASES; do mkdir -p releases/$PIBOX_RELEASE; mv pibox-installer-macos.dmg releases/$PIBOX_RELEASE/; scp -r -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/; done
+    - for PIBOX_RELEASE in $PIBOX_RELEASES; do mkdir -p releases/$PIBOX_RELEASE; cp pibox-installer-macos.dmg releases/$PIBOX_RELEASE/; scp -r -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/; done
 
   - os: linux
     language: python
@@ -141,4 +141,4 @@ matrix:
     - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer-linux.tar.gz pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/
 
     - PIBOX_RELEASES=$(git tag -l --points-at HEAD | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*\(-rc[[:digit:]]\+\)\?') || true
-    - for PIBOX_RELEASE in $PIBOX_RELEASES; do mkdir -p releases/$PIBOX_RELEASE; mv dist/pibox-installer-linux.tar.gz releases/$PIBOX_RELEASE; scp -r -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/; done
+    - for PIBOX_RELEASE in $PIBOX_RELEASES; do mkdir -p releases/$PIBOX_RELEASE; cp dist/pibox-installer-linux.tar.gz releases/$PIBOX_RELEASE; scp -r -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/; done
