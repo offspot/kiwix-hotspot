@@ -10,10 +10,6 @@ platform:
   - x86
   - x64
 
-environment:
-  certificate_secret:
-    secure: /Ephvg5HQQLR0IJmmeBGGpEww+93XqAMjdGAJKZyWsNeNCarAjvBDgcNBO/K1CWzwxpvty5sM0dZiWCFXt9kZcmU8vCPIYjwJE1B5Q5/mAQ=
-
 install:
   # decrypt certificate
   - nuget install secure-file -ExcludeVersion
