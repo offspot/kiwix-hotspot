@@ -11,7 +11,7 @@ import posixpath
 from .util import startup_info_args
 from .util import subprocess_pretty_check_call
 
-timeout = 5*60
+timeout = 10*60
 
 if os.name == "nt":
     qemu_system_arm_exe = "qemu\qemu-system-arm.exe"
