@@ -68,6 +68,8 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
             # Resize filesystem
             emulation.resize_fs()
 
+            emulation.exec_cmd("sudo sed -i s/mirrordirector/archive/ /etc/apt/sources.list")
+
             ansiblecube_emulation_path = "/var/lib/ansible/local"
             emulation.exec_cmd("sudo mkdir --mode 0755 -p /var/lib/ansible/")
             emulation.put_dir(data.ansiblecube_path, ansiblecube_emulation_path)
