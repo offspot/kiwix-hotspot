@@ -1306,7 +1306,7 @@ In File mode the image is created at build path, you can choose the size
     <property name="type_hint">dialog</property>
     <property name="transient_for">window</property>
     <property name="program_name">Pibox Installer</property>
-    <property name="version">nightly</property>
+    <property name="version">0.1</property>
     <property name="website">https://framagit.org/ideascube/pibox-installer</property>
     <property name="logo_icon_name">image-missing</property>
     <property name="license_type">gpl-3-0</property>
