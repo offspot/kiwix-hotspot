@@ -108,6 +108,9 @@ class Application:
         # wifi password
         self.component.wifi_password_switch.connect("notify::active", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(not switch.get_active()))
 
+        # admin account
+        self.component.admin_account_switch.connect("notify::active", lambda switch, state: self.component.admin_account_revealer.set_reveal_child(switch.get_active()))
+
         # ideascube language
         for code, language in data.ideascube_languages:
             self.component.language_tree_store.append([code, language])
@@ -379,6 +382,23 @@ class Application:
         validate_label(self.component.wifi_password_label, condition)
         all_valid = all_valid and condition
 
+        if not self.component.admin_account_switch.get_state():
+            admin_account = None
+            login_condition = True
+            pwd_condition = True
+        else:
+            admin_account = {
+                "login": self.component.admin_account_login_entry.get_text(),
+                "pwd": self.component.admin_account_pwd_entry.get_text(),
+            }
+            login_condition = len(admin_account["login"]) <= 31 and set(admin_account["login"]) <= set(string.ascii_uppercase + string.ascii_lowercase + string.digits)
+            pwd_condition = len(admin_account["pwd"]) <= 31 and set(admin_account["pwd"]) <= set(string.ascii_uppercase + string.ascii_lowercase + string.digits)
+        self.component.admin_account_login_constraints_revealer.set_reveal_child(not login_condition)
+        self.component.admin_account_pwd_constraints_revealer.set_reveal_child(not pwd_condition)
+        validate_label(self.component.admin_account_login_label, login_condition)
+        validate_label(self.component.admin_account_pwd_label, pwd_condition)
+        all_valid = all_valid and pwd_condition and login_condition
+
         zim_install = []
         for zim in self.component.zim_list_store:
             if zim[8]:
@@ -462,6 +482,7 @@ class Application:
                         logo=logo,
                         favicon=favicon,
                         build_dir=build_dir,
+                        admin_account=admin_account,
                         done_callback=lambda error: GLib.idle_add(self.installation_done, error))
 
             self.component.window.hide()

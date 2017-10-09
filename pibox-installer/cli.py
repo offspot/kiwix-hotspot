@@ -51,6 +51,7 @@ parser.add_argument("--favicon", help="set favicon")
 parser.add_argument("--logo", help="set logo")
 parser.add_argument("--build-dir", help="set build directory (default current)", default=".")
 parser.add_argument("--catalog", help="show catalog and exit", action="store_true")
+parser.add_argument("--admin-account", help="create admin account [LOGIN, PWD]", nargs=2)
 
 args = parser.parse_args()
 
@@ -58,6 +59,13 @@ if args.catalog:
     for catalog in catalogs:
         print(yaml.dump(catalog, default_flow_style=False, default_style=''))
     exit(0)
+
+if args.admin_account:
+    admin_account = { "login": args.admin_account[0], "pwd": args.admin_account[1] }
+else:
+    admin_account = None
+
+print(admin_account)
 
 build_free_space = get_free_space_in_dir(args.build_dir)
 if build_free_space < args.size:
@@ -93,6 +101,7 @@ try:
             sd_card=None,
             logo=args.logo,
             favicon=args.favicon,
+            admin_account=admin_account,
             build_dir=args.build_dir)
 except:
     cancel_event.cancel()

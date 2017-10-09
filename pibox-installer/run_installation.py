@@ -12,7 +12,7 @@ import data
 import sys
 import re
 
-def run_installation(name, timezone, language, wifi_pwd, kalite, aflatoun, wikifundi, edupi, zim_install, size, logger, cancel_event, sd_card, favicon, logo, done_callback=None, build_dir="."):
+def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, aflatoun, wikifundi, edupi, zim_install, size, logger, cancel_event, sd_card, favicon, logo, done_callback=None, build_dir="."):
 
     try:
         # Prepare SD Card
@@ -67,6 +67,8 @@ def run_installation(name, timezone, language, wifi_pwd, kalite, aflatoun, wikif
         with emulator.run(cancel_event) as emulation:
             # Resize filesystem
             emulation.resize_fs()
+
+            emulation.exec_cmd("sudo sed -i s/mirrordirector/archive/ /etc/apt/sources.list")
 
             ansiblecube_emulation_path = "/var/lib/ansible/local"
             emulation.exec_cmd("sudo mkdir --mode 0755 -p /var/lib/ansible/")
@@ -161,6 +163,10 @@ LANGUAGE_CODE = '{}'
                 favicon_emulation_path = "/usr/share/ideascube/static/branding/favicon.png"
                 emulation.put_file(favicon, favicon_emulation_path)
                 emulation.exec_cmd("sudo chown ideascube:ideascube {}".format(favicon_emulation_path))
+
+            if admin_account is not None:
+                logger.std("create super user")
+                emulation.exec_cmd("sudo ideascube createsuperuser --serial '{}' <<< '{}'".format(admin_account["login"], admin_account["pwd"]), show_command=False)
 
         # Write image to SD Card
         if sd_card:
