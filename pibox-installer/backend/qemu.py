@@ -235,7 +235,9 @@ class _RunningInstance:
 
         self._client = paramiko.SSHClient()
         self._client.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())
-        self._client.connect("localhost", port=ssh_port, username="pi", password="raspberry")
+        self._client.connect("localhost", port=ssh_port,
+                             username="pi", password="raspberry",
+                             allow_agent=False, look_for_keys=False)
 
     def _shutdown(self):
         self.exec_cmd("sudo shutdown 0")
