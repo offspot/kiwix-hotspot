@@ -144,7 +144,7 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
                        "EXTRA_APP_CARDS = {extra_app_cards}\n\n"
                        "CUSTOM_CARDS = {custom_cards}\n\n"
                        "LANGUAGE_CODE = '{language}'\n\n"
-                       "LANGUAGES = [('{language}', '{language_name}')]]\n").format(
+                       "LANGUAGES = [('{language}', '{language_name}')]\n").format(
                         extra_app_cards=extra_app_cards,
                         custom_cards=custom_cards,
                         language=language,
