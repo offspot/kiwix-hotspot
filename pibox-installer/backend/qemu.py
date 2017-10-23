@@ -6,12 +6,13 @@ import socket
 import paramiko
 import re
 import random
+import time
 import threading
 import posixpath
 from .util import startup_info_args
 from .util import subprocess_pretty_check_call
 
-timeout = 5*60
+timeout = 10*60
 
 if os.name == "nt":
     qemu_system_arm_exe = "qemu\qemu-system-arm.exe"
@@ -233,9 +234,13 @@ class _RunningInstance:
         os.write(stdin_writer, b" exit\n")
         self._wait_signal(stdout_reader, stdout_writer, b"login: ", timeout)
 
+        time.sleep(10);
+
         self._client = paramiko.SSHClient()
         self._client.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())
-        self._client.connect("localhost", port=ssh_port, username="pi", password="raspberry")
+        self._client.connect("localhost", port=ssh_port,
+                             username="pi", password="raspberry",
+                             allow_agent=False, look_for_keys=False)
 
     def _shutdown(self):
         self.exec_cmd("sudo shutdown 0")

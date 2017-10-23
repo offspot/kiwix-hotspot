@@ -140,14 +140,15 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
                     'is_staff': False
                     })
 
-            kb_conf = """from .pibox import *  # pragma: no flakes
-
-EXTRA_APP_CARDS = {}
-
-CUSTOM_CARDS = {}
-
-LANGUAGE_CODE = '{}'
-""".format(extra_app_cards, custom_cards, language)
+            kb_conf = ("from .pibox import *  # pragma: no flakes\n\n"
+                       "EXTRA_APP_CARDS = {extra_app_cards}\n\n"
+                       "CUSTOM_CARDS = {custom_cards}\n\n"
+                       "LANGUAGE_CODE = '{language}'\n\n"
+                       "LANGUAGES = [('{language}', '{language_name}')]]\n").format(
+                        extra_app_cards=extra_app_cards,
+                        custom_cards=custom_cards,
+                        language=language,
+                        language_name=dict(data.ideascube_languages)[language])
 
             kb_conf_fmt = kb_conf.replace("'", "'\\''")
             kb_conf_path = "/opt/venvs/ideascube/lib/python3.4/site-packages/ideascube/conf/kb.py"
