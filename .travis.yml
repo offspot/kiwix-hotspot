@@ -21,7 +21,7 @@ matrix:
     # Download playbook
     - wget https://framagit.org/ideascube/ansiblecube/repository/oneUpdateFile0.4/archive.zip -O oneUpdateFile0.4.zip
     - unzip oneUpdateFile0.4.zip
-    - mv ansiblecube-oneUpdateFile0.4 ansiblecube
+    - mv ansiblecube-oneUpdateFile0.4* ansiblecube
 
     # Bundle QEMU
     - git clone https://github.com/auriamg/macdylibbundler/
@@ -101,7 +101,7 @@ matrix:
     # Download playbook
     - wget https://framagit.org/ideascube/ansiblecube/repository/oneUpdateFile0.4/archive.zip -O oneUpdateFile0.4.zip
     - unzip oneUpdateFile0.4.zip
-    - mv ansiblecube-oneUpdateFile0.4 ansiblecube
+    - mv ansiblecube-oneUpdateFile0.4* ansiblecube
 
     # Compile QEMU statically
     - wget http://download.qemu-project.org/$QEMU_ARCHIVE

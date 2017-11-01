@@ -22,7 +22,7 @@ install:
   # Download playbook
   - appveyor DownloadFile "https://framagit.org/ideascube/ansiblecube/repository/oneUpdateFile0.4/archive.zip" -FileName "oneUpdateFile0.4.zip"
   - 7z.exe x oneUpdateFile0.4.zip
-  - move ansiblecube-oneUpdateFile0.4 ansiblecube
+  - move ansiblecube-oneUpdateFile0.4* ansiblecube
 
   # Install pygobject
   # pygi-aio provides a way to install from cmd even if it is not documented
