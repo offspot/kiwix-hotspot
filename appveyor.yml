@@ -20,7 +20,7 @@ install:
   - 7z.exe x pibox-installer-vexpress-boot.zip
 
   # Download playbook
-  - appveyor DownloadFile "https://github.com/thiolliere/ansiblecube/archive/oneUpdateFile0.4.zip"
+  - appveyor DownloadFile "https://framagit.org/ideascube/ansiblecube/repository/oneUpdateFile0.4/archive.zip" -FileName "oneUpdateFile0.4.zip"
   - 7z.exe x oneUpdateFile0.4.zip
   - move ansiblecube-oneUpdateFile0.4 ansiblecube
 
