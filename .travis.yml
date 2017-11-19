@@ -69,7 +69,6 @@ matrix:
     language: python
     python: 3.4
     dist: trusty
-    group: deprecated-2017Q2
     sudo: required
     virtualenv:
       system_site_packages: true
