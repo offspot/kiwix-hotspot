@@ -62,6 +62,8 @@ subprocess.check_call("make -j 2 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- all
 
 print("--> create vexpress boot directory")
 os.mkdir("../{}".format(boot_dir))
+subprocess.check_call("cp .config arch/arm/boot/zImage arch/arm/boot/dts/vexpress-v2p-ca15-tc1.dtb ../{}".format(boot_dir), shell=True)
+subprocess.check_call("cp .config arch/arm/boot/zImage arch/arm/boot/dts/vexpress-v2p-ca15_a7.dtb ../{}".format(boot_dir), shell=True)
 subprocess.check_call("cp .config arch/arm/boot/zImage arch/arm/boot/dts/vexpress-v2p-ca9.dtb ../{}".format(boot_dir), shell=True)
 os.chdir("..")
 with open("{}/README.txt".format(boot_dir), "w+") as readme:
