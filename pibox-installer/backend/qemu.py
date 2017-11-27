@@ -202,6 +202,7 @@ class _RunningInstance:
                 "-sd", self._emulation._image,
                 "-redir", "tcp:%d::22" % ssh_port,
                 "-display", "none",
+                "-smp", "2",
                 "-no-reboot",
                 ], stdin=stdin_reader, stdout=stdout_writer, stderr=subprocess.STDOUT, **startup_info_args())
             cancel_register.register(self._qemu.pid)
