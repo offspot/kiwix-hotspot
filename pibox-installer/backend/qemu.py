@@ -194,7 +194,7 @@ class _RunningInstance:
             self._qemu = subprocess.Popen([
                 qemu_system_arm_exe_path,
                 "-m", "1G",
-                "-M", "vexpress-a9",
+                "-M", "vexpress-a15",
                 "-kernel", self._emulation._kernel,
                 "-dtb", self._emulation._dtb,
                 "-append", "root=/dev/mmcblk0p2 console=ttyAMA0 console=tty",
