@@ -26,7 +26,7 @@ matrix:
     # Bundle QEMU
     - git clone https://github.com/auriamg/macdylibbundler/
     - cd macdylibbundler/
-    - git checkout 3c79be6efb0867775bd0571011331946f76f36a6
+    - git checkout 84440587e1b2e4e9e0727cbba7a455b96820e40a
     - make
     - cd ..
     - mkdir qemu
@@ -36,8 +36,6 @@ matrix:
     - chmod u+w qemu-img
     - chmod u+w qemu-system-arm
     - ../macdylibbundler/dylibbundler -d . -p @executable_path/ -b -x ./qemu-system-arm  -x ./qemu-img
-    # Fix macdylibbundler issue
-    - install_name_tool -change /usr/local/Cellar/nettle/3.3/lib/libnettle.6.dylib @executable_path/libnettle.6.3.dylib ./libhogweed.4.3.dylib
     - chmod u-w qemu-img
     - chmod u-w qemu-system-arm
     - otool -L *
