@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.20.0 -->
+<!-- Generated with glade 3.20.1 -->
 <interface>
   <requires lib="gtk+" version="3.10"/>
+  <object class="GtkFileFilter" id="css_filter">
+    <mime-types>
+      <mime-type>text/css</mime-type>
+    </mime-types>
+  </object>
   <object class="GtkListStore" id="language_tree_store">
     <columns>
       <!-- column-name code -->
@@ -193,6 +198,9 @@
         </child>
       </object>
     </child>
+    <child type="titlebar">
+      <placeholder/>
+    </child>
   </object>
   <object class="GtkWindow" id="done_window">
     <property name="can_focus">False</property>
@@ -236,6 +244,9 @@
           </packing>
         </child>
       </object>
+    </child>
+    <child type="titlebar">
+      <placeholder/>
     </child>
   </object>
   <object class="GtkTreeStore" id="timezone_tree_store">
@@ -416,6 +427,7 @@ and digits '0' to '9' and hyphen '-'</property>
                   <object class="GtkLabel" id="logo_chooser_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">Logo</property>
                     <property name="label" translatable="yes">Logo :</property>
                   </object>
                   <packing>
@@ -444,6 +456,49 @@ and digits '0' to '9' and hyphen '-'</property>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox" id="no_id_76">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Top left logo</property>
+                <property name="spacing">5</property>
+                <child>
+                  <object class="GtkLabel" id="css_chooser_label">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">CSS style
+It can be modified after installation using the file:
+/usr/share/ideascube/static/branding/style.css</property>
+                    <property name="label" translatable="yes">CSS style :</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkFileChooserButton" id="css_chooser">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="create_folders">False</property>
+                    <property name="filter">css_filter</property>
+                    <property name="title" translatable="yes"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="pack_type">end</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">3</property>
               </packing>
             </child>
             <child>
@@ -481,7 +536,7 @@ and digits '0' to '9' and hyphen '-'</property>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">3</property>
+                <property name="position">4</property>
               </packing>
             </child>
             <child>
@@ -518,7 +573,7 @@ and digits '0' to '9' and hyphen '-'</property>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">4</property>
+                <property name="position">5</property>
               </packing>
             </child>
             <child>
@@ -585,7 +640,7 @@ and digits '0' to '9'</property>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">5</property>
+                <property name="position">6</property>
               </packing>
             </child>
             <child>
@@ -600,7 +655,7 @@ and digits '0' to '9'</property>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="pack_type">end</property>
-                <property name="position">6</property>
+                <property name="position">7</property>
               </packing>
             </child>
             <child>
@@ -636,7 +691,7 @@ and digits '0' to '9'</property>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">7</property>
+                <property name="position">8</property>
               </packing>
             </child>
             <child>
@@ -774,7 +829,7 @@ and digits '0' to '9'</property>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">8</property>
+                <property name="position">9</property>
               </packing>
             </child>
             <child>
@@ -811,7 +866,7 @@ and digits '0' to '9'</property>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">9</property>
+                <property name="position">10</property>
               </packing>
             </child>
             <child>
@@ -850,7 +905,7 @@ and digits '0' to '9'</property>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">10</property>
+                <property name="position">11</property>
               </packing>
             </child>
             <child>
@@ -889,7 +944,7 @@ In File mode the image is created at build path, you can choose the size
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">11</property>
+                <property name="position">12</property>
               </packing>
             </child>
             <child>
@@ -997,7 +1052,7 @@ In File mode the image is created at build path, you can choose the size
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">12</property>
+                <property name="position">13</property>
               </packing>
             </child>
             <child>
@@ -1034,7 +1089,7 @@ In File mode the image is created at build path, you can choose the size
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">13</property>
+                <property name="position">14</property>
               </packing>
             </child>
             <child>
@@ -1072,7 +1127,7 @@ In File mode the image is created at build path, you can choose the size
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">14</property>
+                <property name="position">15</property>
               </packing>
             </child>
             <child>
@@ -1108,7 +1163,7 @@ In File mode the image is created at build path, you can choose the size
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">15</property>
+                <property name="position">16</property>
               </packing>
             </child>
             <child>
@@ -1187,7 +1242,7 @@ In File mode the image is created at build path, you can choose the size
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">16</property>
+                <property name="position">17</property>
               </packing>
             </child>
             <child>
@@ -1252,7 +1307,7 @@ In File mode the image is created at build path, you can choose the size
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">17</property>
+                <property name="position">18</property>
               </packing>
             </child>
             <child>
@@ -1288,7 +1343,7 @@ In File mode the image is created at build path, you can choose the size
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">18</property>
+                <property name="position">19</property>
               </packing>
             </child>
           </object>
@@ -1299,6 +1354,9 @@ In File mode the image is created at build path, you can choose the size
           </packing>
         </child>
       </object>
+    </child>
+    <child type="titlebar">
+      <placeholder/>
     </child>
   </object>
   <object class="GtkAboutDialog" id="about_dialog">
@@ -1330,6 +1388,9 @@ In File mode the image is created at build path, you can choose the size
           <placeholder/>
         </child>
       </object>
+    </child>
+    <child>
+      <placeholder/>
     </child>
   </object>
   <object class="GtkWindow" id="space_error_window">
@@ -1544,6 +1605,9 @@ In File mode the image is created at build path, you can choose the size
           </packing>
         </child>
       </object>
+    </child>
+    <child type="titlebar">
+      <placeholder/>
     </child>
   </object>
   <object class="GtkWindow" id="zim_window">
@@ -1802,6 +1866,9 @@ In File mode the image is created at build path, you can choose the size
           </packing>
         </child>
       </object>
+    </child>
+    <child type="titlebar">
+      <placeholder/>
     </child>
   </object>
 </interface>

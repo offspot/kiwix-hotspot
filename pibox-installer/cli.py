@@ -49,6 +49,7 @@ parser.add_argument("--zim-install", help="install zim", choices=zim_choices, na
 parser.add_argument("--size", help="resize image in B (5*2**30)", type=float, default=5*2**30)
 parser.add_argument("--favicon", help="set favicon")
 parser.add_argument("--logo", help="set logo")
+parser.add_argument("--css", help="set css style")
 parser.add_argument("--build-dir", help="set build directory (default current)", default=".")
 parser.add_argument("--catalog", help="show catalog and exit", action="store_true")
 parser.add_argument("--admin-account", help="create admin account [LOGIN, PWD]", nargs=2)
@@ -101,6 +102,7 @@ try:
             sd_card=None,
             logo=args.logo,
             favicon=args.favicon,
+            css=args.css,
             admin_account=admin_account,
             build_dir=args.build_dir)
 except:

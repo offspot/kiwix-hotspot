@@ -444,6 +444,7 @@ class Application:
 
         logo = self.component.logo_chooser.get_filename()
         favicon = self.component.favicon_chooser.get_filename()
+        css = self.component.css_chooser.get_filename()
 
         build_dir = self.component.build_path_chooser.get_filename()
         condition = build_dir != None
@@ -481,6 +482,7 @@ class Application:
                         sd_card=sd_card,
                         logo=logo,
                         favicon=favicon,
+                        css=css,
                         build_dir=build_dir,
                         admin_account=admin_account,
                         done_callback=lambda error: GLib.idle_add(self.installation_done, error))
