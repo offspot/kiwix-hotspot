@@ -87,7 +87,7 @@ matrix:
           python3-dev
           libgdk-pixbuf2.0-dev
     env:
-    - QEMU_VERSION=2.9.0
+    - QEMU_VERSION=2.10.1
     - QEMU_DIR=qemu-$QEMU_VERSION
     - QEMU_ARCHIVE=$QEMU_DIR.tar.xz
     script:
