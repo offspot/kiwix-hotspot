@@ -12,7 +12,7 @@ import data
 import sys
 import re
 
-def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, aflatoun, wikifundi, edupi, zim_install, size, logger, cancel_event, sd_card, favicon, logo, done_callback=None, build_dir="."):
+def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, aflatoun, wikifundi, edupi, zim_install, size, logger, cancel_event, sd_card, favicon, logo, css, done_callback=None, build_dir="."):
 
     try:
         # Prepare SD Card
@@ -164,6 +164,11 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
                 favicon_emulation_path = "/usr/share/ideascube/static/branding/favicon.png"
                 emulation.put_file(favicon, favicon_emulation_path)
                 emulation.exec_cmd("sudo chown ideascube:ideascube {}".format(favicon_emulation_path))
+
+            if css is not None:
+                css_emulation_path = "/usr/share/ideascube/static/branding/style.css"
+                emulation.put_file(css, css_emulation_path)
+                emulation.exec_cmd("sudo chown ideascube:ideascube {}".format(css_emulation_path))
 
             if admin_account is not None:
                 logger.std("create super user")
