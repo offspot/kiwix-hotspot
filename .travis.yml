@@ -48,7 +48,8 @@ matrix:
     - security create-keychain -p mysecretpassword build.keychain
     - security default-keychain -s build.keychain
     - security unlock-keychain -p mysecretpassword build.keychain
-    - security import pibox-installer.p12 -k build.keychain -P $MACOS_CERTIFICATE_PASSWORD -T /usr/bin/codesign
+    - security import pibox-installer.p12 -k build.keychain -P $MACOS_CERTIFICATE_PASSWORD -A
+    - "security set-key-partition-list -S apple-tool:,apple: -s -k mysecretpassword build.keychain"
     - security find-identity -v
     - "codesign -s \"Developer ID Application: Wikimedia CH (L7HWM3SP3L)\" dist/pibox-installer.app --deep"
 
