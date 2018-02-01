@@ -246,7 +246,7 @@ class _RunningInstance:
                              allow_agent=False, look_for_keys=False)
 
     def _shutdown(self):
-        self.exec_cmd("sudo shutdown 0")
+        self.exec_cmd("sudo shutdown -P 0")
         self._client.close()
         self._qemu.wait(timeout)
         with self._cancel_event.lock() as cancel_register:
