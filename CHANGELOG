@@ -1,5 +1,104 @@
-pibox-installer (0.1) unstable; urgency=low
+CURRENT
+* FIXED #11: travis ubuntu image (deprecated config)
+* FIXED: macOS dylib issue
+* FIXED: macOS code signing issue
+* Switched from vexpress-a9 to vexpress-a15 Qemu machine emulation
+* Updated Qemu to 2.10.1
+* Improved Qemu options (2 vCPU, 2GB RAM, multi-thread)
+* Added option to set own-branding CSS
+* Force Qemu to poweroff once done
 
-  * Initial release.
+0.1-rc8
+* Get ansible play-book from framagit repository instead of thiolliere one
 
- -- Guillaume Thiolliere <guillaume.thiolliere@opmbx.org>  Thu Jul 13 16:49:00 CEST 2017
+0.1-rc7
+* FIXED #123: ideascude config file (syntax error again)
+
+0.1-rc6
+* FIXED #119: crash due to missing GTK id in glade
+* FIXED: ideascude config file (syntax error)
+
+0.1-rc5
+* Set version to 0.1
+* Update ideascube config file with selected language
+* Added 10s sleep before connecting using SSH
+* Enforce password login for SSH to qemu
+* Added option to customize ideascube admin account
+* FIXED #114: Use raspbian image from archive.raspbian.org
+
+
+0.1-rc4
+* Set GUI version to nightly
+* Set Qemu timeout to 10mn (needed for shutdown)
+
+0.1-rc3
+* Nightly release script
+
+0.1-rc2
+* Set GUI version to 0.1
+* Additional logs
+* Minor UI fixes (favicon, typo)
+* FIXED #102: fixed remote dir for qemu transfer
+* FIXED #106: crash if options not set
+
+0.1-rc1
+* Updated CLI: can now specify SD-card to write onto
+* Added input check to CLI languages argument
+* Added Wikifundi sizes
+* Added required space for Edupi and Aflatoun to GUI
+* CLI compares total size with SD size
+* Updated cli to support all GUI options
+* Auto-retries until Qemu receives raspbian login prompt (or timeout)
+* Qemu timeout set to 5mn
+* Minor Bug fixes
+
+0.0.3.1
+* Added Abort Dialog
+* Added Wikifundi
+* Cleaned devices names (removed \x00)
+* Added EDUPI
+* Added Aflatoun
+* Added languages option
+* Added rebranding option
+* Updated cli to support all GUI options
+* Kalite languages reordered in alpha order
+* Minor GUI fixes (double click to choose ZIM)
+* Fixes to ansiblecube
+* Ansibled now packaged in binary
+* Updated ansible to oneUpdateFile0.4
+* Set version to 0.0.4
+* Minor Bug fixes
+
+0.0.3-rc4
+* FIXED: build issue for commits with multiple tags
+
+0.0.3-rc3
+* Double size of ZIM in GUI to account for ZIP extraction
+
+0.0.3-rc2
+* Better README
+* Added Quit menu item in menu bar
+* Added About Dialog
+* Added File Chooser for build directory
+* Added ideascube config file
+* Minor UI improvements & fixes
+* Use branch oneUpdateFile0.2 of Ansiblecube
+* Raspbian image's ZIP file extracted directly to build dir
+* Qemu timeout now set to 30mn instead of 10
+* Added constraints to custom hostname (ASCII, digits, -)
+* Added constraints to SSID (ASCII, digits, max 31 chars)
+* Added size estimates for kalite in GUI
+* Allowed builds off release candidates tags
+* FIXED: win64 build name issue
+* FIXED #80: crash on OSX due to `echo`
+* FIXED: macOS build as a single directory
+* FIXED: arguments for cli SD card output
+* FIXED: macOS code signing
+* Use older pyinstaller version to accomodate pygobject
+
+0.0.2
+* Sign macOS build with Wikimedia CH certificate
+
+
+0.0.1
+* NEW: Initial release.
