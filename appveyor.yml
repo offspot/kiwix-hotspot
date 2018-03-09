@@ -52,6 +52,7 @@ install:
 
   # Install pyinstaller and requirements
   - cd C:\projects\pibox-installer
+  - C:\Python34\python.exe -m pip install pypiwin32==219
   - C:\Python34\python.exe -m pip install pyinstaller==3.2.1
   - C:\Python34\python.exe -m pip install -r requirements-windows.txt
 
