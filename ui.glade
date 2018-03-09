@@ -15,9 +15,15 @@
       <column type="gchararray"/>
     </columns>
   </object>
-  <object class="GtkFileFilter" id="logo_favicon_filter">
+  <object class="GtkFileFilter" id="logo_filter">
     <mime-types>
       <mime-type>image/png</mime-type>
+    </mime-types>
+  </object>
+  <object class="GtkFileFilter" id="favicon_filter">
+    <mime-types>
+      <mime-type>image/png</mime-type>
+      <mime-type>image/x-icon</mime-type>
     </mime-types>
   </object>
   <object class="GtkMenu" id="no_id_7">
@@ -400,7 +406,7 @@ and digits '0' to '9' and hyphen '-'</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="create_folders">False</property>
-                    <property name="filter">logo_favicon_filter</property>
+                    <property name="filter">favicon_filter</property>
                     <property name="title" translatable="yes"/>
                   </object>
                   <packing>
@@ -441,7 +447,7 @@ and digits '0' to '9' and hyphen '-'</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="create_folders">False</property>
-                    <property name="filter">logo_favicon_filter</property>
+                    <property name="filter">logo_filter</property>
                     <property name="title" translatable="yes"/>
                   </object>
                   <packing>
