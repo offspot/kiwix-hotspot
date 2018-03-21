@@ -7,6 +7,9 @@ import ctypes
 import platform
 import data
 
+from path import Path
+
+
 def compute_space_required(catalog, zim_list, kalite, wikifundi, aflatoun, edupi):
     # TODO: compute actual space used with empty install
     used_space = 2 * 2**30 # space of raspbian with ideascube without content
@@ -117,3 +120,9 @@ class ReportHook():
         if line != self._last_line:
             self._last_line = line
             self._writter(line)
+
+
+def relpathto(dest):
+    if dest is None:
+        return None
+    return str(Path(dest).relpath())

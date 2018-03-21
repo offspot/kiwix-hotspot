@@ -12,3 +12,4 @@ pytz==2017.2
 PyYAML==3.12
 six==1.10.0
 langcodes==1.4.0
+path.py==11.0
