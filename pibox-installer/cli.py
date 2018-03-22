@@ -1,6 +1,7 @@
 import os
 import argparse
 import sys
+import json
 import yaml
 import data
 from backend import catalog
@@ -8,6 +9,63 @@ from run_installation import run_installation
 from util import CancelEvent
 from util import get_free_space_in_dir
 from util import compute_space_required
+
+
+def set_config(config, args):
+    if not isinstance(config, dict):
+            return
+
+    # direct arguments
+    for key, arg_key in {'project_name': 'name',
+                         'timezone': 'timezone',
+                         'language': 'language',
+                         'size': 'size'}.items():
+        if key in config:
+            setattr(args, arg_key, config.get(key))
+
+    # branding files
+    if "branding" in config and isinstance(config["branding"], dict):
+        for key in ('logo', 'favicon', 'css'):
+            if config["branding"].get(key) is not None:
+                setattr(args, key, os.path.abspath(config["branding"][key]))
+
+    # wifi
+    if "wifi" in config and isinstance(config["wifi"], dict):
+        if "password" in config["wifi"] \
+                and config["wifi"].get("protected", True):
+            args.wifi_pwd = config["wifi"]["password"]
+
+    # admin account
+    if "admin_account" in config \
+            and isinstance(config["admin_account"], dict):
+        if config["admin_account"].get("custom") is not None:
+
+            # we need both login and password
+            if config["admin_account"].get("login") is not None \
+                    and config["admin_account"].get("password") is not None:
+                args.admin_account = [config["admin_account"]["login"],
+                                      config["admin_account"]["password"]]
+
+    # build_dir
+    if config.get("build_dir") is not None:
+        args.build_dir = os.path.abspath(config["build_dir"])
+
+    # content
+    if "content" in config and isinstance(config["content"], dict):
+
+        # list contents (langs)
+        for key, arg_key in {'kalite': 'kalite',
+                             'wikifundi': 'wikifundi',
+                             'zims': 'zim_install'}.items():
+            if key in config["content"] \
+                    and isinstance(config["content"][key], list):
+                setattr(args, arg_key, config["content"][key])
+
+        # bool contents (switch)
+        for key in ('edupi', 'aflatoun'):
+            if config["content"].get(key) is not None:
+                setattr(args, key, config["content"][key])
+
 
 class Logger:
     def step(step):
@@ -53,8 +111,20 @@ parser.add_argument("--css", help="set css style")
 parser.add_argument("--build-dir", help="set build directory (default current)", default=".")
 parser.add_argument("--catalog", help="show catalog and exit", action="store_true")
 parser.add_argument("--admin-account", help="create admin account [LOGIN, PWD]", nargs=2)
+parser.add_argument("--config", help="use a JSON config file to set parameters (superseeds cli parameters)")
+
 
 args = parser.parse_args()
+
+if args.config:
+    try:
+        with open(args.config, 'r') as fd:
+            config = json.load(fd)
+    except Exception:
+        print("Failed to parse JSON file {}".format(args.config))
+        exit(1)
+    else:
+        set_config(config, args)
 
 if args.catalog:
     for catalog in catalogs:
