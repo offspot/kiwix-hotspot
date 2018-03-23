@@ -298,12 +298,14 @@ class _RunningInstance:
         sftp_client.close()
         self.exec_cmd("sudo mv -T {} {}".format(tmpremotepath, remotepath))
 
-    def exec_cmd(self, command, capture_stdout=False, check=True, show_command=True):
+    def exec_cmd(self, command, displayed_command=None, capture_stdout=False, check=True, show_command=True):
         if capture_stdout:
             stdout_buffer = ""
 
         if show_command:
-            self._logger.std(command)
+            if displayed_command is None:
+                displayed_command = command
+            self._logger.std(displayed_command)
         _, stdout, stderr = self._client.exec_command(command)
         while True:
             line = stdout.readline()
