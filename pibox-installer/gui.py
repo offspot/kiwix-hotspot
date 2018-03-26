@@ -101,6 +101,23 @@ class Application:
         # main window
         self.component.window.connect("delete-event", Gtk.main_quit)
 
+        # gtk file filters (macOS fix)
+        self.component.favicon_filter.set_name("Favicon (ICO, PNG)")  # opt
+        self.component.favicon_filter.add_pattern("*.png")
+        self.component.favicon_filter.add_pattern("*.ico")
+        self.component.favicon_chooser.add_filter(
+            self.component.favicon_filter)
+
+        self.component.logo_filter.set_name("Logo (PNG)")  # opt
+        self.component.logo_filter.add_pattern("*.png")
+        self.component.logo_chooser.add_filter(
+            self.component.logo_filter)
+
+        self.component.css_filter.set_name("CSS File")  # opt
+        self.component.css_filter.add_pattern("*.css")
+        self.component.css_chooser.add_filter(
+            self.component.css_filter)
+
         # menu bar
         self.component.menu_quit.connect("activate", lambda widget: self.component.window.close())
         self.component.menu_about.connect("activate", self.activate_menu_about)
