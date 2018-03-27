@@ -1,7 +1,7 @@
 import json
 
 # machine must provide write_file and exec_cmd functions
-def run(machine, name, timezone, wifi_pwd, edupi, wikifundi, aflatoun, kalite, zim_install, ansiblecube_path):
+def run(machine, name, timezone, wifi_pwd, edupi, wikifundi, aflatoun, kalite, zim_install, ansiblecube_path, admin_account):
     machine.exec_cmd("sudo apt-get update")
     machine.exec_cmd("sudo apt-get install -y python-pip python-yaml python-jinja2 python-httplib2 python-paramiko python-pkg-resources libffi-dev libssl-dev git lsb-release")
     machine.exec_cmd("sudo pip install ansible==2.2.0")
@@ -54,6 +54,8 @@ def run(machine, name, timezone, wifi_pwd, edupi, wikifundi, aflatoun, kalite, z
     extra_vars += " git_branch=oneUpdateFile0.3"
     extra_vars += " own_config_file=True"
     extra_vars += " managed_by_bsf=False"
+    if admin_account is not None:
+        extra_vars += " admin_account='{login}' admin_password='{pwd}'"
 
     ansible_args = "--inventory hosts"
     ansible_args += " --tags master,custom"
@@ -62,4 +64,10 @@ def run(machine, name, timezone, wifi_pwd, edupi, wikifundi, aflatoun, kalite, z
 
     ansible_pull_cmd = "sudo sh -c 'cd {} && /usr/local/bin/ansible-playbook {}'".format(ansiblecube_path, ansible_args)
 
-    machine.exec_cmd(ansible_pull_cmd)
+    if admin_account is not None:
+        run_ansible_pull_cmd = ansible_pull_cmd.format(**admin_account)
+        displayed_ansible_pull_cmd = ansible_pull_cmd.format(login='****', pwd='****')
+    else:
+        run_ansible_pull_cmd = displayed_ansible_pull_cmd = ansible_pull_cmd
+
+    machine.exec_cmd(run_ansible_pull_cmd, displayed_ansible_pull_cmd)

@@ -86,7 +86,8 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
                     edupi=edupi,
                     aflatoun=aflatoun,
                     ansiblecube_path=ansiblecube_emulation_path,
-                    zim_install=zim_install)
+                    zim_install=zim_install,
+                    admin_account=admin_account)
 
             # Write ideascube configuration
             with open(data.pibox_ideascube_conf, "r") as f:
@@ -169,10 +170,6 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
                 css_emulation_path = "/usr/share/ideascube/static/branding/style.css"
                 emulation.put_file(css, css_emulation_path)
                 emulation.exec_cmd("sudo chown ideascube:ideascube {}".format(css_emulation_path))
-
-            if admin_account is not None:
-                logger.std("create super user")
-                emulation.exec_cmd("sudo ideascube createsuperuser --serial '{}' <<< '{}'".format(admin_account["login"], admin_account["pwd"]), show_command=False)
 
         # Write image to SD Card
         if sd_card:
