@@ -82,8 +82,8 @@ install:
 
   - if defined APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH (echo %APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH% > branch.txt) else (echo %APPVEYOR_REPO_BRANCH% > branch.txt)
   - move branch.txt C:\msys64\home\appveyor\
-  - if %platform%==x86 C:\msys64\usr\bin\bash --login -c "scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-win32.exe pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +'%%Y-%%m-%%d')/pibox-installer-win32-$(cat branch.txt | sed 's/ //g').exe"
-  - if %platform%==x64 C:\msys64\usr\bin\bash --login -c "scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-win64.exe pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +'%%Y-%%m-%%d')/pibox-installer-win64-$(cat branch.txt | sed 's/ //g').exe"
+  - if %platform%==x86 C:\msys64\usr\bin\bash --login -c "scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-win32.exe pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/nightlies/$(date +'%%Y-%%m-%%d')/pibox-installer-win32-$(cat branch.txt | sed 's/ //g').exe"
+  - if %platform%==x64 C:\msys64\usr\bin\bash --login -c "scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-win64.exe pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/nightlies/$(date +'%%Y-%%m-%%d')/pibox-installer-win64-$(cat branch.txt | sed 's/ //g').exe"
 
   - if defined APPVEYOR_REPO_TAG_NAME (echo %APPVEYOR_REPO_TAG_NAME% > C:\msys64\home\appveyor\tag.txt)
   - C:\msys64\usr\bin\bash --login -c "PIBOX_RELEASE=$(cat tag.txt | sed 's/ //g' | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*\(-rc[[:digit:]]\+\)\?') || true; if [ $PIBOX_RELEASE ]; then mkdir -p releases/$PIBOX_RELEASE/; cp pibox-installer-win*.exe releases/$PIBOX_RELEASE/; scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/; fi"
