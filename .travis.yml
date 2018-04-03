@@ -60,7 +60,7 @@ matrix:
 
     # Send dmg
     - BRANCH=${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}
-    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-macos.dmg pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/$(date +"%Y-%m-%d")/pibox-installer-macos-$BRANCH.dmg
+    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-macos.dmg pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/nightlies/$(date +"%Y-%m-%d")/pibox-installer-macos-$BRANCH.dmg
 
     - PIBOX_RELEASE=$(echo $TRAVIS_TAG | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*\(-rc[[:digit:]]\+\)\?') || true
     - if [ $PIBOX_RELEASE ]; then mkdir -p releases/$PIBOX_RELEASE; cp pibox-installer-macos.dmg releases/$PIBOX_RELEASE/; scp -r -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases pibox_ci@buildbot.wan.bsf-intranet.org:/srv/repos/pibox/; fi
