@@ -46,6 +46,9 @@ with open(".config", "w") as config:
         line = re.sub(r"^CONFIG_HW_RANDOM=y$", "CONFIG_HW_RANDOM=n", line)
         config.write(line)
 
+    # Enable FUSE
+    config.write("\nCONFIG_FUSE_FS=y\n")
+
     # Enable IPV6
     config.write("\nCONFIG_IPV6=y\n")
 

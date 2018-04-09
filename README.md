@@ -59,7 +59,7 @@ run CLI application: `python3 pibox-installer/cli.py`
 pibox-installer use a linux kernel for the QEMU emulation of vexpress machine.
 This vexpress boot can be compiled on linux using make-vexpress-boot python3 script.
 
-requirements: `gcc-arm-linux-gnueabihf` and `zip`
+requirements: `gcc-arm-linux-gnueabihf`, `bc` and `zip`
 
 run: `python3 make-vexpress-boot`
 
