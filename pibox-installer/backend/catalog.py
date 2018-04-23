@@ -1,19 +1,19 @@
-import os
+
 import urllib.request
 import yaml
 
-catalog_url_path = "http://catalog.ideascube.org/"
 
-catalog_files = [
-        "kiwix.yml",
-        "static-sites.yml",
-        "bibliotecamovil.yml",
-        ]
+catalog_urls = [
+    "http://download.kiwix.org/library/ideascube.yml",
+    "http://catalog.ideascube.org/static-sites.yml",
+    "http://catalog.ideascube.org/bibliotecamovil.yml",
+]
+
 
 def get_catalogs():
     catalog = []
-    for catalog_file in catalog_files:
-        with urllib.request.urlopen(catalog_url_path + catalog_file) as f:
+    for catalog_url in catalog_urls:
+        with urllib.request.urlopen(catalog_url) as f:
             catalog.append(yaml.load(f.read().decode("utf-8")))
 
     return catalog
