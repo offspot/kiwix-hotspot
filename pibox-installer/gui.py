@@ -7,12 +7,15 @@ import pytz
 import tzlocal
 import os
 import sys
+import json
+import math
 import threading
 from util import CancelEvent
 import sd_card_info
 from util import human_readable_size
 from util import get_free_space_in_dir
 from util import compute_space_required
+from util import relpathto
 import data
 import langcodes
 import string
@@ -122,6 +125,11 @@ class Application:
         self.component.menu_quit.connect("activate", lambda widget: self.component.window.close())
         self.component.menu_about.connect("activate", self.activate_menu_about)
 
+        self.component.menu_load_config.connect(
+            "activate", self.activate_menu_config, False)
+        self.component.menu_save_config.connect(
+            "activate", self.activate_menu_config, True)
+
         # wifi password
         self.component.wifi_password_switch.connect("notify::active", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(not switch.get_active()))
 
@@ -195,7 +203,20 @@ class Application:
         # zim content
         self.component.zim_choose_content_button.connect("clicked", self.zim_choose_content_button_clicked)
 
-        self.component.zim_list_store = Gtk.ListStore(str, str, str, str, str, object, str, str, bool, str, bool, Gdk.RGBA);
+        self.component.zim_list_store = Gtk.ListStore(
+            str,  # key
+            str,  # name
+            str,  # url
+            str,  # description
+            str,  # formatted_size
+            object,  # languages
+            str,  # type
+            str,  # version
+            bool,  # selected
+            str,  # size
+            bool,  # its language is selected
+            Gdk.RGBA  # background color
+        )
         self.component.zim_list_store.set_sort_column_id(1, Gtk.SortType.ASCENDING)
 
         all_languages = set()
@@ -352,6 +373,237 @@ class Application:
     def run_new_install_button_clicked(self, widget):
         self.component.run_window.hide()
         self.component.window.show()
+
+    def display_error_message(self, title, message=None,
+                              parent=None, flags=None):
+        if parent is None:
+            parent = self.component.window
+        dialog = Gtk.MessageDialog(
+            parent, flags, Gtk.MessageType.ERROR,
+            Gtk.ButtonsType.OK, title)
+        if message is not None:
+            dialog.format_secondary_text(message)
+        dialog.set_modal(True)
+        dialog.run()
+        dialog.destroy()
+
+    def activate_menu_config(self, widget, for_save=False):
+        def _save(dialog):
+            try:
+                with open(dialog.get_filename(), 'w') as fd:
+                    json.dump(self.get_config(), fd, indent=4)
+            except Exception:
+                self.display_error_message(
+                    "Unable to save JSON configuration to file",
+                    "Please check that the path is reachable and writable.")
+
+        def _load(dialog):
+            try:
+                with open(dialog.get_filename(), 'r') as fd:
+                    config = json.load(fd)
+            except Exception:
+                self.display_error_message(
+                    "Unable to load JSON configuration",
+                    "Please check that the file is readable "
+                    "and in proper JSON format")
+            else:
+                self.set_config(config)
+
+        if for_save:
+            title = "Select Pibox config file to load"
+            action = Gtk.FileChooserAction.SAVE
+            on_accept = _save
+        else:
+            title = "Select Pibox config file to load"
+            action = Gtk.FileChooserAction.OPEN
+            on_accept = _load
+
+        dialog = Gtk.FileChooserNative.new(
+            title,
+            self.component.window,  # make it tied to parent and modal
+            action, "OK", "Cancel")
+        dialog.set_modal(True)  # does not seem to have effect
+
+        filter_json = Gtk.FileFilter()
+        filter_json.set_name("JSON files")
+        filter_json.add_mime_type("application/json")
+        filter_json.add_pattern("*.json")
+        dialog.add_filter(filter_json)
+
+        response = dialog.run()
+
+        if response == Gtk.ResponseType.ACCEPT:
+            on_accept(dialog)
+        dialog.destroy()
+
+    def set_config(self, config):
+        if not isinstance(config, dict):
+            return
+
+        # project_name
+        if "project_name" in config:
+            self.component.project_name_entry.set_text(
+                config.get("project_name"))
+
+        # value in list (language, timezone)
+        for key, items in {
+                'language': data.ideascube_languages,
+                'timezone': self.component.timezone_tree_store}.items():
+            try:
+                item_tuple = dict(items)[config[key]]
+                item_id = items.index(item_tuple)
+            except (KeyError, ValueError):
+                pass
+            else:
+                getattr(self.component, '{}_combobox'.format(key)) \
+                    .set_active(item_id)
+
+        # wifi
+        if "wifi" in config and isinstance(config["wifi"], dict):
+            if "protected" in config["wifi"]:
+                self.component.wifi_password_switch.set_state(
+                    not config["wifi"]["protected"])
+            if "password" in config["wifi"]:
+                self.component.wifi_password_entry.set_text(
+                    config["wifi"]["password"])
+
+        # admin account
+        if "admin_account" in config \
+                and isinstance(config["admin_account"], dict):
+            if config["admin_account"].get("custom") is not None:
+                self.component.admin_account_switch.set_state(
+                    config["admin_account"]["custom"])
+
+            for key, arg_key in {'login': 'login', 'password': 'pwd'}.items():
+                if config["admin_account"].get(key) is not None:
+                    getattr(self.component, 'admin_account_{}_entry'
+                            .format(arg_key)) \
+                        .set_text(config["admin_account"][key])
+
+        # branding
+        if "branding" in config and isinstance(config["branding"], dict):
+            for key in ('logo', 'favicon', 'css'):
+                if config["branding"].get(key) is not None:
+                    getattr(self.component, '{}_chooser'.format(key)) \
+                        .set_filename(os.path.abspath(config["branding"][key]))
+
+        # build_dir
+        if config.get("build_dir") is not None:
+            self.component.build_path_chooser.set_filename(
+                os.path.abspath(config["build_dir"]))
+
+        # size
+        if config.get("size") is not None:
+            try:
+                size = int(config["size"] / pow(1024, 3))
+            except Exception:
+                size = None
+            if size is not None:
+                self.component.size_entry.set_text(str(size))
+
+        # content
+        if "content" in config and isinstance(config["content"], dict):
+
+            # langs-related contents
+            for key in ('kalite', 'wikifundi'):
+                if key in config["content"] \
+                        and isinstance(config["content"][key], list):
+                    for lang, button in getattr(
+                            self, 'iter_{}_check_button'.format(key))():
+                        button.set_active(lang in config["content"][key])
+
+            # boolean contents (switches)
+            for key in ('edupi', 'aflatoun'):
+                if config["content"].get(key) is not None:
+                    getattr(self.component, '{}_switch'.format(key)) \
+                        .set_active(config["content"][key])
+
+            if "zims" in config["content"] \
+                    and isinstance(config["content"]["zims"], list):
+
+                nb_zims = len(self.component.zim_tree_view.get_model())
+                index = 0
+                nb_selected = 0
+                while index < (nb_zims - nb_selected):
+                    try:
+                        zim = self.component.zim_tree_view.get_model()[index]
+                    except IndexError:
+                        break
+                    selected = zim[0] in config["content"]["zims"]
+
+                    self.component.zim_tree_view.get_model()[index][8] = \
+                        selected
+
+                    if selected:
+                        nb_selected += 1
+                    else:
+                        index += 1
+                    continue
+
+                self.update_free_space()
+
+    def get_config(self):
+        try:
+            language_id = self.component.language_combobox.get_active()
+            language = data.ideascube_languages[language_id][0]
+        except Exception:
+            language = None
+
+        try:
+            timezone_id = self.component.timezone_combobox.get_active()
+            timezone = self.component.timezone_tree_store[timezone_id][0]
+        except Exception:
+            timezone = None
+
+        zim_install = []
+        for zim in self.component.zim_list_store:
+            if zim[8]:
+                zim_install.append(zim[0])
+
+        kalite_active_langs = [
+            lang for lang, button in self.iter_kalite_check_button()
+            if button.get_active()]
+
+        wikifundi_active_langs = [
+            lang for lang, button in self.iter_wikifundi_check_button()
+            if button.get_active()]
+
+        try:
+            size = int(self.component.size_entry.get_text()) * pow(1024, 3)
+        except Exception:
+            size = None
+
+        return {
+            "project_name": self.component.project_name_entry.get_text(),
+            "language": language,
+            "timezone": timezone,
+            "wifi": {
+                "protected":
+                    not self.component.wifi_password_switch.get_state(),
+                "password": self.component.wifi_password_entry.get_text(),
+            },
+            "admin_account": {
+                "custom": self.component.admin_account_switch.get_state(),
+                "login": self.component.admin_account_login_entry.get_text(),
+                "password": self.component.admin_account_pwd_entry.get_text(),
+            },
+            "branding": {
+                "logo": relpathto(self.component.logo_chooser.get_filename()),
+                "favicon":
+                    relpathto(self.component.favicon_chooser.get_filename()),
+                "css": relpathto(self.component.css_chooser.get_filename()),
+            },
+            "build_dir":
+                relpathto(self.component.build_path_chooser.get_filename()),
+            "size": size,
+            "content": {
+                "zims": zim_install,  # content-ids list
+                "kalite": kalite_active_langs,  # languages list
+                "wikifundi": wikifundi_active_langs,  # languages list
+                "aflatoun": self.component.aflatoun_switch.get_active(),
+                "edupi": self.component.edupi_switch.get_active(),
+            }
+        }
 
     def reset_run_window(self):
         self.component.run_install_done_buttons_revealer.set_reveal_child(False)
