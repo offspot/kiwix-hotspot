@@ -410,7 +410,7 @@ class Application:
                 self.set_config(config)
 
         if for_save:
-            title = "Select Pibox config file to load"
+            title = "Select a file to save Pibox config to"
             action = Gtk.FileChooserAction.SAVE
             on_accept = _save
         else:
@@ -418,10 +418,17 @@ class Application:
             action = Gtk.FileChooserAction.OPEN
             on_accept = _load
 
-        dialog = Gtk.FileChooserNative.new(
-            title,
-            self.component.window,  # make it tied to parent and modal
-            action, "OK", "Cancel")
+        if hasattr(Gtk, 'FileChooserNative'):
+            dialog = Gtk.FileChooserNative.new(
+                title,
+                self.component.window,  # make it tied to parent and modal
+                action, "OK", "Cancel")
+        else:
+            dialog = Gtk.FileChooserDialog(
+                title, self.component.window,
+                action=action,
+                buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                         Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
         dialog.set_modal(True)  # does not seem to have effect
 
         filter_json = Gtk.FileFilter()
