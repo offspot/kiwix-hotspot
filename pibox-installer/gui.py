@@ -389,8 +389,11 @@ class Application:
 
     def activate_menu_config(self, widget, for_save=False):
         def _save(dialog):
+            filename = dialog.get_filename() \
+                if dialog.get_filename().endswith('.json') \
+                else "{}.json".format(dialog.get_filename())
             try:
-                with open(dialog.get_filename(), 'w') as fd:
+                with open(filename, 'w') as fd:
                     json.dump(self.get_config(), fd, indent=4)
             except Exception:
                 self.display_error_message(
