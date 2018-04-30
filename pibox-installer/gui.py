@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib, GdkPixbuf
@@ -8,7 +9,7 @@ import tzlocal
 import os
 import sys
 import json
-import math
+import tempfile
 import threading
 from util import CancelEvent
 import sd_card_info
@@ -16,6 +17,7 @@ from util import human_readable_size
 from util import get_free_space_in_dir
 from util import compute_space_required
 from util import relpathto
+from util import b64encode, b64decode
 import data
 import langcodes
 import string
@@ -482,10 +484,16 @@ class Application:
 
         # branding
         if "branding" in config and isinstance(config["branding"], dict):
+            folder = tempfile.mkdtemp()
             for key in ('logo', 'favicon', 'css'):
                 if config["branding"].get(key) is not None:
-                    getattr(self.component, '{}_chooser'.format(key)) \
-                        .set_filename(os.path.abspath(config["branding"][key]))
+                    try:
+                        fpath = b64decode(**config["branding"][key], to=folder)
+                    except Exception:
+                        pass
+                    else:
+                        getattr(self.component, '{}_chooser'.format(key)) \
+                            .set_filename(fpath)
 
         # build_dir
         if config.get("build_dir") is not None:
@@ -573,37 +581,43 @@ class Application:
         except Exception:
             size = None
 
-        return {
-            "project_name": self.component.project_name_entry.get_text(),
-            "language": language,
-            "timezone": timezone,
-            "wifi": {
+        branding = {}
+        for key in ('logo', 'favicon', 'css'):
+            fpath = getattr(self.component,
+                            '{}_chooser'.format(key)).get_filename()
+            if fpath is not None and os.path.exists(fpath):
+                try:
+                    branding[key] = {'fname': os.path.basename(fpath),
+                                     'data': b64encode(fpath)}
+                except Exception:
+                    pass
+
+        return OrderedDict([
+            ("project_name", self.component.project_name_entry.get_text()),
+            ("language", language),
+            ("timezone", timezone),
+            ("wifi", {
                 "protected":
                     not self.component.wifi_password_switch.get_state(),
                 "password": self.component.wifi_password_entry.get_text(),
-            },
-            "admin_account": {
+            }),
+            ("admin_account", {
                 "custom": self.component.admin_account_switch.get_state(),
                 "login": self.component.admin_account_login_entry.get_text(),
                 "password": self.component.admin_account_pwd_entry.get_text(),
-            },
-            "branding": {
-                "logo": relpathto(self.component.logo_chooser.get_filename()),
-                "favicon":
-                    relpathto(self.component.favicon_chooser.get_filename()),
-                "css": relpathto(self.component.css_chooser.get_filename()),
-            },
-            "build_dir":
-                relpathto(self.component.build_path_chooser.get_filename()),
-            "size": size,
-            "content": {
+            }),
+            ("build_dir",
+                relpathto(self.component.build_path_chooser.get_filename())),
+            ("size", size),
+            ("content", {
                 "zims": zim_install,  # content-ids list
                 "kalite": kalite_active_langs,  # languages list
                 "wikifundi": wikifundi_active_langs,  # languages list
                 "aflatoun": self.component.aflatoun_switch.get_active(),
                 "edupi": self.component.edupi_switch.get_active(),
-            }
-        }
+            }),
+            ("branding", branding),
+        ])
 
     def reset_run_window(self):
         self.component.run_install_done_buttons_revealer.set_reveal_child(False)

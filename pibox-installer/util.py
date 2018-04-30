@@ -2,8 +2,9 @@ import os
 import math
 import threading
 import signal
-import sys
+import base64
 import ctypes
+import tempfile
 import platform
 import data
 
@@ -123,6 +124,21 @@ class ReportHook():
 
 
 def relpathto(dest):
+    ''' relative path to an absolute one '''
     if dest is None:
         return None
     return str(Path(dest).relpath())
+
+
+def b64encode(fpath):
+    ''' base64 string of a binary file '''
+    with open(fpath, "rb") as fp:
+        return base64.b64encode(fp.read()).decode('utf-8')
+
+
+def b64decode(fname, data, to):
+    ''' write back a binary file from its fname and base64 string '''
+    fpath = os.path.join(to, fname)
+    with open(fpath, 'wb') as fp:
+        fp.write(base64.b64decode(data))
+    return fpath

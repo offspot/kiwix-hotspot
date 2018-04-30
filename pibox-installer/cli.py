@@ -3,12 +3,17 @@ import argparse
 import sys
 import json
 import yaml
+import time
+import tempfile
 import data
 from backend import catalog
 from run_installation import run_installation
 from util import CancelEvent
 from util import get_free_space_in_dir
 from util import compute_space_required
+from util import b64decode
+
+CANCEL_TIMEOUT = 5
 
 
 def set_config(config, args):
@@ -20,14 +25,20 @@ def set_config(config, args):
                          'timezone': 'timezone',
                          'language': 'language',
                          'size': 'size'}.items():
-        if key in config:
+        if key in config and config.get(key) is not None:
             setattr(args, arg_key, config.get(key))
 
     # branding files
     if "branding" in config and isinstance(config["branding"], dict):
+        folder = tempfile.mkdtemp()
         for key in ('logo', 'favicon', 'css'):
             if config["branding"].get(key) is not None:
-                setattr(args, key, os.path.abspath(config["branding"][key]))
+                try:
+                    fpath = b64decode(**config["branding"][key], to=folder)
+                except Exception:
+                    pass
+                else:
+                    setattr(args, key, os.path.abspath(fpath))
 
     # wifi
     if "wifi" in config and isinstance(config["wifi"], dict):
@@ -136,8 +147,6 @@ if args.admin_account:
 else:
     admin_account = None
 
-print(admin_account)
-
 build_free_space = get_free_space_in_dir(args.build_dir)
 if build_free_space < args.size:
     print("Not enough space available at {} to build image".format(args.build_dir), file=sys.stderr)
@@ -153,6 +162,22 @@ space_required = compute_space_required(
 if args.size < space_required:
     print("image size ({}) is not large enough for the content ({})".format(args.size, space_required), file=sys.stderr)
     exit(3)
+
+# display configuration and offer time to cancel
+print("Pibox-installer configuration:")
+keys = args.__dict__.keys()
+longest = max([len(key) for key in keys])
+for name in keys:
+    print("  {name}:{space} {value}".format(
+        name=name,
+        value=getattr(args, name),
+        space=" " * (longest - len(name))))
+print("\nInstaller will start in ({}) seconds."
+      .format(CANCEL_TIMEOUT), end='', flush=True)
+for timeout in range(CANCEL_TIMEOUT, 0, -1):
+    time.sleep(1)
+    print(" {} ".format(timeout), end='', flush=True)
+print("\nStarting...")
 
 cancel_event = CancelEvent()
 try:
