@@ -498,7 +498,9 @@ class Application:
             for key in ('logo', 'favicon', 'css'):
                 if config["branding"].get(key) is not None:
                     try:
-                        fpath = b64decode(**config["branding"][key], to=folder)
+                        fpath = b64decode(
+                            fname=config["branding"][key]['fname'],
+                            data=config["branding"][key]['data'], to=folder)
                     except Exception:
                         pass
                     else:
