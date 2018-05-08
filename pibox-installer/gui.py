@@ -457,18 +457,25 @@ class Application:
             self.component.project_name_entry.set_text(
                 config.get("project_name"))
 
-        # value in list (language, timezone)
-        for key, items in {
-                'language': data.ideascube_languages,
-                'timezone': self.component.timezone_tree_store}.items():
-            try:
-                item_tuple = dict(items)[config[key]]
-                item_id = items.index(item_tuple)
-            except (KeyError, ValueError):
-                pass
-            else:
-                getattr(self.component, '{}_combobox'.format(key)) \
-                    .set_active(item_id)
+        # language
+        try:
+            value = dict(data.ideascube_languages)[config['language']]
+            item_tuple = (config['language'], value)
+            item_id = data.ideascube_languages.index(item_tuple)
+        except KeyError:
+            pass
+        else:
+            self.component.language_combobox.set_active(item_id)
+
+        # timezone
+        try:
+            item_id = [row_id for row_id, row_data
+                       in enumerate(self.component.timezone_tree_store)
+                       if row_data[0] == config['timezone']][0]
+        except (KeyError, IndexError):
+            pass
+        else:
+            self.component.timezone_combobox.set_active(item_id)
 
         # wifi
         if "wifi" in config and isinstance(config["wifi"], dict):
