@@ -1,4 +1,8 @@
-CURRENT
+1.0
+* FIXED: using a free-only catalog
+* FIXED: preconfigured admin credentials
+* NEW: kiwix-serve updated to 0.5
+* NEW: Save and load config from a JSON file
 * FIXED #11: travis ubuntu image (deprecated config)
 * FIXED: macOS dylib issue
 * FIXED: macOS code signing issue
