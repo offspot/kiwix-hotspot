@@ -1,3 +1,6 @@
+CURRENT
+* FIXED: language and timezone not set on external JSON config import
+
 1.0
 * FIXED: using a free-only catalog
 * FIXED: preconfigured admin credentials
