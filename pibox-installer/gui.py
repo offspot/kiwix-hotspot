@@ -480,8 +480,8 @@ class Application:
         # wifi
         if "wifi" in config and isinstance(config["wifi"], dict):
             if "protected" in config["wifi"]:
-                self.component.wifi_password_switch.set_state(
-                    not config["wifi"]["protected"])
+                self.component.wifi_password_switch.set_active(
+                    not bool(config["wifi"]["protected"]))
             if "password" in config["wifi"]:
                 self.component.wifi_password_entry.set_text(
                     config["wifi"]["password"])
@@ -490,8 +490,8 @@ class Application:
         if "admin_account" in config \
                 and isinstance(config["admin_account"], dict):
             if config["admin_account"].get("custom") is not None:
-                self.component.admin_account_switch.set_state(
-                    config["admin_account"]["custom"])
+                self.component.admin_account_switch.set_active(
+                    bool(config["admin_account"]["custom"]))
 
             for key, arg_key in {'login': 'login', 'password': 'pwd'}.items():
                 if config["admin_account"].get(key) is not None:
@@ -617,11 +617,11 @@ class Application:
             ("timezone", timezone),
             ("wifi", {
                 "protected":
-                    not self.component.wifi_password_switch.get_state(),
+                    not self.component.wifi_password_switch.get_active(),
                 "password": self.component.wifi_password_entry.get_text(),
             }),
             ("admin_account", {
-                "custom": self.component.admin_account_switch.get_state(),
+                "custom": self.component.admin_account_switch.get_active(),
                 "login": self.component.admin_account_login_entry.get_text(),
                 "password": self.component.admin_account_pwd_entry.get_text(),
             }),
