@@ -41,7 +41,7 @@ install dependencies:
 * [pygobject](https://pygobject.readthedocs.io/en/latest/getting_started.html):
   on Windows you can also install it using [pygi-aio](https://sourceforge.net/projects/pygobjectwin32/)
 * [pibox-installer-vexpress-boot](http://download.kiwix.org/dev/pibox-installer-vexpress-boot.zip): unzip in the directory
-* [ansiblecube thiolliere fork](https://github.com/thiolliere/ansiblecube): branch oneUpdateFile0.3, rename the directory to ansiblecube
+* [ansiblecube](https://framagit.org/ideascube/ansiblecube/): branch oneUpdateFile0.4, rename the directory to ansiblecube
 
 create a virtual a virtual environment that includes pygobject: `python3 -m venv --system-site-packages my_venv`
 
