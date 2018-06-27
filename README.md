@@ -22,8 +22,6 @@ presentation of the projet at Potsdam [Slides](http://wiki.kiwix.org/w/images/4/
 
 ## CLI usage
 
-note: CLI is currently not packaged, you have to run it from source
-
 run cli mode: `pibox-installer cli`
 
 show help: `pibox-installer cli -h`
@@ -41,7 +39,6 @@ install dependencies:
 * [pygobject](https://pygobject.readthedocs.io/en/latest/getting_started.html):
   on Windows you can also install it using [pygi-aio](https://sourceforge.net/projects/pygobjectwin32/)
 * [pibox-installer-vexpress-boot](http://download.kiwix.org/dev/pibox-installer-vexpress-boot.zip): unzip in the directory
-* [ansiblecube](https://framagit.org/ideascube/ansiblecube/): branch oneUpdateFile0.4, rename the directory to ansiblecube
 
 create a virtual a virtual environment that includes pygobject: `python3 -m venv --system-site-packages my_venv`
 
@@ -52,7 +49,7 @@ install pip dependencies: `pip3 install -r requirements-PLATFORM.txt`
 
 run GUI application: `python3 pibox-installer`
 
-run CLI application: `python3 pibox-installer/cli.py`
+run CLI application: `python3 pibox-installer cli`
 
 ## Build pibox-installer-vexpress-boot
 
@@ -62,6 +59,23 @@ This vexpress boot can be compiled on linux using make-vexpress-boot python3 scr
 requirements: `gcc-arm-linux-gnueabihf`, `bc` and `zip`
 
 run: `python3 make-vexpress-boot`
+
+## Build pibox base image
+
+pibox-installer uses a custom base image based off raspbian-lite with the following modifications (not exhaustive):
+
+* `2018-04-19-raspbian-jessie-lite` 
+* SSH enabled
+* 7GB `/` partition (ext4)
+* 1GB `/data` partition (extfat)
+* ansiblecube deployed: `nginx`, `ideascube`, `kiwix-serve`, etc.
+
+Should you want to build the base image:
+
+``` sh
+pibox-installer image --root 7 --size 8 --out my-base.img
+```
+
 
 ## Package pibox-installer
 

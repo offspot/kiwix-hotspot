@@ -1,5 +1,52 @@
+2.0a
+* Added Online FAQ
+* Fixed Ctrl^C handling
+* Kiwix-serve 0.6.0
+* System requirements check at start of process
+* Overall and per-stage Progress Indicator
+* Ideascube home now displays ZIM icons
+* Default placeholders for failed services (HTTP 502)
+* Default placeholders on non-installed softwares
+* Master image now contains all software in root (no network usage in qemu)
+* Friendlier cli arguments handling
+* Devices permissions restored at the end of the process (Linux, macOS)
+* Bundled imdisk (image file mounter) on Windows
+* Bundled Exfat support in vexpress (QEMU) kernel and as a kernel module on image
+* Using GB (decimal) sizes for disk/images/partitions and GiB (binary) for contents
+* Updated ideacube with ZIM move instead of copy and skip-sha256
+* Better size estimations for content
+* Updated to KA-Lite 0.17.4
+* Kiwix-serve doesn't use library.xml anymore (metadata retrieved from zim: better http://kiwix.FQDN)
+* Large contents are extracted directly into mounted partition
+* Downloads are slighty more reliable (retried with increasing delays)
+* Large files are downloaded into a cache and retrieved from it
+* Large content files listed in a JSON file with details
+* Large content file downloaded in pibox-installer
+* Captive portal now available in English and French
+* Catalogs now defined only in pibox and passwd to ansiblecube
+* Documentation to setup an online demo of pibox images
+* CLI params and JSON export/import now uses human-readble sizes (still supports bytes)
+* Using latest ansible (2.5.4)
+* Major ansiblecube clean-up
+ * Large files all using Kiwix mirror (download.kiwix.org)
+ * Fixed hostname issues
+ * fixed Edupi
+ * Fixed KA-Lite videos
+ * Increased Wikifundi uploads to 5M
+ * resize of partitions now in ansiblecube
+ * removed all outdated steps
+* Anisblecube now integrated in pibox
+* Better QEMU usage:
+ * updated to latest qemu (2.12.0)
+ * using no deprecated parameter
+ * assigning an N-1 cores to Qemu based on number of cores available
+* Base Image contains a system partition and a dedicated ExFAT data partition
+* Can now create base image using `pibox-installer image`
+* Now using own custom base image
+* Updated to raspbian 2018-04-19 (stretch)
+
 CURRENT
-* FIXED: language and timezone not set on external JSON config import
+* Presets in the repo for common images
 
 1.0
 * FIXED: using a free-only catalog
