@@ -95,6 +95,7 @@ def set_config(config, args):
                 vl = "yes" if config["content"][key] in ("yes", True) else "no"
                 setif(key, vl)
 
+
 try:
     assert len(YAML_CATALOGS)
 except Exception as exception:
@@ -109,37 +110,74 @@ for catalog in YAML_CATALOGS:
 
 languages = [code for code, language in data.ideascube_languages]
 
+defaults = {
+    'name': "mybox",
+    'timezone': "Europe/Paris",
+    'language': "en",
+    'size': "8GB",
+    'build_dir': ".",
+    'catalog': False,
+    'edupi': "no",
+    'aflatoun': "no",
+    'kalite': [],
+    'wikifundi': [],
+    'zim_install': [],
+}
+
 parser = argparse.ArgumentParser(description="ideascube/kiwix installer for raspberrypi.")
-parser.add_argument("--name", help="name of the box (mybox)", default="mybox")
-parser.add_argument("--timezone", help="timezone (Europe/Paris)", default="Europe/Paris")
-parser.add_argument("--language", help="language (en)", choices=languages, default="en")
-parser.add_argument("--wifi-pwd", help="wifi password (Open)")
-parser.add_argument("--kalite", help="install kalite", choices=["fr", "en", "er"], nargs="+")
-parser.add_argument("--aflatoun", help="install aflatoun", action="store_true")
-parser.add_argument("--wikifundi", help="install wikifundi", choices=["fr", "en"], nargs="+")
-parser.add_argument("--edupi", help="install edupi", action="store_true")
-parser.add_argument("--zim-install", help="install zim", choices=zim_choices, nargs="+")
-parser.add_argument("--size", help="resize image in B (5*2**30)", type=float, default=5*2**30)
+parser.add_argument("--name", help="name of the box ({})"
+                    .format(defaults['name']))
+parser.add_argument("--timezone", help="timezone ({})"
+                    .format(defaults['timezone']))
+parser.add_argument("--language", help="language ({})"
+                    .format(defaults['language']), choices=languages)
+parser.add_argument("--wifi-pwd", help="wifi password (None, Network is Open)")
+parser.add_argument("--kalite", help="install kalite",
+                    choices=["fr", "en", "es"], nargs="+")
+parser.add_argument("--aflatoun", help="install aflatoun",
+                    choices=["yes", "no"])
+parser.add_argument("--wikifundi", help="install wikifundi",
+                    choices=["fr", "en"], nargs="+")
+parser.add_argument("--edupi", help="install edupi", choices=["yes", "no"])
+parser.add_argument("--zim-install", help="install zim",
+                    choices=zim_choices, nargs="+")
+parser.add_argument("--size", help="resize image ({})"
+                    .format(defaults['size']))
 parser.add_argument("--favicon", help="set favicon")
 parser.add_argument("--logo", help="set logo")
 parser.add_argument("--css", help="set css style")
-parser.add_argument("--build-dir", help="set build directory (default current)", default=".")
-parser.add_argument("--catalog", help="show catalog and exit", action="store_true")
-parser.add_argument("--admin-account", help="create admin account [LOGIN, PWD]", nargs=2)
+parser.add_argument("--build-dir", help="set build directory ({})"
+                    .format(defaults['build_dir']))
+parser.add_argument("--catalog",
+                    help="show catalog and exit", action="store_true")
+parser.add_argument("--admin-account",
+                    help="create admin account [LOGIN, PWD]", nargs=2)
 parser.add_argument("--config", help="use a JSON config file to set parameters (superseeds cli parameters)")
 parser.add_argument("--ram", help="Max RAM for QEMU", default="2G")
 
 args = parser.parse_args()
 
+# apply options from config file if requested
 if args.config:
     try:
         with open(args.config, 'r') as fd:
             config = json.load(fd)
     except Exception:
         print("Failed to parse JSON file {}".format(args.config))
-        exit(1)
+        sys.exit(1)
     else:
-        set_config(config, args)
+        try:
+            set_config(config, args)
+        except Exception as exp:
+            print("Error while parsing your config file ({})"
+                  .format(args.config))
+            print(exp)
+            sys.exit(1)
+
+# apply defaults for all non-set options
+for key, value in defaults.items():
+    if getattr(args, key, None) is None:
+        setattr(args, key, value)
 
 if args.catalog:
     for catalog in YAML_CATALOGS:
