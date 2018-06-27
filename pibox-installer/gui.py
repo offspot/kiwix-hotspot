@@ -25,6 +25,20 @@ import humanfriendly
 
 VALID_RGBA = Gdk.RGBA(0., 0., 0., 0.)
 INVALID_RGBA = Gdk.RGBA(1, 0.5, 0.5, 1.)
+mainloop = None
+
+def quit(*args, **kwargs):
+    global mainloop
+    mainloop.quit()
+
+def run():
+    global mainloop
+    mainloop = GObject.MainLoop()
+    try:
+        mainloop.run()
+    except KeyboardInterrupt:
+        print("\nKeyboardInterrupt, exiting.")
+        quit()
 
 class ShortDialog(Gtk.Dialog):
     def __init__(self, parent, buttons, msg):
@@ -104,7 +118,7 @@ class Application:
         self.logger = Logger(self.component.run_text_view.get_buffer(), self.component.run_step_label)
 
         # main window
-        self.component.window.connect("delete-event", Gtk.main_quit)
+        self.component.window.connect("delete-event", quit)
 
         # gtk file filters (macOS fix)
         self.component.favicon_filter.set_name("Favicon (ICO, PNG)")  # opt
@@ -359,7 +373,7 @@ class Application:
 
     def run_window_delete_event(self, widget, path):
         self.cancel_event.cancel()
-        Gtk.main_quit()
+        quit()
 
     def run_quit_button_clicked(self, widget):
         self.component.run_window.close()
@@ -928,6 +942,4 @@ except Exception as exception:
 
 Application(YAML_CATALOGS)
 
-Application(catalog)
-Gtk.main()
-
+run()
