@@ -22,6 +22,7 @@ import data
 import langcodes
 import string
 import humanfriendly
+import webbrowser
 
 VALID_RGBA = Gdk.RGBA(0., 0., 0., 0.)
 INVALID_RGBA = Gdk.RGBA(1, 0.5, 0.5, 1.)
@@ -209,6 +210,8 @@ class Application:
             "activate", self.activate_menu_config, False)
         self.component.menu_save_config.connect(
             "activate", self.activate_menu_config, True)
+        self.component.menu_help.connect(
+            "activate", self.activate_menu_help)
 
         # wifi password
         self.component.wifi_password_switch.connect("notify::active", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(not switch.get_active()))
@@ -412,6 +415,9 @@ class Application:
         response = self.component.about_dialog.run()
         if response == Gtk.ResponseType.DELETE_EVENT or response == Gtk.ResponseType.CANCEL:
             self.component.about_dialog.hide()
+
+    def activate_menu_help(self, widget):
+        webbrowser.open(data.help_url)
 
     def installation_done(self, error):
         ok = error == None
