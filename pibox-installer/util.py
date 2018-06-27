@@ -1,41 +1,209 @@
 import os
-import math
+import re
 import threading
 import signal
+import sys
 import base64
-import ctypes
+import hashlib
 import tempfile
+import ctypes
 import platform
-import data
+import datetime
+import collections
 
 from path import Path
+import humanfriendly
+
+ONE_MiB = 2 ** 20
+ONE_GiB = 2 ** 30
+ONE_GB = int(1e9)
 
 
-def compute_space_required(catalog, zim_list, kalite, wikifundi, aflatoun, edupi):
-    # TODO: compute actual space used with empty install
-    used_space = 2 * 2**30 # space of raspbian with ideascube without content
-    if zim_list:
-        zim_space_required = {}
-        for one_catalog in catalog:
-            for (key, value) in one_catalog["all"].items():
-                if zim_space_required.get(key):
-                    raise ValueError("same key in two catalogs")
-                zim_space_required[key] = value["size"]*2
+STAGES = collections.OrderedDict([
+    ('master', "Retrieve Master Image"),
+    ('download', "Download contents"),
+    ('setup', "Image configuration (virtualized)"),
+    ('copy', "Copy contents onto image"),
+    ('move', "Post-process contents (virtualized)"),
+    ('write', "SD-card creation"),
+])
 
-        for zim in zim_list:
-            used_space += zim_space_required[zim]
-    if kalite:
-        for lang in kalite:
-            used_space += data.kalite_sizes[lang]
-    if wikifundi:
-        for lang in wikifundi:
-            used_space += data.wikifundi_sizes[lang]
-    if aflatoun:
-        used_space += data.aflatoun_size
-    if edupi:
-        used_space += data.edupi_size
 
-    return used_space
+class ProgressHelper(object):
+    ''' progression manager for the logger
+
+        must be inherited by the logger (CLILogger or Logger)
+
+        two kinds of progresses:
+            - stages (1-6) are main high-level stages
+            - steps are individual tasks
+
+        progress percentage is kept by stage (0 to 1).
+        total percentage is calculated using current stage and its progress'''
+
+    def __init__(self):
+        self.stage_id = 'init'  # id of current stage
+        self.stage_progress = None  # percentage of current stage progress
+        self.will_write = False  # wether the process will run write stage
+
+        self.started_on = datetime.datetime.now()  # when the process started
+        self.ended_on = None  # when it ended
+        self.durations = {}  # records timedeltas for every ran stages
+
+    def start(self, will_write):
+        ''' record logger start.
+            will_write informs about whether stage 6 will take place '''
+        self.started_on = datetime.datetime.now()
+        self.will_write = will_write
+
+    def stop(self):
+        self.ended_on = datetime.datetime.now()
+
+    def clean_up_stage(self):
+        started_on = getattr(self, 'stage_started_on', self.started_on)
+        ended_on = datetime.datetime.now()
+        self.durations[self.stage_id] = (started_on, ended_on,
+                                         ended_on - started_on)
+        self.stage_started_on = None
+        self.stage_progress = None
+        self.tasks = None
+
+    def stage(self, stage_id):
+        ''' change the current stage. expects a string ID '''
+        self.clean_up_stage()  # record duration of previous stage
+
+        self.stage_id = stage_id
+        self.stage_started_on = datetime.datetime.now()
+        self.update()
+
+    def progress(self, percentage=None):
+        ''' record progress for the current stage '''
+        assert percentage is None or (percentage >= 0 and percentage <= 1)
+        self.stage_progress = percentage
+        self.update()
+
+    def ansible(self, line):
+        ''' reads logger output while in ansible
+
+            detects the ansible --tasks-list call to build its list of tasks
+            detects ansible's task calling to set progress accordingly '''
+
+        # display output anyway
+        self.std(line)
+
+        if self.stage_id not in ['setup', 'move']:
+            return
+
+        # detect number of task for ansiblecube phase
+        if self.tasks is None and line.startswith("### TASKS ###"):
+            try:
+                self.tasks = [
+                    re.search(r'^\s{6}(.*)\tTAGS\:.*$', l).groups()[0]
+                    for l in line.split("^")[5:]]
+            except Exception as exp:
+                print(str(exp))
+                pass
+
+        # detect tasks being executed
+        # TODO: we currently record the task as complete while it just started
+        if self.tasks is not None:
+            # detect current task
+            if line.startswith("TASK ["):
+                try:
+                    task = re.search(r'^TASK \[(.*)\] \*+$', line).groups()[0]
+                except Exception:
+                    return
+                else:
+                    self.step(task)
+                    try:
+                        task_index = self.tasks.index(task)
+                    except ValueError:
+                        pass
+                    else:
+                        self.progress(task_index / len(self.tasks))
+
+    @property
+    def stage_name(self):
+        return self.get_stage_name(self.stage_id)
+
+    @property
+    def nb_of_stages(self):
+        n = len(STAGES)
+        return n if self.will_write else n - 1
+
+    @property
+    def stage_number(self):
+        return self.get_stage_number(self.stage_id)
+
+    @property
+    def stage_numbers(self):
+        return "{c}/{t}".format(c=self.stage_number, t=self.nb_of_stages)
+
+    def get_stage_string(self, stage_id):
+        return "[{c}/{t}] {n}".format(c=self.get_stage_number(stage_id),
+                                      t=self.nb_of_stages,
+                                      n=self.get_stage_name(stage_id))
+
+    @classmethod
+    def get_stage_number(cls, stage_id):
+        try:
+            return list(STAGES.keys()).index(stage_id) + 1
+        except Exception:
+            return 0
+
+    @classmethod
+    def get_stage_name(cls, stage_id):
+        return STAGES.get(stage_id, "Preparations")
+
+    def get_overall_progress(self):
+        ''' total progression based on current stage and its progress '''
+        if not self.stage_number:
+            return 0
+        span = 1 / self.nb_of_stages
+        lbound = span * (self.stage_number - 1)
+        if self.stage_progress is None:
+            return lbound
+        current_progress = self.stage_progress * span
+        return lbound + current_progress
+
+    def complete(self):
+        ''' mark the logger as complete (successful) '''
+        self.clean_up_stage()
+        self.stop()
+
+    def failed(self):
+        ''' mark the logger as complete (failure) '''
+        self.clean_up_stage()
+        self.stop()
+
+    def update(self):
+        ''' update UI according to new stage/step/progress '''
+        raise NotImplementedError()
+
+    def summary(self):
+        ''' textual summary of each stage's durations '''
+
+        # make sure we have an end datetime
+        if self.ended_on is None:
+            self.stop()
+
+        self.std("*** DURATIONS SUMMARY ***")
+        for stage_id in STAGES.keys():
+            data = self.durations.get(stage_id)
+            if data is None:
+                continue
+            self.std("{stage}: {duration} ({start} to {end})"
+                     .format(stage=self.get_stage_string(stage_id),
+                             duration=humanfriendly.format_timespan(
+                                 data[2].total_seconds()),
+                             start=data[0].strftime('%c'),
+                             end=data[1].strftime('%c')))
+        duration = self.ended_on - self.started_on
+        self.std("TOTAL: {duration} ({start} to {end})"
+                 .format(duration=humanfriendly.format_timespan(
+                         duration.total_seconds()),
+                         start=self.started_on.strftime('%c'),
+                         end=self.ended_on.strftime('%c')))
 
 def get_free_space_in_dir(dirname):
     """Return folder/drive free space."""
@@ -80,21 +248,21 @@ class _CancelEventRegister:
     def unregister(self, pid):
         self._pids.remove(pid)
 
-def human_readable_size(size):
-    try:
-        size = int(size)
-    except:
-        return 'NaN'
-
-    if size == 0:
-        return '0B'
-    if size < 0:
-        return "- " + human_readable_size(-size)
-    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
-    i = int(math.floor(math.log(size,1024)))
-    p = math.pow(1024,i)
-    s = round(size/p,2)
-    return '%s %s' % (s,size_name[i])
+def human_readable_size(size, binary=True):
+    if isinstance(size, (int, float)):
+        num_bytes = size
+    else:
+        try:
+            num_bytes = humanfriendly.parse_size(size)
+        except Exception:
+            return "NaN"
+    is_neg = num_bytes < 0
+    if is_neg:
+        num_bytes = abs(num_bytes)
+    output = humanfriendly.format_size(num_bytes, binary=binary)
+    if is_neg:
+        return "- {}".format(output)
+    return output
 
 class ReportHook():
     def __init__(self, writter):
@@ -102,6 +270,7 @@ class ReportHook():
         self.width = 60
         self._last_line = None
         self._writter = writter
+        self.reporthook(0, 0, 100)  # display empty bar as we start
 
     def reporthook(self, chunk, chunk_size, total_size):
         if chunk != 0:
@@ -122,6 +291,57 @@ class ReportHook():
             self._last_line = line
             self._writter(line)
 
+class CLILogger(ProgressHelper):
+    def __init__(self):
+        super(CLILogger, self).__init__()
+
+    def step(self, step):
+        self.p("--> {}".format(step), color="34")
+
+    def err(self, err):
+        self.p(err, color="31")
+
+    def raw_std(self, std):
+        sys.stdout.write(std)
+
+    def std(self, std, end=None):
+        self.p(std, end=end, flush=True)
+
+    def p(self, text, color=None, end=None, flush=False):
+        if color is not None and sys.platform != 32:
+            text = "\033[00;{col}m{text}\033[00m".format(col=color, text=text)
+        print(text, end=end, flush=flush)
+
+    def complete(self):
+        super(CLILogger, self).complete()
+        self.p("Installation succeded.", color="32")
+
+    def failed(self, error="?"):
+        super(CLILogger, self).failed()
+        self.err("Installation failed: {}".format(error))
+
+    def update(self):
+        self.p("[STAGE {nums}: {name} - {pc:.0f}%]"
+               .format(nums=self.stage_numbers,
+                       name=self.stage_name,
+                       pc=self.get_overall_progress() * 100),
+               color="35")
+
+def get_checksum(fpath, func=hashlib.sha256):
+    h = func()
+    with open(fpath, "rb") as f:
+        for chunk in iter(lambda: f.read(ONE_MiB * 8), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+def get_cache(build_folder):
+    fpath = os.path.join(build_folder, "cache")
+    os.makedirs(fpath, exist_ok=True)
+    return fpath
+
+def get_temp_folder(in_path):
+    os.makedirs(in_path, exist_ok=True)
+    return tempfile.mkdtemp(dir=in_path)
 
 def relpathto(dest):
     ''' relative path to an absolute one '''
@@ -129,12 +349,10 @@ def relpathto(dest):
         return None
     return str(Path(dest).relpath())
 
-
 def b64encode(fpath):
     ''' base64 string of a binary file '''
     with open(fpath, "rb") as fp:
         return base64.b64encode(fp.read()).decode('utf-8')
-
 
 def b64decode(fname, data, to):
     ''' write back a binary file from its fname and base64 string '''
