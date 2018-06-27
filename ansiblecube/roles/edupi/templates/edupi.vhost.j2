@@ -1,0 +1,27 @@
+server {
+    listen 80;
+    server_name {{ edupi_fqdn }} {{ edupi_server_name }};
+
+    # client_max_body_size 500M;
+
+    location /static {
+        alias {{ edupi_data_root }}/static;
+    }
+
+    location /media {
+        access_log /var/log/nginx/edupi_media_access.log;
+        alias {{ edupi_data_root }}/media;
+    }
+
+    location / {
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Scheme $scheme;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_pass http://localhost:8010;
+    }
+
+    location /ideascube-static/ { alias /var/ideascube/static/; expires 1y; }
+    location /502.html { internal; root /var/www; }
+    error_page 502 /502.html;
+
+}

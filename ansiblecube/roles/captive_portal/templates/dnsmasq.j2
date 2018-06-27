@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ $1 == "{{ lan_interface }}" ] ||  [ $1 == "{{ lan_interface2 }}" ] || [ $1 == "{{ client_interface }}" ]
+
+  then
+  	case "$2" in
+		## set dnsmasq.conf as default configuration
+	  up) sed -i 's/^DNSMASQ_OPTS=.*/DNSMASQ_OPTS="--conf-file=\/etc\/dnsmasq.conf"/g' /etc/default/dnsmasq;;
+        ## set dnsmasq-spoof.conf as default configuration
+	  down) sed -i 's/^DNSMASQ_OPTS=.*/DNSMASQ_OPTS="--conf-file=\/etc\/dnsmasq-spoof.conf --local-ttl=600"/g' /etc/default/dnsmasq;;
+	  *) exit 0;;
+	esac
+	systemctl restart dnsmasq.service
+fi

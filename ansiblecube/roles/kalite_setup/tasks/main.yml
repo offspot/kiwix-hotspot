@@ -1,0 +1,73 @@
+---
+- import_tasks: clean_apt.yml
+  tags: setup
+
+# kalite content folder is placed on data part
+- name: Ensure kalite folder exists on data part
+  file:
+    path: "{{ kalite_root }}"
+    state: directory
+  tags: ['setup', 'reconfigure']
+
+- name: Setup kalite virtualenv
+  become: yes
+  become_user: "{{ username }}"
+  command: virtualenv -p python2.7 --no-site-packages {{ kalite_env }}
+  tags: setup
+  
+- name: Install Ka-lite
+  become: yes
+  become_user: "{{ username }}"
+  pip:
+    name: ka-lite
+    version: "{{ kalite_version }}"
+    virtualenv: "{{ kalite_env }}"
+  register: kalite_installation 
+  tags: setup
+
+- name: Install cherrypy 6.1.0 to fix an issue
+  become: yes
+  become_user: "{{ username }}"
+  pip:
+    name: cherrypy
+    version: 6.1.0
+    virtualenv: "{{ kalite_env }}"
+  tags: setup
+
+- name: Create a user admin for kalite
+  become: yes
+  become_user: "{{ username }}"
+  environment:
+    KALITE_PYTHON: "{{ kalite_env }}/bin/python"
+    KALITE_HOME: "{{ kalite_root }}"
+  command: "{{ kalite_env }}/bin/kalite manage setup --username={{ admin_account }} --password={{ admin_password }} --noinput"
+  when: admin_account is defined
+  tags:
+    - setup
+    - reconfigure
+
+- name: Run kalite manage setup without admin user
+  become: yes
+  become_user: "{{ username }}"
+  environment:
+    KALITE_PYTHON: "{{ kalite_env }}/bin/python"
+    KALITE_HOME: "{{ kalite_root }}"
+  command: "{{ kalite_env }}/bin/kalite manage setup --noinput"
+  when: admin_account is not defined
+  tags:
+    - setup
+    - reconfigure
+
+- name: Copy nginx vhost
+  template:
+    src: kalite.vhost.j2
+    dest: /etc/nginx/sites-available/kalite
+  notify: restart nginx
+  tags: ['setup', 'rename']
+
+- name: Setup startup file
+  template:
+    src: kalite.service.j2
+    dest: /etc/systemd/system/kalite.service
+  notify: reload systemd
+  tags: setup

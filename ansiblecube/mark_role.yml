@@ -1,0 +1,7 @@
+---
+- name: mark role {{ role }} complete
+  ini_file:
+    dest: /etc/ansible/facts.d/progress.fact
+    section: main
+    option: "{{ role }}"
+    value: "y"

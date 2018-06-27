@@ -1,0 +1,96 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import subprocess
+
+TRANSLATIONS = {
+    'fr': {
+        'button': u"Ok",
+        'message': u"Vous allez maintenant être redirigé vers {{ fqdn }}",
+    },
+    'en': {
+        'button': u"Ok",
+        'message': u"You will now be redirected to {{ fqdn }}",
+    },
+}
+
+header = u"""
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+html, body { width: 100%; height: 100%; position: relative; }
+.myButton {
+    border: none;
+    border-radius: 2px;
+    padding: 0 10px;
+    text-decoration: none;
+    color: #fff;
+    font-size: 1.1em;
+    background-color: #6C7A89;
+    display: inline-block;
+    margin-top: 10px;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    cursor: pointer;
+}
+.myButton:hover {
+    background-color: #95A5A6;
+    color: #fff;
+}
+.myButton:active {
+    position:relative;
+    top:1px;
+}
+.center {
+position: absolute; top: calc(50% - 60px);left: calc(50% - 260px);
+width: 500px; height: 100px; border: 0px; padding: 10px;
+text-align:center;
+}
+</style>
+</head>"""
+
+body = u"""
+<body>
+<div class="center">
+<h3>{message}</h3>
+<a href="/letmein.html" class="myButton">{button}</a>
+</div>
+</body>
+"""
+
+footer = u"</html>"
+
+
+def get_translation_for(accept_lang_header, default='en'):
+    chosen_lang = default
+    langs = [lang_item.replace('_', '-').split('-')[0].lower()
+             for lang_code in accept_lang_header.split(",")
+             for lang_item in lang_code.split(";")
+             if 'q=' not in lang_item]
+
+    for lang in langs:
+        if lang in TRANSLATIONS.keys():
+            chosen_lang = lang
+            break
+
+    return TRANSLATIONS.get(chosen_lang, default)
+
+
+def allow_host(ipaddress):
+    subprocess.check_output(
+        "sudo iptables -t nat -I CAPTIVE_PASSLIST 1 -s {ip} -j ACCEPT"
+        .format(ip=ipaddress), shell=True)
+
+
+def application(env, start_response):
+    if env['REQUEST_URI'] == "/letmein.html":
+        allow_host(env['REMOTE_ADDR'])
+        start_response('302 Found', [('Location', "http://{{ fqdn }}")])
+        return ['1']
+
+    start_response('200 OK', [('Content-Type', 'text/html')])
+    translation = get_translation_for(env.get('HTTP_ACCEPT_LANGUAGE'))
+    page = header + body.format(**translation) + footer
+    return [page.encode('utf-8')]

@@ -1,0 +1,49 @@
+# NGINX configuration for KA Lite
+#
+# Upstream Aflatoun server uses port 7007
+# Nginx proxy for Aflatoun uses port 8008
+#
+# If you want the website to be accessible at a different port, change
+#  PROXY_PORT = nnnn setting in /var/ka-lite/.aflatoun/settings.py
+# and change the below accordingly.
+
+server {
+
+    listen 80;
+    server_name {{ aflatoun_fqdn }} {{ aflatoun_server_name }};
+
+    # Default value, overwritten in nginx.d
+    set $aflatoun_home {{ aflatoun_root }}/;
+    # include /etc/ka-lite/nginx.d/*.conf;
+
+    location /static {
+        alias   $aflatoun_home/httpsrv/static/;
+    }
+
+    location /media {
+        alias   $aflatoun_home/httpsrv/media/;
+    }
+
+    location /content {
+        alias   $aflatoun_home/content/;
+    }
+
+    location /content/khan {
+        alias   $aflatoun_home/content/assessment/khan/;
+    }
+
+    location /favicon.ico {
+        empty_gif;
+    }
+
+    location / {
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Scheme $scheme;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_pass http://localhost:8009;
+    }
+
+    location /ideascube-static/ { alias /var/ideascube/static/; expires 1y; }
+    location /502.html { internal; root /var/www; }
+    error_page 502 /502.html;
+}

@@ -1,0 +1,16 @@
+[Unit]
+Description=Parsoid server
+
+[Service]
+User=ideascube
+Group=ideascube
+ExecStart={{ wikifundi_parsoid }}/bin/server.js
+Restart=always
+TimeoutStopSec=60
+PIDFile=/var/run/parsoid.pid
+KillSignal=SIGINT
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

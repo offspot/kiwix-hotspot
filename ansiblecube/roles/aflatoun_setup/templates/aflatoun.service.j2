@@ -1,0 +1,19 @@
+[Unit]
+Description=Aflatoun server
+
+[Service]
+User=ideascube
+Group=ideascube
+Environment="KALITE_HOME={{ aflatoun_root }}"
+Environment="KALITE_PYTHON={{ aflatoun_env }}/bin/python"
+ExecStart={{ aflatoun_env }}/bin/kalite start --port=8009 --foreground
+ExecStop={{ aflatoun_env }}/bin/kalite stop
+Restart=always
+TimeoutStopSec=60
+PIDFile=/var/run/aflatoun.pid
+KillSignal=SIGINT
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

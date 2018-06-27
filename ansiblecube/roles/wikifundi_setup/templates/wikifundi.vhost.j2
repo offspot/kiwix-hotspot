@@ -1,0 +1,49 @@
+upstream php {
+    {% if ansible_distribution_release == "jessie" %}server unix:/var/run/php5-fpm.sock;{% endif %}
+    {% if ansible_distribution_release == "stretch" %}server unix:/var/run/php/php7.0-fpm.sock;{% endif %}
+}
+
+server {
+    listen      80;
+    listen      [::]:80;
+
+    server_name {{ item }}.{{ wikifundi_fqdn }} {{ item }}.{{ wikifundi_server_name }};
+    root        /var/www/{{ item }}.africapack.kiwix.org;
+
+    client_max_body_size 100m;
+    client_body_timeout 600;
+
+    # Mediawiki redirections
+    location / {
+        index index.html index.php index.php5 index.php7;
+        rewrite ^/wiki/(.*)$ /w/index.php?title=$1&$args;
+        rewrite ^/([^/\.]*)$ /wiki/$1 redirect;
+    }
+
+    # PHP handler
+    location ~ ^(?!.*/images/).*\.(php|hh) {
+        fastcgi_keep_conn        on;
+        fastcgi_pass             php;
+        fastcgi_index            index.php;
+        fastcgi_param            SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include                  fastcgi_params;
+        fastcgi_split_path_info  ^(.+\.php?)(/.+)$;
+        fastcgi_param            PATH_INFO $fastcgi_path_info;
+        fastcgi_param            SERVER_SOFTWARE nginx;
+        fastcgi_param            REQUEST_URI $request_uri;
+        fastcgi_param            QUERY_STRING $query_string;
+        fastcgi_intercept_errors on;
+        fastcgi_param            HTTP_ACCEPT_ENCODING      ""; # Safari has a problem here
+        fastcgi_read_timeout	 180s; # file uploads might take long to process (thumbnail creation)
+        fastcgi_send_timeout	 180s; # file uploads still
+    }
+
+    # Force caching images
+    location ~ ^/[^w].*\.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+        expires 10d;
+    }
+
+    location /ideascube-static/ { alias /var/ideascube/static/; expires 1y; }
+    location /502.html { internal; root /var/www; }
+    error_page 502 /502.html;
+}

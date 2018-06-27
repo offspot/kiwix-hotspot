@@ -1,0 +1,32 @@
+# interface name
+interface={{ hotspot_interface }}
+# wlan card driver
+driver=nl80211
+# wifi ssid
+ssid={{ hotspot_name }}
+# wifi mode
+hw_mode=g
+# wifi channel
+channel=1
+# MAC address access control (0 = accept by default)
+macaddr_acl=0
+# limit wifi conexion
+max_num_sta={{ max_wifi_client }}
+# dunno lol
+auth_algs=1
+# dont hide the SSID
+ignore_broadcast_ssid=0
+{% if wpa_pass is defined %}
+# wpa version
+wpa=2
+# wpa passwd
+wpa_passphrase={{ wpa_pass }}
+# wpa encryption
+wpa_key_mgmt=WPA-PSK
+wpa_pairwise=TKIP
+rsn_pairwise=CCMP
+{% else %}
+
+{% endif %}
+ieee80211n=1
+wmm_enabled=1

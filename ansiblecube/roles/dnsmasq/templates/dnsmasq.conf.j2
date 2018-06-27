@@ -1,0 +1,15 @@
+interface={{ hotspot_interface }}
+except-interface={{ lan_interface }}
+except-interface={{ lan_interface2 }}
+except-interface={{ client_interface }}
+dhcp-range=192.168.2.100,192.168.2.240,255.255.255.0,12h
+
+expand-hosts
+bogus-priv
+domain={{ fqdn }},192.168.2.0/24,local
+
+address=/{{ fqdn }}/{{ hotspot_ip }}
+address=/{{ hostname }}/{{ hotspot_ip }}
+server=8.8.8.8
+server=8.8.4.4
+no-hosts

@@ -1,0 +1,222 @@
+---
+- name: Install conntrack
+  apt:
+    name: "{{item}}"
+    state: latest
+    autoremove: yes
+    autoclean: yes
+  with_items:
+    - conntrack
+    - uwsgi-plugin-python
+  tags: master
+
+- name: Create /var/www/captiveportal folder
+  file:
+    path: /var/www/captiveportal
+    owner: ideascube
+    group: ideascube
+    mode: 0755
+    state: directory
+  tags: master
+  
+- name: Copy captive portal script to /var/www/captiveportal
+  template:
+    src: cap.py.j2
+    dest: /var/www/captiveportal/cap.py
+    owner: ideascube
+    group: ideascube
+    mode: 0755
+  notify: restart uwsgi
+  tags: ['master', 'rename']
+
+- name: Add nginx specific configuration file
+  copy:
+    src: nginx-captiveportal
+    dest: /etc/nginx/sites-available/captiveportal
+    owner: root
+    group: root
+    mode: 0644
+  tags: master
+
+- name: Make sure ideascube is not default_server
+  lineinfile:
+    dest: /etc/nginx/sites-available/ideascube
+    regexp: '^(.*)listen(.*)default_server(.*)'
+    line: "    listen      80 ;"
+    backrefs: yes
+  tags: master
+
+- name: Enable captive portal vhost
+  file:
+    src: /etc/nginx/sites-available/captiveportal
+    dest: /etc/nginx/sites-enabled/captiveportal
+    state: link
+  notify: restart nginx
+  tags: master
+
+- name: Start dnsmasq-spoof.conf file by default - forcing short TTL
+  lineinfile: 
+    dest: /etc/default/dnsmasq
+    regexp: 'DNSMASQ_OPTS='
+    line: 'DNSMASQ_OPTS="--conf-file=/etc/dnsmasq-spoof.conf --local-ttl=600"'
+    state: present
+  tags: master
+              
+- name: Create /etc/nginx/ssl folder
+  file:
+    path: /etc/nginx/ssl
+    owner: root
+    group: root
+    mode: 0644
+    state: directory
+  tags: master
+
+- name: Generate a Private key
+  command: openssl genrsa -out /etc/nginx/ssl/ideascube.key 2048
+  tags: master
+
+- name: Create Certificate Signing Request
+  command: openssl req -new -sha256 -key /etc/nginx/ssl/ideascube.key -out /etc/nginx/ssl/ideascube.csr -subj "/C=CH/ST=Vaud/L=Lausanne/O=Kiwix/OU=Kiwix Plug/CN={{ fqdn }}"
+  tags: ['master', 'rename']
+
+- name: Sign the certificate
+  command: openssl x509 -req -sha256 -days 3650 -in /etc/nginx/ssl/ideascube.csr -signkey /etc/nginx/ssl/ideascube.key -out /etc/nginx/ssl/ideascube.crt
+  tags: ['master', 'rename']  
+
+- name: Copy new catch-all redirect 301 vhost
+  template:
+    src: redirect.j2
+    dest: /etc/nginx/sites-enabled/redirect
+  tags: ['master', 'rename']
+
+- name: Add UWSGI specific configuration file
+  copy:
+    src: captive.ini
+    dest: /etc/uwsgi/apps-available/captive.ini
+    owner: root
+    group: root
+    mode: 0644
+  tags: master
+
+- name: Enable captive.ini for UWSGI
+  file:
+    src: /etc/uwsgi/apps-available/captive.ini
+    dest: /etc/uwsgi/apps-enabled/captive.ini
+    state: link
+  notify: restart uwsgi
+  tags: master
+
+- name: Copy Systemd script to set /etc/default/dnsmasq default options
+  copy:
+    src: clean-up.service
+    dest: /etc/systemd/system/clean-up.service
+  tags: master
+
+- name: enable clean-up
+  service:
+    name: clean-up
+    enabled: yes
+  tags: master
+
+- name: Copy shell script that actually does the job
+  copy:
+    src: clean-up-dnsmasq.sh
+    dest: /usr/local/bin/clean-up-dnsmasq.sh
+    owner: root
+    group: root
+    mode: 0755
+  tags: master
+
+- name: Copy dnsmasq script for NetworkManager
+  template:
+    src: dnsmasq.j2
+    dest: /etc/NetworkManager/dispatcher.d/03dnsmasq
+    mode: 0755
+  notify: restart network manager
+  tags: ['master', 'rename']
+
+- name: Copy clear_iptables.sh to /usr/bin/local
+  copy:
+    src: clear_iptables.sh
+    dest: /usr/local/bin/clean_iptables.sh
+    owner: root
+    group: root
+    mode: 0755
+  tags: master
+
+- name: Add a cron entry to clean iptables rules
+  cron:
+    name: "Clear dead connections from CAPTIVE_PASSLIST"
+    minute: "*/5"
+    job: "/usr/local/bin/clean_iptables.sh"
+    state: present
+  tags: master
+
+- name: Load current IPtables configuration
+  shell: /etc/network/if-up.d/iptables
+  tags: master
+
+- name: Create iptables empty chains
+  command: "{{item}}"
+  with_items:
+    - /sbin/iptables -t nat -N CAPTIVE_HTTP
+    - /sbin/iptables -t nat -N CAPTIVE_HTTPS
+    - /sbin/iptables -t nat -N CAPTIVE_PASSLIST
+  tags: master
+  ignore_errors: yes
+
+- name: Send to CAPTIVE_HTTP if destination *:80/tcp
+  command: iptables -t nat -A PREROUTING -p tcp -m tcp ! -s "{{ hotspot_ip }}" ! -d "{{ hotspot_ip }}" --dport 80 -j CAPTIVE_HTTP
+  tags: master
+
+- name: Send to CAPTIVE_HTTPS if destination *:443/tcp
+  command: iptables -t nat -A PREROUTING -p tcp -m tcp ! -s "{{ hotspot_ip }}" ! -d "{{ hotspot_ip }}" --dport 443 -j CAPTIVE_HTTPS
+  tags: master
+
+- name: From CAPTIVE_HTTP, send to CAPTIVE_PASSLIST
+  iptables:
+    table: nat
+    chain: CAPTIVE_HTTP
+    protocol: tcp
+    jump: CAPTIVE_PASSLIST
+  tags: master
+
+- name: From CAPTIVE_HTTPS, send to CAPTIVE_PASSLIST
+  iptables:
+    table: nat
+    chain: CAPTIVE_HTTPS
+    protocol: tcp
+    jump: CAPTIVE_PASSLIST
+  tags: master
+
+- name: DNAT HTTP to hotspot_ip:82
+  iptables:
+    table: nat
+    chain: CAPTIVE_HTTP
+    protocol: tcp
+    jump: DNAT
+    to_destination: "{{ hotspot_ip }}:82"
+    comment: Redirect HTTP traffic to server port 82
+  tags: master
+
+- name: DNAT HTTPS to hotspot_ip:83
+  iptables:
+    table: nat
+    chain: CAPTIVE_HTTPS
+    protocol: tcp
+    jump: DNAT
+    to_destination: "{{ hotspot_ip }}:83"
+    comment: Redirect HTTPS traffic to server port 83
+  tags: master
+
+- name: Last CAPTIVE_PASSLIST rules RETURN to calling chain
+  iptables:
+    table: nat
+    chain: CAPTIVE_PASSLIST
+    protocol: tcp
+    jump: RETURN
+  tags: master
+
+- name: Overwrite /etc/iptables.rules to include new rules
+  shell: /sbin/iptables-save > /etc/iptables.rules
+  tags: master

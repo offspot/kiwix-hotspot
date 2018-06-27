@@ -1,0 +1,105 @@
+---
+- import_tasks: clean_apt.yml
+  tags: setup
+
+- name: make sur wikifundi_root exists
+  file:
+    dest: "{{ wikifundi_root }}"
+    state: directory
+  tags: ['setup', 'reconfigure']
+
+- name: Symlink wikifundi folders
+  file:
+    src: "{{ wikifundi_root }}/{{ item }}.africapack.kiwix.org"
+    dest: "/var/www/{{ item }}.africapack.kiwix.org"
+    state: link
+    force: yes
+  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  tags: ['setup', 'reconfigure']
+
+- name: Install dependencies (tex)
+  apt:
+    name: texlive,texlive-latex-extra,cjk-latex,texlive-fonts-recommended,texlive-lang-greek,texlive-latex-recommended
+    state: latest
+    autoremove: yes
+    autoclean: yes
+  tags: setup
+
+- import_tasks: clean_apt.yml
+  tags: setup
+
+- name: Install dependencies (PHP, jessie)
+  apt:
+    name: php5-fpm,php5-curl,php5-sqlite
+    state: latest
+    autoremove: yes
+    autoclean: yes
+  when: ansible_distribution_release == "jessie"
+  tags: setup
+
+- include_tasks: disable_service.yml service=php5-fpm
+  when: ansible_distribution_release == "jessie"
+  tags: setup
+
+- name: Install dependencies (PHP, stretch)
+  apt:
+    name: php-fpm,php-curl,php-sqlite3
+    state: latest
+    autoremove: yes
+    autoclean: yes
+  when: ansible_distribution_release == "stretch"
+  tags: setup
+
+- include_tasks: disable_service.yml service=php7.0-fpm
+  when: ansible_distribution_release == "stretch"
+  tags: setup
+
+- import_tasks: clean_apt.yml
+  tags: setup
+
+- name: Install dependencies (others)
+  apt:
+    name: nginx,memcached,nodejs,imagemagick,php-pear,libav-tools,librsvg2-bin,poppler-utils,npm,redis-server,dvipng,lua5.1,build-essential,ocaml
+    state: latest
+    autoremove: yes
+    autoclean: yes
+  tags: setup
+
+- import_tasks: clean_apt.yml
+  tags: setup
+
+- name: change PHP5 settings to allow file uploads up to 5MiB
+  copy:
+    src: 90-wikifundi.ini
+    dest: /etc/php5/fpm/conf.d/90-wikifundi.ini
+  when: ansible_distribution_release == "jessie"
+  tags: setup
+
+- name: change PHP7 settings to allow file uploads up to 5MiB
+  copy:
+    src: 90-wikifundi.ini
+    dest: /etc/php/7.0/fpm/conf.d/90-wikifundi.ini
+  when: ansible_distribution_release == "stretch"
+  tags: setup
+
+- name: Link node to nodejs binary
+  file:
+    src: /usr/bin/nodejs
+    dest: /usr/bin/node
+    state: link
+  tags: setup
+
+- name: Setup parsoid service
+  template:
+    src: parsoid.service.j2
+    dest: /etc/systemd/system/parsoid.service
+  notify: reload systemd
+  tags: setup
+
+- name: Copy nginx vhosts
+  template:
+    src: wikifundi.vhost.j2
+    dest: /etc/nginx/sites-available/{{ item }}.wikifundi
+  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  notify: restart nginx
+  tags: ['setup', 'rename']

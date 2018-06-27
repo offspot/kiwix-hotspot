@@ -1,0 +1,18 @@
+[Unit]
+Description=Edupi server
+
+[Service]
+User=ideascube
+Group=ideascube
+WorkingDirectory={{ edupi_root }}
+ExecStart={{ edupi_env }}/bin/gunicorn \
+  --bind localhost:8010 edupi.wsgi:application \
+  --log-level info
+Restart=always
+TimeoutStopSec=60
+KillSignal=SIGINT
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

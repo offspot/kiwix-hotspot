@@ -1,0 +1,19 @@
+[Unit]
+Description=Kalite server
+
+[Service]
+User=ideascube
+Group=ideascube
+Environment="KALITE_PYTHON={{ kalite_env }}/bin/python"
+Environment="KALITE_HOME={{ kalite_root }}"
+ExecStart={{ kalite_env }}/bin/kalite start --foreground
+ExecStop={{ kalite_env }}/bin/kalite stop
+Restart=always
+TimeoutStopSec=60
+PIDFile=/var/run/kalite.pid
+KillSignal=SIGINT
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
