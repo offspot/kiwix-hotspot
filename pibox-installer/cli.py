@@ -6,14 +6,15 @@ import yaml
 import time
 import tempfile
 import data
-from backend import catalog
+from backend.catalog import YAML_CATALOGS
 from run_installation import run_installation
 from util import CancelEvent
 from util import get_free_space_in_dir
 from util import compute_space_required
-from util import b64decode
+from util import CLILogger, b64decode
 
 CANCEL_TIMEOUT = 5
+logger = CLILogger()
 
 
 def set_config(config, args):
@@ -80,28 +81,15 @@ def set_config(config, args):
                 setattr(args, key, config["content"][key])
 
 
-class Logger:
-    def step(step):
-        print("\033[00;34m--> " + step + "\033[00m")
-
-    def err(err):
-        print("\033[00;31m" + err + "\033[00m")
-
-    def raw_std(std):
-        sys.stdout.write(std)
-
-    def std(std):
-        print(std)
-
 try:
-    catalogs = catalog.get_catalogs()
+    assert len(YAML_CATALOGS)
 except Exception as exception:
     print(exception, file=sys.stderr)
     print("Catalog downloads failed, you may check your internet connection")
-    exit(2)
+    sys.exit(2)
 
 zim_choices = []
-for catalog in catalogs:
+for catalog in YAML_CATALOGS:
     for (key, value) in catalog["all"].items():
         zim_choices.append(key)
 
@@ -125,7 +113,7 @@ parser.add_argument("--build-dir", help="set build directory (default current)",
 parser.add_argument("--catalog", help="show catalog and exit", action="store_true")
 parser.add_argument("--admin-account", help="create admin account [LOGIN, PWD]", nargs=2)
 parser.add_argument("--config", help="use a JSON config file to set parameters (superseeds cli parameters)")
-
+parser.add_argument("--ram", help="Max RAM for QEMU", default="2G")
 
 args = parser.parse_args()
 
@@ -140,9 +128,9 @@ if args.config:
         set_config(config, args)
 
 if args.catalog:
-    for catalog in catalogs:
+    for catalog in YAML_CATALOGS:
         print(yaml.dump(catalog, default_flow_style=False, default_style=''))
-    exit(0)
+    sys.exit(0)
 
 if args.admin_account:
     admin_account = { "login": args.admin_account[0], "pwd": args.admin_account[1] }
@@ -190,22 +178,18 @@ try:
             wifi_pwd=args.wifi_pwd,
             kalite=args.kalite,
             wikifundi=args.wikifundi,
-            aflatoun=args.aflatoun,
-            edupi=args.edupi,
+            aflatoun=args.aflatoun == "yes",
+            edupi=args.edupi == "yes",
             zim_install=args.zim_install,
             size=args.size,
-            logger=Logger,
+            logger=logger,
             cancel_event=cancel_event,
             sd_card=None,
             logo=args.logo,
             favicon=args.favicon,
             css=args.css,
             admin_account=admin_account,
-            build_dir=args.build_dir)
+            build_dir=args.build_dir,
+            qemu_ram=args.ram)
 except:
     cancel_event.cancel()
-else:
-    if error:
-        print("Installation failed: " + str(error), file=sys.stderr)
-    else:
-        print("Installation succeded")
