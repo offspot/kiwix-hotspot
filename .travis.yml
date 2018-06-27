@@ -5,12 +5,22 @@ before_install:
 
 matrix:
   include:
+  - language: python
+    python:
+      - "2.7"
+    sudo: false
+    install:
+    - pip install -r ansiblecube/tests/requirements-dev.txt
+    script:
+    - cd ansiblecube
+    - py.test
+
   - os: osx
     language: generic
     install:
     # Package pibox-installer
     - brew update
-    - brew install qemu pygobject3 --with-python3 gtk+3 adwaita-icon-theme
+    - brew install pygobject3 --with-python3 gtk+3 adwaita-icon-theme
     - python3 -m pip install -r requirements-macos.txt
     - python3 -m pip install https://github.com/pyinstaller/pyinstaller/archive/93eec04eb2fbfc714d2c3453e04fd126e6a86f52.zip
 
@@ -18,28 +28,9 @@ matrix:
     - wget http://download.kiwix.org/dev/pibox-installer-vexpress-boot.zip
     - unzip pibox-installer-vexpress-boot.zip
 
-    # Download playbook
-    - wget https://framagit.org/ideascube/ansiblecube/repository/oneUpdateFile0.4/archive.zip -O oneUpdateFile0.4.zip
-    - unzip oneUpdateFile0.4.zip
-    - mv ansiblecube-oneUpdateFile0.4* ansiblecube
-
     # Bundle QEMU
-    - git clone https://github.com/auriamg/macdylibbundler/
-    - cd macdylibbundler/
-    - git checkout 84440587e1b2e4e9e0727cbba7a455b96820e40a
-    - make
-    - cd ..
-    - mkdir qemu
-    - cd qemu
-    - cp /usr/local/bin/qemu-img .
-    - cp /usr/local/bin/qemu-system-arm .
-    - chmod u+w qemu-img
-    - chmod u+w qemu-system-arm
-    - ../macdylibbundler/dylibbundler -d . -p @executable_path/ -b -x ./qemu-system-arm  -x ./qemu-img
-    - chmod u-w qemu-img
-    - chmod u-w qemu-system-arm
-    - otool -L *
-    - cd ..
+    - wget http://download.kiwix.org/dev/qemu-2.12.0_macOS.tar
+    - tar xf qemu-2.12.0_macOS.tar
 
     # Run PyInstaller
     - pyinstaller --log-level=DEBUG pibox-installer-macos.spec
@@ -88,40 +79,24 @@ matrix:
           python-dev
           python3-dev
           libgdk-pixbuf2.0-dev
-    env:
-    - QEMU_VERSION=2.10.1
-    - QEMU_DIR=qemu-$QEMU_VERSION
-    - QEMU_ARCHIVE=$QEMU_DIR.tar.xz
     script:
+    # update XZ (trusty version -5.0.5 is too old)
+    - wget http://download.kiwix.org/dev/xz-5.2.4.tar.gz
+    - tar xf xz-5.2.4.tar.gz
+    - cd xz-5.2.4
+    - ./configure --enable-shared
+    - make
+    - sudo make install
+    - sudo ldconfig
+    - cd ..
+
     # Download pibox-installer-vexpress-boot
     - wget http://download.kiwix.org/dev/pibox-installer-vexpress-boot.zip
     - unzip pibox-installer-vexpress-boot.zip
 
-    # Download playbook
-    - wget https://framagit.org/ideascube/ansiblecube/repository/oneUpdateFile0.4/archive.zip -O oneUpdateFile0.4.zip
-    - unzip oneUpdateFile0.4.zip
-    - mv ansiblecube-oneUpdateFile0.4* ansiblecube
-
-    # Compile QEMU statically
-    - wget http://download.qemu-project.org/$QEMU_ARCHIVE
-    - tar -xf $QEMU_ARCHIVE
-    - rm $QEMU_ARCHIVE
-
-    - cd $QEMU_DIR
-    - ./configure
-        --target-list=arm-softmmu
-        --static
-        --disable-gtk
-        --disable-cocoa
-        --disable-libusb
-        --disable-glusterfs
-        --disable-smartcard
-        --disable-usb-redir
-        --python=python2
-    - make
-    - cp arm-softmmu/qemu-system-arm ..
-    - cp qemu-img ..
-    - cd ..
+    # get static QEMU
+    - wget http://download.kiwix.org/dev/qemu-2.12.0-linux-x86_64.tar.gz
+    - tar xf qemu-2.12.0-linux-x86_64.tar.gz
 
     # Install python dependancies
     - pip3 install -r requirements-linux.txt
