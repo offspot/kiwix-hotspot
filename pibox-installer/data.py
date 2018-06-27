@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 import sys
 
@@ -11,14 +13,14 @@ _vexpress_boot_dir = "pibox-installer-vexpress-boot"
 vexpress_boot_kernel = os.path.join(data_dir, _vexpress_boot_dir, "zImage")
 vexpress_boot_dtb = os.path.join(data_dir, _vexpress_boot_dir, "vexpress-v2p-ca15_a7.dtb")
 
-pibox_ideascube_conf = os.path.join(data_dir, "pibox_ideascube_conf.py")
-
 pibox_logo = os.path.join(data_dir, "pibox-installer-logo.png")
 
-raspbian_url = "http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2017-03-03/2017-03-02-raspbian-jessie-lite.zip"
-raspbian_zip_path = "2017-03-02-raspbian-jessie-lite.img"
+cache_folder_name = "cache"
+content_file = os.path.join(data_dir, 'contents.json')
 
 ansiblecube_path = os.path.join(data_dir, "ansiblecube")
+
+mirror = "http://download.kiwix.org"
 
 ideascube_languages = [
         ('am', u'አማርኛ'),
@@ -33,25 +35,4 @@ ideascube_languages = [
         ('sw', u'Kiswahili')
         ]
 
-kalite_sizes = {
-    "fr": 10737418240,
-    "es": 19327352832,
-    "en": 41875931136,
-}
-
-# Those size correspond to 2017_01 packages.
-# It must be updated as africapack are updated.
-wikifundi_sizes = {
-    "fr": 11811160000, #11GiB
-    "en": 12884900000, #12GiB
-}
-
-# This size is 5G but actual final size on disk is 3.9
-# We use 8G because we need space to build aflatoun
-# TODO: 5G is not enough
-# TODO: 8G may not be enough
-aflatoun_size = 8589934592
-
-# TODO: 100 MB may be enough
-# TODO: use 200 MB for now
-edupi_size = 2097152
+help_url = "https://framagit.org/ideascube/pibox-installer/wikis/faq"
