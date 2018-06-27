@@ -18,6 +18,13 @@ logger = CLILogger()
 
 
 def set_config(config, args):
+    def get_choices(option):
+        return [x for x in parser._actions if x.dest == option][-1].choices
+
+    def setif(key, value):
+        if getattr(args, key, None) is None:
+            setattr(args, key, value)
+
     if not isinstance(config, dict):
             return
 
@@ -27,7 +34,7 @@ def set_config(config, args):
                          'language': 'language',
                          'size': 'size'}.items():
         if key in config and config.get(key) is not None:
-            setattr(args, arg_key, config.get(key))
+            setif(arg_key, str(config.get(key)))
 
     # branding files
     if "branding" in config and isinstance(config["branding"], dict):
@@ -41,13 +48,13 @@ def set_config(config, args):
                 except Exception:
                     pass
                 else:
-                    setattr(args, key, os.path.abspath(fpath))
+                    setif(key, os.path.abspath(fpath))
 
     # wifi
     if "wifi" in config and isinstance(config["wifi"], dict):
         if "password" in config["wifi"] \
                 and config["wifi"].get("protected", True):
-            args.wifi_pwd = config["wifi"]["password"]
+            setif('wifi_pwd', config["wifi"]["password"])
 
     # admin account
     if "admin_account" in config \
@@ -57,12 +64,12 @@ def set_config(config, args):
             # we need both login and password
             if config["admin_account"].get("login") is not None \
                     and config["admin_account"].get("password") is not None:
-                args.admin_account = [config["admin_account"]["login"],
-                                      config["admin_account"]["password"]]
+                setif('admin_account', [config["admin_account"]["login"],
+                                        config["admin_account"]["password"]])
 
     # build_dir
     if config.get("build_dir") is not None:
-        args.build_dir = os.path.abspath(config["build_dir"])
+        setif('build_dir', os.path.abspath(config["build_dir"]))
 
     # content
     if "content" in config and isinstance(config["content"], dict):
@@ -73,13 +80,20 @@ def set_config(config, args):
                              'zims': 'zim_install'}.items():
             if key in config["content"] \
                     and isinstance(config["content"][key], list):
-                setattr(args, arg_key, config["content"][key])
+                value = config["content"][key]
+                # check that all elements are valid choices
+                wrong = [x for x in value if x not in get_choices(arg_key)]
+                if len(wrong):
+                    raise ValueError("Incorrect values for `{key}`: {val}"
+                                     .format(key=arg_key, val=" ".join(wrong)))
+                else:
+                    setif(arg_key, value)
 
         # bool contents (switch)
         for key in ('edupi', 'aflatoun'):
             if config["content"].get(key) is not None:
-                setattr(args, key, config["content"][key])
-
+                vl = "yes" if config["content"][key] in ("yes", True) else "no"
+                setif(key, vl)
 
 try:
     assert len(YAML_CATALOGS)
