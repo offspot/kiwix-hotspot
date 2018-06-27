@@ -1,0 +1,119 @@
+{
+    "raspbian_image": {
+        "url": "http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2018-04-19/2018-04-18-raspbian-stretch-lite.zip",
+        "name": "2018-04-18-raspbian-stretch-lite.zip",
+        "kernel_version": "4.14.34",
+        "checksum": "5a0747b2bfb8c8664192831b7dc5b22847718a1cb77639a1f3db3683b242dc96",
+        "archive_size": 366646269,
+        "expanded_size": 1862270976
+    },
+    "pibox_base_image": {
+        "url": "{mirror}/plug/base/pibox-master_2018-06-21.img.zip",
+        "name": "pibox-master_2018-06-21.img.zip",
+        "root_partition_size": 7000000000,
+        "checksum": "07f90c0d954cfdef94a0195079a63559abe06d725d94385e34f5e0c70228f97d",
+        "archive_size": 2860797810,
+        "expanded_size": 8000000000
+    },
+    "aflatoun_content": {
+        "url": "{mirror}/other/aflatoun/content.tar.gz",
+        "name": "aflatoun_content.tar.gz",
+        "folder_name": "content",
+        "checksum": "396e8850d8f0bbd5ad0252d7dca30791d132d28918654666e8400bf2858b89f7",
+        "archive_size": 3494985803,
+        "expanded_size": 3742367744
+    },
+    "aflatoun_langpack_fr": {
+        "url": "{mirror}/other/aflatoun/fr.zip",
+        "name": "aflatoun_pack_fr.zip",
+        "folder_name": null,
+        "checksum": "936e9f7051b5a9cba7fef61e4598568588f2ba6f1aa441b42234c8e41d11e372",
+        "copied_on_destination": true,
+        "archive_size": 966934,
+        "expanded_size": 1966080
+    },
+    "aflatoun_langpack_en": {
+        "url": "{mirror}/other/aflatoun/en.zip",
+        "name": "aflatoun_pack_en.zip",
+        "folder_name": null,
+        "checksum": "77ef69f7acd596cbf7c59c7f9316d3a97127d70b097af80cd20ef275801a4358",
+        "copied_on_destination": true,
+        "archive_size": 773285,
+        "expanded_size": 2097152
+    },
+    "wikifundi_parsoid": {
+        "url": "{mirror}/other/wikifundi/parsoid_2016-08-nosym.tar.bz2",
+        "name": "parsoid_2016-08-nosym.tar.bz2",
+        "folder_name": "parsoid",
+        "checksum": "e3d48cf435fb6caa25a4600fd96dbecf6dc5957b7ecdfe76a33aa8f019481958",
+        "archive_size": 49469932,
+        "expanded_size": 426360832
+    },
+    "wikifundi_langpack_fr": {
+        "url": "{mirror}/other/wikifundi/fr.africapack.kiwix.org_2017-01.tar.bz2",
+        "name": "wikifundi_fr_2017-01.tar.bz2",
+        "folder_name": "fr.africapack.kiwix.org",
+        "checksum": "eb04d53b78ecb12e0e774cfdf8c4145acc506d37ad1fd3fbd6f15cb7b5e88254",
+        "archive_size": 4184681300,
+        "expanded_size": 8081637376
+    },
+    "wikifundi_langpack_en": {
+        "url": "{mirror}/other/wikifundi/en.africapack.kiwix.org_2017-01.tar.bz2",
+        "name": "wikifundi_en_2017-01.tar.bz2",
+        "folder_name": "en.africapack.kiwix.org",
+        "checksum": "2f125eef7902273213d72f87387e268f6e244993cd21ef9555a895994f35dec0",
+        "archive_size": 5086718807,
+        "expanded_size": 10023993344
+    },
+    "kalite_langpack_fr": {
+        "url": "{mirror}/other/kalite/langpack_fr_0.17.zip",
+        "name": "kalite_pack_fr.zip",
+        "folder_name": null,
+        "checksum": "90807ceff17694d74a7748dab76c5765cd87347ea09b260ba83604c2f4b4019b",
+        "copied_on_destination": true,
+        "archive_size": 101891723,
+        "expanded_size": 102690816
+    },
+    "kalite_langpack_en": {
+        "url": "{mirror}/other/kalite/langpack_en_0.17.zip",
+        "name": "kalite_pack_en.zip",
+        "folder_name": null,
+        "checksum": "011d45a47df66de445526122495b7146f755bceb0186219b834b244223aae059",
+        "copied_on_destination": true,
+        "archive_size": 929916955,
+        "expanded_size": 1117425664
+    },
+    "kalite_langpack_es": {
+        "url": "{mirror}/other/kalite/langpack_es_0.17.zip",
+        "name": "kalite_pack_es.zip",
+        "folder_name": null,
+        "checksum": "69567e9fe94ed6185af1ee3f1bde31bebf474d9e7019f516402d35a214aeea72",
+        "copied_on_destination": true,
+        "archive_size": 93567392,
+        "expanded_size": 95309824
+    },
+    "kalite_videos_fr": {
+        "url": "{mirror}/other/kalite/videos_fr_0.17.tar",
+        "name": "kalite_videos_fr.tar",
+        "folder_name": "kalite_videos_fr",
+        "checksum": "4fd0e13b6ed02c3d7b3abac7d913ffb8b3e792405b5a7be6c5547faccbae1f47",
+        "archive_size": 11389573120,
+        "expanded_size": 11396665344
+    },
+    "kalite_videos_en": {
+        "url": "{mirror}/other/kalite/videos_en_0.17.tar",
+        "name": "kalite_videos_en.tar",
+        "folder_name": "kalite_videos_en",
+        "checksum": "4f459155682535ddf82f4f58a888a19256a0bee3441ec344393e3e3c9c193c4c",
+        "archive_size": 46781337600,
+        "expanded_size": 46810681344
+    },
+    "kalite_videos_es": {
+        "url": "{mirror}/other/kalite/videos_es_0.17.tar",
+        "name": "kalite_videos_es.tar",
+        "folder_name": "kalite_videos_es",
+        "checksum": "ab155d0c66d3fde43ec7c99b28ef72a03c304e9f9dab1e0ca75332c7cb202ff5",
+        "archive_size": 22402590720,
+        "expanded_size": 22417682432
+    }
+}
