@@ -1,0 +1,30 @@
+---
+- name: Make sure aflatoun content directory does not exist
+  file:
+    dest: "{{ aflatoun_root }}/content"
+    state: absent
+  tags: move-content
+
+# downloaded content was placed in a different location on data part
+- name: Move downloaded content to proper location
+  command: mv {{ aflatoun_content_path }} {{ aflatoun_root }}/content
+  tags: move-content
+
+- name: re-launch setup for it annotates the content items
+  become: yes
+  become_user: "{{ username }}"
+  environment:
+    KALITE_PYTHON: "{{ aflatoun_env }}/bin/python"
+    KALITE_HOME: "{{ aflatoun_root }}"
+  command: "{{ aflatoun_env }}/bin/kalite manage setup --noinput --no-assessment-items"
+  tags: move-content
+
+- name: Install Aflatoun language pack
+  become: yes
+  become_user: "{{ username }}"
+  environment:
+    KALITE_PYTHON: "{{ aflatoun_env }}/bin/python"
+    KALITE_HOME: "{{ aflatoun_root }}"
+  command: "{{ aflatoun_env }}/bin/kalite manage retrievecontentpack local {{ item }} {{ aflatoun_langpack_prefix }}{{ item }}.zip"
+  with_items: "{{ ansible_local.config.aflatoun_languages }}"
+  tags: move-content

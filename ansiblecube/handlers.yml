@@ -1,0 +1,40 @@
+---
+- name: restart systemd-logind
+  service:
+    name: systemd-logind
+    state: restarted
+
+- name: update timezone
+  command: dpkg-reconfigure --frontend noninteractive tzdata
+
+- name: update grub
+  command: update-grub
+
+- name: reload systemd
+  systemd:
+    daemon-reload: yes
+
+- name: restart hostapd
+  service:
+    name: hostapd
+    state: restarted
+
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+
+- name: restart uwsgi
+  service:
+    name: uwsgi
+    state: restarted
+
+- name: restart kiwix
+  service:
+    name: kiwix-server
+    state: restarted
+
+- name: restart network manager
+  service:
+    name: network-manager
+    state: restarted

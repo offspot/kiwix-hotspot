@@ -1,0 +1,42 @@
+---
+- name: Unblock wlan
+  command: rfkill unblock wlan
+  when: (ansible_architecture == 'x86_64' or ansible_architecture == 'i386')
+  ignore_errors: yes
+  tags: master
+
+- name: Install hostapd
+  apt:
+    name: hostapd
+    state: latest
+    autoremove: yes
+    autoclean: yes
+  tags: master
+
+- name: Remove sysVinit startup file
+  file:
+    path: /etc/init.d/hostapd
+    state: absent
+  tags: master
+
+- name: Copy hostapd.conf file
+  template:
+    src: hostapd.conf.j2
+    dest: /etc/hostapd/hostapd.conf
+    owner: root
+    group: root
+    mode: 0755
+  notify: restart hostapd
+  tags: ['master', 'rename']
+
+- name: Copy startup script
+  copy:
+    src: hostapd
+    dest: /etc/systemd/system/hostapd.service
+    owner: root
+    group: root
+    mode: 0664
+  tags: master
+
+- include_tasks: enable_service.yml service=hostapd
+  tags: master

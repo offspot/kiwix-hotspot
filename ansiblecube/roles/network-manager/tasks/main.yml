@@ -1,0 +1,8 @@
+---
+- name: Install Network-Manager
+  apt:
+    name: network-manager
+    state: latest
+    autoremove: yes
+    autoclean: yes
+  tags: master

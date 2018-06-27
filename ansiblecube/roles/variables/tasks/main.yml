@@ -1,0 +1,80 @@
+---
+- debug: msg="Start playbook {{ ansible_date_time["date"] }} - {{ ansible_date_time["time"] }}"
+  tags: always
+
+- name: ensure custom facts directory exists
+  file:
+    path: /etc/ansible/facts.d
+    recurse: yes
+    state: directory
+  tags: master
+
+- block:
+  
+  - name: set python3.4 for jessie
+    set_fact:
+      python3_version: "3.4"
+    when: ansible_distribution_release == "jessie"
+
+  - name: set python3.5 for stretch
+    set_fact:
+      python3_version: "3.5"
+    when: ansible_distribution_release == "stretch"
+
+  tags: always
+
+# set hostname and variants
+- block:
+
+  - set_fact:
+      project_name: "{{ project_name }}"
+      project_name_safe: "{{ project_name|replace(\" \", \"_\")|replace(\"_\", \"-\")|lower }}"
+    name: Set project_name and project_name_safe facts
+
+  - set_fact:
+      hostname: "{{ project_name_safe }}"
+      fqdn: "{{ project_name_safe }}.{{ tld }}"
+      hotspot_name: "{{ project_name }}"
+    name: Set hostname and hostpot_name
+
+  - set_fact:
+      kiwix_server_name: kiwix.{{ hostname }}
+      kalite_server_name: khanacademy.{{hostname}}
+      aflatoun_server_name: aflatoun.{{hostname}}
+      edupi_server_name: edupi.{{hostname}}
+      wikifundi_server_name: wikifundi.{{hostname}}
+      kiwix_fqdn: kiwix.{{ fqdn }}
+      kalite_fqdn: khanacademy.{{fqdn}}
+      aflatoun_fqdn: aflatoun.{{fqdn}}
+      edupi_fqdn: edupi.{{fqdn}}
+      wikifundi_fqdn: wikifundi.{{fqdn}}
+    name: Update names and fqdns for all projects
+
+  - lineinfile:
+      dest: /etc/hosts
+      line: "127.0.0.1  {{ hostname }} {{ fqdn }}"
+      state: present
+    name: Ensure hostname is in /etc/hosts
+
+  - hostname:
+      name: "{{ fqdn }}"
+    name: Set hostname using to {{ fqdn }}
+    notify: restart systemd-logind
+  
+  tags: always
+
+- name: Create config.fact file
+  file:
+    src: /var/lib/ansible/local/extra_vars.json
+    dest: /etc/ansible/facts.d/config.fact
+    state: link
+  tags: ['master', 'reconfigure']
+
+- name: reload local facts
+  setup:
+    filter: ansible_local
+    gather_timeout: 240
+  tags: ['master', 'reconfigure']
+
+- debug: msg="My name is {{ ansible_hostname }} -- {{ fqdn }}"
+  tags: always

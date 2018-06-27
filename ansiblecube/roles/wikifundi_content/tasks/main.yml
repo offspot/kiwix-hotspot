@@ -1,0 +1,74 @@
+---
+- name: make sure content folders does not exist
+  file:
+    path: "{{ wikifundi_root }}/{{ item }}.africapack.kiwix.org"
+    state: absent
+  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  tags: move-content
+
+- name: Move downloaded content to proper location
+  command: mv {{ wikifundi_langpack_prefix }}{{ item }}/ {{ wikifundi_root }}/{{ item }}.africapack.kiwix.org
+  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  notify: restart nginx
+  tags: move-content
+
+# fix path in content source code
+- name: Change lua path and TMP in LocalSettings.custom.php
+  replace:
+    name: "{{ wikifundi_root }}/{{ item }}.africapack.kiwix.org/w/LocalSettings.custom.php"
+    regexp: '^\<\?php$'
+    replace: '<?php\nputenv("TMP={$wgUploadDirectory}/temp");\n$wgScribuntoEngineConf[''luastandalone''][''luaPath''] = "/usr/bin/lua5.1";'
+  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  notify: restart nginx
+  tags: move-content
+
+- name: Change hostname in LocalSettings.custom.php
+  replace:
+    name: "{{ wikifundi_root }}/{{ item }}.africapack.kiwix.org/w/LocalSettings.custom.php"
+    regexp: "^.+'domain' => '{{ item }}.africapack.kiwix.org',$"
+    replace: "\t\t\t\t\t\t   'domain' => '{{ item }}.{{ wikifundi_fqdn }}',"
+  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  notify: restart nginx
+  tags: move-content
+
+- name: Set max upload size to 5M
+  lineinfile:
+    path: "{{ wikifundi_root }}/{{ item }}.africapack.kiwix.org/w/LocalSettings.custom.php"
+    line: '$wgMaxUploadSize = 1024*1024*5;'
+    insertbefore: '^\?>$'
+    state: present
+  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  tags: move-content
+
+# fix extensions in the content
+- name: Get the Math renderer correctly
+  become: yes
+  shell:
+    cd {{ wikifundi_root }}/{{ item }}.africapack.kiwix.org/w/extensions/Math/math;
+    make clean all;
+    cd {{ wikifundi_root }}/{{ item }}.africapack.kiwix.org/w/extensions/Math/texvccheck;
+    make clean all;
+  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  notify: restart nginx
+  tags: move-content
+
+# parsoid
+- name: Make sure parsoid directory does not exist
+  file:
+    dest: "{{ wikifundi_parsoid }}"
+    state: absent
+  tags: move-content
+
+# downloaded content was placed in a different location on data part
+- name: Move downloaded parsoid to proper location
+  command: mv {{ wikifundi_parsoid_path }} {{ wikifundi_parsoid }}
+  tags: move-content
+
+- name: Change hostnames in localsettings.js
+  replace:
+    name: "{{ wikifundi_parsoid }}/localsettings.js"
+    regexp: "{{ item }}.africapack.kiwix.org"
+    replace: "{{ item }}.{{ wikifundi_fqdn }}"
+  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  notify: restart nginx
+  tags: move-content

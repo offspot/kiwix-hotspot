@@ -1,0 +1,38 @@
+---
+- name: Install iptables
+  apt:
+    name: iptables
+    state: latest
+    autoremove: yes
+    autoclean: yes
+  tags: master
+
+- name: Authorize routing
+  replace:
+    dest: /etc/sysctl.conf
+    regexp: '^#net.ipv4.ip_forward=1$'
+    replace: 'net.ipv4.ip_forward=1'
+    backup: yes
+  tags: master
+
+- name: Copy iptables rules file
+  template:
+    src: iptables.rules.j2
+    dest: /etc/iptables.rules
+    owner: root
+    group: root
+    mode: 0644
+  tags: master
+
+- name: Copy iptables restore file
+  copy:
+    src: iptables
+    dest: /etc/network/if-up.d/iptables
+    owner: root
+    group: root
+    mode: 0755
+  tags: master
+
+- name: Reload sysctl conf
+  command: sysctl -p
+  tags: master

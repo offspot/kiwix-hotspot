@@ -1,0 +1,18 @@
+server {
+    listen  80;
+    server_name kiwix.{{ fqdn }} kiwix.{{ hostname }};
+    location / {
+        proxy_pass_header Server;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Scheme $scheme;
+        proxy_connect_timeout 60;
+        proxy_read_timeout 60;
+        proxy_pass http://localhost:8002/;
+    }
+    
+    location /ideascube-static/ { alias /var/ideascube/static/; expires 1y; }
+    location /502.html { internal; root /var/www; }
+    error_page 502 /502.html;
+}

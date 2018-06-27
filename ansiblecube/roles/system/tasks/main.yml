@@ -1,0 +1,295 @@
+---
+- name: Remove udev rules for wifi
+  file:
+    path: /etc/udev/rules.d/70-persistent-net.rules
+    state: absent
+  tags: master
+
+- name: reload udev
+  shell: udevadm control --reload-rules && udevadm trigger
+  tags: master
+
+- name: download exfat kernel module
+  unarchive:
+    src: "{{ mirror }}/dev/exfat_{{ kernel_version }}.tar"
+    dest: /tmp/
+    remote_src: True
+  tags: master
+
+- name: install module files
+  command: install -m644 -b -D /tmp/exfat_{{ item }}.ko /lib/modules/{{ item }}+/kernel/fs/exfat/exfat.ko
+  with_items:
+    - "{{ kernel_version }}"
+    - "{{ kernel_version }}-v7"
+  tags: master
+
+- name: make temp directories to fool depmod
+  file:
+    dest: /tmp/{{ item }}/lib/modules
+    state: directory
+  with_items:
+    - "{{ kernel_version }}"
+    - "{{ kernel_version }}-v7"
+  tags: master
+
+- name: create symlinks to fool depmod
+  file:
+    src: /lib/modules/{{ item }}+
+    dest: /tmp/{{ item }}/lib/modules/{{ qemu_kernel_version }}
+    state: link
+  with_items:
+    - "{{ kernel_version }}"
+    - "{{ kernel_version }}-v7"
+  tags: master
+
+- name: regenerate modules list
+  command: depmod -a -b /tmp/{{ item }}
+  with_items:
+    - "{{ kernel_version }}"
+    - "{{ kernel_version }}-v7"
+  tags: master
+
+- name: add exfat module to startup list
+  lineinfile:
+    dest: /etc/modules-load.d/modules.conf
+    line: exfat
+    state: present
+  tags: master
+
+- name: check if exfat is already loaded
+  shell: cat /proc/filesystems |grep exfat | wc -l
+  register: has_exfat
+  tags: master
+
+- name: load exfat module for current run
+  command: modprobe exfat
+  when: has_exfat.stdout.strip()|int == 0
+  tags: master
+
+- name: install stretch debian keyring
+  apt:
+    deb: http://ftp.fr.debian.org/debian/pool/main/d/debian-archive-keyring/debian-archive-keyring_2017.5_all.deb
+  when: ansible_distribution_release == "stretch"
+  tags: master
+
+- name: install jessie debian keyring
+  apt:
+    deb: http://ftp.fr.debian.org/debian/pool/main/d/debian-archive-keyring/debian-archive-keyring_2017.5~deb8u1_all.deb
+  when: ansible_distribution_release == "jessie"
+  tags: master
+
+- name: Drop a complete sources.list
+  copy:
+    src: sources_{{ ansible_distribution_release }}.list
+    dest: /etc/apt/sources.list
+  when: ansible_distribution == "Debian"
+  tags: master
+
+- name: Run apt update
+  apt:
+    update_cache: yes
+  tags: ['master', 'setup']
+
+- name: Fix broken package
+  shell: dpkg --configure -a
+  tags: master
+
+- name: Remove unwanted packages before upgrading
+  apt:
+    name: apache2,apache2-mpm-worker,apache2-utils,apache2.2-bin,apache2.2-common,btrfs-tools,figlet,toilet,bluez,fping,stress,iperf,iotop,lirc,apt-listchanges,clipit,sslh,python-pip,python-setuptools,python-virtualenv,virtualenv
+    state: absent
+    purge: yes
+    autoremove: yes
+    autoclean: yes
+  tags: master
+
+- name: Install all required package
+  apt:
+    name: python-dev,git,sudo,lsb-release,vim,locate,git,unzip,bash-completion,aptitude,ntpdate,fake-hwclock,hdparm,ncurses-term,libffi-dev,libssl-dev,tree,screen,iftop,tmux,mtr-tiny,libwww-perl,httpie,lshw,hwinfo,sqlite3,elinks,mosh,curl,apt-transport-https,tar,exfat-utils
+    state: latest
+    autoremove: yes
+    autoclean: yes
+  tags: master
+
+- import_tasks: clean_apt.yml
+  tags: master
+
+- name: install newer exfat-utils from bower
+  apt:
+    deb: "{{ mirror }}/dev/exfat-utils_1.2.8-1_armhf.deb"
+  tags: ['master', 'resize']
+
+- name: Install avahi packages
+  apt:
+    name: "{{ item }}"
+    state: latest
+    autoremove: yes
+    autoclean: yes
+  with_items:
+   - avahi-daemon
+   - libnss-mdns
+   - avahi-utils
+  tags: master
+
+- name: Download pip install script
+  get_url:
+    url: https://bootstrap.pypa.io/get-pip.py
+    dest: /tmp/get-pip.py
+    timeout: 60
+    force: yes
+  tags: master
+
+- name: Install pip for python{{ python3_version }}
+  command: python{{ python3_version }} /tmp/get-pip.py
+  tags: master
+
+- name: Upgrade pip and virtualenv for python{{ python3_version }}
+  command: python{{ python3_version }} -m pip install -U pip virtualenv
+  tags: master
+
+- name: Upgrade packages
+  apt:
+    upgrade: safe
+    autoremove: yes
+    autoclean: yes
+    allow_unauthenticated: yes
+  tags: master
+
+- name: Drop hosts file on device
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+  tags: ['master', 'rename']
+
+- name: Create an ideascube user on the system
+  user:
+    name: "{{ username }}"
+    shell: /bin/bash
+    groups: "sudo,www-data,adm,staff"
+    home: "/home/{{ username }}"
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+    password: "{{ password }}"
+    update_password: 'on_create'
+  tags: master
+
+- name: Add locales
+  locale_gen:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - fr_FR.UTF-8
+    - en_US.UTF-8
+  tags: master
+
+- name: Copy a blank rc.local
+  copy:
+    src: rc.local
+    dest: /etc/rc.local
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+  tags: master
+
+- name: Copy .bashrc for root
+  copy:
+    src: bashrc
+    dest: /root/.bashrc
+    owner: root
+  tags: master
+
+- name: Copy the global vimrc file
+  copy:
+    src: vimrc.local
+    dest: /etc/vim/vimrc.local
+    owner: root
+    mode: 0644
+  tags: master
+
+- name: Copy .bashrc for new username
+  copy:
+    src: bashrc
+    dest: /home/{{ username }}/.bashrc
+    owner: "{{ username }}"
+  tags: master
+
+- name: Copy visudo file for ideascube user
+  template:
+    src: visudo.j2
+    dest: /etc/sudoers.d/shutdown
+    owner: root
+    group: root
+    mode: 0440
+    validate: "/usr/sbin/visudo -cf %s"
+  tags: master
+
+- name: Create/chmod local directory to work from
+  file:
+    path: /var/lib/ansible/local
+    state: directory
+    owner: root
+    group: root
+    mode: 0751
+  tags: master
+
+- name: Create ansible hosts directory to work from
+  file:
+    path: /etc/ansible/
+    state: directory
+    owner: root
+    group: root
+    mode: 0751
+  tags: master
+
+- name: Copy ansible inventory file to client
+  copy:
+    src: hosts
+    dest: /etc/ansible/hosts
+    owner: root
+    group: root
+    mode: 0644
+  tags: master
+
+- name: Remove the existing localtime file
+  file:
+    path: /etc/localtime
+    state: absent
+  tags: ['master', 'setup', 'reconfigure']
+
+- name: Set a new localtime file corresponding to the timezone
+  file:
+    src: /usr/share/zoneinfo/{{ timezone }}
+    dest: /etc/localtime
+    state: link
+    force: yes
+  tags: ['master', 'setup', 'reconfigure']
+
+- name: Set timezone variables
+  copy:
+    content: "{{ timezone }}"
+    dest: /etc/timezone
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+  notify: update timezone
+  tags: ['master', 'setup', 'reconfigure']
+
+- name: Checking if grub conf file is there
+  stat:
+    path: /etc/default/grub
+  register: is_grub
+  tags: master
+
+- name: Shorten GRUB_TIMEOUT
+  lineinfile:
+    dest: /etc/default/grub
+    state: present
+    backup: yes
+    regexp: '^GRUB_TIMEOUT=.*'
+    line: 'GRUB_TIMEOUT=0'
+  notify: update grub
+  when: is_grub.stat.exists is defined and is_grub.stat.exists
+  tags: master

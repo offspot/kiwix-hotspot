@@ -1,0 +1,6 @@
+---
+- name: disable service {{ service }}
+  service:
+    name: "{{ service }}"
+    enabled: no
+    state: stopped

@@ -1,0 +1,13 @@
+[Unit]
+Description=Launch hostapd 
+After=syslog.target network.target
+
+[Service]
+PIDFile=/var/run/hostapd.pid
+ExecStart=/usr/sbin/hostapd -P /var/run/hostapd.pid /etc/hostapd/hostapd.conf
+KillSignal=SIGINT
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

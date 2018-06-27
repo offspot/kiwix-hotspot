@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <title>404 Not Found - {{ hostname }}</title>
+        <link rel="icon" href="/ideascube-static/branding/favicon.png">
+        <link rel="stylesheet" href="/ideascube-static/ideascube/vendor/font-awesome/css/font-awesome.min.css" />
+        <!--[if lte IE 8]>
+            <link rel="stylesheet" type="text/css" href="/ideascube-static/ideascube/vendor/purecss/pure-css-grids-old-ie-min.css">
+        <![endif]-->
+        <!--[if gt IE 8]><!-->
+            <link rel="stylesheet" type="text/css" href="/ideascube-static/ideascube/vendor/purecss/pure-css-grids-min.css">
+        <!--<![endif]-->
+        <link rel="stylesheet" type="text/css" href="/ideascube-static/ideascube/main.css" />
+        <link rel="stylesheet" type="text/css" href="/ideascube-static/branding/style.css" />
+    </head>
+    <body class="">
+        <header>
+            <section>
+              <a href="/">
+                <h1>
+                  <img src="/ideascube-static/branding/header-logo.png"></img>
+                </h1>
+              </a>
+              <span class="boxid">{{ hostname }}</span>
+            </section>
+        </header>
+        <ul class="messages">
+            <li class="error">HTTP 404 Not Found</li>
+        </ul>
+        <div class="content">
+            <h2>Unable to connect to the requested service.</h2>
+            <ul>
+                <li>The service is not installed.</li>
+            </ul>
+            <p>Please, <a href="http://{{ fqdn }}">go back home</a> or get an administrator's help.</p>
+        </div>
+        <footer>
+            <div class="row">
+                <div class="col third i18n_switch"></div>
+                <div class="col half">
+                    <img src="/ideascube-static/ideascube/img/logoBSF.png" />
+                </div>
+            </div>
+        </footer>
+    </body>
+</html>

@@ -1,0 +1,9 @@
+[Unit]
+Description=Run ideascube clean leftover-files
+RefuseManualStart=no
+RefuseManualStop=yes
+ 
+[Service]
+Type=oneshot
+TimeoutStartSec=8min
+ExecStart=/usr/bin/ideascube clean leftover-files

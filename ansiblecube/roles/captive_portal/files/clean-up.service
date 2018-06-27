@@ -1,0 +1,13 @@
+[Unit]
+Description=Boot-only system-wide cleanup script
+Before=network.target dnsmasq.service
+RefuseManualStart=no
+RefuseManualStop=no
+
+[Service]
+ExecStart=/usr/local/bin/clean-up-dnsmasq.sh
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
+

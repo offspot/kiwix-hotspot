@@ -1,0 +1,16 @@
+---
+- name: Remove uwsgi installed using pip (bug #17)
+  pip:
+    name: uwsgi
+    state: absent
+  tags: master
+
+- name: Remove the old service file
+  file:
+    path: /etc/systemd/system/uwsgi.service
+    state: absent
+  tags: master
+
+- name: just force systemd to reread its services
+  command: systemctl daemon-reload
+  tags: master
