@@ -23,11 +23,11 @@
 - include_tasks: enable_service.yml service=parsoid
   when: ansible_local.config.wikifundi_languages | length
 
-- include_tasks: enable_service.yml service=php5-fpm
-  when: ansible_local.config.wikifundi_languages | length and ansible_distribution_release == "jessie"
+- include_tasks: enable_service.yml service=memcached
+  when: ansible_local.config.wikifundi_languages | length
 
 - include_tasks: enable_service.yml service=php7.0-fpm
-  when: ansible_local.config.wikifundi_languages | length and ansible_distribution_release == "stretch"
+  when: ansible_local.config.wikifundi_languages | length
 
 - include_tasks: enable_vhost.yml name={{ item }}.wikifundi
   with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"

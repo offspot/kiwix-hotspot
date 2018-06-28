@@ -52,7 +52,6 @@
       # move content
     - role: packages
       when: ansible_local.config.packages | length
-      tags: move-content
 
     - role: kalite_content
       when: ansible_local.config.kalite_languages | length

@@ -2,22 +2,16 @@
 - import_tasks: clean_apt.yml
   tags: setup
 
+# excluding node (npm,nodejs) as already installed during wikifundi_setup
 - name: Install dependencies
   apt:
-    name: nginx,libmagickwand-dev,npm,nodejs,python3-dev
+    name: nginx,libmagickwand-dev,python3-dev
     state: latest
     autoremove: yes
     autoclean: yes
   tags: setup
 
 - import_tasks: clean_apt.yml
-  tags: setup
-
-- name: Link node to nodejs binary
-  file:
-    src: /usr/bin/nodejs
-    dest: /usr/bin/node
-    state: link
   tags: setup
 
 - name: Install bower

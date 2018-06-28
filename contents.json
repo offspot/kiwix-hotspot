@@ -41,29 +41,21 @@
         "archive_size": 773285,
         "expanded_size": 2097152
     },
-    "wikifundi_parsoid": {
-        "url": "{mirror}/other/wikifundi/parsoid_2016-08-nosym.tar.bz2",
-        "name": "parsoid_2016-08-nosym.tar.bz2",
-        "folder_name": "parsoid",
-        "checksum": "e3d48cf435fb6caa25a4600fd96dbecf6dc5957b7ecdfe76a33aa8f019481958",
-        "archive_size": 49469932,
-        "expanded_size": 426360832
-    },
     "wikifundi_langpack_fr": {
-        "url": "{mirror}/other/wikifundi/fr.africapack.kiwix.org_2017-01.tar.bz2",
-        "name": "wikifundi_fr_2017-01.tar.bz2",
-        "folder_name": "fr.africapack.kiwix.org",
-        "checksum": "eb04d53b78ecb12e0e774cfdf8c4145acc506d37ad1fd3fbd6f15cb7b5e88254",
-        "archive_size": 4184681300,
-        "expanded_size": 8081637376
+        "url": "{mirror}/other/wikifundi/2.0/mediawiki_data_fr_2018-06.tar.bz2",
+        "name": "mediawiki_data_fr_2018-06.tar.bz2",
+        "folder_name": "data",
+        "checksum": "078b61788e8ae4c8b9b970c415e5114b086b30c85fd5be2a9f992df9e7f2f858",
+        "archive_size": 2270930112,
+        "expanded_size": 2832760832
     },
     "wikifundi_langpack_en": {
-        "url": "{mirror}/other/wikifundi/en.africapack.kiwix.org_2017-01.tar.bz2",
-        "name": "wikifundi_en_2017-01.tar.bz2",
-        "folder_name": "en.africapack.kiwix.org",
-        "checksum": "2f125eef7902273213d72f87387e268f6e244993cd21ef9555a895994f35dec0",
-        "archive_size": 5086718807,
-        "expanded_size": 10023993344
+        "url": "{mirror}/other/wikifundi/2.0/mediawiki_data_en_2018-06.tar.bz2",
+        "name": "mediawiki_data_en_2018-06.tar.bz2",
+        "folder_name": "data",
+        "checksum": "3e4e80472ae99cc83cb770bbcfaa5505b422df8faf953ea8ea80b81d4517ebb8",
+        "archive_size": 2277071443,
+        "expanded_size": 3175219200
     },
     "kalite_langpack_fr": {
         "url": "{mirror}/other/kalite/langpack_fr_0.17.zip",

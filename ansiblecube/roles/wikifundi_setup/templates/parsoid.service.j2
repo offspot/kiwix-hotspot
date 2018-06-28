@@ -2,9 +2,8 @@
 Description=Parsoid server
 
 [Service]
-User=ideascube
-Group=ideascube
-ExecStart={{ wikifundi_parsoid }}/bin/server.js
+WorkingDirectory={{ parsoid_root }}
+ExecStart=/usr/local/bin/node bin/server.js
 Restart=always
 TimeoutStopSec=60
 PIDFile=/var/run/parsoid.pid
@@ -14,3 +13,7 @@ RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
+
+# MAINTENANCE
+# rm -rf {{ wikifundi_data_root }}/locks
+# maintenance/update.php --quick > {{ wikifundi_data_root }}/mw_update.log

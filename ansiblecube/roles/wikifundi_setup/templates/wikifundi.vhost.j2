@@ -1,23 +1,26 @@
-upstream php {
-    {% if ansible_distribution_release == "jessie" %}server unix:/var/run/php5-fpm.sock;{% endif %}
-    {% if ansible_distribution_release == "stretch" %}server unix:/var/run/php/php7.0-fpm.sock;{% endif %}
-}
-
 server {
     listen      80;
     listen      [::]:80;
 
     server_name {{ item }}.{{ wikifundi_fqdn }} {{ item }}.{{ wikifundi_server_name }};
-    root        /var/www/{{ item }}.africapack.kiwix.org;
+    root        {{ wikifundi_root }};
+    # access_log  /var/log/nginx/access.log;
+    # error_log   /var/log/nginx/error.log;
 
-    client_max_body_size 100m;
+    client_max_body_size 400m;
     client_body_timeout 600;
+
+    # image shortcut
+    location /w/images {
+        alias {{ wikifundi_data_root }}/images_{{ item }};
+    }
 
     # Mediawiki redirections
     location / {
-        index index.html index.php index.php5 index.php7;
+        index index.html index.php index.php5;
         rewrite ^/wiki/(.*)$ /w/index.php?title=$1&$args;
         rewrite ^/([^/\.]*)$ /wiki/$1 redirect;
+        proxy_read_timeout 3600;
     }
 
     # PHP handler
@@ -34,8 +37,10 @@ server {
         fastcgi_param            QUERY_STRING $query_string;
         fastcgi_intercept_errors on;
         fastcgi_param            HTTP_ACCEPT_ENCODING      ""; # Safari has a problem here
-        fastcgi_read_timeout	 180s; # file uploads might take long to process (thumbnail creation)
-        fastcgi_send_timeout	 180s; # file uploads still
+        fastcgi_read_timeout     180s; # file uploads might take long to process (thumbnail creation)
+        fastcgi_send_timeout     180s; # file uploads still
+        # set the language so the proper config file gets included
+        fastcgi_param            WIKIFUNDI_LANG "{{ item }}";
     }
 
     # Force caching images

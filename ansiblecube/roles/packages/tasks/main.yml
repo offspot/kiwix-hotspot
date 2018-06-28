@@ -40,16 +40,6 @@
     state: present
   tags: move-content
 
-- name: Add wikifundi CSS hack
-  lineinfile:
-    dest: /opt/venvs/ideascube/lib/python{{ python3_version }}/site-packages/ideascube/static/ideascube/cards.css
-    line: '.card.tinted[href*="http://{{ item }}.{{ wikifundi_fqdn }}"], { background-image: url("http://{{ item }}.{{ wikifundi_fqdn }}/logo.png"); background-size: 80px; }'
-    insertafter: EOF
-    state: present
-  with_items: '{{ ansible_local.config.wikifundi_languages | default(omit) }}'
-  when: ansible_local.config.wikifundi_languages | length
-  tags: ['move-content', 'rename']
-
 - name: collect static for ideascube
   become: yes
   become_user: "{{ username }}"

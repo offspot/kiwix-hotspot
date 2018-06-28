@@ -216,12 +216,6 @@ def run_wikifundi_actions(cache_folder, mount_point, logger, languages=[]):
     if not len(languages):
         return
 
-    extract_and_move(content=get_content('wikifundi_parsoid'),
-                     cache_folder=cache_folder,
-                     root_path=mount_point,
-                     final_path=os.path.join(mount_point, 'wikifundi_parsoid'),
-                     logger=logger)
-
     for lang in languages:
         lang_key = 'wikifundi_langpack_{lang}'.format(lang=lang)
         content = get_content(lang_key)

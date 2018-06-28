@@ -1,74 +1,43 @@
 ---
-- name: make sure content folders does not exist
+- name: make sure wikifundi data folder exists
   file:
-    path: "{{ wikifundi_root }}/{{ item }}.africapack.kiwix.org"
+    path: "{{ wikifundi_data_root }}"
+    state: directory
+  tags: move-content
+
+- name: make sure images folder does not exists
+  file:
+    path: "{{ wikifundi_data_root }}/images_{{ item }}"
     state: absent
   with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
   tags: move-content
 
-- name: Move downloaded content to proper location
-  command: mv {{ wikifundi_langpack_prefix }}{{ item }}/ {{ wikifundi_root }}/{{ item }}.africapack.kiwix.org
+- name: move wikifundi database
+  command: mv {{ wikifundi_langpack_prefix }}{{ item }}/mw_wikifundi_{{ item }}.sqlite {{ wikifundi_data_root }}/mw_wikifundi_{{ item }}.sqlite
   with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
-  notify: restart nginx
   tags: move-content
 
-# fix path in content source code
-- name: Change lua path and TMP in LocalSettings.custom.php
-  replace:
-    name: "{{ wikifundi_root }}/{{ item }}.africapack.kiwix.org/w/LocalSettings.custom.php"
-    regexp: '^\<\?php$'
-    replace: '<?php\nputenv("TMP={$wgUploadDirectory}/temp");\n$wgScribuntoEngineConf[''luastandalone''][''luaPath''] = "/usr/bin/lua5.1";'
+- name: Add admin account to Wikifundi
+  environment:
+    WIKIFUNDI_LANG: "{{ item }}"
+  command: php maintenance/createAndPromote.php --bureaucrat --sysop --bot --force "{{ admin_account }}" "{{ admin_password }}"
+  args:
+    chdir: "{{ mediawiki_root }}"
   with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
-  notify: restart nginx
+  when: ansible_local.config.admin_account is defined
   tags: move-content
 
-- name: Change hostname in LocalSettings.custom.php
-  replace:
-    name: "{{ wikifundi_root }}/{{ item }}.africapack.kiwix.org/w/LocalSettings.custom.php"
-    regexp: "^.+'domain' => '{{ item }}.africapack.kiwix.org',$"
-    replace: "\t\t\t\t\t\t   'domain' => '{{ item }}.{{ wikifundi_fqdn }}',"
+- name: move wikifundi images
+  command: mv {{ wikifundi_langpack_prefix }}{{ item }}/images {{ wikifundi_data_root }}/images_{{ item }}
   with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
-  notify: restart nginx
   tags: move-content
 
-- name: Set max upload size to 5M
+- name: Add wikifundi CSS hack
   lineinfile:
-    path: "{{ wikifundi_root }}/{{ item }}.africapack.kiwix.org/w/LocalSettings.custom.php"
-    line: '$wgMaxUploadSize = 1024*1024*5;'
-    insertbefore: '^\?>$'
+    dest: /opt/venvs/ideascube/lib/python{{ python3_version }}/site-packages/ideascube/static/ideascube/cards.css
+    line: '.card.tinted[href*="http://{{ item }}.{{ wikifundi_fqdn }}"], { background-image: url("http://{{ item }}.{{ wikifundi_fqdn }}/logo-sq.png"); background-size: 48px; }'
+    insertafter: EOF
     state: present
-  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
-  tags: move-content
-
-# fix extensions in the content
-- name: Get the Math renderer correctly
-  become: yes
-  shell:
-    cd {{ wikifundi_root }}/{{ item }}.africapack.kiwix.org/w/extensions/Math/math;
-    make clean all;
-    cd {{ wikifundi_root }}/{{ item }}.africapack.kiwix.org/w/extensions/Math/texvccheck;
-    make clean all;
-  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
-  notify: restart nginx
-  tags: move-content
-
-# parsoid
-- name: Make sure parsoid directory does not exist
-  file:
-    dest: "{{ wikifundi_parsoid }}"
-    state: absent
-  tags: move-content
-
-# downloaded content was placed in a different location on data part
-- name: Move downloaded parsoid to proper location
-  command: mv {{ wikifundi_parsoid_path }} {{ wikifundi_parsoid }}
-  tags: move-content
-
-- name: Change hostnames in localsettings.js
-  replace:
-    name: "{{ wikifundi_parsoid }}/localsettings.js"
-    regexp: "{{ item }}.africapack.kiwix.org"
-    replace: "{{ item }}.{{ wikifundi_fqdn }}"
-  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
-  notify: restart nginx
-  tags: move-content
+  with_items: '{{ ansible_local.config.wikifundi_languages | default(omit) }}'
+  when: ansible_local.config.wikifundi_languages | length
+  tags: ['move-content', 'rename']
