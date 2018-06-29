@@ -152,7 +152,6 @@
     upgrade: safe
     autoremove: yes
     autoclean: yes
-    allow_unauthenticated: yes
   tags: master
 
 - name: Drop hosts file on device
