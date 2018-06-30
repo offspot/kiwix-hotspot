@@ -428,7 +428,6 @@ class Application:
             self.component.done_label.set_text("Installation failed")
 
         self.component.done_window.show()
-        self.logger.complete()
         self.component.run_install_running_buttons_revealer.set_reveal_child(False)
         self.component.run_install_done_buttons_revealer.set_reveal_child(True)
 
