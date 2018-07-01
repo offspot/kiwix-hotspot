@@ -103,9 +103,9 @@
     autoclean: yes
   tags: master
 
-- name: Install all required package
+- name: Install or upgrade all required package
   apt:
-    name: python-dev,git,sudo,lsb-release,vim,locate,git,unzip,bash-completion,aptitude,ntpdate,fake-hwclock,hdparm,ncurses-term,libffi-dev,libssl-dev,tree,screen,iftop,tmux,mtr-tiny,libwww-perl,httpie,lshw,hwinfo,sqlite3,elinks,mosh,curl,apt-transport-https,tar,exfat-utils
+    name: python-dev,git,sudo,lsb-release,vim,locate,git,unzip,bash-completion,aptitude,ntpdate,fake-hwclock,hdparm,ncurses-term,libffi-dev,libssl-dev,tree,screen,iftop,tmux,mtr-tiny,libwww-perl,httpie,lshw,hwinfo,sqlite3,elinks,mosh,curl,apt-transport-https,tar,exfat-utils,gzip,hostname,liblzma5,pkg-config,systemd,systemd-sysv,tzdata,wget,xz-utils
     state: latest
     autoremove: yes
     autoclean: yes
@@ -131,6 +131,9 @@
    - avahi-utils
   tags: master
 
+- import_tasks: clean_apt.yml
+  tags: master
+
 - name: Download pip install script
   get_url:
     url: https://bootstrap.pypa.io/get-pip.py
@@ -145,13 +148,6 @@
 
 - name: Upgrade pip and virtualenv for python{{ python3_version }}
   command: python{{ python3_version }} -m pip install -U pip virtualenv
-  tags: master
-
-- name: Upgrade packages
-  apt:
-    upgrade: safe
-    autoremove: yes
-    autoclean: yes
   tags: master
 
 - name: Drop hosts file on device
