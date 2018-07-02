@@ -2,7 +2,7 @@ server {
     listen 80;
     server_name {{ edupi_fqdn }} {{ edupi_server_name }};
 
-    # client_max_body_size 500M;
+    client_max_body_size 500M;
 
     location /static {
         alias {{ edupi_data_root }}/static;
