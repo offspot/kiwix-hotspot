@@ -1,4 +1,20 @@
 ---
+- name: remount /boot as rw to change cmdline
+  command: mount -o remount,rw /boot
+  tags: master
+
+- name: remove resize_fs from first boot
+  replace:
+    path: /boot/cmdline.txt
+    regexp: ' init=/usr/lib/raspi-config/init_resize.sh'
+    replace: ''
+    backup: yes
+  tags: master
+
+- name: remount /boot as ro after cmdline change
+  command: mount -o remount,ro /boot
+  tags: master
+
 - name: Remove udev rules for wifi
   file:
     path: /etc/udev/rules.d/70-persistent-net.rules
