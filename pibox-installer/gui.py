@@ -62,6 +62,8 @@ class Logger(ProgressHelper):
         self.text_buffer = self.component.run_text_view.get_buffer()
         self.step_tag = self.text_buffer.create_tag("step", foreground="blue")
         self.err_tag = self.text_buffer.create_tag("err", foreground="red")
+        self.succ_tag = self.text_buffer.create_tag("succ", foreground="green")
+        self.stg_tag = self.text_buffer.create_tag("stg", foreground="purple")
         self.run_pulse()
 
     def step(self, step):
@@ -82,23 +84,26 @@ class Logger(ProgressHelper):
     def failed(self, error):
         GLib.idle_add(self.main_thread_failed, error)
 
-    def main_thread_step(self, text):
+    def main_thread_text(self, text, end="\n", tag=None):
+        text += end
         text_iter = self.text_buffer.get_end_iter()
-        self.text_buffer.insert_with_tags(text_iter, text + "\n", self.step_tag)
+        if tag is None:
+            self.text_buffer.insert(text_iter, text)
+        else:
+            self.text_buffer.insert_with_tags(text_iter, text, tag)
+
+    def main_thread_step(self, text):
+        self.main_thread_text("--> {}".format(text), "\n", self.step_tag)
         self._update_progress_text(text)
 
     def main_thread_err(self, text):
-        text_iter = self.text_buffer.get_end_iter()
-        self.text_buffer.insert_with_tags(text_iter, text + "\n", self.err_tag)
+        self.main_thread_text(text, "\n", self.err_tag)
 
     def main_thread_raw_std(self, text):
-        text_iter = self.text_buffer.get_end_iter()
-        self.text_buffer.insert(text_iter, text)
+        self.main_thread_text(text)
 
     def main_thread_std(self, text, end=None):
-        text_iter = self.text_buffer.get_end_iter()
-        text += end if end is not None else "\n"
-        self.text_buffer.insert(text_iter, text)
+        self.main_thread_text(text, end if end is not None else "\n")
 
     def _update_progress_text(self, text):
         self.component.run_progressbar.set_text(text)
@@ -107,6 +112,13 @@ class Logger(ProgressHelper):
         GLib.idle_add(self.update_gui)
 
     def update_gui(self):
+        # show text progress in console
+        self.main_thread_text("[STAGE {nums}: {name} - {pc:.0f}%]"
+               .format(nums=self.stage_numbers,
+                       name=self.stage_name,
+                       pc=self.get_overall_progress() * 100),
+               tag=self.stg_tag)
+
         # update overall percentage on window title
         self.component.run_window.set_title(
             "Pibox installer ({:.0f}%)"
@@ -127,12 +139,14 @@ class Logger(ProgressHelper):
 
     def main_thread_complete(self):
         super(Logger, self).complete()
+        self.main_thread_text("Installation succeded.", tag=self.succ_tag)
         self.component.run_step_label.set_markup("<b>Done.</b>")
         self.progress(1)
 
     def main_thread_failed(self, error):
         super(Logger, self).failed()
         self.step("Failed: {}".format(error))
+        self.err("Installation failed: {}".format(error))
         self.progress(1)
 
     def run_pulse(self):
