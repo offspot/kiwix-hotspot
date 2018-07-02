@@ -1,4 +1,13 @@
 ---
+- name: prevent kernel from being upgraded
+  dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  with_items:
+    - raspberrypi-kernel
+    - raspberrypi-bootloader
+  tags: master
+
 - name: remount /boot as rw to change cmdline
   command: mount -o remount,rw /boot
   tags: master
