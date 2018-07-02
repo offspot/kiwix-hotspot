@@ -1,4 +1,21 @@
 ---
+- name: prevent kernel from being upgraded
+  dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  with_items:
+    - raspberrypi-kernel
+    - raspberrypi-bootloader
+  tags: master
+
+- name: remove resize_fs from first boot
+  replace:
+    path: /boot/cmdline.txt
+    regexp: ' init=/usr/lib/raspi-config/init_resize.sh'
+    replace: ''
+    backup: no
+  tags: master
+
 - name: Remove udev rules for wifi
   file:
     path: /etc/udev/rules.d/70-persistent-net.rules
@@ -103,9 +120,15 @@
     autoclean: yes
   tags: master
 
+<<<<<<< HEAD
 - name: Install all required package
   apt:
     name: python-dev,git,sudo,lsb-release,vim,locate,git,unzip,bash-completion,aptitude,ntpdate,fake-hwclock,hdparm,ncurses-term,libffi-dev,libssl-dev,tree,screen,iftop,tmux,mtr-tiny,libwww-perl,httpie,lshw,hwinfo,sqlite3,elinks,mosh,curl,apt-transport-https,tar,exfat-utils
+=======
+- name: Install or upgrade all required package
+  apt:
+    name: python-dev,git,sudo,lsb-release,vim,locate,git,unzip,bash-completion,aptitude,ntpdate,fake-hwclock,hdparm,ncurses-term,libffi-dev,libssl-dev,tree,screen,iftop,tmux,mtr-tiny,libwww-perl,httpie,lshw,hwinfo,sqlite3,elinks,mosh,curl,apt-transport-https,tar,exfat-utils,gzip,hostname,liblzma5,pkg-config,systemd,systemd-sysv,tzdata,wget,xz-utils
+>>>>>>> v2master
     state: latest
     autoremove: yes
     autoclean: yes
@@ -131,6 +154,12 @@
    - avahi-utils
   tags: master
 
+<<<<<<< HEAD
+=======
+- import_tasks: clean_apt.yml
+  tags: master
+
+>>>>>>> v2master
 - name: Download pip install script
   get_url:
     url: https://bootstrap.pypa.io/get-pip.py
@@ -147,6 +176,7 @@
   command: python{{ python3_version }} -m pip install -U pip virtualenv
   tags: master
 
+<<<<<<< HEAD
 - name: Upgrade packages
   apt:
     upgrade: safe
@@ -155,6 +185,8 @@
     allow_unauthenticated: yes
   tags: master
 
+=======
+>>>>>>> v2master
 - name: Drop hosts file on device
   template:
     src: hosts.j2
