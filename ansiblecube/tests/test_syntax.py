@@ -18,7 +18,7 @@ def test_jinja2_file(jinja2_file):
 
 def test_json_file(json_file):
     try:
-        with open(json_file, mode='rb') as f:
+        with open(json_file, mode='r') as f:
             json.load(f, encoding='utf-8')
 
     except Exception as e:

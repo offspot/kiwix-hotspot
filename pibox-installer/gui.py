@@ -3,7 +3,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib, GdkPixbuf, GObject
 from backend.catalog import YAML_CATALOGS
-from backend.content import get_expanded_size, get_collection, get_required_image_size, get_content
+from backend.content import get_expanded_size, get_collection, get_required_image_size, get_content, isremote
 from run_installation import run_installation
 import pytz
 import tzlocal
@@ -216,6 +216,11 @@ class Application:
         self.component.css_chooser.add_filter(
             self.component.css_filter)
 
+        self.component.edupi_resources_filter.set_name("ZIP File")  # opt
+        self.component.edupi_resources_filter.add_pattern("*.zip")
+        self.component.css_chooser.add_filter(
+            self.component.edupi_resources_filter)
+
         # menu bar
         self.component.menu_quit.connect("activate", lambda widget: self.component.window.close())
         self.component.menu_about.connect("activate", self.activate_menu_about)
@@ -232,6 +237,9 @@ class Application:
 
         # admin account
         self.component.admin_account_switch.connect("notify::active", lambda switch, state: self.component.admin_account_revealer.set_reveal_child(switch.get_active()))
+
+        # edupi resources
+        self.component.edupi_switch.connect("notify::active", lambda switch, state: self.component.edupi_resources_revealer.set_reveal_child(switch.get_active()))
 
         # ideascube language
         for code, language in data.ideascube_languages:
@@ -396,7 +404,9 @@ class Application:
 
         # edupi
         self.component.edupi_switch.connect("notify::active", lambda switch, state: self.update_free_space())
-        self.component.edupi_label.set_label("{} ({})".format(self.component.edupi_label.get_label(), human_readable_size(ONE_MiB)))
+        self.component.edupi_label.set_label("{} ({})".format(self.component.edupi_label.get_label(), human_readable_size(10 * ONE_MiB)))
+        self.component.edupi_resources_url_entry.connect("changed", lambda _: self.update_free_space())
+        self.component.edupi_resources_chooser.connect("file-set", lambda _: self.update_free_space())
 
         # language tree view
         renderer_text = Gtk.CellRendererText()
@@ -645,6 +655,16 @@ class Application:
                     getattr(self.component, '{}_switch'.format(key)) \
                         .set_active(config["content"][key])
 
+            # edupi resources
+            if config["content"].get("edupi_resources") is not None:
+                rsc = config["content"].get("edupi_resources")
+                if isremote(rsc):
+                    self.component.edupi_resources_url_entry \
+                        .set_text(str(rsc))
+                else:
+                    self.component.edupi_resources_chooser \
+                        .set_filename(str(rsc))
+
             if "zims" in config["content"] \
                     and isinstance(config["content"]["zims"], list):
 
@@ -681,6 +701,10 @@ class Application:
             timezone = self.component.timezone_tree_store[timezone_id][0]
         except Exception:
             timezone = None
+
+        edupi_resources = self.get_edupi_resources()
+        if not isremote(edupi_resources):
+            edupi_resources = relpathto(self.get_edupi_resources())
 
         zim_install = []
         for zim in self.component.zim_list_store:
@@ -727,13 +751,14 @@ class Application:
             }),
             ("build_dir",
                 relpathto(self.component.build_path_chooser.get_filename())),
-            ("size", human_readable_size(size, False)),
+            ("size", None if size is None else human_readable_size(size, False)),
             ("content", {
                 "zims": zim_install,  # content-ids list
                 "kalite": kalite_active_langs,  # languages list
                 "wikifundi": wikifundi_active_langs,  # languages list
                 "aflatoun": self.component.aflatoun_switch.get_active(),
                 "edupi": self.component.edupi_switch.get_active(),
+                "edupi_resources": edupi_resources,
             }),
             ("branding", branding),
         ])
@@ -918,6 +943,11 @@ class Application:
     def zim_choose_content_button_clicked(self, button):
         self.component.zim_window.show()
 
+    def get_edupi_resources(self):
+        local_rsc = self.component.edupi_resources_chooser.get_filename()
+        remote_rsc = self.component.edupi_resources_url_entry.get_text()
+        return (remote_rsc if remote_rsc else local_rsc) or None
+
     def get_free_space(self):
         zim_list = []
         for zim in self.component.zim_list_store:
@@ -936,9 +966,11 @@ class Application:
 
         aflatoun = self.component.aflatoun_switch.get_active()
         edupi = self.component.edupi_switch.get_active()
+        edupi_resources = self.get_edupi_resources()
 
         collection = get_collection(
             edupi=edupi,
+            edupi_resources=edupi_resources,
             packages=zim_list,
             kalite_languages=kalite,
             wikifundi_languages=wikifundi,

@@ -9,6 +9,8 @@ import math
 import shutil
 import itertools
 
+import requests
+
 from data import content_file, mirror
 from util import get_temp_folder, get_checksum, ONE_GiB, ONE_GB
 from backend.catalog import YAML_CATALOGS
@@ -28,7 +30,53 @@ def get_content(key):
     return CONTENTS.get(key)
 
 
+def isremote(path_or_url):
+    return path_or_url.startswith('http')
+
+def isarchive(fpath):
+    path, ext = os.path.splitext(fpath)
+    return ext in ('.zip', '.tar', '.tar.bz2', '.tar.gz', '.tar.xz')
+
+
+def get_alien_content(path_or_url):
+    return get_remote_content(path_or_url) \
+        if isremote(path_or_url) else get_local_content(path_or_url)
+
+
+def get_local_content(fpath):
+    ''' content-like dict for a user-provided local file
+
+        WARN: file should be copied into cache manually '''
+
+    fname = os.path.basename(fpath)
+    fsize = os.path.getsize(fpath)
+    assert fsize > 0
+    return {
+        "url": "file://{fpath}".format(fpath=fpath),
+        "name": fname,
+        "checksum": None,
+        "copied_on_destination": False,
+        "archive_size": fsize,
+        "expanded_size": fsize * 1.2 if isarchive(fpath) else fsize
+    }
+
+
+def get_remote_content(url):
+    fname = os.path.basename(url)
+    fsize = int(requests.head(url).headers['Content-Length'])
+    assert fsize > 0
+    return {
+        "url": url,
+        "name": fname,
+        "checksum": None,
+        "copied_on_destination": False,
+        "archive_size": fsize,
+        "expanded_size": fsize * 1.2 if isarchive(url) else fsize
+    }
+
+
 def get_collection(edupi=False,
+                   edupi_resources=None,
                    packages=[],
                    kalite_languages=[],
                    wikifundi_languages=[],
@@ -57,7 +105,8 @@ def get_collection(edupi=False,
     if edupi:
         collection.append(('EduPi',
                            get_edupi_contents, run_edupi_actions,
-                           {'enable': edupi}))
+                           {'enable': edupi,
+                            'resources_path': edupi_resources}))
 
     if len(packages):
         collection.append(('Packages',
@@ -91,9 +140,9 @@ def get_all_contents_for(collection):
     ])
 
 
-def get_edupi_contents(enable=False):
-    ''' edupi: has no large downloads '''
-    return []
+def get_edupi_contents(enable=False, resources_path=None):
+    ''' edupi: has no large downloads. might have user-specified one '''
+    return [get_alien_content(resources_path)] if resources_path else []
 
 
 def get_kalite_contents(languages=[]):
@@ -109,7 +158,7 @@ def get_kalite_contents(languages=[]):
 
 def get_wikifundi_contents(languages=[]):
     ''' wikifundi: small size parsoid + large language pack for each lang '''
-    return [get_content('wikifundi_parsoid')] + [
+    return [
         get_content('wikifundi_langpack_{lang}'.format(lang=lang))
         for lang in languages]
 
@@ -181,9 +230,17 @@ def copy(content, cache_folder, final_path, logger):
     shutil.copy(archive_fpath, final_path)
 
 
-def run_edupi_actions(cache_folder, mount_point, logger, enable=False):
+def run_edupi_actions(cache_folder, mount_point, logger,
+                      enable=False, resources_path=None):
     ''' no action for EduPi ; everything within ansiblecube '''
-    return
+    if not enable or not resources_path:
+        return
+
+    extract_and_move(content=get_alien_content(resources_path),
+                     cache_folder=cache_folder,
+                     root_path=mount_point,
+                     final_path=os.path.join(mount_point, 'edupi_resources'),
+                     logger=logger)
 
 
 def run_kalite_actions(cache_folder, mount_point, logger, languages=[]):

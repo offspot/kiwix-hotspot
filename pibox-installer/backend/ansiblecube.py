@@ -88,6 +88,7 @@ def run_for_image(machine, root_partition_size, disk_size):
         name="default", timezone="UTC",
         language="en", language_name="English", wifi_pwd="",
         edupi=True,
+        edupi_resources=None,
         wikifundi_languages=['en', 'fr'],
         aflatoun_languages=['en', 'fr'],
         kalite_languages=['en', 'fr', 'es'],
@@ -100,7 +101,8 @@ def run_for_image(machine, root_partition_size, disk_size):
 
 
 def build_extra_vars(name, timezone, language, language_name, wifi_pwd,
-                     edupi, wikifundi_languages,
+                     edupi, edupi_resources,
+                     wikifundi_languages,
                      aflatoun_languages, kalite_languages, packages,
                      admin_account,
                      root_partition_size, disk_size):
@@ -117,6 +119,7 @@ def build_extra_vars(name, timezone, language, language_name, wifi_pwd,
         'wikifundi_languages': wikifundi_languages,
         'aflatoun_languages': aflatoun_languages,
         'edupi': edupi,
+        'edupi_has_resources': bool(edupi_resources),
         'packages': packages,
         'captive_portal': True,
         'custom_branding_path': '/tmp',

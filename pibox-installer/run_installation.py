@@ -1,6 +1,7 @@
 from backend import ansiblecube
 from backend import qemu
-from backend.content import get_collection, get_content, get_all_contents_for
+from backend.content import (get_collection, get_content,
+                             get_all_contents_for, isremote)
 from backend.download import download_content, unzip_file
 from backend.mount import mount_data_partition, unmount_data_partition, test_mount_procedure
 from backend.util import subprocess_pretty_check_call, subprocess_pretty_call
@@ -11,13 +12,15 @@ from datetime import datetime
 import os
 import sys
 import re
+import shutil
 
 
-def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, aflatoun, wikifundi, edupi, zim_install, size, logger, cancel_event, sd_card, favicon, logo, css, done_callback=None, build_dir=".", qemu_ram="2G"):
+def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, aflatoun, wikifundi, edupi, edupi_resources, zim_install, size, logger, cancel_event, sd_card, favicon, logo, css, done_callback=None, build_dir=".", qemu_ram="2G"):
 
     logger.start(bool(sd_card))
 
     logger.stage('init')
+    cache_folder = get_cache(build_dir)
 
     try:
         logger.step("Check System Requirements")
@@ -96,10 +99,15 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
         wikifundi_languages = [] if wikifundi is None else wikifundi
         aflatoun_languages = ['fr', 'en'] if aflatoun else []
 
+        if edupi_resources and not isremote(edupi_resources):
+            logger.step("Copying EduPi resources into cache")
+            shutil.copy(edupi_resources, cache_folder)
+
         # collection contains both downloads and processing callbacks
         # for all requested contents
         collection = get_collection(
             edupi=edupi,
+            edupi_resources=edupi_resources,
             packages=packages,
             kalite_languages=kalite_languages,
             wikifundi_languages=wikifundi_languages,
@@ -157,6 +165,7 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
             'language_name': dict(data.ideascube_languages)[language],
 
             'edupi': edupi,
+            'edupi_resources': edupi_resources,
             'wikifundi_languages': wikifundi_languages,
             'aflatoun_languages': aflatoun_languages,
             'kalite_languages': kalite_languages,
@@ -198,7 +207,6 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
             expanded_total_size = sum([c['expanded_size'] for c in downloads])
             processed = 0
 
-            cache_folder = get_cache(build_dir)
             for category, content_dl_cb, \
                     content_run_cb, cb_kwargs in collection:
 

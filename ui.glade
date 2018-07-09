@@ -20,6 +20,11 @@
       <mime-type>image/png</mime-type>
     </mime-types>
   </object>
+  <object class="GtkFileFilter" id="edupi_resources_filter">
+    <mime-types>
+      <mime-type>application/zip</mime-type>
+    </mime-types>
+  </object>
   <object class="GtkFileFilter" id="favicon_filter">
     <mime-types>
       <mime-type>image/png</mime-type>
@@ -1200,6 +1205,66 @@ In File mode the image is created at build path, you can choose the size
               </packing>
             </child>
             <child>
+              <object class="GtkRevealer" id="edupi_resources_revealer">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <child>
+                  <object class="GtkBox" id="no_id_77">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="spacing">5</property>
+                    <child>
+                      <object class="GtkLabel" id="edupi_resources_label">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">Preload EduPi with content from a ZIP file</property>
+                        <property name="label" translatable="yes">EduPi Initial Data :</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkEntry" id="edupi_resources_url_entry">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="text" translatable="yes"></property>
+                        <property name="tooltip_text" translatable="yes">URL to a ZIP file containing EduPi resources (overrides local ZIP file)</property>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                    	<object class="GtkFileChooserButton" id="edupi_resources_chooser">
+	                       <property name="visible">True</property>
+	                       <property name="can_focus">False</property>
+	                       <property name="create_folders">False</property>
+	                       <property name="filter">edupi_resources_filter</property>
+	                       <property name="title" translatable="yes"/>
+	                       <property name="tooltip_text" translatable="yes">ZIP file containing EduPi resources</property>
+	                     </object>
+	                     <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">False</property>
+                            <property name="pack_type">end</property>
+                            <property name="position">2</property>
+                          </packing>
+                    </child>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">17</property>
+              </packing>
+            </child>
+            <child>
               <object class="GtkBox" id="no_id_40">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -1275,7 +1340,7 @@ In File mode the image is created at build path, you can choose the size
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">17</property>
+                <property name="position">18</property>
               </packing>
             </child>
             <child>
@@ -1340,7 +1405,7 @@ In File mode the image is created at build path, you can choose the size
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">18</property>
+                <property name="position">19</property>
               </packing>
             </child>
             <child>
@@ -1376,7 +1441,7 @@ In File mode the image is created at build path, you can choose the size
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">19</property>
+                <property name="position">20</property>
               </packing>
             </child>
           </object>
