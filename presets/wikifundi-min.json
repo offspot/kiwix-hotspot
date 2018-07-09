@@ -1,6 +1,6 @@
 {
     "project_name": "WikiFundi EN Min",
-    "language": "en",
+    "language": "fr",
     "timezone": "Europe/Paris",
     "wifi": {
         "protected": false,
@@ -17,7 +17,8 @@
         "zims": [],
         "kalite": [],
         "wikifundi": [
-            "en"
+            "en",
+            "fr"
         ],
         "aflatoun": false,
         "edupi": false
