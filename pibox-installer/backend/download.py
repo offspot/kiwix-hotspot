@@ -43,7 +43,7 @@ class RequestedFile(object):
         return rf
 
     @classmethod
-    def from_disk(cls, url, fpath, checksum):
+    def from_disk(cls, url, fpath, checksum=None):
         rf = cls(url, fpath)
         rf.checksum = checksum
         rf.set(cls.FOUND)
@@ -75,7 +75,8 @@ class RequestedFile(object):
 
     @property
     def verified(self):
-        return self.present and get_checksum(self.fpath) == self.checksum
+        return self.present and (
+            get_checksum(self.fpath) == self.checksum or self.checksum == None)
 
 
 def stream(url, write_to=None, callback=None, block_size=1024):
@@ -144,6 +145,8 @@ def download_if_missing(url, fpath, logger, checksum=None):
             logger.std("MATCH.")
             return RequestedFile.from_disk(url, fpath, checksum)
         logger.std("MISMATCH.")
+    elif os.path.exists(fpath):
+        return RequestedFile.from_disk(url, fpath)
 
     return download_file(url, fpath, logger, checksum)
 
