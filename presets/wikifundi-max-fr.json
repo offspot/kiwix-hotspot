@@ -12,9 +12,10 @@
         "login": "admin"
     },
     "build_dir": null,
-    "size": "NaN",
+    "size": null,
     "content": {
-        "edupi": false,
+        "edupi": true,
+        "edupi_resources": "https://download.openzim.org/wikifundi/2.0/resources_fr_2018-06.zip",
         "kalite": [],
         "aflatoun": false,
         "zims": [
