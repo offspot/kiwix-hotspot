@@ -1,5 +1,8 @@
 import os
 import re
+import sys
+import shutil
+import fileinput
 import subprocess
 import urllib.request
 from netfilter_conf import NETFILTER_CONF
@@ -15,6 +18,8 @@ linux_version = "4.10"
 linux_folder = "linux-" + linux_version
 linux_zip = linux_folder + ".zip"
 url = "https://github.com/torvalds/linux/archive/v{}.zip".format(linux_version)
+exfat_url = "https://github.com/dorimanx/exfat-nofuse/archive/master.zip"
+exfat_zip = "exfat-nofuse-master.zip"
 
 print("--> make vexpress boot")
 if os.path.isdir(boot_zip):
@@ -32,6 +37,29 @@ else:
     zipFile.extractall()
     os.remove(linux_zip)
 
+print("--> download & extract exfat-nofuse")
+urllib.request.urlretrieve(exfat_url, filename=exfat_zip)
+zipFile = ZipFile(exfat_zip)
+zipFile.extractall()
+
+print("--> insert exfat module into kernel tree")
+# move downloaded code to fs/exfat
+exfat_folder = os.path.join(linux_folder, 'fs', 'exfat')
+shutil.rmtree(exfat_folder, ignore_errors=True)
+shutil.move("exfat-nofuse-master", exfat_folder)
+
+# add a reference to fs/exfat in the fs/ Makefile
+with open(os.path.join(linux_folder, 'fs', 'Makefile'), "a") as fs_makefile:
+    fs_makefile.write("\nobj-$(CONFIG_EXFAT_FS)     += exfat/\n")
+
+# add a reference to fs/exfat in the fs/ MenuConfig
+for line in fileinput.input(os.path.join(linux_folder, 'fs', 'Kconfig'),
+                            inplace=True):
+    sys.stdout.write(line)
+    if 'source "fs/fat/Kconfig"' in line:
+        new_line = 'source "fs/exfat/Kconfig"\n'
+        sys.stdout.write(new_line)
+
 os.chdir(linux_folder)
 
 print("--> set linux configuration")
@@ -48,6 +76,9 @@ with open(".config", "w") as config:
 
     # Enable FUSE
     config.write("\nCONFIG_FUSE_FS=y\n")
+
+    # Enable ExFAT
+    config.write("\nCONFIG_EXFAT_FS=y\n")
 
     # Enable IPV6
     config.write("\nCONFIG_IPV6=y\n")

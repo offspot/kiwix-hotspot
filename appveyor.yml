@@ -7,8 +7,8 @@ image: Visual Studio 2015
 build: off
 
 platform:
-  - x86
   - x64
+  - x86
 
 install:
   # decrypt certificate
@@ -19,16 +19,11 @@ install:
   - appveyor DownloadFile "http://download.kiwix.org/dev/pibox-installer-vexpress-boot.zip"
   - 7z.exe x pibox-installer-vexpress-boot.zip
 
-  # Download playbook
-  - appveyor DownloadFile "https://framagit.org/ideascube/ansiblecube/repository/oneUpdateFile0.4/archive.zip" -FileName "oneUpdateFile0.4.zip"
-  - 7z.exe x oneUpdateFile0.4.zip
-  - move ansiblecube-oneUpdateFile0.4* ansiblecube
-
   # Install pygobject
   # pygi-aio provides a way to install from cmd even if it is not documented
   # the only package to install is GTK with GIR
   # note: we don't use msys2 because pyinstaller fails to install on msys2
-  - appveyor DownloadFile "https://sourceforge.net/projects/pygobjectwin32/files/pygi-aio-3.18.2_rev12-setup_549872deadabb77a91efbc56c50fe15f969e5681.exe/download" -FileName "pygi-aio-setup.exe"
+  - appveyor DownloadFile "http://download.kiwix.org/dev/pygi-aio-3.18.2_rev12-setup_549872deadabb77a91efbc56c50fe15f969e5681.exe" -FileName "pygi-aio-setup.exe"
   - mkdir pygi-aio-setup
   - cd pygi-aio-setup
   - set SOURCEPATH=%cd%
@@ -59,10 +54,29 @@ install:
   # Install qemu
   - mkdir "C:\Program Files\qemu"
   - cd "C:\Program Files\qemu"
-  - if %platform%==x86 appveyor DownloadFile "https://qemu.weilnetz.de/w32/2017/qemu-w32-setup-20171006.exe" -FileName "qemu-setup.exe"
-  - if %platform%==x64 appveyor DownloadFile "https://qemu.weilnetz.de/w64/2017/qemu-w64-setup-20171006.exe" -FileName "qemu-setup.exe"
+  - if %platform%==x86 appveyor DownloadFile "https://qemu.weilnetz.de/w32/qemu-w32-setup-20180430.exe" -FileName "qemu-setup.exe"
+  - if %platform%==x64 appveyor DownloadFile "https://qemu.weilnetz.de/w64/qemu-w64-setup-20180430.exe" -FileName "qemu-setup.exe"
   - 7z x qemu-setup.exe
+  - del qemu-setup.exe
+  - move qemu-system-arm.exe qemu-arm.exe
+  - rmdir /S /Q keymaps lib share $PLUGINSDIR
+  - del qemu-system-*
+  - move qemu-arm.exe qemu-system-arm.exe
   - dir "C:\Program Files\qemu"
+
+  # bundle 7zip
+  - mkdir "C:\Program Files\7zextra"
+  - cd "C:\Program Files\7zextra"
+  - appveyor DownloadFile "https://www.7-zip.org/a/7z1805-extra.7z"
+  - 7z.exe x 7z1805-extra.7z
+
+  # Copy Imdisk Installer
+  - mkdir "C:\Program Files\imdiskinst"
+  - cd "C:\Program Files\imdiskinst"
+  - appveyor DownloadFile "http://download.kiwix.org/dev/imdiskinst.exe" -FileName "imdiskinst.exe"
+  - 7z x imdiskinst.exe
+  - del imdiskinst.exe
+  - dir "C:\Program Files\imdiskinst"
 
   # Run pyinstaller and show warning
   - cd C:\projects\pibox-installer
@@ -70,7 +84,6 @@ install:
   - if %platform%==x64 C:\Python34\python.exe C:\Python34\Scripts\pyinstaller-script.py --log-level=DEBUG pibox-installer-win64.spec
   - if %platform%==x86 type build\pibox-installer-win32\warnpibox-installer-win32.txt
   - if %platform%==x64 type build\pibox-installer-win64\warnpibox-installer-win64.txt
-
 
   # Deploy
   - cd C:\projects\pibox-installer\dist\pibox-installer

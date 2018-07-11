@@ -1,0 +1,44 @@
+image: "python:3.4"
+
+before_script:
+  - apt-get update
+  - DEBIAN_FRONTEND=noninteractive apt-get install -y locales openssh-client wget zip unzip tar python3-gi python3-gi-cairo python3-cairo gir1.2-gtk-3.0 libdbus-1-dev libdbus-glib-1-dev libffi-dev build-essential libssl-dev python3-dev libgdk-pixbuf2.0-dev
+  - sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && dpkg-reconfigure --frontend=noninteractive locales && update-locale LANG=en_US.UTF-8
+
+  # SSH key and known hosts handling
+  - eval $(ssh-agent -s)
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - ssh-keyscan download.kiwix.org >> ~/.ssh/known_hosts
+  - chmod 644 ~/.ssh/known_hosts
+
+build-pibox-image:
+  stage: build
+  variables:
+    LANG: 'en_US.UTF-8'
+  script:
+    # download custom kernel
+    - wget http://download.kiwix.org/dev/pibox-installer-vexpress-boot.zip
+    - unzip pibox-installer-vexpress-boot.zip
+
+    # download a static qemu
+    - wget http://download.kiwix.org/dev/qemu-2.12.0-linux-x86_64.tar.gz
+    - tar xf qemu-2.12.0-linux-x86_64.tar.gz
+
+    # Install python dependancies
+    - pip3 install -r requirements-linux.txt
+
+    # Install and run pyinstaller
+    - pip3 install https://github.com/thiolliere/pyinstaller/archive/develop.zip
+    - pyinstaller --log-level=DEBUG pibox-installer-linux.spec
+    - cat build/pibox-installer-linux/warnpibox-installer-linux.txt
+
+    # start image builder
+    - eval "export OUT_IMG=pibox-master_$(date +"%Y-%m-%d").img"
+    - dist/pibox-installer image --ram 8G --root 7 --size 8 --out ${OUT_IMG}
+    - zip -9 ${OUT_IMG}.zip ${OUT_IMG}
+    - scp ${OUT_IMG}.zip upload@download.kiwix.org:/var/www/download.kiwix.org/plug/base/
+  only:
+    - schedules
+    - web
