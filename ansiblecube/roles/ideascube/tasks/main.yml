@@ -64,6 +64,12 @@
   with_items: "{{ ideascube_handlers }}"
   tags: reconfigure
 
+- name: replace BSF logo with Kiwix one
+  copy:
+    src: logoKIWIX-ideascube.png
+    dest: /opt/venvs/ideascube/lib/python{{ python3_version }}/site-packages/ideascube/static/ideascube/img/logoBSF.png
+  tags: master
+
 - block:
 
   - debug: msg="Customize branding"
