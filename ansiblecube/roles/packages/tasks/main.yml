@@ -15,7 +15,7 @@
 - name: Install, upgrade or remove packages
   become: yes
   become_user: "{{ username }}"
-  shell: ideascube catalog install --package-cache {{ packages_cache }} --skip-sha256 {{ item.name }}
+  shell: ideascube catalog install --package-cache {{ packages_cache }} --skip-sha256 {{ item }}
   with_items: '{{ ansible_local.config.packages | default(omit) }}'
   when: ansible_local.config.packages | length
   register: ideascube_catalog_cmd
@@ -25,7 +25,7 @@
 - name: Add CSS for package icon
   lineinfile:
     dest: /opt/venvs/ideascube/lib/python{{ python3_version }}/site-packages/ideascube/static/ideascube/cards.css
-    line: '.card.{{ item.name|splitext|first|replace(".", "\.") }} { background-image: url("http://{{ kiwix_fqdn }}/{{ item.name }}/-/favicon"); }'
+    line: '.card.{{ item|splitext|first|replace(".", "\.") }} { background-image: url("http://{{ kiwix_fqdn }}/{{ item }}/-/favicon"); }'
     insertafter: EOF
     state: present
   with_items: '{{ ansible_local.config.packages | default(omit) }}'
