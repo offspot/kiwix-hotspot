@@ -36,9 +36,9 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
         # set image names
         today = datetime.today().strftime('%Y_%m_%d-%H_%M_%S')
 
-        image_final_path = os.path.join(build_dir, "pibox-{}.img".format(today))
-        image_building_path = os.path.join(build_dir, "pibox-{}.BUILDING.img".format(today))
-        image_error_path = os.path.join(build_dir, "pibox-{}.ERROR.img".format(today))
+        image_final_path = os.path.join(build_dir, "plug-{}.img".format(today))
+        image_building_path = os.path.join(build_dir, "plug-{}.BUILDING.img".format(today))
+        image_error_path = os.path.join(build_dir, "plug-{}.ERROR.img".format(today))
 
         # Prepare SD Card
         if sd_card:
@@ -66,11 +66,11 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
 
         # Download Base image
         logger.stage('master')
-        logger.step("Retrieving pibox base image file")
+        logger.step("Retrieving base image file")
         base_image = get_content('pibox_base_image')
         rf = download_content(base_image, logger, build_dir)
         if not rf.successful:
-            logger.err("Failed to download pibox base image.\n{e}"
+            logger.err("Failed to download base image.\n{e}"
                        .format(e=rf.exception))
             sys.exit(1)
         elif rf.found:

@@ -93,17 +93,17 @@ install:
   - if %platform%==x64 type build\pibox-installer-win64\warnpibox-installer-win64.txt
 
   # Deploy
-  - cd C:\projects\pibox-installer\dist\pibox-installer
-  - 7z.exe a -m0=Copy C:\projects\pibox-installer\windows_bundle\pibox-installer.exe *
+  - cd C:\projects\pibox-installer\dist\kiwix-plug_installer
+  - 7z.exe a -m0=Copy C:\projects\pibox-installer\windows_bundle\kiwix-plug_installer.exe *
 
-  - if %platform%==x86 move C:\projects\pibox-installer\windows_bundle\pibox-installer.exe C:\msys64\home\appveyor\pibox-installer-win32.exe
-  - if %platform%==x64 move C:\projects\pibox-installer\windows_bundle\pibox-installer.exe C:\msys64\home\appveyor\pibox-installer-win64.exe
+  - if %platform%==x86 move C:\projects\pibox-installer\windows_bundle\kiwix-plug_installer.exe C:\msys64\home\appveyor\kiwix-plug_installer-win32.exe
+  - if %platform%==x64 move C:\projects\pibox-installer\windows_bundle\kiwix-plug_installer.exe C:\msys64\home\appveyor\kiwix-plug_installer-win64.exe
   - move C:\projects\pibox-installer\pibox_installer_ci_rsa C:\msys64\home\appveyor\
 
   - if defined APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH (echo %APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH% > branch.txt) else (echo %APPVEYOR_REPO_BRANCH% > branch.txt)
   - move branch.txt C:\msys64\home\appveyor\
-  - if %platform%==x86 C:\msys64\usr\bin\bash --login -c "DESTINATION=$(cat /c/destination-ps.txt | tr -d '\r' | tr -d '\n') ; scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-win32.exe nightlybot@download.kiwix.org:$DESTINATION/pibox-installer-win32-$(cat branch.txt | sed 's/ //g').exe"
-  - if %platform%==x64 C:\msys64\usr\bin\bash --login -c "DESTINATION=$(cat /c/destination-ps.txt | tr -d '\r' | tr -d '\n') ; scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-win64.exe nightlybot@download.kiwix.org:$DESTINATION/pibox-installer-win64-$(cat branch.txt | sed 's/ //g').exe"
+  - if %platform%==x86 C:\msys64\usr\bin\bash --login -c "DESTINATION=$(cat /c/destination-ps.txt | tr -d '\r' | tr -d '\n') ; scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa kiwix-plug_installer-win32.exe nightlybot@download.kiwix.org:$DESTINATION/kiwix-plug_installer-win32-$(cat branch.txt | sed 's/ //g').exe"
+  - if %platform%==x64 C:\msys64\usr\bin\bash --login -c "DESTINATION=$(cat /c/destination-ps.txt | tr -d '\r' | tr -d '\n') ; scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa kiwix-plug_installer-win64.exe nightlybot@download.kiwix.org:$DESTINATION/kiwix-plug_installer-win64-$(cat branch.txt | sed 's/ //g').exe"
 
   - if defined APPVEYOR_REPO_TAG_NAME (echo %APPVEYOR_REPO_TAG_NAME% > C:\msys64\home\appveyor\tag.txt)
-  - C:\msys64\usr\bin\bash --login -c "PIBOX_RELEASE=$(cat tag.txt | sed 's/ //g' | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*\(-rc[[:digit:]]\+\)\?') || true; if [ $PIBOX_RELEASE ]; then mkdir -p releases/$PIBOX_RELEASE/; cp pibox-installer-win*.exe releases/$PIBOX_RELEASE/; scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases/$PIBOX_RELEASE nightlybot@download.kiwix.org:/var/www/download.kiwix.org/release/kiwix-plug_installer/; fi"
+  - C:\msys64\usr\bin\bash --login -c "PIBOX_RELEASE=$(cat tag.txt | sed 's/ //g' | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*\(-rc[[:digit:]]\+\)\?') || true; if [ $PIBOX_RELEASE ]; then mkdir -p releases/$PIBOX_RELEASE/; cp kiwix-plug_installer-win*.exe releases/$PIBOX_RELEASE/; scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases/$PIBOX_RELEASE nightlybot@download.kiwix.org:/var/www/download.kiwix.org/release/kiwix-plug_installer/; fi"

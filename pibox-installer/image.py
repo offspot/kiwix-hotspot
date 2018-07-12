@@ -128,7 +128,7 @@ def main(logger,
     logger.std("SUCCESS! {} was built successfuly".format(image_fpath))
 
 
-parser = argparse.ArgumentParser(description="pibox base image creator")
+parser = argparse.ArgumentParser(description="Kiwix-plug base image creator")
 parser.add_argument("--root", help="root partition size (GB)", default=7)
 parser.add_argument("--size", help="Image (SD card) size (GB)", default=8)
 parser.add_argument("--build", help="Folder to create files in",

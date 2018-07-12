@@ -1,10 +1,10 @@
-# Pibox installer
+# Kiwix-plug installer
 
 This installer install [Ideascube](https://framagit.org/ideascube/ideascube) on an SD card for raspberrypi 2 or raspberrypi 3.
 
 Ideascube is a solution to serve offline content from the web such as Wikipedia, the Gutenberg library, TED talks.
 
-Pibox installer configure the RaspberryPi into a hotspot WiFi with Ideascube server and offline contents.
+Kiwix-plug installer configure the RaspberryPi into a hotspot WiFi with Ideascube server and offline contents.
 
 ## Download
 

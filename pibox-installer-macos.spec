@@ -26,7 +26,7 @@ pyz = PYZ(a.pure, a.zipped_data,
 exe = EXE(pyz,
           a.scripts,
           exclude_binaries=True,
-          name='pibox-installer',
+          name='kiwix-plug_installer',
           debug=False,
           strip=False,
           upx=True,
@@ -37,8 +37,8 @@ coll = COLLECT(exe,
                a.datas,
                strip=False,
                upx=True,
-               name='pibox-installer')
+               name='kiwix-plug_installer')
 app = BUNDLE(coll,
-             name='pibox-installer.app',
+             name='kiwix-plug_installer.app',
              icon='pibox-installer-logo.icns',
-             bundle_identifier='org.ideascube.pibox')
+             bundle_identifier='org.kiwix.plug')

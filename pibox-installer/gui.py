@@ -43,7 +43,7 @@ def run():
 
 class ShortDialog(Gtk.Dialog):
     def __init__(self, parent, buttons, msg):
-        Gtk.Dialog.__init__(self, "pibox installer - dialog", parent, 0, buttons)
+        Gtk.Dialog.__init__(self, "kiwix-plug installer", parent, 0, buttons)
         self.set_default_size(150, 100)
         label = Gtk.Label(msg)
         box = self.get_content_area()
@@ -121,7 +121,7 @@ class Logger(ProgressHelper):
 
         # update overall percentage on window title
         self.component.run_window.set_title(
-            "Pibox installer ({:.0f}%)"
+            "Kiwix-plug installer ({:.0f}%)"
             .format(self.get_overall_progress() * 100))
 
         # update stage name and number (Stage x/y)
@@ -572,11 +572,11 @@ class Application:
                 self.set_config(config)
 
         if for_save:
-            title = "Select a file to save Pibox config to"
+            title = "Select a file to save Kiwix-plug config to"
             action = Gtk.FileChooserAction.SAVE
             on_accept = _save
         else:
-            title = "Select Pibox config file to load"
+            title = "Select Kiwix-plug config file to load"
             action = Gtk.FileChooserAction.OPEN
             on_accept = _load
 
@@ -833,7 +833,7 @@ class Application:
         all_valid = True
 
         project_name = self.component.project_name_entry.get_text()
-        allowed_chars = set(string.ascii_uppercase + string.ascii_lowercase + string.digits + '-')
+        allowed_chars = set(string.ascii_uppercase + string.ascii_lowercase + string.digits + '-' + ' ')
         condition = len(project_name) >= 1 and len(project_name) <= 64 and set(project_name) <= allowed_chars
         validate_label(self.component.project_name_label, condition)
         self.component.project_name_constraints_revealer.set_reveal_child(not condition)

@@ -46,7 +46,7 @@
   </object>
   <object class="GtkWindow" id="run_window">
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes">Pibox installer</property>
+    <property name="title" translatable="yes">Kiwix-plug installer</property>
     <property name="default_width">640</property>
     <property name="default_height">480</property>
     <child>
@@ -218,7 +218,7 @@
   </object>
   <object class="GtkWindow" id="done_window">
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes">Pibox installer</property>
+    <property name="title" translatable="yes">Kiwix-plug installer</property>
     <property name="modal">True</property>
     <property name="default_width">320</property>
     <property name="default_height">240</property>
@@ -271,7 +271,7 @@
   </object>
   <object class="GtkWindow" id="window">
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes">Pibox installer</property>
+    <property name="title" translatable="yes">Kiwix-plug installer</property>
     <child>
       <object class="GtkBox" id="no_id_56">
         <property name="visible">True</property>
@@ -364,7 +364,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="tooltip_text" translatable="yes">Machine and WiFi name</property>
-                    <property name="label" translatable="yes">Pibox name :</property>
+                    <property name="label" translatable="yes">Plug name :</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -376,7 +376,7 @@
                   <object class="GtkEntry" id="project_name_entry">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="text" translatable="yes">pibox</property>
+                    <property name="text" translatable="yes">Kiwix Plug</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -640,7 +640,7 @@ It can be modified after installation using the file:
                       <object class="GtkEntry" id="wifi_password_entry">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="text" translatable="yes">piboxwifipwd</property>
+                        <property name="text" translatable="yes">kiwixplug-wifipwd</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -1461,7 +1461,7 @@ In File mode the image is created at build path, you can choose the size
     <property name="can_focus">False</property>
     <property name="type_hint">dialog</property>
     <property name="transient_for">window</property>
-    <property name="program_name">Pibox Installer</property>
+    <property name="program_name">Kiwix-plug installer</property>
     <property name="version">nightly</property>
     <property name="website">https://framagit.org/ideascube/pibox-installer</property>
     <property name="logo_icon_name">image-missing</property>
@@ -1493,7 +1493,7 @@ In File mode the image is created at build path, you can choose the size
   </object>
   <object class="GtkWindow" id="space_error_window">
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes">Pibox installer</property>
+    <property name="title" translatable="yes">Kiwix-plug installer</property>
     <property name="modal">True</property>
     <property name="window_position">center-on-parent</property>
     <property name="transient_for">window</property>
@@ -1710,7 +1710,7 @@ In File mode the image is created at build path, you can choose the size
   </object>
   <object class="GtkWindow" id="zim_window">
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes">Pibox installer</property>
+    <property name="title" translatable="yes">Kiwix-plug installer</property>
     <property name="modal">True</property>
     <property name="default_width">1025</property>
     <property name="default_height">640</property>

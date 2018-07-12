@@ -211,7 +211,7 @@ else:
     args.human_size = human_readable_size(args.size, False)
 
 # display configuration and offer time to cancel
-print("Pibox-installer configuration:")
+print("Kiwix-plug installer configuration:")
 keys = args.__dict__.keys()
 longest = max([len(key) for key in keys])
 for name in keys:
