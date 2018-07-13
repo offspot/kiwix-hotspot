@@ -249,26 +249,9 @@ class Application:
         self.component.language_combobox.pack_start(renderer, True)
         self.component.language_combobox.add_attribute(renderer, "text", 1)
 
-        index = -1
-        for i, (code, language) in enumerate(data.ideascube_languages):
-            if code == 'en':
-                index = i
-        self.component.language_combobox.set_active(index)
-
-        # timezone
-        default_id = -1
-        local_tz = tzlocal.get_localzone()
-        for id, timezone in enumerate(pytz.common_timezones):
-            if timezone == "UTC" and default_id == -1:
-                default_id = id
-            if pytz.timezone(timezone) == local_tz:
-                default_id = id
-            self.component.timezone_tree_store.append(None, [timezone])
-
         renderer = Gtk.CellRendererText()
         self.component.timezone_combobox.pack_start(renderer, True)
         self.component.timezone_combobox.add_attribute(renderer, "text", 0)
-        self.component.timezone_combobox.set_active(default_id)
 
         # output
         self.component.sd_card_combobox.connect("changed", lambda _: self.update_free_space())
@@ -419,9 +402,75 @@ class Application:
         self.component.zim_language_tree_view.get_selection().connect("changed", self.zim_language_selection_changed)
 
         self.refresh_disk_list()
-        self.update_free_space()
+
+        self.reset_config()  # will calculate free space
 
         self.component.window.show()
+
+    def reset_config(self):
+        ''' restore UI to its initial (non-configured) state '''
+
+        # name
+        self.component.project_name_entry.set_text("Kiwix Plug")
+
+        # language
+        index = -1
+        for i, (code, language) in enumerate(data.ideascube_languages):
+            if code == 'en':
+                index = i
+        self.component.language_combobox.set_active(index)
+
+        # timezone
+        default_id = -1
+        local_tz = tzlocal.get_localzone()
+        for id, timezone in enumerate(pytz.common_timezones):
+            if timezone == "UTC" and default_id == -1:
+                default_id = id
+            if pytz.timezone(timezone) == local_tz:
+                default_id = id
+            self.component.timezone_tree_store.append(None, [timezone])
+        self.component.timezone_combobox.set_active(default_id)
+
+        # wifi
+        self.component.wifi_password_switch.set_active(True)
+        self.component.wifi_password_entry.set_text("kiwixplug-wifipwd")
+
+        # admin account
+        self.component.admin_account_switch.set_active(False)
+        self.component.admin_account_login_entry.set_text("admin")
+        self.component.admin_account_pwd_entry.set_text("admin-password")
+
+        # branding
+        for key in ('logo', 'favicon', 'css'):
+            getattr(self.component, '{}_chooser'.format(key)).unselect_all()
+
+        # build_dir
+        self.component.build_path_chooser.unselect_all()
+
+        # size
+        self.component.size_entry.set_text('')
+
+        # content
+        for key in ('kalite', 'wikifundi'):
+            for lang, button in getattr(self, 'iter_{}_check_button'
+                                              .format(key))():
+                button.set_active(False)
+
+        for key in ('edupi', 'aflatoun'):
+            getattr(self.component, '{}_switch'.format(key)).set_active(False)
+
+        # edupi resources
+        self.component.edupi_resources_url_entry.set_text('')
+        self.component.edupi_resources_chooser.unselect_all()
+
+        # static contents
+        for index, zim in enumerate(self.component.zim_list_store):
+            if zim[8]:
+                self.component.zim_list_store[index][8] = False
+        self.component.choosen_zim_tree_view.set_model(self.component.zim_list_store)
+
+        self.update_free_space()
+
 
     def iter_kalite_check_button(self):
         return [("fr", self.component.kalite_fr_check_button),
@@ -559,6 +608,9 @@ class Application:
     def set_config(self, config):
         if not isinstance(config, dict):
             return
+
+        # reset all options
+        self.reset_config()
 
         # project_name
         if "project_name" in config:
