@@ -9,7 +9,7 @@ import time
 import string
 import random
 import tempfile
-import subprocess
+import platform
 
 from data import data_dir
 from backend.content import get_content
@@ -124,7 +124,7 @@ def install_imdisk_via_cmd(logger=None):
     cwd = os.getcwd()
     try:
         os.chdir(imdiskinst)
-        subprocess.check_call(['cmd.exe', 'install.cmd'], logger)
+        subprocess_pretty_check_call(['cmd.exe', 'install.cmd'], logger)
     except Exception:
         pass
     finally:
@@ -256,17 +256,17 @@ def mount_data_partition(image_fpath, logger=None):
 
     elif sys.platform == "darwin":
         # attach image to create loop devices
-        hdiutil_out = subprocess.check_output(
-            [hdiutil_exe, 'attach', '-nomount', image_fpath]) \
-            .decode('utf-8', 'ignore')
+        hdiutil_out = subprocess_pretty_call(
+            [hdiutil_exe, 'attach', '-nomount', image_fpath],
+            logger, check=True, decode=True)[0].strip()
         target_dev = str(hdiutil_out.splitlines()[0].split()[0])
         target_part = "{dev}s3".format(dev=target_dev)
 
         # create a mount point in /tmp
         mount_point = tempfile.mkdtemp()
         try:
-            subprocess.check_call([mount_exe, '-t', 'exfat',
-                                  target_part, mount_point])
+            subprocess_pretty_check_call(
+                [mount_exe, '-t', 'exfat', target_part, mount_point], logger)
         except Exception:
             # ensure we release the loop device on mount failure
             unmount_data_partition(mount_point, target_dev)
