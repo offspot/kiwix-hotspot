@@ -8,7 +8,7 @@
     },
     "admin_account": {
         "custom": false,
-        "password": "admin",
+        "password": "adminadmin",
         "login": "admin"
     },
     "build_dir": null,
@@ -21,15 +21,10 @@
         "zims": [
             "wikipedia_fr_medicine_nopic.fr",
             "vikidia_fr_all.fr",
-            "wikipedia_en_medicine_novid.en",
             "wikimooc_fr_all.fr",
-            "wikipedia_en_all_novid.en",
             "wikipedia_fr_all_novid.fr",
             "wikiquote_fr_all_novid.fr",
-            "wikiquote_en_all_novid.en",
             "wikisource_fr_all_novid.fr",
-            "wikisource_en_all_novid.en",
-            "wiktionary_en_all_novid.en",
             "wiktionary_fr_all.fr"
         ],
         "wikifundi": [

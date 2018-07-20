@@ -7,7 +7,7 @@
         "protected": false
     },
     "admin_account": {
-        "password": "admin",
+        "password": "adminadmin",
         "custom": false,
         "login": "admin"
     },
