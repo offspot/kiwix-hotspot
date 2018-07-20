@@ -1,5 +1,5 @@
 {
-    "project_name": "WikiFundi Simple EN FR",
+    "project_name": "WikiFundi",
     "language": "en",
     "timezone": "Europe/Paris",
     "wifi": {
@@ -19,7 +19,7 @@
             "en"
         ],
         "edupi": true,
-        "edupi_resources": "https://download.openzim.org/wikifundi/2.0/resources_en_fr_2018-06.zip",
+        "edupi_resources": "https://download.openzim.org/wikifundi/2.0/resources_en_fr_2018-07.zip",
         "aflatoun": false,
         "zims": [],
         "kalite": []
