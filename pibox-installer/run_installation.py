@@ -3,7 +3,7 @@ from backend import qemu
 from backend.content import (get_collection, get_content,
                              get_all_contents_for, isremote)
 from backend.download import download_content, unzip_file
-from backend.mount import mount_data_partition, unmount_data_partition, test_mount_procedure
+from backend.mount import mount_data_partition, unmount_data_partition, test_mount_procedure, format_data_partition
 from backend.util import subprocess_pretty_check_call, subprocess_pretty_call
 from backend.sysreq import host_matches_requirements, requirements_url
 import data
@@ -91,7 +91,7 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
                           .format(image_building_path))
 
         logger.step("Testing mount procedure")
-        test_mount_procedure(image_building_path, logger)
+        test_mount_procedure(image_building_path, logger, thorough=True)
 
         # harmonize options
         packages = [] if zim_install is None else zim_install
@@ -197,8 +197,11 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
 
         # mount image's 3rd partition on host
         logger.stage('copy')
-        logger.step("Mounting data partition on host")
 
+        logger.step("Formating data partition on host")
+        format_data_partition(image_building_path, logger)
+
+        logger.step("Mounting data partition on host")
         # copy contents from cache to mount point
         try:
             mount_point, device = mount_data_partition(

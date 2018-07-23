@@ -1,0 +1,19 @@
+---
+- name: restore {{ data_path }} archive
+  become: yes
+  become_user: "{{ username }}"
+  shell: tar -m --no-same-permissions --no-same-owner --no-overwrite-dir -C {{ data_path }} -xf /home/{{ username }}/data_part.tar
+  ignore_errors: yes
+  tags: move-content
+
+- name: ensure kiwix data folder is present
+  file:
+    path: "{{ data_path }}/ideascube/kiwix/data"
+    state: directory
+  tags: move-content
+
+- name: remove backup archive
+  file:
+    path: /home/{{ username }}/data_part.tar
+    state: absent
+  tags: move-content

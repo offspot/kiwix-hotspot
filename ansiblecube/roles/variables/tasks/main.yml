@@ -2,6 +2,10 @@
 - debug: msg="Start playbook {{ ansible_date_time["date"] }} - {{ ansible_date_time["time"] }}"
   tags: always
 
+- name: DEBUG list {{ data_path }} content
+  command: ls -lh {{ data_path }}
+  tags: always
+
 - name: ensure custom facts directory exists
   file:
     path: /etc/ansible/facts.d

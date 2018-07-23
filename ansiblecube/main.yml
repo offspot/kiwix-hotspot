@@ -14,6 +14,9 @@
   roles:
     - role: variables
 
+    - role: restore
+      tags: move-content
+
     # master, setup (timezone, apt-update)
     - role: system
     
@@ -64,6 +67,9 @@
 
     - role: wikifundi_content
       when: ansible_local.config.wikifundi_languages | length
+
+    - role: backup
+      tags: reconfigure
 
     - role: services
       tags: seal

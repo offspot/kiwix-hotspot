@@ -134,7 +134,7 @@
 - name: install newer exfat-utils from bower
   apt:
     deb: "{{ mirror }}/dev/exfat-utils_1.2.8-1_armhf.deb"
-  tags: ['master', 'resize']
+  tags: master
 
 - name: Install avahi packages
   apt:

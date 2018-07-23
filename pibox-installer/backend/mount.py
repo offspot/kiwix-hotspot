@@ -37,8 +37,10 @@ if sys.platform == "win32":
 elif sys.platform == "linux":
     udisksctl_exe = '/usr/bin/udisksctl'
     udisks_nou = '--no-user-interaction'
+    mkfs_exe = '/sbin/mkfs.exfat'
 elif sys.platform == "darwin":
     hdiutil_exe = '/usr/bin/hdiutil'
+    diskutil_exe = '/usr/sbin/diskutil'
     mount_exe = '/sbin/mount'
     umount_exe = '/sbin/umount'
 
@@ -213,8 +215,8 @@ def test_mount_procedure(image_fpath, logger=None, thorough=False):
             pass  # failed to unmount (outch)
 
 
-def mount_data_partition(image_fpath, logger=None):
-    ''' mount the QEMU image's 3rd part and return its mount point/drive '''
+def get_virtual_device(image_fpath, logger=None):
+    ''' create and return a loop device or drive letter we can format/mount '''
 
     if sys.platform == "linux":
         # find out offset for third partition from the root part size
@@ -222,7 +224,6 @@ def mount_data_partition(image_fpath, logger=None):
         disk_size = get_qemu_image_size(image_fpath, logger)
         offset, size = get_start_offset(
             base_image.get('root_partition_size'), disk_size)
-        # size = get_partition_size(image_fpath, offset, logger)
 
         # prepare loop device
         udisks_loop = subprocess_pretty_call(
@@ -234,6 +235,82 @@ def mount_data_partition(image_fpath, logger=None):
         target_dev = re.search(r"(\/dev\/loop[0-9]+)\.$",
                                udisks_loop).groups()[0]
 
+        return target_dev
+
+    elif sys.platform == "darwin":
+        # attach image to create loop devices
+        hdiutil_out = subprocess_pretty_call(
+            [hdiutil_exe, 'attach', '-nomount', image_fpath],
+            logger, check=True, decode=True)[0].strip()
+        target_dev = str(hdiutil_out.splitlines()[0].split()[0])
+
+        return target_dev
+
+    elif sys.platform == "win32":
+        # make sure we have imdisk installed
+        install_imdisk(logger)
+
+        # get an available letter
+        target_dev = get_avail_drive_letter(logger)
+
+        return target_dev
+
+
+def format_data_partition(image_fpath, logger=None):
+    ''' format the QEMU image's 3rd part in exfat on host '''
+
+    target_dev = get_virtual_device(image_fpath, logger)
+
+    if sys.platform == "linux":
+        # make sure it's not mounted (gnoe automounts)
+        subprocess_pretty_call(
+            [udisksctl_exe, 'unmount',
+             '--block-device', target_dev, udisks_nou], logger)
+
+        # format the data partition
+        try:
+            subprocess_pretty_check_call(
+                [mkfs_exe, '-n', 'data', target_dev], logger)
+        except Exception:
+            raise
+        finally:
+            # ensure we release the loop device on mount failure
+            unmount_data_partition(None, target_dev)
+
+    elif sys.platform == "darwin":
+        target_part = "{dev}s3".format(dev=target_dev)
+
+        try:
+            subprocess_pretty_check_call(
+                [diskutil_exe, 'eraseVolume', 'exfat', 'data',  target_part], logger)
+        except Exception:
+            raise
+        finally:
+            # ensure we release the loop device on mount failure
+            unmount_data_partition(None, target_dev)
+
+    elif sys.platform == "win32":
+        # mount into specified path AND format
+        try:
+            subprocess_pretty_check_call(
+                [imdisk_exe, '-a', '-f', image_fpath,
+                 '-o', 'rw', '-t', 'file',
+                 '-v', '3',
+                 '-p', '/fs:exfat /V:data /q /y',
+                 '-m', target_dev], logger)
+        except Exception:
+            raise
+        finally:
+            # ensure we release the loop device on mount failure
+            unmount_data_partition(None, target_dev)
+
+
+def mount_data_partition(image_fpath, logger=None):
+    ''' mount the QEMU image's 3rd part and return its mount point/drive '''
+
+    target_dev = get_virtual_device(image_fpath, logger)
+
+    if sys.platform == "linux":
         # mount the loop-device (udisksctl sets the mount point)
         udisks_mount_ret, udisks_mount = subprocess_pretty_call(
             [udisksctl_exe, 'mount',
@@ -255,11 +332,6 @@ def mount_data_partition(image_fpath, logger=None):
         return mount_point, target_dev
 
     elif sys.platform == "darwin":
-        # attach image to create loop devices
-        hdiutil_out = subprocess_pretty_call(
-            [hdiutil_exe, 'attach', '-nomount', image_fpath],
-            logger, check=True, decode=True)[0].strip()
-        target_dev = str(hdiutil_out.splitlines()[0].split()[0])
         target_part = "{dev}s3".format(dev=target_dev)
 
         # create a mount point in /tmp
@@ -274,11 +346,6 @@ def mount_data_partition(image_fpath, logger=None):
         return mount_point, target_dev
 
     elif sys.platform == "win32":
-        # make sure we have imdisk installed
-        install_imdisk(logger)
-
-        # get an available letter
-        target_dev = get_avail_drive_letter(logger)
         mount_point = "{}\\".format(target_dev)
 
         # mount into the specified drive
@@ -292,30 +359,36 @@ def unmount_data_partition(mount_point, device, logger=None):
     ''' unmount data partition and free virtual resources '''
 
     if sys.platform == "linux":
+
         # sleep to prevent unmount failures
         time.sleep(5)
-        # unmount using device path
-        subprocess_pretty_call(
-            [udisksctl_exe, 'unmount',
-             '--block-device', device, udisks_nou], logger)
-        try:
-            os.rmdir(mount_point)
-        except FileNotFoundError:
-            pass
+
+        if mount_point:
+            # unmount using device path
+            subprocess_pretty_call(
+                [udisksctl_exe, 'unmount',
+                 '--block-device', device, udisks_nou], logger)
+            try:
+                os.rmdir(mount_point)
+            except FileNotFoundError:
+                pass
         # delete the loop device (might have already been deletec)
         subprocess_pretty_call(
             [udisksctl_exe, 'loop-delete',
              '--block-device', device, udisks_nou], logger)
 
     elif sys.platform == "darwin":
-        # unmount
-        subprocess_pretty_call([umount_exe, mount_point], logger)
-        try:
-            os.rmdir(mount_point)
-        except FileNotFoundError:
-            pass
+
+        if mount_point:
+            # unmount
+            subprocess_pretty_call([umount_exe, mount_point], logger)
+            try:
+                os.rmdir(mount_point)
+            except FileNotFoundError:
+                pass
         # detach image file (also unmounts if not already done)
         subprocess_pretty_call([hdiutil_exe, 'detach', device], logger)
     elif sys.platform == "win32":
+
         # unmount using force (-D) as -d is not reliable
         subprocess_pretty_call([imdisk_exe, '-D', '-m', device], logger)

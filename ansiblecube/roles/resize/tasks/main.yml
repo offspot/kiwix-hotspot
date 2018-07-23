@@ -160,5 +160,5 @@
     state: directory
   with_items:
     - "{{ data_path }}/test"
-  tags: ['setup', 'reconfigure']
+  tags: always
 
