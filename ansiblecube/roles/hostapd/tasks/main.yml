@@ -38,5 +38,9 @@
     mode: 0664
   tags: master
 
+- name: reload systemd
+  systemd:
+    daemon-reload: yes
+
 - include_tasks: enable_service.yml service=hostapd
   tags: master

@@ -18,23 +18,28 @@
   service:
     name: hostapd
     state: restarted
+    enabled: yes
 
 - name: restart nginx
   service:
     name: nginx
     state: restarted
+    enabled: yes
 
 - name: restart uwsgi
   service:
     name: uwsgi
     state: restarted
+    enabled: yes
 
 - name: restart kiwix
   service:
     name: kiwix-server
     state: restarted
+    enabled: yes
 
 - name: restart network manager
   service:
     name: network-manager
     state: restarted
+    enabled: yes
