@@ -54,8 +54,9 @@ matrix:
     - mv pibox-installer-0.0.0.dmg pibox-installer-macos.dmg
 
     # Send dmg
+    - if [ "$TRAVIS_EVENT_TYPE" = "cron" ]; then DESTINATION="/var/www/download.kiwix.org/nightly/$(date +'%Y-%m-%d')"; else DESTINATION="/var/www/tmp.kiwix.org/ci"; fi
     - BRANCH=${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}
-    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-macos.dmg nightlybot@download.kiwix.org:/var/www/download.kiwix.org/nightly/$(date +"%Y-%m-%d")/pibox-installer-macos-$BRANCH.dmg
+    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa pibox-installer-macos.dmg nightlybot@download.kiwix.org:$DESTINATION/pibox-installer-macos-$BRANCH.dmg
 
     - PIBOX_RELEASE=$(echo $TRAVIS_TAG | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*\(-rc[[:digit:]]\+\)\?') || true
     - if [ $PIBOX_RELEASE ]; then mkdir -p releases/$PIBOX_RELEASE; cp pibox-installer-macos.dmg releases/$PIBOX_RELEASE/; scp -r -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases/$PIBOX_RELEASE nightlybot@download.kiwix.org:/var/www/download.kiwix.org/release/kiwix-plug_installer/; fi
@@ -117,8 +118,9 @@ matrix:
     - cd ..
 
     # Deploy
+    - if [ "$TRAVIS_EVENT_TYPE" = "cron" ]; then DESTINATION="/var/www/download.kiwix.org/nightly/$(date +'%Y-%m-%d')"; else DESTINATION="/var/www/tmp.kiwix.org/ci"; fi
     - BRANCH=${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}
-    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer-linux.tar.gz nightlybot@download.kiwix.org:/var/www/download.kiwix.org/nightly/$(date +"%Y-%m-%d")/pibox-installer-linux-$BRANCH.tar.gz
+    - scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/pibox-installer-linux.tar.gz nightlybot@download.kiwix.org:$DESTINATION/pibox-installer-linux-$BRANCH.tar.gz
 
     - PIBOX_RELEASE=$(echo $TRAVIS_TAG | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*\(-rc[[:digit:]]\+\)\?') || true
     - if [ $PIBOX_RELEASE ]; then mkdir -p releases/$PIBOX_RELEASE; cp dist/pibox-installer-linux.tar.gz releases/$PIBOX_RELEASE; scp -r -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases/$PIBOX_RELEASE nightlybot@download.kiwix.org:/var/www/download.kiwix.org/release/kiwix-plug_installer/; fi
