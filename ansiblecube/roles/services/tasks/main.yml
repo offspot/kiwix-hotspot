@@ -39,4 +39,4 @@
 - name: Disable SSH
   systemd:
     name: ssh
-    enabled: yes
+    enabled: no
