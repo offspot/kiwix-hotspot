@@ -954,6 +954,7 @@ class Application:
                         wikifundi=wikifundi,
                         aflatoun=aflatoun,
                         edupi=edupi,
+                        edupi_resources=self.get_edupi_resources(),
                         zim_install=zim_install,
                         size=output_size,
                         logger=self.logger,
