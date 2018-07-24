@@ -124,7 +124,7 @@ def build_extra_vars(name, timezone, language, language_name, wifi_pwd,
         'captive_portal': True,
         'custom_branding_path': '/tmp',
         'admin_account': "admin",
-        'admin_password': "admin",
+        'admin_password': "admin-password",
     }
 
     if wifi_pwd:

@@ -395,7 +395,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Must contains only 1 to 31 ASCII letters 'A' to 'z'
-and digits '0' to '9' and hyphen '-'</property>
+and digits '0' to '9', space and hyphen '-'</property>
                         <attributes>
                           <attribute name="foreground" value="#efef29292929"/>
                         </attributes>
@@ -780,8 +780,8 @@ and digits '0' to '9'</property>
                               <object class="GtkLabel" id="no_id_72">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Must contains only 0 to 31 ASCII letters 'A' to 'z'
-and digits '0' to '9'</property>
+                                <property name="label" translatable="yes">Must contains only 0 to 31 ASCII letters 'A' to 'z',
+digits '0' to '9', hyphen '_' and underscore '_'</property>
                                 <attributes>
                                   <attribute name="foreground" value="#efef29292929"/>
                                 </attributes>
@@ -840,8 +840,9 @@ and digits '0' to '9'</property>
                               <object class="GtkLabel" id="no_id_74">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Must contains only 0 to 31 ASCII letters 'A' to 'z'
-and digits '0' to '9'</property>
+                                <property name="label" translatable="yes">Must contains only 0 to 31 ASCII letters 'A' to 'z',
+digits '0' to '9', hyphen '-' and underscore '_'
+Must be different than login</property>
                                 <attributes>
                                   <attribute name="foreground" value="#efef29292929"/>
                                 </attributes>

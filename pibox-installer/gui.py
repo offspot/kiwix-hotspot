@@ -870,8 +870,8 @@ class Application:
                 "login": self.component.admin_account_login_entry.get_text(),
                 "pwd": self.component.admin_account_pwd_entry.get_text(),
             }
-            login_condition = len(admin_account["login"]) <= 31 and set(admin_account["login"]) <= set(string.ascii_uppercase + string.ascii_lowercase + string.digits)
-            pwd_condition = len(admin_account["pwd"]) <= 31 and set(admin_account["pwd"]) <= set(string.ascii_uppercase + string.ascii_lowercase + string.digits)
+            login_condition = len(admin_account["login"]) <= 31 and set(admin_account["login"]) <= set(string.ascii_uppercase + string.ascii_lowercase + string.digits + '-' + '_')
+            pwd_condition = len(admin_account["pwd"]) <= 31 and set(admin_account["pwd"]) <= set(string.ascii_uppercase + string.ascii_lowercase + string.digits + '-' + '_') and (admin_account["pwd"] != admin_account["login"])
         self.component.admin_account_login_constraints_revealer.set_reveal_child(not login_condition)
         self.component.admin_account_pwd_constraints_revealer.set_reveal_child(not pwd_condition)
         validate_label(self.component.admin_account_login_label, login_condition)
