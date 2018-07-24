@@ -1,5 +1,6 @@
 import os
 import re
+import zipfile
 import threading
 import signal
 import sys
@@ -17,6 +18,7 @@ import humanfriendly
 ONE_MiB = 2 ** 20
 ONE_GiB = 2 ** 30
 ONE_GB = int(1e9)
+EXFAT_FORBIDDEN_CHARS = ['/', '\\', ':', '*', '?', '"', '<', '>', '|']
 
 
 STAGES = collections.OrderedDict([
@@ -360,3 +362,28 @@ def b64decode(fname, data, to):
     with open(fpath, 'wb') as fp:
         fp.write(base64.b64decode(data))
     return fpath
+
+
+def exfat_fnames_filter(fname):
+    ''' whether supplied fname is valid exfat fname or not '''
+    # TODO: check for chars U+0000 to U+001F
+    return sum([1 for x in EXFAT_FORBIDDEN_CHARS if x in fname]) == 0
+
+
+def ensure_zip_exfat_compatible(fpath):
+    ''' wether supplied ZIP archive at fpath contains exfat-OK file names
+
+        boolean, [erroneous, file, names]'''
+    bad_fnames = []
+    try:
+        with zipfile.ZipFile(fpath, 'r') as zipf:
+            # loop over all file names in the ZIP
+            for path in zipf.namelist():
+                # loop over all parts (folder, subfolder(s), fname)
+                for part in Path(path).splitall():
+                    if not exfat_fnames_filter(part) \
+                            and part not in bad_fnames:
+                        bad_fnames.append(part)
+    except Exception as exp:
+        return False, [str(exp)]
+    return len(bad_fnames) == 0, bad_fnames

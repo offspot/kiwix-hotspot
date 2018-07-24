@@ -1,13 +1,14 @@
 from backend import ansiblecube
 from backend import qemu
 from backend.content import (get_collection, get_content,
-                             get_all_contents_for, isremote)
+                             get_all_contents_for, isremote, get_content_cache,
+                             get_alien_content)
 from backend.download import download_content, unzip_file
 from backend.mount import mount_data_partition, unmount_data_partition, test_mount_procedure, format_data_partition
 from backend.util import subprocess_pretty_check_call, subprocess_pretty_call
 from backend.sysreq import host_matches_requirements, requirements_url
 import data
-from util import human_readable_size, get_cache
+from util import human_readable_size, get_cache, ensure_zip_exfat_compatible, EXFAT_FORBIDDEN_CHARS
 from datetime import datetime
 import os
 import sys
@@ -139,6 +140,21 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
                                    s=human_readable_size(rf.downloaded_size)))
             retrieved += dl_content['archive_size']
             logger.progress(retrieved / archives_total_size)
+
+        # check edupi resources compliance
+        if edupi_resources:
+            logger.step("Verifying EduPi resources file names")
+            exfat_compat, exfat_errors = ensure_zip_exfat_compatible(get_content_cache(get_alien_content(edupi_resources),
+                                                    cache_folder, True))
+            if not exfat_compat:
+                raise ValueError("Your EduPi resources archive is incorrect.\n"
+                                 "It should be a ZIP file of a root folder "
+                                 "in which all files have exfat-compatible "
+                                 "names (no {chars})\n... {fnames}"
+                                 .format(chars=" ".join(EXFAT_FORBIDDEN_CHARS),
+                                         fnames="\n... ".join(exfat_errors)))
+            else:
+                logger.std("EduPi resources archive OK")
 
         # instanciate emulator
         logger.stage('setup')
