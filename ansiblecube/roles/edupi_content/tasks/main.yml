@@ -1,0 +1,6 @@
+---
+- name: Install the user-provided resources
+  become: yes
+  become_user: "{{ username }}"
+  command: "{{ edupi_env }}/bin/python3 {{ edupi_root }}/manage.py import-from-folder {{ edupi_resources_path }}"
+  tags: move-content

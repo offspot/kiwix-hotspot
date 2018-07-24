@@ -1,0 +1,82 @@
+---
+- hosts: localhost
+
+  handlers:
+    - import_tasks: handlers.yml
+
+  pre_tasks:
+    - name: Set the LED steady before upgrading !!!
+      shell: echo default-on >/sys/class/leds/a20-olinuxino-lime2:green:usr/trigger
+      when: ansible_architecture == 'armv7l' and ansible_lsb.id == 'Debian'
+      ignore_errors: yes
+      tags: ['always']
+
+  roles:
+    - role: variables
+
+    - role: restore
+      tags: move-content
+
+    # master, setup (timezone, apt-update)
+    - role: system
+    
+      # master, resize
+    - role: resize
+
+    - role: nginx
+      tags: master
+
+    - role: uwsgi
+      tags: master
+
+      # master, rename, setup, reconfigure
+    - role: ideascube
+
+      # master, rename
+    - role: kiwix
+
+      # master, rename
+    - role: captive_portal
+      when: ansible_local.config.captive_portal|bool
+
+      # content setup (install, dependencies)
+    - role: wikifundi_setup
+      when: ansible_local.config.wikifundi_languages | length
+
+    - role: aflatoun_setup
+      when: ansible_local.config.aflatoun_languages | length
+
+    - role: edupi_setup
+      when: ansible_local.config.edupi|bool
+
+    - role: kalite_setup
+      when: ansible_local.config.kalite_languages | length
+
+      # move content
+    - role: edupi_content
+      when: ansible_local.config.edupi_has_resources|bool
+
+    - role: packages
+      when: ansible_local.config.packages | length
+
+    - role: kalite_content
+      when: ansible_local.config.kalite_languages | length
+
+    - role: aflatoun_content
+      when: ansible_local.config.aflatoun_languages | length
+
+    - role: wikifundi_content
+      when: ansible_local.config.wikifundi_languages | length
+
+    - role: backup
+      tags: reconfigure
+
+    - role: services
+      tags: seal
+
+  post_tasks:
+    - name: Heartbeat mode on KoomBook LED, update is over !!!
+      shell: echo heartbeat >/sys/class/leds/a20-olinuxino-lime2:green:usr/trigger
+      when: ansible_architecture == 'armv7l' and ansible_lsb.id == 'Debian'
+      ignore_errors: yes
+      tags: ['always']

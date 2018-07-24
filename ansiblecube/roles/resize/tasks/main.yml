@@ -1,0 +1,164 @@
+---
+- name: disable exfat-fuse as handler for exfat fs
+  file:
+    dest: /sbin/mount.exfat
+    state: absent
+  tags: master
+
+- name: Unmount {{ data_path }} partition
+  become: yes
+  command: umount {{ data_path }}
+  ignore_errors: True
+  tags: ['master', 'resize']
+
+- name: make sure data partition is removed from fstab
+  lineinfile:
+    dest: /etc/fstab
+    state: absent
+    regexp: 'exfat'
+  tags: ['master', 'resize']
+
+- name: remove {{ data_path }} if it exists
+  file:
+    dest: "{{ data_path }}"
+    state: absent
+  tags: resize
+
+- name: Copy partition table analysis script
+  copy:
+    src: partition_boundaries.py
+    dest: /tmp/partition_boundaries.py
+  tags: ['master', 'resize']
+
+- name: display disk table
+  command: fdisk -l {{ disk }}
+  tags: ['master', 'resize']
+
+- name: Analyze disk partition table
+  become: yes
+  shell: fdisk -l {{ disk }} | python /tmp/partition_boundaries.py {{ root_partition_size }} {{ disk_size }}
+  register: disk_partition_infos  
+  tags: ['master', 'resize']
+
+- name: Delete partition table analysis script
+  file:
+    path: /tmp/partition_boundaries.py
+    state: absent
+  tags: ['master', 'resize']
+
+- name: get number of partitions
+  shell: ls -l {{ disk }}p* |wc -l
+  register: nb_partitions
+  tags: ['master', 'resize']
+
+- name: delete data partition if it exists
+  become: yes
+  shell: /bin/echo -e "d\n3\nw" | fdisk {{ disk }}
+  ignore_errors: True
+  when: nb_partitions.stdout.strip()|int >= 3
+  tags: ['master', 'resize']
+
+- name: informing kernel about partition deletion
+  become: yes
+  command: partprobe -s
+  when: nb_partitions.stdout.strip()|int >= 3
+  tags: ['master', 'resize']
+
+- name: recreating root partition
+  become: yes
+  shell: /bin/echo -e "d\n2\nn\np\n2\n{{ disk_partition_infos.stdout.split()[0] }}\n{{ disk_partition_infos.stdout.split()[1] }}\nt\n2\n83\nw" | fdisk {{ disk }}
+  ignore_errors: True
+  tags: ['master', 'resize']
+
+- name: informing kernel about root partition's new boundaries
+  become: yes
+  command: partprobe -s
+  tags: ['master', 'resize']
+
+- name: resize filesystem on root partition
+  become: yes
+  command: resize2fs {{ root_partition }}
+  tags: ['master', 'resize']
+
+# should raise an error because acting on mounted partitions
+- name: Recreating third partition
+  become: yes
+  shell: /bin/echo -e "n\np\n3\n{{ disk_partition_infos.stdout.split()[2] }}\n{{ disk_partition_infos.stdout.split()[3] }}\nt\n3\n7\nw" | fdisk {{ disk }}
+  ignore_errors: True
+  tags: ['master', 'resize']
+
+- name: informing kernel about new data partition
+  become: yes
+  command: partprobe -s
+  tags: ['master', 'resize']
+
+- name: Formatting third partition (exfat)
+  become: yes
+  command: mkfs.exfat {{ data_partition }}
+  tags: ['master', 'resize']
+
+- name: display disk table
+  command: fdisk -l {{ disk }}
+  tags: ['master', 'resize']
+
+- name: display disk table
+  command: fdisk -l {{ data_partition }}
+  tags: ['master', 'resize']
+
+- name: display exfat table
+  command: dumpexfat -s {{ data_partition }}
+  tags: ['master', 'resize']
+
+- name: check exfat
+  command: fsck.exfat {{ data_partition }}
+  tags: ['master', 'resize']
+
+- name: create {{ data_path }} placeholder
+  file:
+    dest: "{{ data_path }}"
+    state: directory
+    owner: "{{ username }}"
+    group: www-data
+    mode: 0775
+  tags: ['master', 'resize']
+
+- name: installing a new fstab with longer device timeouts and {{ data_path }} mout point
+  template:
+    src: fstab.j2
+    dest: /etc/fstab
+  tags: ['master', 'resize']
+
+- name: create systemd-service to mount /boot
+  template:
+    src: mount-boot-partition.service
+    dest: /etc/systemd/system/mount-boot-partition.service
+  tags: master
+
+- name: make systemd-udev-trigger dependent on our boot service
+  replace:
+    name: /lib/systemd/system/systemd-udev-trigger.service
+    regexp: '^Wants=systemd-udevd.service$'
+    replace: 'Wants=systemd-udevd.service mount-boot-partition.service'
+  tags: master
+
+- name: reload systemd
+  command: systemctl daemon-reload
+  tags: master
+
+- name: Mounting third partition to {{ data_path }}
+  command: mount "{{ data_path }}"
+  args:
+    warn: no
+  ignore_errors: True
+  tags: ['master', 'resize']
+
+- name: Create test directory
+  become: yes
+  become_user: "{{ username }}"
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ data_path }}/test"
+  tags: always
+

@@ -1,0 +1,140 @@
+---
+- import_tasks: clean_apt.yml
+  tags: setup
+
+# excluding node (npm,nodejs) as already installed during wikifundi_setup
+- name: Install dependencies
+  apt:
+    name: nginx,libmagickwand-dev,python3-dev
+    state: latest
+    autoremove: yes
+    autoclean: yes
+  tags: setup
+
+- import_tasks: clean_apt.yml
+  tags: setup
+
+- name: Install bower
+  npm:
+    name: bower
+    global: yes
+    state: latest
+  tags: setup
+
+- name: Create directories
+  become: yes
+  become_user: "{{ username }}"
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ edupi_data_root }}/"
+    - "{{ edupi_data_root }}/database"
+    - "{{ edupi_data_root }}/static"
+    - "{{ edupi_data_root }}/media"
+    - "{{ edupi_data_root }}/stats"
+  tags: ['setup', 'reconfigure']
+
+- name: remove edupi folder if it exists
+  become: yes
+  become_user: "{{ username }}"
+  file:
+    dest: "{{ edupi_root }}"
+    state: absent
+  tags: setup
+
+- name: remove edupi env if it exists
+  become: yes
+  become_user: "{{ username }}"
+  file:
+    dest: "{{ edupi_env }}"
+    state: absent
+  tags: setup
+
+- name: Download edupi
+  become: yes
+  become_user: "{{ username }}"
+  git:
+    repo: https://github.com/rgaudin/edupi.git
+    dest: "{{ edupi_root }}"
+    version: v{{ edupi_version }}
+  tags: setup
+
+- name: Replace allowed hosts
+  become: yes
+  become_user: "{{ username }}"
+  replace:
+    path: "{{ edupi_root }}/edupi/settings.py"
+    regexp: '^ALLOWED_HOSTS =.*$'
+    replace: 'ALLOWED_HOSTS = ["{{ edupi_fqdn }}", ".{{ fqdn }}", "{{ fqdn }}", "{{ hostname }}", "localhost"]'
+  tags: ['setup', 'rename']
+
+- name: Replace EduPi DATA_ROOT
+  become: yes
+  become_user: "{{ username }}"
+  replace:
+    name: "{{ edupi_root }}/edupi/settings.py"
+    regexp: '^DATA_ROOT =.*$'
+    replace: 'DATA_ROOT = "{{ edupi_data_root }}"'
+  tags: ['setup', 'reconfigure']
+
+- name: collectstatic edupi
+  become: yes
+  become_user: "{{ username }}"
+  command: "{{ edupi_env }}/bin/python3 {{ edupi_root }}/manage.py collectstatic --noinput"
+  tags: reconfigure
+
+- name: Create python{{ python3_version }} environment
+  become: yes
+  become_user: "{{ username }}"
+  command: virtualenv --python=python{{ python3_version }} {{ edupi_env }}
+  tags: setup
+
+- name: Install requirements
+  become: yes
+  become_user: "{{ username }}"
+  pip:
+    requirements: "{{ edupi_root }}/requirements.txt"
+    executable: "{{ edupi_env }}/bin/pip"
+  tags: setup
+
+- name: Manage install bower
+  become: yes
+  become_user: "{{ username }}"
+  command: "{{ edupi_env }}/bin/python3 {{ edupi_root }}/manage.py bower install"
+  tags: setup
+
+- name: Manage migrate
+  become: yes
+  become_user: "{{ username }}"
+  command: "{{ edupi_env }}/bin/python3 {{ edupi_root }}/manage.py migrate"
+  tags: reconfigure
+
+- name: Check if EduPi super user is installed
+  become: yes
+  become_user: "{{ username }}"
+  shell: /bin/echo "from django.contrib.auth.models import User; print('****{}****'.format(User.objects.filter(username='{{ admin_account }}').count()))" | {{ edupi_env }}/bin/python3 {{ edupi_root }}/manage.py shell --plain
+  register: edupi_admin_shell_output
+  when: admin_account is defined
+  tags: reconfigure
+
+- name: Install EduPi super user
+  become: yes
+  become_user: "{{ username }}"
+  shell: /bin/echo "from django.contrib.auth.models import User; User.objects.create_superuser('{{ admin_account }}', None, '{{ admin_password }}')" | {{ edupi_env }}/bin/python3 {{ edupi_root }}/manage.py shell --plain
+  when: admin_account is defined and edupi_admin_shell_output.stdout.split('****')[1]|int == 0
+  tags: reconfigure
+
+- name: Copy nginx vhost
+  template:
+    src: edupi.vhost.j2
+    dest: /etc/nginx/sites-available/edupi
+  notify: restart nginx
+  tags: ['setup', 'rename']
+
+- name: Setup edupi service
+  template:
+    src: edupi.service.j2
+    dest: /etc/systemd/system/edupi.service
+  notify: reload systemd
+  tags: setup

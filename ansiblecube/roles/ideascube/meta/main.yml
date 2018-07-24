@@ -1,0 +1,6 @@
+---
+dependencies:
+  - { role: dnsmasq }
+  - { role: hostapd }
+  - { role: iptables }
+  - { role: network-manager }

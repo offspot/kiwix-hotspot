@@ -1,0 +1,53 @@
+from .base import *  # pragma: no flakes
+
+from tzlocal import get_localzone
+
+ALLOWED_HOSTS = [".{{ fqdn }}", "{{ fqdn }}", "{{ hostname }}", "localhost", "127.0.0.1"]
+TIME_ZONE = get_localzone().zone
+DOMAIN = "{{ fqdn }}"
+STAFF_HOME_CARDS = [c for c in STAFF_HOME_CARDS  # pragma: no flakes
+                    if c['url'] in ['user_list', 'server:settings']]
+LANGUAGE_CODE = "{{ language }}"
+LANGUAGES = [("{{ language }}", "{{ language_name }}")]
+BUILTIN_APP_CARDS = []
+EXTRA_APP_CARDS = [{% if kalite_languages | length %}"khanacademy"{% endif %}]
+CUSTOM_CARDS = [
+{% if aflatoun_languages | length %}
+    {"category": "learn",
+     "url": "http://{{ aflatoun_fqdn }}",
+     "title": "Aflatoun",
+     "description": "Social and Financial Education for Children and Young People",
+     "fa": "book",
+     "is_staff": False
+    },
+{% endif %}
+{% if wikifundi_languages | length %}
+{% if "en" in wikifundi_languages %}
+    {"category": "create",
+     "url": "http://en.{{ wikifundi_fqdn }}",
+     "title": "Wikifundi",
+     "description": "Offline editable environment that provides a similar experience to editing Wikipedia online",
+     "fa": "wikifundi",
+     "is_staff": False
+    },
+{% endif %}
+{% if "fr" in wikifundi_languages %}
+    {"category": "create",
+     "url": "http://fr.{{ wikifundi_fqdn }}",
+     "title": "Wikifundi",
+     "description": "Environnement qui vous permet de créer des articles Wikipédia hors-ligne",
+     "fa": "wikifundi",
+     "is_staff": False
+    },
+{% endif %}
+{% endif %}
+{% if edupi %}
+    {"category": "manage",
+     "url": "http://{{ edupi_fqdn }}",
+     "title": "Edupi",
+     "description": "Content management application",
+     "fa": "folder",
+     "is_staff": False
+    },
+{% endif %}
+]

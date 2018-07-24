@@ -1,0 +1,6 @@
+proc           /proc           proc    defaults                                                  0       0
+{{ disk }}p1 /boot           vfat    defaults,x-systemd.device-timeout=3min                    0       2
+{{ disk }}p2 /               ext4    defaults,noatime,x-systemd.device-timeout=3min            0       1
+{{ disk }}p3 {{ data_path }}           exfat   umask=0002,uid=1001,gid=33,x-systemd.device-timeout=3min  0       0
+# a swapfile is not a swap partition, no line here
+#   use  dphys-swapfile swap[on|off]  for that

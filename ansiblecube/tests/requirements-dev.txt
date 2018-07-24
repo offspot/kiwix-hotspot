@@ -1,0 +1,2 @@
+ansible==2.5.4
+pytest==3.6.1

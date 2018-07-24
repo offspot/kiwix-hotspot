@@ -1,0 +1,22 @@
+# the upstream component nginx needs to connect to
+server {
+
+## Captive portal listening on port 82 for HTTP and 83 for HTTPS
+
+    listen	82;
+    listen	[::]:82;
+    listen	83 ssl;
+
+## SSL certificate only used to allow forwarding of HTTPS requests. 
+
+    ssl_certificate /etc/nginx/ssl/ideascube.crt;
+    ssl_certificate_key /etc/nginx/ssl/ideascube.key;
+    keepalive_timeout 0;
+
+    location / {
+        expires 0;
+        add_header Cache-Control no-store;
+        include uwsgi_params;
+        uwsgi_pass 127.0.0.1:3031;
+    }
+}

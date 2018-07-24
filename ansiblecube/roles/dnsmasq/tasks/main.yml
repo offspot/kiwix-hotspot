@@ -1,0 +1,40 @@
+---
+- name: Install dnsmasq
+  apt:
+    name: dnsmasq
+    state: latest
+    autoremove: yes
+    autoclean: yes
+  tags: master
+
+- name: stop dnsmasq
+  service:
+    name: dnsmasq
+    enabled: no
+    state: stopped
+
+- name: Copy dnsmasq.conf file
+  template:
+    src: dnsmasq.conf.j2
+    dest: /etc/dnsmasq.conf
+    backup: yes
+  tags: ['master', 'rename']
+
+- name: Copy dnsmasq-spoof.conf file
+  template: 
+    src: dnsmasq-spoof.conf.j2
+    dest: /etc/dnsmasq-spoof.conf
+  tags: master
+
+- name: Create a new interfaces file
+  template:
+    src: interfaces.j2
+    dest: /etc/network/interfaces
+    backup: yes
+  tags: master
+
+- name: restart dsnmasq
+  service:
+    name: dnsmasq
+    state: restarted
+  tags: seal

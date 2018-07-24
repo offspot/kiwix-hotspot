@@ -1,0 +1,42 @@
+---
+- include_tasks: enable_service.yml service=remove_staticfiles_json
+- include_tasks: enable_service.yml service=kiwix-server
+
+- include_tasks: enable_service.yml service=edupi
+  when: ansible_local.config.edupi|bool
+
+- include_tasks: enable_vhost.yml name=edupi
+  when: ansible_local.config.edupi|bool
+
+- include_tasks: enable_service.yml service=kalite
+  when: ansible_local.config.kalite_languages | length
+
+- include_tasks: enable_vhost.yml name=kalite
+  when: ansible_local.config.kalite_languages | length
+
+- include_tasks: enable_service.yml service=aflatoun
+  when: ansible_local.config.aflatoun_languages | length
+
+- include_tasks: enable_vhost.yml name=aflatoun
+  when: ansible_local.config.aflatoun_languages | length
+
+- include_tasks: enable_service.yml service=parsoid
+  when: ansible_local.config.wikifundi_languages | length
+
+- include_tasks: enable_service.yml service=memcached
+  when: ansible_local.config.wikifundi_languages | length
+
+- include_tasks: enable_service.yml service=php7.0-fpm
+  when: ansible_local.config.wikifundi_languages | length
+
+- include_tasks: enable_vhost.yml name={{ item }}.wikifundi
+  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  when: ansible_local.config.wikifundi_languages | length
+
+- include_tasks: enable_service.yml service=dnsmasq
+
+# TODO: set to no
+- name: Disable SSH
+  systemd:
+    name: ssh
+    enabled: yes

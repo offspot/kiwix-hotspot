@@ -1,0 +1,8 @@
+---
+- name: enable nginx virtualhost {{ name }}
+  file:
+    src: /etc/nginx/sites-available/{{ name }}
+    dest: /etc/nginx/sites-enabled/{{ name }}
+    state: link
+    force: yes
+  notify: restart nginx

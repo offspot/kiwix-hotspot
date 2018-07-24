@@ -1,8 +1,9 @@
 from collections import OrderedDict
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk, GLib, GdkPixbuf
-from backend import catalog
+from gi.repository import Gtk, Gdk, GLib, GdkPixbuf, GObject
+from backend.catalog import YAML_CATALOGS
+from backend.content import get_expanded_size, get_collection, get_required_image_size, get_content, isremote
 from run_installation import run_installation
 import pytz
 import tzlocal
@@ -11,23 +12,38 @@ import sys
 import json
 import tempfile
 import threading
-from util import CancelEvent
+from util import CancelEvent, ProgressHelper
 import sd_card_info
-from util import human_readable_size
+from util import human_readable_size, ONE_GB, ONE_MiB
 from util import get_free_space_in_dir
-from util import compute_space_required
 from util import relpathto
 from util import b64encode, b64decode
 import data
 import langcodes
 import string
+import humanfriendly
+import webbrowser
 
 VALID_RGBA = Gdk.RGBA(0., 0., 0., 0.)
 INVALID_RGBA = Gdk.RGBA(1, 0.5, 0.5, 1.)
+mainloop = None
+
+def quit(*args, **kwargs):
+    global mainloop
+    mainloop.quit()
+
+def run():
+    global mainloop
+    mainloop = GObject.MainLoop()
+    try:
+        mainloop.run()
+    except KeyboardInterrupt:
+        print("\nKeyboardInterrupt, exiting.")
+        quit()
 
 class ShortDialog(Gtk.Dialog):
     def __init__(self, parent, buttons, msg):
-        Gtk.Dialog.__init__(self, "pibox installer - dialog", parent, 0, buttons)
+        Gtk.Dialog.__init__(self, "kiwix-plug installer", parent, 0, buttons)
         self.set_default_size(150, 100)
         label = Gtk.Label(msg)
         box = self.get_content_area()
@@ -38,12 +54,17 @@ def hide_on_delete(widget, event):
     widget.hide()
     return True
 
-class Logger:
-    def __init__(self, text_buffer, step_label):
-        self.text_buffer = text_buffer
-        self.step_label = step_label
+class Logger(ProgressHelper):
+    def __init__(self, component):
+        super(Logger, self).__init__()
+        self.component = component
+
+        self.text_buffer = self.component.run_text_view.get_buffer()
         self.step_tag = self.text_buffer.create_tag("step", foreground="blue")
         self.err_tag = self.text_buffer.create_tag("err", foreground="red")
+        self.succ_tag = self.text_buffer.create_tag("succ", foreground="green")
+        self.stg_tag = self.text_buffer.create_tag("stg", foreground="purple")
+        self.run_pulse()
 
     def step(self, step):
         GLib.idle_add(self.main_thread_step, step)
@@ -54,25 +75,97 @@ class Logger:
     def raw_std(self, std):
         GLib.idle_add(self.main_thread_raw_std, std)
 
-    def std(self, std):
-        GLib.idle_add(self.main_thread_std, std)
+    def std(self, std, end=None):
+        GLib.idle_add(self.main_thread_std, std, end)
+
+    def complete(self):
+        GLib.idle_add(self.main_thread_complete)
+
+    def failed(self, error):
+        GLib.idle_add(self.main_thread_failed, error)
+
+    def main_thread_text(self, text, end="\n", tag=None):
+        text += end
+        text_iter = self.text_buffer.get_end_iter()
+        if tag is None:
+            self.text_buffer.insert(text_iter, text)
+        else:
+            self.text_buffer.insert_with_tags(text_iter, text, tag)
 
     def main_thread_step(self, text):
-        text_iter = self.text_buffer.get_end_iter()
-        self.text_buffer.insert_with_tags(text_iter, text + "\n", self.step_tag)
-        self.step_label.set_text(text)
+        self.main_thread_text("--> {}".format(text), "\n", self.step_tag)
+        self._update_progress_text(text)
 
     def main_thread_err(self, text):
-        text_iter = self.text_buffer.get_end_iter()
-        self.text_buffer.insert_with_tags(text_iter, text + "\n", self.err_tag)
+        self.main_thread_text(text, "\n", self.err_tag)
 
     def main_thread_raw_std(self, text):
-        text_iter = self.text_buffer.get_end_iter()
-        self.text_buffer.insert(text_iter, text)
+        self.main_thread_text(text)
 
-    def main_thread_std(self, text):
-        text_iter = self.text_buffer.get_end_iter()
-        self.text_buffer.insert(text_iter, text + "\n")
+    def main_thread_std(self, text, end=None):
+        self.main_thread_text(text, end if end is not None else "\n")
+
+    def _update_progress_text(self, text):
+        self.component.run_progressbar.set_text(text)
+
+    def update(self):
+        GLib.idle_add(self.update_gui)
+
+    def update_gui(self):
+        # show text progress in console
+        self.main_thread_text("[STAGE {nums}: {name} - {pc:.0f}%]"
+               .format(nums=self.stage_numbers,
+                       name=self.stage_name,
+                       pc=self.get_overall_progress() * 100),
+               tag=self.stg_tag)
+
+        # update overall percentage on window title
+        self.component.run_window.set_title(
+            "Kiwix-plug installer ({:.0f}%)"
+            .format(self.get_overall_progress() * 100))
+
+        # update stage name and number (Stage x/y)
+        self.component.run_step_label.set_markup(
+            "<b>Stage {nums}</b>: {name}"
+            .format(nums=self.stage_numbers, name=self.stage_name))
+
+        # update the progress bar according to the stage's progress
+        if self.stage_progress is not None:
+            self.component.run_progressbar.set_inverted(False)
+            self.component.run_progressbar.set_fraction(self.stage_progress)
+        else:
+            # animate the stage progress bar to show an unknown progress
+            self.run_pulse()
+
+    def main_thread_complete(self):
+        super(Logger, self).complete()
+        self.main_thread_text("Installation succeded.", tag=self.succ_tag)
+        self.component.run_step_label.set_markup("<b>Done.</b>")
+        self.progress(1)
+
+    def main_thread_failed(self, error):
+        super(Logger, self).failed()
+        self.step("Failed: {}".format(error))
+        self.err("Installation failed: {}".format(error))
+        self.progress(1)
+
+    def run_pulse(self):
+        ''' used for progress bar animation (unknown progress) '''
+        self._update_progress_text("")
+        self.timeout_id = GObject.timeout_add(50, self.on_timeout)
+
+    def on_timeout(self):
+        ''' used for progress bar animation (unknown progress) '''
+        if self.stage_progress is None:
+            new_value = self.component.run_progressbar.get_fraction() + 0.035
+            # inverse direction if end reached
+            if new_value > 1:
+                new_value = 0
+                # switch from left-to-right to right-to-left at bounds
+                self.component.run_progressbar.set_inverted(
+                    not self.component.run_progressbar.get_inverted())
+            self.component.run_progressbar.set_fraction(new_value)
+            return True  # returns True so it continues to get called
 
 class Component:
     def __init__(self, builder):
@@ -101,10 +194,10 @@ class Application:
 
         self.component = Component(builder)
         self.cancel_event = CancelEvent()
-        self.logger = Logger(self.component.run_text_view.get_buffer(), self.component.run_step_label)
+        self.logger = Logger(self.component)
 
         # main window
-        self.component.window.connect("delete-event", Gtk.main_quit)
+        self.component.window.connect("delete-event", quit)
 
         # gtk file filters (macOS fix)
         self.component.favicon_filter.set_name("Favicon (ICO, PNG)")  # opt
@@ -123,6 +216,11 @@ class Application:
         self.component.css_chooser.add_filter(
             self.component.css_filter)
 
+        self.component.edupi_resources_filter.set_name("ZIP File")  # opt
+        self.component.edupi_resources_filter.add_pattern("*.zip")
+        self.component.css_chooser.add_filter(
+            self.component.edupi_resources_filter)
+
         # menu bar
         self.component.menu_quit.connect("activate", lambda widget: self.component.window.close())
         self.component.menu_about.connect("activate", self.activate_menu_about)
@@ -131,12 +229,17 @@ class Application:
             "activate", self.activate_menu_config, False)
         self.component.menu_save_config.connect(
             "activate", self.activate_menu_config, True)
+        self.component.menu_help.connect(
+            "activate", self.activate_menu_help)
 
         # wifi password
         self.component.wifi_password_switch.connect("notify::active", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(not switch.get_active()))
 
         # admin account
         self.component.admin_account_switch.connect("notify::active", lambda switch, state: self.component.admin_account_revealer.set_reveal_child(switch.get_active()))
+
+        # edupi resources
+        self.component.edupi_switch.connect("notify::active", lambda switch, state: self.component.edupi_resources_revealer.set_reveal_child(switch.get_active()))
 
         # ideascube language
         for code, language in data.ideascube_languages:
@@ -146,26 +249,9 @@ class Application:
         self.component.language_combobox.pack_start(renderer, True)
         self.component.language_combobox.add_attribute(renderer, "text", 1)
 
-        index = -1
-        for i, (code, language) in enumerate(data.ideascube_languages):
-            if code == 'en':
-                index = i
-        self.component.language_combobox.set_active(index)
-
-        # timezone
-        default_id = -1
-        local_tz = tzlocal.get_localzone()
-        for id, timezone in enumerate(pytz.common_timezones):
-            if timezone == "UTC" and default_id == -1:
-                default_id = id
-            if pytz.timezone(timezone) == local_tz:
-                default_id = id
-            self.component.timezone_tree_store.append(None, [timezone])
-
         renderer = Gtk.CellRendererText()
         self.component.timezone_combobox.pack_start(renderer, True)
         self.component.timezone_combobox.add_attribute(renderer, "text", 0)
-        self.component.timezone_combobox.set_active(default_id)
 
         # output
         self.component.sd_card_combobox.connect("changed", lambda _: self.update_free_space())
@@ -228,11 +314,7 @@ class Application:
                 name = value["name"]
                 url = value["url"]
                 description = value.get("description") or "none"
-                # We double indicated size because in ideascube throught ansiblecube
-                # will first download the zip file and then extract the content
-                # TODO: an improvment would be to delete zip file after extraction and
-                # compute a temporar space needed that is max of all installed size
-                size = str(value["size"]*2)
+                size = str(value["size"])
                 languages_iso = (value.get("language") or "Unkown language").split(",")
                 languages = set(map(lambda l: langcodes.Language.get(l).language_name(), languages_iso))
                 typ = value["type"]
@@ -284,23 +366,30 @@ class Application:
         choosen_zim_filter.set_visible_func(self.choosen_zim_filter_func)
         self.component.choosen_zim_tree_view.set_model(choosen_zim_filter)
 
+        def get_project_size(name, lang):
+            langs = ['fr', 'en'] if name == 'aflatoun' else [lang]
+            return get_expanded_size(get_collection(
+                **{"{}_languages".format(name): langs}))
+
         # kalite
         for lang, button in self.iter_kalite_check_button():
-            button.set_label("{} ({})".format(button.get_label(), human_readable_size(data.kalite_sizes[lang])))
+            button.set_label("{} ({})".format(button.get_label(), human_readable_size(get_project_size('kalite', lang))))
             button.connect("toggled", lambda button: self.update_free_space())
 
         # wikifundi
         for lang, button in self.iter_wikifundi_check_button():
-            button.set_label("{} ({})".format(button.get_label(), human_readable_size(data.wikifundi_sizes[lang])))
+            button.set_label("{} ({})".format(button.get_label(), human_readable_size(get_project_size('wikifundi', lang))))
             button.connect("toggled", lambda button: self.update_free_space())
 
         # aflatoun
         self.component.aflatoun_switch.connect("notify::active", lambda switch, state: self.update_free_space())
-        self.component.aflatoun_label.set_label("{} ({})".format(self.component.aflatoun_label.get_label(), human_readable_size(data.aflatoun_size)))
+        self.component.aflatoun_label.set_label("{} ({})".format(self.component.aflatoun_label.get_label(), human_readable_size(get_project_size('aflatoun', lang))))
 
         # edupi
         self.component.edupi_switch.connect("notify::active", lambda switch, state: self.update_free_space())
-        self.component.edupi_label.set_label("{} ({})".format(self.component.edupi_label.get_label(), human_readable_size(data.edupi_size)))
+        self.component.edupi_label.set_label("{} ({})".format(self.component.edupi_label.get_label(), human_readable_size(10 * ONE_MiB)))
+        self.component.edupi_resources_url_entry.connect("changed", lambda _: self.update_free_space())
+        self.component.edupi_resources_chooser.connect("file-set", lambda _: self.update_free_space())
 
         # language tree view
         renderer_text = Gtk.CellRendererText()
@@ -313,9 +402,75 @@ class Application:
         self.component.zim_language_tree_view.get_selection().connect("changed", self.zim_language_selection_changed)
 
         self.refresh_disk_list()
-        self.update_free_space()
+
+        self.reset_config()  # will calculate free space
 
         self.component.window.show()
+
+    def reset_config(self):
+        ''' restore UI to its initial (non-configured) state '''
+
+        # name
+        self.component.project_name_entry.set_text("Kiwix Plug")
+
+        # language
+        index = -1
+        for i, (code, language) in enumerate(data.ideascube_languages):
+            if code == 'en':
+                index = i
+        self.component.language_combobox.set_active(index)
+
+        # timezone
+        default_id = -1
+        local_tz = tzlocal.get_localzone()
+        for id, timezone in enumerate(pytz.common_timezones):
+            if timezone == "UTC" and default_id == -1:
+                default_id = id
+            if pytz.timezone(timezone) == local_tz:
+                default_id = id
+            self.component.timezone_tree_store.append(None, [timezone])
+        self.component.timezone_combobox.set_active(default_id)
+
+        # wifi
+        self.component.wifi_password_switch.set_active(True)
+        self.component.wifi_password_entry.set_text("kiwixplug-wifipwd")
+
+        # admin account
+        self.component.admin_account_switch.set_active(False)
+        self.component.admin_account_login_entry.set_text("admin")
+        self.component.admin_account_pwd_entry.set_text("admin-password")
+
+        # branding
+        for key in ('logo', 'favicon', 'css'):
+            getattr(self.component, '{}_chooser'.format(key)).unselect_all()
+
+        # build_dir
+        self.component.build_path_chooser.unselect_all()
+
+        # size
+        self.component.size_entry.set_text('')
+
+        # content
+        for key in ('kalite', 'wikifundi'):
+            for lang, button in getattr(self, 'iter_{}_check_button'
+                                              .format(key))():
+                button.set_active(False)
+
+        for key in ('edupi', 'aflatoun'):
+            getattr(self.component, '{}_switch'.format(key)).set_active(False)
+
+        # edupi resources
+        self.component.edupi_resources_url_entry.set_text('')
+        self.component.edupi_resources_chooser.unselect_all()
+
+        # static contents
+        for index, zim in enumerate(self.component.zim_list_store):
+            if zim[8]:
+                self.component.zim_list_store[index][8] = False
+        self.component.choosen_zim_tree_view.set_model(self.component.zim_list_store)
+
+        self.update_free_space()
+
 
     def iter_kalite_check_button(self):
         return [("fr", self.component.kalite_fr_check_button),
@@ -334,6 +489,9 @@ class Application:
         if response == Gtk.ResponseType.DELETE_EVENT or response == Gtk.ResponseType.CANCEL:
             self.component.about_dialog.hide()
 
+    def activate_menu_help(self, widget):
+        webbrowser.open(data.help_url)
+
     def installation_done(self, error):
         ok = error == None
         validate_label(self.component.done_label, ok)
@@ -343,7 +501,6 @@ class Application:
             self.component.done_label.set_text("Installation failed")
 
         self.component.done_window.show()
-        self.component.run_spinner.stop()
         self.component.run_install_running_buttons_revealer.set_reveal_child(False)
         self.component.run_install_done_buttons_revealer.set_reveal_child(True)
 
@@ -358,7 +515,7 @@ class Application:
 
     def run_window_delete_event(self, widget, path):
         self.cancel_event.cancel()
-        Gtk.main_quit()
+        quit()
 
     def run_quit_button_clicked(self, widget):
         self.component.run_window.close()
@@ -415,11 +572,11 @@ class Application:
                 self.set_config(config)
 
         if for_save:
-            title = "Select a file to save Pibox config to"
+            title = "Select a file to save Kiwix-plug config to"
             action = Gtk.FileChooserAction.SAVE
             on_accept = _save
         else:
-            title = "Select Pibox config file to load"
+            title = "Select Kiwix-plug config file to load"
             action = Gtk.FileChooserAction.OPEN
             on_accept = _load
 
@@ -451,6 +608,9 @@ class Application:
     def set_config(self, config):
         if not isinstance(config, dict):
             return
+
+        # reset all options
+        self.reset_config()
 
         # project_name
         if "project_name" in config:
@@ -522,7 +682,9 @@ class Application:
         # size
         if config.get("size") is not None:
             try:
-                size = int(config["size"] / pow(1024, 3))
+                size = humanfriendly.parse_size(config["size"]) \
+                    if isinstance(config['size'], str) else config['size']
+                size = int(size / ONE_GB)
             except Exception:
                 size = None
             if size is not None:
@@ -544,6 +706,16 @@ class Application:
                 if config["content"].get(key) is not None:
                     getattr(self.component, '{}_switch'.format(key)) \
                         .set_active(config["content"][key])
+
+            # edupi resources
+            if config["content"].get("edupi_resources") is not None:
+                rsc = config["content"].get("edupi_resources")
+                if isremote(rsc):
+                    self.component.edupi_resources_url_entry \
+                        .set_text(str(rsc))
+                else:
+                    self.component.edupi_resources_chooser \
+                        .set_filename(str(rsc))
 
             if "zims" in config["content"] \
                     and isinstance(config["content"]["zims"], list):
@@ -582,6 +754,10 @@ class Application:
         except Exception:
             timezone = None
 
+        edupi_resources = self.get_edupi_resources()
+        if not isremote(edupi_resources):
+            edupi_resources = relpathto(self.get_edupi_resources())
+
         zim_install = []
         for zim in self.component.zim_list_store:
             if zim[8]:
@@ -596,7 +772,7 @@ class Application:
             if button.get_active()]
 
         try:
-            size = int(self.component.size_entry.get_text()) * pow(1024, 3)
+            size = int(self.component.size_entry.get_text()) * ONE_GB
         except Exception:
             size = None
 
@@ -627,13 +803,14 @@ class Application:
             }),
             ("build_dir",
                 relpathto(self.component.build_path_chooser.get_filename())),
-            ("size", size),
+            ("size", None if size is None else human_readable_size(size, False)),
             ("content", {
                 "zims": zim_install,  # content-ids list
                 "kalite": kalite_active_langs,  # languages list
                 "wikifundi": wikifundi_active_langs,  # languages list
                 "aflatoun": self.component.aflatoun_switch.get_active(),
                 "edupi": self.component.edupi_switch.get_active(),
+                "edupi_resources": edupi_resources,
             }),
             ("branding", branding),
         ])
@@ -642,7 +819,7 @@ class Application:
         self.component.run_install_done_buttons_revealer.set_reveal_child(False)
         self.component.run_install_running_buttons_revealer.set_reveal_child(True)
         self.component.run_text_view.get_buffer().set_text("")
-        self.component.run_spinner.start()
+        self.logger.update()
 
     def run_copy_log_to_clipboard_button_clicked(self, widget):
         text_buffer = self.component.run_text_view.get_buffer()
@@ -656,7 +833,7 @@ class Application:
         all_valid = True
 
         project_name = self.component.project_name_entry.get_text()
-        allowed_chars = set(string.ascii_uppercase + string.ascii_lowercase + string.digits + '-')
+        allowed_chars = set(string.ascii_uppercase + string.ascii_lowercase + string.digits + '-' + ' ')
         condition = len(project_name) >= 1 and len(project_name) <= 64 and set(project_name) <= allowed_chars
         validate_label(self.component.project_name_label, condition)
         self.component.project_name_constraints_revealer.set_reveal_child(not condition)
@@ -693,8 +870,8 @@ class Application:
                 "login": self.component.admin_account_login_entry.get_text(),
                 "pwd": self.component.admin_account_pwd_entry.get_text(),
             }
-            login_condition = len(admin_account["login"]) <= 31 and set(admin_account["login"]) <= set(string.ascii_uppercase + string.ascii_lowercase + string.digits)
-            pwd_condition = len(admin_account["pwd"]) <= 31 and set(admin_account["pwd"]) <= set(string.ascii_uppercase + string.ascii_lowercase + string.digits)
+            login_condition = len(admin_account["login"]) <= 31 and set(admin_account["login"]) <= set(string.ascii_uppercase + string.ascii_lowercase + string.digits + '-' + '_')
+            pwd_condition = len(admin_account["pwd"]) <= 31 and set(admin_account["pwd"]) <= set(string.ascii_uppercase + string.ascii_lowercase + string.digits + '-' + '_') and (admin_account["pwd"] != admin_account["login"])
         self.component.admin_account_login_constraints_revealer.set_reveal_child(not login_condition)
         self.component.admin_account_pwd_constraints_revealer.set_reveal_child(not pwd_condition)
         validate_label(self.component.admin_account_login_label, login_condition)
@@ -777,6 +954,7 @@ class Application:
                         wikifundi=wikifundi,
                         aflatoun=aflatoun,
                         edupi=edupi,
+                        edupi_resources=self.get_edupi_resources(),
                         zim_install=zim_install,
                         size=output_size,
                         logger=self.logger,
@@ -818,6 +996,11 @@ class Application:
     def zim_choose_content_button_clicked(self, button):
         self.component.zim_window.show()
 
+    def get_edupi_resources(self):
+        local_rsc = self.component.edupi_resources_chooser.get_filename()
+        remote_rsc = self.component.edupi_resources_url_entry.get_text()
+        return (remote_rsc if remote_rsc else local_rsc) or None
+
     def get_free_space(self):
         zim_list = []
         for zim in self.component.zim_list_store:
@@ -836,16 +1019,18 @@ class Application:
 
         aflatoun = self.component.aflatoun_switch.get_active()
         edupi = self.component.edupi_switch.get_active()
+        edupi_resources = self.get_edupi_resources()
 
-        used_space = compute_space_required(
-                catalog=self.catalog,
-                zim_list=zim_list,
-                kalite=kalite,
-                wikifundi=wikifundi,
-                aflatoun=aflatoun,
-                edupi=edupi)
+        collection = get_collection(
+            edupi=edupi,
+            edupi_resources=edupi_resources,
+            packages=zim_list,
+            kalite_languages=kalite,
+            wikifundi_languages=wikifundi,
+            aflatoun_languages=['fr', 'en'] if aflatoun else [])
+        required_image_size = get_required_image_size(collection)
 
-        return self.get_output_size() - used_space
+        return self.get_output_size() - required_image_size
 
     def update_free_space(self):
         free_space = self.get_free_space()
@@ -855,6 +1040,13 @@ class Application:
         condition = free_space >= 0
         validate_label(self.component.free_space_label1, condition)
         validate_label(self.component.free_space_label2, condition)
+
+        # size_entry should be at least base_image size
+        size = self.get_output_size()
+        validate_label(
+            self.component.size_entry,
+            size >= get_content('pibox_base_image')['expanded_size'])
+
         for row in self.component.zim_list_store:
             if free_space - int(row[9]) >= 0:
                 row[11] = VALID_RGBA
@@ -872,7 +1064,7 @@ class Application:
                 size = int(self.component.sd_card_list_store[sd_card_id][get_size_index])
         else:
             try:
-                size = int(self.component.size_entry.get_text()) * 2**30
+                size = int(self.component.size_entry.get_text()) * ONE_GB
             except:
                 size = -1
 
@@ -908,13 +1100,14 @@ class Application:
         return model[iter][8]
 
 try:
-    catalog = catalog.get_catalogs()
+    assert len(YAML_CATALOGS)
 except Exception as exception:
     dialog = ShortDialog(None, (Gtk.STOCK_OK, Gtk.ResponseType.OK), "Catalog downloads failed, you may check your internet connection")
     dialog.run()
     print(exception, file=sys.stderr)
     dialog.destroy()
-    exit(1)
+    sys.exit(1)
 
-Application(catalog)
-Gtk.main()
+Application(YAML_CATALOGS)
+
+run()

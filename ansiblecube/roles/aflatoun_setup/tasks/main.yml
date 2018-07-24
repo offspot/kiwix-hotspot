@@ -1,0 +1,62 @@
+---
+- import_tasks: clean_apt.yml
+  tags: setup
+
+- name: Create working directory
+  file:
+    path: "{{ aflatoun_root }}"
+    state: directory
+  tags: ['setup', 'reconfigure']
+
+- name: Download Aflatoun
+  get_url:
+    url: "{{ mirror }}/other/aflatoun/ka-lite-static-0.16.7b3.tar.gz"
+    dest: /tmp/ka-lite-static-0.16.7b3.tar.gz
+  tags: setup
+
+- name: Create aflatoun environment
+  become: yes
+  become_user: "{{ username }}"
+  command: virtualenv -p python2.7 {{ aflatoun_env }}
+  tags: setup
+
+- name: downgrade setuptools for KA-lite 0.16 (aflatoun)
+  pip:
+    name: setuptools
+    version: 28.8.0
+    virtualenv: "{{ aflatoun_env }}"
+  tags: setup
+
+- name: Install Aflatoun
+  pip:
+    name: /tmp/ka-lite-static-0.16.7b3.tar.gz
+    virtualenv: "{{ aflatoun_env }}"
+  tags: setup
+
+- name: Initialize aflatoun and Create an admin user
+  become: yes
+  become_user: "{{ username }}"
+  shell: KALITE_PYTHON={{ aflatoun_env }}/bin/python KALITE_HOME={{ aflatoun_root }} {{ aflatoun_env }}/bin/kalite manage setup --username={{ admin_account }} --password={{ admin_password }} --noinput --no-assessment-items
+  when: admin_account is defined
+  tags: ['setup', 'reconfigure']
+
+- name: Initialize Aflatoun without creating an admin user
+  become: yes
+  become_user: "{{ username }}"
+  shell: KALITE_PYTHON={{ aflatoun_env }}/bin/python KALITE_HOME={{ aflatoun_root }} {{ aflatoun_env }}/bin/kalite manage setup --noinput --no-assessment-items
+  when: admin_account is not defined
+  tags: ['setup', 'reconfigure']
+
+- name: Copy nginx vhost
+  template:
+    src: aflatoun.vhost.j2
+    dest: /etc/nginx/sites-available/aflatoun
+  notify: restart nginx
+  tags: ['setup', 'rename']
+
+- name: Setup startup file
+  template:
+    src: aflatoun.service.j2
+    dest: /etc/systemd/system/aflatoun.service
+  notify: reload systemd
+  tags: setup

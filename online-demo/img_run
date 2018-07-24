@@ -1,0 +1,73 @@
+#!/bin/bash
+# img_run: launchs a pibox image in qemu using vexpress kernel and tap iface
+
+img=$1
+
+if [ -z "${img}" ] ; then
+	echo "Usage: $0 IMG_PATH"
+	exit 0
+fi
+
+is_url=$(echo "${img}" | grep "^http")
+if [ ! -z "${is_url}" ] ; then
+	echo "image appears to be an URL, downloading"
+	ufname=$(basename "${img}")
+	wget -O ~/${ufname} ${img}
+	img=${ufname}
+fi
+
+is_zip=$(echo "${img}" | grep "zip$")
+if [ ! -z "${is_zip}" ] ; then
+	echo "image appears to be zipped, extracting"
+	zfname=$(basename "${img}")
+	unzip -d ~/ ${img}
+	img=~/$(echo "${zfname}" | sed "s/.zip//")
+fi
+
+if [ ! -f "${img}" ] ; then
+	echo "Unable to read image file at ${img}"
+	exit 1
+fi
+
+if [ ! -f ~/zImage ] ; then
+	echo "kernel files not present, downloading"
+	wget -O ~/boot.zip http://download.kiwix.org/dev/pibox-installer-vexpress-boot.zip
+	unzip boot.zip
+	mv ~/pibox-installer-vexpress-boot/* ~/.
+	rmdir ~/pibox-installer-vexpress-boot
+fi
+
+# max ram to use by QEMU guest (format: XM or XG)
+if [ -z "${QEMU_RAM}" ] ; then
+	QEMU_RAM="2040M"
+fi
+
+# adjust accelearation based on number of cores
+nb_cores=$(nproc)
+if [ ${nb_cores} -ge 3 ] ; then
+	qemu_cores=$(expr ${nb_cores} - 1)
+	# vexpress-a15 is limited to 4 cores
+	if [ ${qemu_cores} -gt 4 ] ; then
+		qemu_cores=4
+	fi
+    SMP_OPT="-smp ${qemu_cores} --accel tcg,thread=multi"
+else
+    SMP_OPT=""
+fi
+
+echo "hooray. starting ${img}"
+
+qemu-system-arm \
+    -m ${QEMU_RAM} \
+    -M vexpress-a15 \
+    -kernel ~/zImage \
+    -dtb ~/vexpress-v2p-ca15_a7.dtb \
+    -append "root=/dev/mmcblk0p2 console=ttyAMA0 console=tty" \
+    -serial stdio \
+    -drive "format=raw,if=sd,file=${img}" \
+    -display none \
+    ${SMP_OPT} \
+    -netdev user,id=eth1,hostfwd=tcp::5022-:22 \
+    -device virtio-net-device,netdev=eth1 \
+    -netdev tap,id=eth0,ifname=tap0,script=no,downscript=no \
+    -device virtio-net-device,netdev=eth0

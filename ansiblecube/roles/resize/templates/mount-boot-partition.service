@@ -1,0 +1,8 @@
+[Unit]
+Description=Mount Boot Partition (custom)
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/mount /dev/mmcblk0p1

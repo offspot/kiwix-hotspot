@@ -1,0 +1,28 @@
+---
+# import zipped downloaded language pack (subtitles and all)
+- name: Import Kalite language pack
+  become: yes
+  become_user: "{{ username }}"
+  environment:
+    KALITE_PYTHON: "{{ kalite_env }}/bin/python"
+    KALITE_HOME: "{{ kalite_root }}"
+  command: "{{ kalite_env }}/bin/kalite manage retrievecontentpack local {{ item }} {{ kalite_langpack_prefix }}{{ item }}.zip"
+  with_items: "{{ ansible_local.config.kalite_languages | default(omit) }}"
+  tags: move-content
+
+# downloaded videos were placed in a different location on data part
+- name: move downloaded videos to kalite folder
+  shell: mv {{ kalite_videos_prefix }}{{ item }}/* {{ data_path }}/kalite/content/
+  with_items: "{{ ansible_local.config.kalite_languages | default(omit) }}"
+  tags: move-content
+
+# loop over content folder to find and reckon downloaded video files
+- name: Perfom a video scan on the device
+  become: yes
+  become_user: "{{ username }}"
+  environment:
+    KALITE_PYTHON: "{{ kalite_env }}/bin/python"
+    KALITE_HOME: "{{ kalite_root }}"
+  command: "{{ kalite_env }}/bin/kalite manage videoscan --language={{ item }}"
+  with_items: "{{ ansible_local.config.kalite_languages | default(omit) }}"
+  tags: move-content

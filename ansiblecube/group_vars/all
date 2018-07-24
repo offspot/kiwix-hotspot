@@ -1,0 +1,93 @@
+---
+# Network
+hotspot_ip: 192.168.2.1
+hotspot_interface: wlan0
+lan_interface: eth0
+lan_interface2: eth1
+client_interface: wlan1
+max_wifi_client: 15
+cert_domain: ideascube.lan
+hostname: ideasbox
+tld: "lan"
+fqdn: "{{ hostname }}.{{ tld }}"
+hotspot_name: ideasbox
+project_name: ideasbox
+ideascube_id: pibox
+
+# System
+disk: /dev/mmcblk0
+root_partition: "{{ disk }}p2"
+data_partition: "{{ disk }}p3"
+data_path: /data
+disk_size: 4
+root_partition_size: 3
+username: ideascube
+password: $6$YcJS1HjRAv/$1bUosoPalzHEvfpx71UhnG6vCeckTGbA5U1i6UpA8X21Jrv7fYRPyNrq/YWuiBp3xQWd5kRRhrKKPHcbTkkfQ/
+mirror: https://download.kiwix.org
+timezone: "Europe/Paris"
+language: "en"
+language_name: "English"
+
+# versions
+qemu_kernel_version: "4.10.0"
+kernel_version: "4.14.34"
+kiwix_version: "0.6.0"
+kalite_version: "0.17.4"
+ideascube_version: "0.37.2"
+edupi_version: "1.4.7"
+python3_version: "3.5"
+mediawiki_major_version: 1.31
+mediawiki_version: 1.31.0
+mediawiki_rc: rc.0
+mediawiki_ext_version: REL1_31
+
+# Apps path
+zim_path: /var/ideascube/kiwix
+venvs_root: /home/{{ username }}/venvs
+ideascube_handlers: ['kiwix', 'nginx', 'mediacenter']
+aflatoun_root: "{{ data_path }}/aflatoun"
+aflatoun_env: "{{ venvs_root }}/aflatoun"
+edupi_root: "/home/{{ username }}/edupi"
+edupi_data_root: "{{ data_path }}/edupi"
+edupi_env: "{{ venvs_root }}/edupi"
+kalite_root: "{{ data_path }}/kalite"
+kalite_env: "{{ venvs_root }}/kalite"
+wikifundi_data_root: "{{ data_path }}/wikifundi"
+wikifundi_root: "/var/www/wikifundi"
+mediawiki_root: "{{ wikifundi_root }}/w"
+parsoid_root: "{{ mediawiki_root }}/parsoid"
+
+# Domain names
+kiwix_server_name: kiwix.{{ hostname }}
+kalite_server_name: khanacademy.{{ hostname }}
+aflatoun_server_name: aflatoun.{{ hostname }}
+edupi_server_name: edupi.{{ hostname }}
+wikifundi_server_name: wikifundi.{{ hostname }}
+sites_server_name: sites.{{ hostname }}
+
+kiwix_fqdn: kiwix.{{ fqdn }}
+kalite_fqdn: khanacademy.{{ fqdn }}
+aflatoun_fqdn: aflatoun.{{ fqdn }}
+edupi_fqdn: edupi.{{ fqdn }}
+wikifundi_fqdn: wikifundi.{{ fqdn }}
+sites_fqdn: sites.{{ fqdn }}
+
+# content & features
+captive_portal: true
+has_custom_branding: false
+custom_branding_path: /tmp
+kalite_languages: []
+wikifundi_languages: []
+aflatoun_languages: []
+packages: []
+edupi: false
+catalogs: []
+
+# temporary path for contents in data partition
+aflatoun_content_path: "{{ data_path }}/aflatoun_content"
+aflatoun_langpack_prefix: "{{ data_path }}/aflatoun_pack_"
+kalite_langpack_prefix: "{{ data_path }}/kalite_pack_"
+kalite_videos_prefix: "{{ data_path }}/kalite_videos_"
+packages_cache: "{{ data_path }}/packages_cache"
+wikifundi_langpack_prefix: "{{ data_path }}/wikifundi_langpack_"
+edupi_resources_path: "{{ data_path }}/edupi_resources"

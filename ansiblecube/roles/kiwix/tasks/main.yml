@@ -1,0 +1,83 @@
+---
+- debug: msg="kiwix_version {{ kiwix_version }}"
+  tags: master
+
+- name: Downloading kiwix binaries {{ kiwix_version }}
+  get_url:
+    url: "{{ mirror }}/release/kiwix-tools/kiwix-tools_linux-{{ ansible_architecture }}-{{ kiwix_version }}.tar.gz"
+    dest: /tmp/kiwix-tools.tar.gz
+    timeout: 30
+    force: yes
+  when: ansible_architecture in ("x86_64", "i586")
+  tags: master
+
+- name: Downloading kiwix binaries {{ kiwix_version }}
+  get_url:
+    url: "{{ mirror }}/release/kiwix-tools/kiwix-tools_linux-i586-{{ kiwix_version }}.tar.gz"
+    dest: /tmp/kiwix-tools.tar.gz
+    timeout: 30
+    force: yes
+  when: ansible_architecture not in ("x86_64", "i586", "armhf", "armv7l")
+  tags: master
+
+- name: Downloading kiwix binaries {{ kiwix_version }}
+  get_url:
+    url: "{{ mirror }}/release/kiwix-tools/kiwix-tools_linux-armhf-{{ kiwix_version }}.tar.gz"
+    dest: /tmp/kiwix-tools.tar.gz
+    timeout: 30
+    force: yes
+  when: ansible_architecture in ("armhf", "armv7l")
+  tags: master
+
+- name: Copying downloaded kiwix-tools
+  shell: tar -x --strip-components 1 -f /tmp/kiwix-tools.tar.gz && mv /tmp/kiwix-serve /usr/local/bin/kiwix-serve && chmod 755 /usr/local/bin/kiwix-serve chdir=/tmp
+  args:
+    warn: no
+  tags: master
+
+- name: Create a kiwix directory in ideascube folder
+  file:
+    path: "{{zim_path}}/"
+    owner: "{{username}}"
+    group: "{{username}}"
+    state: directory
+  tags: master
+
+- name: Setup startup file
+  template:
+    src: kiwix-server.service.j2
+    dest: /etc/systemd/system/kiwix-server.service
+  tags: master
+
+- name: Remove nginx configuration otherwise, if hostname var change it won't be overrided
+  file:
+    path: /etc/nginx/sites-available/kiwix
+    state: absent
+  tags: ['master', 'rename']
+
+- name: Copy nginx vhost
+  template:
+    src: nginx.vhost.j2
+    dest: /etc/nginx/sites-available/kiwix
+  notify: restart nginx
+  tags: ['master', 'rename']
+
+- name: Ensure that Ideascube cache folder belong to ideascube user 
+  file:
+    path: /var/cache/ideascube/catalog/ 
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    state: directory
+    recurse: yes
+  tags: master
+
+- name: Nginx enable Virtual host
+  file:
+    src: /etc/nginx/sites-available/kiwix
+    dest: /etc/nginx/sites-enabled/kiwix
+    state: link
+  notify: restart nginx
+  tags: ['master', 'rename']
+
+- include_tasks: enable_service.yml service=kiwix-server
+  tags: master

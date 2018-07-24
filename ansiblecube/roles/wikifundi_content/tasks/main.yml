@@ -1,0 +1,43 @@
+---
+- name: make sure wikifundi data folder exists
+  file:
+    path: "{{ wikifundi_data_root }}"
+    state: directory
+  tags: move-content
+
+- name: make sure images folder does not exists
+  file:
+    path: "{{ wikifundi_data_root }}/images_{{ item }}"
+    state: absent
+  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  tags: move-content
+
+- name: move wikifundi database
+  command: mv {{ wikifundi_langpack_prefix }}{{ item }}/mw_wikifundi_{{ item }}.sqlite {{ wikifundi_data_root }}/mw_wikifundi_{{ item }}.sqlite
+  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  tags: move-content
+
+- name: Add admin account to Wikifundi
+  environment:
+    WIKIFUNDI_LANG: "{{ item }}"
+  command: php maintenance/createAndPromote.php --bureaucrat --sysop --bot --force "{{ admin_account }}" "{{ admin_password }}"
+  args:
+    chdir: "{{ mediawiki_root }}"
+  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  when: ansible_local.config.admin_account is defined
+  tags: move-content
+
+- name: move wikifundi images
+  command: mv {{ wikifundi_langpack_prefix }}{{ item }}/images {{ wikifundi_data_root }}/images_{{ item }}
+  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  tags: move-content
+
+- name: Add wikifundi CSS hack
+  lineinfile:
+    dest: /opt/venvs/ideascube/lib/python{{ python3_version }}/site-packages/ideascube/static/ideascube/cards.css
+    line: '.card.tinted[href*="http://{{ item }}.{{ wikifundi_fqdn }}"], { background-image: url("http://{{ item }}.{{ wikifundi_fqdn }}/logo-sq.png"); background-size: 48px; }'
+    insertafter: EOF
+    state: present
+  with_items: '{{ ansible_local.config.wikifundi_languages | default(omit) }}'
+  when: ansible_local.config.wikifundi_languages | length
+  tags: ['move-content', 'rename']

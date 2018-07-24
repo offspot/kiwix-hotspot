@@ -1,0 +1,259 @@
+---
+- import_tasks: clean_apt.yml
+  tags: setup
+
+- name: Get nodejs repository installer
+  get_url:
+    url: https://deb.nodesource.com/setup_10.x
+    dest: /tmp/setup_10.x
+    mode: 0755
+  tags: setup
+
+- name: Run nodejs repository installer
+  command: /tmp/setup_10.x
+  tags: setup
+
+- name: Install nodejs
+  environment:
+    RUNLEVEL: 1
+  apt:
+    name: nodejs
+    state: latest
+    autoremove: yes
+    autoclean: yes
+  tags: setup
+
+- name: Install dependencies (tex, for MathRenderer)
+  apt:
+    name: texlive,texlive-fonts-recommended,texlive-lang-greek,texlive-latex-recommended,build-essential,dvipng,ocaml,cjk-latex
+    state: latest
+    autoremove: yes
+    autoclean: yes
+  tags: setup
+
+- import_tasks: clean_apt.yml
+  tags: setup
+
+- name: Install dependencies (PHP)
+  environment:
+    RUNLEVEL: 1
+  apt:
+    name: php7.0-fpm,php7.0-sqlite3,php7.0-intl,php7.0-mbstring,php7.0-xml,php7.0-curl
+    state: latest
+    autoremove: yes
+    autoclean: yes
+  tags: setup
+
+- include_tasks: disable_service.yml service=php7.0-fpm
+  tags: setup
+
+- name: change PHP7 settings to allow file uploads up to 5MiB
+  copy:
+    src: 90-wikifundi.ini
+    dest: /etc/php/7.0/fpm/conf.d/90-wikifundi.ini
+  tags: setup
+
+- import_tasks: clean_apt.yml
+  tags: setup
+
+- name: Install dependencies (others)
+  environment:
+    RUNLEVEL: 1
+  apt:
+    name: git,vim,unzip,imagemagick,libicu-dev,libav-tools,librsvg2-bin,poppler-utils,memcached,redis-server,lua5.1,python3,locales
+    state: latest
+    autoremove: yes
+    autoclean: yes
+  tags: setup
+
+- include_tasks: disable_service.yml service=memcached
+  tags: setup
+
+- import_tasks: clean_apt.yml
+  tags: setup
+
+# locale en_US.UTF-8 already installed on system role
+
+- name: make sure directories exists
+  file:
+    dest: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ wikifundi_root }}"
+    - "{{ mediawiki_root }}"
+  tags: setup
+
+- name: download mediawiki
+  get_url:
+    url: https://releases.wikimedia.org/mediawiki/{{mediawiki_major_version}}/mediawiki-{{mediawiki_version}}-{{mediawiki_rc}}.tar.gz
+    dest: /tmp/mediawiki.tar.gz
+  tags: setup
+
+- name: extract mediawiki
+  command: tar -C {{ mediawiki_root }} -xz --strip-components=1 -f /tmp/mediawiki.tar.gz
+  tags: setup
+
+- name: change ownership of folders
+  file:
+    path: "{{ mediawiki_root }}/{{ item }}"
+    owner: www-data
+    group: www-data
+    state: directory
+    recurse: yes
+  with_items:
+    - skins
+    - cache
+  tags: setup
+
+- name: download parsoid
+  command: git clone --quiet --depth=1 https://gerrit.wikimedia.org/r/p/mediawiki/services/parsoid
+  args:
+    chdir: "{{ mediawiki_root }}"
+  tags: setup
+
+- name: downgrade npm first
+  command: npm install -g npm@4
+  tags: setup
+
+- name: install node dependencies for parsoid
+  command: npm install
+  args:
+    chdir: "{{ parsoid_root }}"
+  ignore_errors: yes
+  tags: setup
+
+- name: clean npm cache
+  command: npm cache clean -f
+  args:
+    chdir: "{{ mediawiki_root }}"
+  tags: setup
+
+- name: install n for parsoid
+  command: npm install -g n
+  args:
+    chdir: "{{ mediawiki_root }}"
+  tags: setup
+
+- name: upgrade npm back
+  command: npm install -g npm
+  tags: setup
+
+- name: updating node to lastest stable
+  command: n stable
+  args:
+    chdir: "{{ mediawiki_root }}"
+  tags: setup
+
+- name: download add_mw_extension script
+  copy:
+    src: add_mw_extension.py
+    dest: /usr/local/bin/add_mw_extension
+    mode: 0755
+  tags: setup
+
+- name: install mediawiki extension
+  command: /usr/local/bin/add_mw_extension {{ item }} {{mediawiki_ext_version}} {{ mediawiki_root }}
+  with_items:
+    - Nuke
+    - Scribunto
+    - UploadWizard
+    - TitleKey
+    - TitleBlacklist
+    - MwEmbedSupport
+    - TimedMediaHandler
+    - wikihiero
+    - Math
+    - timeline
+    - Echo
+    - MobileFrontend
+    - Thanks
+    - VisualEditor
+    - EventLogging
+    - GuidedTour
+    - GeoData
+  tags: setup
+
+- name: download composer
+  get_url:
+    url: https://getcomposer.org/composer.phar
+    dest: "{{ mediawiki_root }}/composer.phar"
+  tags: setup
+
+- name: copy our composer config
+  copy:
+    src: composer.json
+    dest: "{{ mediawiki_root }}/composer.json"
+  tags: setup
+
+- name: install composer
+  command: php composer.phar update --no-dev
+  args:
+    chdir: "{{ mediawiki_root }}"
+  tags: setup
+
+- name: download MetaDescriptionTag extension
+  unarchive:
+    src: https://github.com/kolzchut/mediawiki-extensions-MetaDescriptionTag/archive/master.zip
+    dest: "{{ mediawiki_root }}/extensions/"
+    remote_src: yes
+  tags: setup
+
+- name: move MetaDescriptionTag
+  command: mv {{ mediawiki_root }}/extensions/mediawiki-extensions-MetaDescriptionTag-master {{ mediawiki_root }}/extensions/MetaDescriptionTag
+  tags: setup
+
+- name: clean Math extensions
+  command: make -C extensions/Math/{{ item }} clean all
+  args:
+    chdir: "{{ mediawiki_root }}"
+  with_items:
+    - math
+    - texvccheck
+  tags: setup
+
+- name: fix permission on folder
+  file:
+    path: "{{ mediawiki_root }}/extensions"
+    owner: www-data
+    group: www-data
+    state: directory
+    recurse: yes
+  tags: setup
+
+- name: Copy image assets
+  copy:
+    src: "{{ item }}"
+    dest: "{{ wikifundi_root }}/{{ item }}"
+  with_items:
+    - cc-by-sa.png
+    - favicon.ico
+    - logo.png
+    - logo-sq.png
+  tags: setup
+
+- name: copy php conf for nginx
+  copy:
+    src: php.conf
+    dest: /etc/nginx/conf.d/php.conf
+  tags: setup
+
+# Configuration files
+- name: set mediawiki main config file
+  copy:
+    src: LocalSettings.php
+    dest: "{{ mediawiki_root }}/LocalSettings.php"
+  tags: setup
+
+- name: set parsoid config
+  template:
+    src: config.yaml.j2
+    dest: "{{ parsoid_root }}/config.yaml"
+  tags: ['setup', 'rename']
+
+- name: Setup parsoid service
+  template:
+    src: parsoid.service.j2
+    dest: /etc/systemd/system/parsoid.service
+  notify: reload systemd
+  tags: setup
+
