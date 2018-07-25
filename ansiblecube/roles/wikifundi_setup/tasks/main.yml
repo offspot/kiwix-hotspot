@@ -7,13 +7,6 @@
     state: directory
   tags: ['setup', 'reconfigure']
 
-- name: create custom config file
-  template:
-    src: LocalSettings.custom.php.j2
-    dest: "{{ mediawiki_root }}/LocalSettings.custom.{{ item }}.php"
-  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
-  tags: ['reconfigure', 'rename']
-
 - name: Copy nginx vhosts
   template:
     src: wikifundi.vhost.j2

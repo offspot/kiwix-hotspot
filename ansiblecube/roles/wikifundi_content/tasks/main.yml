@@ -12,6 +12,43 @@
   with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
   tags: move-content
 
+- name: move wikifundi LocalSettings
+  command: mv {{ wikifundi_langpack_prefix }}{{ item }}/config/LocalSettings.custom.php {{ mediawiki_root }}/LocalSettings.custom.{{ item }}.php
+  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  tags: move-content
+
+- name: change sqliteDataDir in LocalSettings.custom
+  lineinfile:
+    dest: "{{ mediawiki_root }}/LocalSettings.custom.{{ item }}.php"
+    regexp: '^\$wgSQLiteDataDir = "/var/www/data";'
+    line: '$wgSQLiteDataDir = "{{ wikifundi_data_root }}/";'
+  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  tags: move-content
+
+- name: add parsoid config to LocalSettings.custom
+  lineinfile:
+    dest: "{{ mediawiki_root }}/LocalSettings.custom.{{ item }}.php"
+    line: "$wgVirtualRestConfig['modules']['parsoid'] = array('url' => 'http://localhost:8000', 'domain' => '{{ item }}.{{ wikifundi_fqdn }}', 'prefix' => 'mediawiki_kiwix', 'forwardCookies' => true);"
+    insertbefore: '\?>'
+  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  tags: move-content
+
+- name: add upload path to LocalSettings.custom
+  lineinfile:
+    dest: "{{ mediawiki_root }}/LocalSettings.custom.{{ item }}.php"
+    line: '$wgUploadPath = "$wgScriptPath/images";'
+    insertbefore: '\?>'
+  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  tags: move-content
+
+- name: add wgUploadDirectory path to LocalSettings.custom
+  lineinfile:
+    dest: "{{ mediawiki_root }}/LocalSettings.custom.{{ item }}.php"
+    line: '$wgUploadDirectory  = "{{ wikifundi_data_root }}/images_{{ item }}";'
+    insertbefore: '\?>'
+  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  tags: move-content
+
 - name: move wikifundi database
   command: mv {{ wikifundi_langpack_prefix }}{{ item }}/mw_wikifundi_{{ item }}.sqlite {{ wikifundi_data_root }}/mw_wikifundi_{{ item }}.sqlite
   with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
