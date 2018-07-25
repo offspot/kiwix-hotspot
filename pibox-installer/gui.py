@@ -73,7 +73,7 @@ class Logger(ProgressHelper):
         GLib.idle_add(self.main_thread_err, err)
 
     def raw_std(self, std):
-        GLib.idle_add(self.main_thread_raw_std, std)
+        GLib.idle_add(self.main_thread_raw_std, std, end="")
 
     def std(self, std, end=None):
         GLib.idle_add(self.main_thread_std, std, end)
