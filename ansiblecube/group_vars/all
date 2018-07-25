@@ -34,7 +34,7 @@ kernel_version: "4.14.34"
 kiwix_version: "0.6.0"
 kalite_version: "0.17.4"
 ideascube_version: "0.37.2"
-edupi_version: "1.4.7"
+edupi_version: "1.4.10"
 python3_version: "3.5"
 mediawiki_major_version: 1.31
 mediawiki_version: 1.31.0
