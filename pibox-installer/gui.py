@@ -514,18 +514,21 @@ class Application:
         self.component.run_text_view.scroll_to_iter(end, 0, True, 0, 1.)
 
     def run_window_delete_event(self, widget, path):
+        return True
+
+    def cancel_run(self):
         self.cancel_event.cancel()
         quit()
 
     def run_quit_button_clicked(self, widget):
-        self.component.run_window.close()
+        self.cancel_run()
 
     def run_abort_button_clicked(self, widget):
-        dialog = ShortDialog(self.component.window, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK), "Are you sure you want to abort the installation ?\nyou will not be able to resume.")
+        dialog = ShortDialog(self.component.run_window, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK), "Are you sure you want to abort the installation ?\nyou will not be able to resume.")
         response = dialog.run()
 
         if response == Gtk.ResponseType.OK:
-            self.component.run_window.close()
+            self.cancel_run()
 
         dialog.destroy()
 
