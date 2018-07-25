@@ -57,7 +57,7 @@
 - name: Add admin account to Wikifundi
   environment:
     WIKIFUNDI_LANG: "{{ item }}"
-  command: php maintenance/createAndPromote.php --bureaucrat --sysop --bot --force "{{ admin_account }}" "{{ admin_password }}"
+  command: php maintenance/createAndPromote.php --bureaucrat --sysop --force "{{ admin_account }}" "{{ admin_password }}"
   args:
     chdir: "{{ mediawiki_root }}"
   with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"

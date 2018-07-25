@@ -345,6 +345,7 @@ $wgAjaxWatch = true;
 # System limitations
 $wgMaxShellMemory = 1024000;
 $wgMaxShellTime = 3600;
+$wgMaxShellFileSize = 524288;
 
 # Number of seconds before autoblock entries expire
 $wgAutoblockExpiry = 8640000; 

@@ -74,6 +74,10 @@
 
 # locale en_US.UTF-8 already installed on system role
 
+- name: hack to avoid thumbs generation error for PDF with errors
+  shell: mv /usr/bin/gs /usr/bin/gs9-20 ; echo '/usr/bin/gs9-20 -sstdout=%stderr $@' > /usr/bin/gs ; chmod a+x /usr/bin/gs
+  tags: setup
+
 - name: make sure directories exists
   file:
     dest: "{{ item }}"
@@ -242,6 +246,15 @@
   copy:
     src: LocalSettings.php
     dest: "{{ mediawiki_root }}/LocalSettings.php"
+  tags: setup
+
+- name: copy blank debug and mirroring config files
+  copy:
+    src: empty.php
+    dest: "{{ mediawiki_root }}/LocalSettings.{{ item }}.php"
+  with_items:
+    - debug
+    - mirroring
   tags: setup
 
 - name: set parsoid config
