@@ -45,6 +45,7 @@
     owner: "{{ username }}"
     group: www-data
     mode: 0775
+    recurse: yes
     state: directory
   with_items: "{{ ideascube_handlers }}"
   tags: reconfigure
