@@ -1,6 +1,11 @@
-2.0a
+2.0-rc1
+* Rebranded as Kiwix-plug installer
+* ZIM files in cache folder can be used with Kiwix Desktop
+* Ability to preload EduPi with documents from a ZIP archive
+* Updated Wikifundi (v2)
 * Added Online FAQ
 * Fixed Ctrl^C handling
+* Fixed abort behavior
 * Kiwix-serve 0.6.0
 * System requirements check at start of process
 * Overall and per-stage Progress Indicator
@@ -44,8 +49,6 @@
 * Can now create base image using `pibox-installer image`
 * Now using own custom base image
 * Updated to raspbian 2018-04-19 (stretch)
-
-CURRENT
 * Presets in the repo for common images
 * FIXED: language and timezone not set on external JSON config import
 
