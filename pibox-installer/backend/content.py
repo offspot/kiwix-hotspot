@@ -175,9 +175,11 @@ def get_package_content(package_id):
     for catalog in YAML_CATALOGS:
         try:
             package = catalog['all'][package_id]
+            package.update({'ext': "zip"
+                            if package['type'] != 'zim' else "zim"})
             return {
                 "url": package['url'],
-                "name": "package_{langid}-{version}".format(**package),
+                "name": "package_{langid}-{version}.{ext}".format(**package),
                 "checksum": package['sha256sum'],
                 "archive_size": package['size'],
                 # add a 10% margin for non-zim (zip file mostly)
@@ -323,7 +325,8 @@ def run_packages_actions(cache_folder, mount_point, logger, packages=[]):
 
         # copy to the packages folder
         final_path = os.path.join(packages_folder,
-                                  re.sub(r'^package_', '', content['name']))
+                                  re.match(r'^package_(.+)\.[a-z]{3}$',
+                                           content['name']).groups()[0])
         shutil.copy(package_fpath, final_path)
 
 
