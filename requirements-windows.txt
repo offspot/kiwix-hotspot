@@ -1,7 +1,7 @@
-tzlocal==1.4
+tzlocal==1.5.1
 asn1crypto==0.22.0
-cffi==1.10.0
-cryptography==1.8.1
+cffi==1.11.5
+cryptography==2.3
 idna==2.5
 packaging==16.8
 paramiko==2.1.2
