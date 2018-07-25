@@ -83,6 +83,17 @@
   when: has_exfat.stdout.strip()|int == 0
   tags: master
 
+- name: remove raspi sources
+  file:
+    path: /etc/apt/sources.list.d/raspi.list
+    state: absent
+  tags: master
+
+- name: Run apt update
+  apt:
+    update_cache: yes
+  tags: master
+
 - name: install stretch debian keyring
   apt:
     deb: http://ftp.fr.debian.org/debian/pool/main/d/debian-archive-keyring/debian-archive-keyring_2017.5_all.deb

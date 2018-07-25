@@ -4,6 +4,7 @@
 
 - name: DEBUG list {{ data_path }} content
   command: ls -lh {{ data_path }}
+  ignore_errors: yes
   tags: always
 
 - name: ensure custom facts directory exists
