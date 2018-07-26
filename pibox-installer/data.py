@@ -36,3 +36,5 @@ ideascube_languages = [
         ]
 
 help_url = "https://framagit.org/ideascube/pibox-installer/wikis/faq"
+
+VERSION = "devel"

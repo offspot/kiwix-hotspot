@@ -1,5 +1,9 @@
 # -*- mode: python -*-
+import os
+import sys
 import subprocess
+sys.path += [os.path.join(os.getcwd(), 'pibox-installer')]
+from version import get_version_str, get_short_version_str
 
 output = subprocess.check_output(["ls", "qemu"])
 files = output.decode('utf-8').splitlines()
@@ -41,4 +45,10 @@ coll = COLLECT(exe,
 app = BUNDLE(coll,
              name='kiwix-plug_installer.app',
              icon='pibox-installer-logo.icns',
-             bundle_identifier='org.kiwix.plug')
+             bundle_identifier='org.kiwix.plug',
+             info_plist={
+                 'CFBundleDisplayName': 'Kiwix-plug installer',
+                 'CFBundleShortVersionString': get_version_str(),
+                 'CFBundleVersion': get_short_version_str(),
+                 'NSHumanReadableCopyright': 'Kiwix'
+              })

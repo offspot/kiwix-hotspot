@@ -14,6 +14,7 @@ import tempfile
 import threading
 from util import CancelEvent, ProgressHelper
 import sd_card_info
+from version import get_version_str
 from util import human_readable_size, ONE_GB, ONE_MiB
 from util import get_free_space_in_dir
 from util import relpathto
@@ -270,6 +271,7 @@ class Application:
 
         # about dialog
         self.component.about_dialog.set_logo(GdkPixbuf.Pixbuf.new_from_file_at_scale(data.pibox_logo, 200, -1, True))
+        self.component.about_dialog.set_version(get_version_str())
 
         # done window
         self.component.done_window_ok_button.connect("clicked", lambda widget: self.component.done_window.hide())

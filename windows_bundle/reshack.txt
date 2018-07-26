@@ -1,0 +1,7 @@
+[FILENAMES]
+Exe=    kiwix-plug_installer.exe
+SaveAs= kiwix-plug_installer.exe
+Log=    CONSOLE
+[COMMANDS]
+-addoverwrite icon.ico, ICONGROUP,MAINICON,0
+-addoverwrite resources.res,,,
