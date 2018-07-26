@@ -1,0 +1,5 @@
+﻿;!@Install@!UTF-8!
+Title="Kiwix-plug installer"
+MiscFlags="4"
+RunProgram="launcher.exe"
+;!@InstallEnd@!
