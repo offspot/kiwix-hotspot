@@ -23,7 +23,7 @@ def startup_info_args():
     return {'startupinfo': si}
 
 
-def subprocess_pretty_call(cmd, logger=None, stdin=None,
+def subprocess_pretty_call(cmd, logger, stdin=None,
                            check=False, decode=False, as_admin=False):
     ''' flexible subprocess helper running separately and using the logger
 

@@ -4,7 +4,8 @@ from backend.content import (get_collection, get_content,
                              get_all_contents_for, isremote, get_content_cache,
                              get_alien_content)
 from backend.download import download_content, unzip_file
-from backend.mount import mount_data_partition, unmount_data_partition, test_mount_procedure, format_data_partition
+from backend.mount import mount_data_partition, unmount_data_partition, test_mount_procedure, format_data_partition, guess_next_loop_device
+from backend.mount import can_write_on, allow_write_on, restore_mode
 from backend.util import subprocess_pretty_check_call, subprocess_pretty_call
 from backend.sysreq import host_matches_requirements, requirements_url
 import data
@@ -41,16 +42,23 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
         image_building_path = os.path.join(build_dir, "plug-{}.BUILDING.img".format(today))
         image_error_path = os.path.join(build_dir, "plug-{}.ERROR.img".format(today))
 
+        # loop device mode on linux (for mkfs in userspace)
+        if sys.platform == "linux":
+            loop_dev = guess_next_loop_device(logger)
+            if loop_dev and not can_write_on(loop_dev):
+                logger.step("Change loop device mode ({})".format(sd_card))
+                previous_loop_mode = allow_write_on(loop_dev, logger)
+            else:
+                previous_loop_mode = None
+
         # Prepare SD Card
         if sd_card:
-            logger.step("Change {} ownership".format(sd_card))
+            logger.step("Change SD-card device mode ({})".format(sd_card))
             if sys.platform == "linux":
-                subprocess_pretty_check_call(
-                    ["chmod", "-c", "o+w", sd_card], logger, as_admin=True)
+                allow_write_on(sd_card, logger)
             elif sys.platform == "darwin":
                 subprocess_pretty_check_call(["diskutil", "unmountDisk", sd_card], logger)
-                subprocess_pretty_check_call(
-                    ["chmod", "-v", "o+w", sd_card], logger, as_admin=True)
+                allow_write_on(sd_card, logger)
             elif sys.platform == "win32":
                 logger.step("Format SD card {}".format(sd_card))
                 matches = re.findall(r"\\\\.\\PHYSICALDRIVE(\d*)", sd_card)
@@ -92,7 +100,8 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
                           .format(image_building_path))
 
         logger.step("Testing mount procedure")
-        test_mount_procedure(image_building_path, logger, thorough=True)
+        if not test_mount_procedure(image_building_path, logger, True):
+            raise ValueError("thorough mount procedure failed")
 
         # harmonize options
         packages = [] if zim_install is None else zim_install
@@ -278,13 +287,17 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
         error = None
     finally:
 
+
+        if sys.platform == "linux" and loop_dev and previous_loop_mode:
+            logger.step("Restoring loop device ({}) mode".format(loop_dev))
+            restore_mode(loop_dev, previous_loop_mode, logger)
+
         if sd_card:
+            logger.step("Restoring SD-card device ({}) mode".format(sd_card))
             if sys.platform == "linux":
-                subprocess_pretty_call(
-                    ["chmod", "-c", "o-w", sd_card], logger, as_admin=True)
+                restore_mode(sd_card, '0660', logger)
             elif sys.platform == "darwin":
-                subprocess_pretty_call(
-                    ["chmod", "-v", "o-w", sd_card], logger, as_admin=True)
+                restore_mode(sd_card, '0660', logger)
 
         # display durations summary
         logger.summary()

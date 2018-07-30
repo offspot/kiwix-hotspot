@@ -75,7 +75,7 @@ def get_partition_size(image_fpath, start_bytes, logger):
     return full_size - start_bytes
 
 
-def install_imdisk(logger=None, force=False):
+def install_imdisk(logger, force=False):
     ''' install imdisk manually (replicating steps from install.cmd) '''
 
     # assume already installed
@@ -116,7 +116,7 @@ def install_imdisk(logger=None, force=False):
                       .format(" ".join(failed)))
 
 
-def install_imdisk_via_cmd(logger=None):
+def install_imdisk_via_cmd(logger):
     ''' install imdisk via its .cmd file (silent mode)
 
         doesn't provide much feedback '''
@@ -133,7 +133,7 @@ def install_imdisk_via_cmd(logger=None):
         os.chdir(cwd)
 
 
-def uninstall_imdisk(logger=None):
+def uninstall_imdisk(logger):
     ''' uninstall imdisk using its uninstaller script '''
 
     # set silent variable to prevent popup
@@ -149,7 +149,7 @@ def uninstall_imdisk(logger=None):
         os.chdir(cwd)
 
 
-def get_avail_drive_letter(logger=None):
+def get_avail_drive_letter(logger):
     ''' returns a free Windows drive letter to mount image in '''
 
     if not sys.platform == "win32":
@@ -177,7 +177,59 @@ def get_avail_drive_letter(logger=None):
             return "{}:".format(letter)
 
 
-def test_mount_procedure(image_fpath, logger=None, thorough=False):
+def can_write_on(fpath):
+    ''' whether user can read+write on specified file (used with loops) '''
+    return os.access(fpath, os.R_OK | os.W_OK)
+
+
+def allow_write_on(fpath, logger):
+    ''' sets o+rw on path and return previous perms for others (0755) '''
+
+    si = os.stat(fpath)
+    subprocess_pretty_call(['chmod', '-v', 'o+rw', fpath], logger,
+                           check=True, as_admin=True)
+
+    return oct(si.st_mode)[-4:]
+
+
+def restore_mode(fpath, mode, logger):
+    ''' sets specified mode to specified file '''
+    subprocess_pretty_call(['chmod', '-v', mode, fpath], logger,
+                           check=True, as_admin=True)
+
+
+
+def guess_next_loop_device(logger):
+    try:
+        lines = subprocess_pretty_call([udisksctl_exe, 'dump'], logger,
+                                       check=True, decode=True)
+    except Exception as exp:
+        logger.err(exp)
+        return None
+
+    devnum = None  # loopX
+    devtype = None  # Block
+
+    for line in lines:
+        if line.startswith('/'):
+            try:
+                devnum = re.search(r'^.*loop([0-9]+)\:$', line).groups()[0]
+            except Exception:
+                devnum = None
+
+        if line.startswith('  org'):
+            try:
+                devtype = re.search(r'\.([a-zA-Z]+)\:$', line).groups()[0]
+            except Exception:
+                devtype = None
+
+        if devnum and devtype == 'Block' and line.startswith('    Size:'):
+            size = int(re.search(r'\s+Size\:\s+([0-9]+)$', line).groups()[0])
+            if size == 0:
+                return "/dev/loop{}".format(devnum)
+
+
+def test_mount_procedure(image_fpath, logger, thorough=False):
     ''' whether we are able to mount and unmount data partition
 
         usefull to ensure setup is OK before starting process
@@ -215,7 +267,7 @@ def test_mount_procedure(image_fpath, logger=None, thorough=False):
             pass  # failed to unmount (outch)
 
 
-def get_virtual_device(image_fpath, logger=None):
+def get_virtual_device(image_fpath, logger):
     ''' create and return a loop device or drive letter we can format/mount '''
 
     if sys.platform == "linux":
@@ -256,7 +308,7 @@ def get_virtual_device(image_fpath, logger=None):
         return target_dev
 
 
-def format_data_partition(image_fpath, logger=None):
+def format_data_partition(image_fpath, logger):
     ''' format the QEMU image's 3rd part in exfat on host '''
 
     target_dev = get_virtual_device(image_fpath, logger)
@@ -267,15 +319,22 @@ def format_data_partition(image_fpath, logger=None):
             [udisksctl_exe, 'unmount',
              '--block-device', target_dev, udisks_nou], logger)
 
+        # change mode via elevation if we can't format it
+        previous_mode = None
+        if not can_write_on(target_dev):
+            previous_mode = allow_write_on(target_dev, logger)
+
         # format the data partition
         try:
             subprocess_pretty_check_call(
                 [mkfs_exe, '-n', 'data', target_dev], logger)
-        except Exception:
-            raise
         finally:
+            # remove write rights we just added
+            if previous_mode:
+                restore_mode(target_dev, previous_mode, logger)
+
             # ensure we release the loop device on mount failure
-            unmount_data_partition(None, target_dev)
+            unmount_data_partition(None, target_dev, logger)
 
     elif sys.platform == "darwin":
         target_part = "{dev}s3".format(dev=target_dev)
@@ -283,11 +342,9 @@ def format_data_partition(image_fpath, logger=None):
         try:
             subprocess_pretty_check_call(
                 [diskutil_exe, 'eraseVolume', 'exfat', 'data',  target_part], logger)
-        except Exception:
-            raise
         finally:
             # ensure we release the loop device on mount failure
-            unmount_data_partition(None, target_dev)
+            unmount_data_partition(None, target_dev, logger)
 
     elif sys.platform == "win32":
         # mount into specified path AND format
@@ -298,14 +355,12 @@ def format_data_partition(image_fpath, logger=None):
                  '-v', '3',
                  '-p', '/fs:exfat /V:data /q /y',
                  '-m', target_dev], logger)
-        except Exception:
-            raise
         finally:
             # ensure we release the loop device on mount failure
-            unmount_data_partition(None, target_dev)
+            unmount_data_partition(None, target_dev, logger)
 
 
-def mount_data_partition(image_fpath, logger=None):
+def mount_data_partition(image_fpath, logger):
     ''' mount the QEMU image's 3rd part and return its mount point/drive '''
 
     target_dev = get_virtual_device(image_fpath, logger)
@@ -341,7 +396,7 @@ def mount_data_partition(image_fpath, logger=None):
                 [mount_exe, '-t', 'exfat', target_part, mount_point], logger)
         except Exception:
             # ensure we release the loop device on mount failure
-            unmount_data_partition(mount_point, target_dev)
+            unmount_data_partition(mount_point, target_dev, logger)
             raise
         return mount_point, target_dev
 
@@ -355,7 +410,7 @@ def mount_data_partition(image_fpath, logger=None):
         return mount_point, target_dev
 
 
-def unmount_data_partition(mount_point, device, logger=None):
+def unmount_data_partition(mount_point, device, logger):
     ''' unmount data partition and free virtual resources '''
 
     if sys.platform == "linux":
