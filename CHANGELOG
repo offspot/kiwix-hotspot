@@ -1,3 +1,6 @@
+2.0-rc2
+* Support for external hardware clock module (rasclock)
+
 2.0-rc1
 * Rebranded as Kiwix-plug installer
 * ZIM files in cache folder can be used with Kiwix Desktop

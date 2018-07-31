@@ -35,6 +35,9 @@
       # master, rename
     - role: kiwix
 
+    # master, rename (nginx hostname), reconfigure (password)
+    - role: clock
+
       # master, rename
     - role: captive_portal
       when: ansible_local.config.captive_portal|bool

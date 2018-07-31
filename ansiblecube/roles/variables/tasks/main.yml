@@ -48,11 +48,15 @@
       aflatoun_server_name: aflatoun.{{hostname}}
       edupi_server_name: edupi.{{hostname}}
       wikifundi_server_name: wikifundi.{{hostname}}
+      sites_server_name: sites.{{hostname}}
+      time_server_name: time.{{hostname}}
       kiwix_fqdn: kiwix.{{ fqdn }}
       kalite_fqdn: khanacademy.{{fqdn}}
       aflatoun_fqdn: aflatoun.{{fqdn}}
       edupi_fqdn: edupi.{{fqdn}}
       wikifundi_fqdn: wikifundi.{{fqdn}}
+      sites_fqdn: sites.{{fqdn}}
+      time_fqdn: time.{{fqdn}}
     name: Update names and fqdns for all projects
 
   - lineinfile:

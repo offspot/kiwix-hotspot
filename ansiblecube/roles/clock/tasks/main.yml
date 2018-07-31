@@ -1,0 +1,81 @@
+---
+- name: add dtoverlay to boot config
+  lineinfile:
+    path: /boot/config.txt
+    line: 'dtoverlay=i2c-rtc,pcf2127-rtc,pcf2127'
+    state: present
+  tags: master
+
+- name: fix hclock-set
+  lineinfile:
+    path: /lib/udev/hwclock-set
+    regexp: '-e /run/systemd/system'
+    line: 'if [ 1 -eq 0 ] ; then'
+  tags: master
+
+- name: fix hclock-set 2
+  lineinfile:
+    path: /lib/udev/hwclock-set
+    regexp: '--systz'
+    state: absent
+  tags: master
+
+- name: create password file for clock
+  environment:
+    USERNAME: "{{ admin_account }}"
+    PASSWORD: "{{ admin_password }}"
+  shell: python -c 'import os ; from random import choice; from crypt import crypt ; from string import ascii_letters, digits ; symbols = ascii_letters + digits ; salt = choice(symbols) + choice(symbols) ; print("{u}:{p}\n".format(u=os.environ.get("USERNAME", "admin"), p=crypt(os.environ.get("PASSWORD", "admin"), salt)))' > /var/www/.admin-passwd
+  tags: ['setup', 'reconfigure']
+
+- name: Create /var/www/clock folder
+  file:
+    path: /var/www/clock
+    owner: "{{ username }}"
+    group: ideascube
+    mode: 0755
+    state: directory
+  tags: master
+  
+- name: Copy clock script to /var/www/clock
+  copy:
+    src: clock.py
+    dest: /var/www/clock/clock.py
+    owner: "{{ username }}"
+    group: ideascube
+    mode: 0755
+  notify: restart uwsgi
+  tags: master
+
+- name: Add UWSGI specific configuration file
+  copy:
+    src: uwsgi.ini
+    dest: /etc/uwsgi/apps-available/clock.ini
+    owner: root
+    group: root
+    mode: 0644
+  tags: master
+
+- name: Add nginx specific configuration file
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/sites-available/clock
+    owner: root
+    group: root
+    mode: 0644
+  tags: ['master', 'rename']
+
+- name: Enable clock.ini for UWSGI
+  file:
+    src: /etc/uwsgi/apps-available/clock.ini
+    dest: /etc/uwsgi/apps-enabled/clock.ini
+    state: link
+  notify: restart uwsgi
+  tags: master
+
+- name: Enable clock vhost
+  file:
+    src: /etc/nginx/sites-available/clock
+    dest: /etc/nginx/sites-enabled/clock
+    state: link
+  notify: restart nginx
+  tags: master
