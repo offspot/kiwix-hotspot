@@ -34,11 +34,13 @@ matrix:
     - brew update
     # checking our formulas out to how they were when python 3.6.5 was around
     - cd /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core
-    - git checkout e128fa1bce3377de32cbf11bd8e46f7334dfd7a6 Formula/python.rb Formula/pygobject3.rb Formula/gtk+3.rb Formula/glib.rb Formula/adwaita-icon-theme.rb
+    # - git checkout e128fa1bce3377de32cbf11bd8e46f7334dfd7a6 Formula/python.rb Formula/pygobject3.rb Formula/gtk+3.rb Formula/glib.rb Formula/adwaita-icon-theme.rb
+    - wget http://download.kiwix.org/dev/brew-py36.zip
+    - unzip -o brew-py36.zip
     - cd -
     - brew install pygobject3 --with-python3 gtk+3 adwaita-icon-theme
     - python3 -m pip install -r requirements-macos.txt
-    - python3 -m pip install https://github.com/pyinstaller/pyinstaller/archive/93eec04eb2fbfc714d2c3453e04fd126e6a86f52.zip
+    - python3 -m pip install https://github.com/pyinstaller/pyinstaller/archive/develop.zip
 
     # Download pibox-installer-vexpress-boot
     - wget http://download.kiwix.org/dev/pibox-installer-vexpress-boot.zip
