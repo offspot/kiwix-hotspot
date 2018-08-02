@@ -41,7 +41,7 @@ if sys.platform == "linux":
                 device = bytes(info.get('PreferredDevice')).decode('utf-8')
 
                 size = info.get('Size')
-                formatted_size = human_readable_size(size)
+                formatted_size = human_readable_size(size, binary=False)
                 devices.append({
                         "key": key,
                         # Because device name ends with \x00
@@ -92,7 +92,7 @@ elif sys.platform == "darwin":
         for name in device_names:
             plist = plistlib.loads(subprocess.check_output(["diskutil", "info", "-plist", name]))
             size = plist["Size"]
-            formatted_size = human_readable_size(size)
+            formatted_size = human_readable_size(size, binary=False)
             devices.append({
                 "bus_protocol": plist["BusProtocol"],
                 "device_identifier": plist["DeviceIdentifier"],
@@ -137,7 +137,7 @@ elif sys.platform == "win32":
         lines.pop(0)
         for line in filter(lambda l: len(l) is not 0, lines):
             size = extract_field(column["Size"], line)
-            formatted_size = human_readable_size(size)
+            formatted_size = human_readable_size(size, binary=False)
             devices.append({
                 "caption": extract_field(column["Caption"], line),
                 "description": extract_field(column["Description"], line),

@@ -1,3 +1,6 @@
+2.0-rc4
+* Use decimal (GB) sizes for SD card selection
+
 2.0-rc3
 * Static content selection window display all contents, not only those selected [regression]
 
