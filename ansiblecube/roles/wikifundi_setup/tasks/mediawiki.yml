@@ -85,6 +85,7 @@
   with_items:
     - "{{ wikifundi_root }}"
     - "{{ mediawiki_root }}"
+    - "{{ parsoid_root }}"
   tags: setup
 
 - name: download mediawiki
@@ -113,7 +114,7 @@
   unarchive:
     remote_src: yes
     src: http://download.kiwix.org/dev/parsoid_0.9.0.tar.gz
-    dest: "{{ mediawiki_root }}"
+    dest: "{{ parsoid_root }}"
   tags: setup
 
 - name: downgrade npm first
