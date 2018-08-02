@@ -1,3 +1,6 @@
+2.0-rc3
+* Static content selection window display all contents, not only those selected [regression]
+
 2.0-rc2
 * macOS build: fixed compilation on travis (rc1 not launchable)
 * Support for external hardware clock module (rasclock)

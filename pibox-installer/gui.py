@@ -364,10 +364,6 @@ class Application:
         column_text = Gtk.TreeViewColumn("Description", renderer_text, text=3)
         self.component.choosen_zim_tree_view.append_column(column_text)
 
-        choosen_zim_filter = self.component.zim_list_store.filter_new()
-        choosen_zim_filter.set_visible_func(self.choosen_zim_filter_func)
-        self.component.choosen_zim_tree_view.set_model(choosen_zim_filter)
-
         def get_project_size(name, lang):
             langs = ['fr', 'en'] if name == 'aflatoun' else [lang]
             return get_expanded_size(get_collection(
@@ -470,6 +466,9 @@ class Application:
             if zim[8]:
                 self.component.zim_list_store[index][8] = False
         self.component.choosen_zim_tree_view.set_model(self.component.zim_list_store)
+        choosen_zim_filter = self.component.zim_list_store.filter_new()
+        choosen_zim_filter.set_visible_func(self.choosen_zim_filter_func)
+        self.component.choosen_zim_tree_view.set_model(choosen_zim_filter)
 
         self.update_free_space()
 
