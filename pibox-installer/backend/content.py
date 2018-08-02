@@ -177,6 +177,7 @@ def get_package_content(package_id):
             package = catalog['all'][package_id]
             package.update({'ext': "zip"
                             if package['type'] != 'zim' else "zim"})
+            package.update({'langid': package.get('langid') or package_id})
             return {
                 "url": package['url'],
                 "name": "package_{langid}-{version}.{ext}".format(**package),
@@ -186,13 +187,14 @@ def get_package_content(package_id):
                 "expanded_size": package['size'] * 1.1
                 if package['type'] != 'zim' else package['size'],
             }
-        except IndexError:
+        except KeyError:
             continue
 
 
 def get_packages_contents(packages=[]):
     ''' ideacube: ZIM file or ZIP file for each package '''
-    return [get_package_content(package) for package in packages]
+    return [get_package_content(package) for package in packages
+            if get_package_content(package) is not None]
 
 
 def extract_and_move(content, cache_folder, root_path, final_path, logger):
