@@ -112,7 +112,7 @@
 - name: download parsoid
   unarchive:
     remote_src: yes
-    url: http://download.kiwix.org/dev/parsoid_0.9.0.tar.gz
+    src: http://download.kiwix.org/dev/parsoid_0.9.0.tar.gz
     dest: "{{ mediawiki_root }}"
   tags: setup
 
