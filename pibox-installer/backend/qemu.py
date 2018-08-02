@@ -138,14 +138,21 @@ class Emulator:
         os.lseek(image, 0, os.SEEK_SET)
 
         current_percentage = 0.0
+        refresh_every = 100 * ONE_MiB
 
         while True:
             current_size = os.lseek(image, 0, os.SEEK_CUR)
             new_percentage = (100 * current_size) / total_size
             if new_percentage != current_percentage:
                 current_percentage = new_percentage
-                self._logger.progress(current_percentage / 100)
-                self._logger.std(str(current_percentage) + "%\r")
+
+                if current_size % refresh_every == 0:
+                    self._logger.progress(current_percentage / 100)
+                    self._logger.std(
+                        "Copied {copied} of {total} ({pc:.2}%)"
+                        .format(copied=human_readable_size(current_size),
+                                total=human_readable_size(total_size),
+                                pc=current_percentage))
 
             buf = os.read(image, 4096)
             if buf == b"":
