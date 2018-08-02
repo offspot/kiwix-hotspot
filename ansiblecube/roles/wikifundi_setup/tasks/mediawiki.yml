@@ -89,7 +89,7 @@
 
 - name: download mediawiki
   get_url:
-    url: https://releases.wikimedia.org/mediawiki/{{mediawiki_major_version}}/mediawiki-{{mediawiki_version}}-{{mediawiki_rc}}.tar.gz
+    url: http://download.kiwix.org/dev/mediawiki-1.31.0-rc.0.tar.gz
     dest: /tmp/mediawiki.tar.gz
   tags: setup
 
@@ -110,9 +110,10 @@
   tags: setup
 
 - name: download parsoid
-  command: git clone --quiet --depth=1 https://gerrit.wikimedia.org/r/p/mediawiki/services/parsoid
-  args:
-    chdir: "{{ mediawiki_root }}"
+  unarchive:
+    remote_src: yes
+    url: http://download.kiwix.org/dev/parsoid_0.9.0.tar.gz
+    dest: "{{ mediawiki_root }}"
   tags: setup
 
 - name: downgrade npm first
@@ -156,7 +157,7 @@
   tags: setup
 
 - name: install mediawiki extension
-  command: /usr/local/bin/add_mw_extension {{ item }} {{mediawiki_ext_version}} {{ mediawiki_root }}
+  command: /usr/local/bin/add_mw_extension {{ item }} REL1_31 {{ mediawiki_root }}
   with_items:
     - Nuke
     - Scribunto
@@ -179,7 +180,7 @@
 
 - name: download composer
   get_url:
-    url: https://getcomposer.org/composer.phar
+    url: http://download.kiwix.org/dev/composer_1.6.5.phar
     dest: "{{ mediawiki_root }}/composer.phar"
   tags: setup
 
