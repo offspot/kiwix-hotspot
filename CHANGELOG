@@ -1,4 +1,5 @@
 2.0-rc2
+* macOS build: fixed compilation on travis (rc1 not launchable)
 * Support for external hardware clock module (rasclock)
 
 2.0-rc1
