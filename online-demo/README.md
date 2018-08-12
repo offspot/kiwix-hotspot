@@ -45,7 +45,7 @@ mv qemu-{system-arm,img} /usr/local/bin/
 useradd -g www-data -l -m -N -s /bin/bash qdemo
 
 # add fake domains to hosts to be able to test outside nginx
-echo "192.168.1.3        ideascube.lan plug-demo.kiwix.org kiwix.plug-demo.kiwix.org khanacademy.plug-demo.kiwix.org aflatoun.plug-demo.kiwix.org edupi.plug-demo.kiwix.org wikifundi.plug-demo.kiwix.org sites.plug-demo.kiwix.org plug-demo kiwix.plug-demo khanacademy.plug-demo aflatoun.plug-demo edupi.plug-demo wikifundi.plug-demo sites.plug-demo" >> /etc/hosts
+echo "192.168.1.3        ideascube.hotspot plug-demo.kiwix.org kiwix.plug-demo.kiwix.org khanacademy.plug-demo.kiwix.org aflatoun.plug-demo.kiwix.org edupi.plug-demo.kiwix.org wikifundi.plug-demo.kiwix.org sites.plug-demo.kiwix.org plug-demo kiwix.plug-demo khanacademy.plug-demo aflatoun.plug-demo edupi.plug-demo wikifundi.plug-demo sites.plug-demo" >> /etc/hosts
 
 # download and execute at-boot script
 wget https://framagit.org/ideascube/pibox-installer/raw/master/online-demo/host-setup.sh -O /root/host-setup.sh && chmod +x /root/host-setup.sh && /root/host-setup.sh

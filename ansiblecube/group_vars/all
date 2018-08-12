@@ -6,10 +6,10 @@ lan_interface: eth0
 lan_interface2: eth1
 client_interface: wlan1
 max_wifi_client: 15
-cert_domain: ideascube.lan
 hostname: ideasbox
-tld: "lan"
+tld: "hotspot"
 fqdn: "{{ hostname }}.{{ tld }}"
+cert_domain: ideascube.{{ tld }}
 hotspot_name: ideasbox
 project_name: ideasbox
 ideascube_id: pibox

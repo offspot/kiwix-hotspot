@@ -40,6 +40,7 @@
       hostname: "{{ project_name_safe }}"
       fqdn: "{{ project_name_safe }}.{{ tld }}"
       hotspot_name: "{{ project_name }}"
+      cert_domain: ideascube.{{ tld }}
     name: Set hostname and hostpot_name
 
   - set_fact:
