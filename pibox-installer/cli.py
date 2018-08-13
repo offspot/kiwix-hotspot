@@ -231,11 +231,15 @@ collection = get_collection(edupi=args.edupi == "yes",
 cache_folder = get_cache(args.build_dir)
 # how much space is available on the build directory?
 avail_space_in_build_dir = get_free_space_in_dir(args.build_dir)
-# how much space do we need to build the image?
-space_required_to_build = get_required_building_space(
-    collection, cache_folder, args.size)
-# how large should the image be?
-required_image_size = get_required_image_size(collection)
+try:
+    # how much space do we need to build the image?
+    space_required_to_build = get_required_building_space(
+        collection, cache_folder, args.size)
+    # how large should the image be?
+    required_image_size = get_required_image_size(collection)
+except FileNotFoundError as exp:
+    print("Supplied File Not Found: {}".format(exp.filename), file=sys.stderr)
+    sys.exit(1)
 base_image_size = get_content('pibox_base_image')['expanded_size']
 
 if args.size < base_image_size:

@@ -33,6 +33,12 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
                 "Your system does not matches system requirements:\n{}".format(
                     "\n".join([" - {}".format(dep) for dep in missing_deps])))
 
+        logger.step("Ensure user files are present")
+        for user_fpath in (edupi_resources, favicon, logo, css):
+            if user_fpath is not None and not os.path.exists(user_fpath):
+                raise ValueError("Specified file is not available ({})"
+                                 .format(user_fpath))
+
         logger.step("Prepare Image file")
 
         # set image names

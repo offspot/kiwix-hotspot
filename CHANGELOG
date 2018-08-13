@@ -1,3 +1,7 @@
+2.0-rc5
+* Domain tld changed to .hotstop (was .lan)
+* Supplied file (edupi_resource, logo, css, favicon) checked for existence
+
 2.0-rc4
 * Use decimal (GB) sizes for SD card selection
 * Fixed logger refresh while writing to SD-card
