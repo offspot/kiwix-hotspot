@@ -759,8 +759,9 @@ class Application:
             timezone = None
 
         edupi_resources = self.get_edupi_resources()
-        if not isremote(edupi_resources):
-            edupi_resources = relpathto(self.get_edupi_resources())
+        if edupi_resources is not None:
+            if not isremote(edupi_resources):
+                edupi_resources = relpathto(self.get_edupi_resources())
 
         zim_install = []
         for zim in self.component.zim_list_store:
