@@ -704,46 +704,6 @@ and digits '0' to '9'</property>
                 <property name="position">7</property>
               </packing>
             </child>
-            <child>
-              <object class="GtkBox" id="no_id_25">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <child>
-                  <object class="GtkLabel" id="no_id_64">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="tooltip_text" translatable="yes">Set the administrator account. Otherwise it will be ask to create one on the first run of the box.</property>
-                    <property name="label" translatable="yes">Preset admin account :</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkSwitch" id="admin_account_switch">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="pack_type">end</property>
-                    <property name="position">1</property>
-                  </packing>
-                </child>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">8</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkRevealer" id="admin_account_revealer">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
                 <child>
                   <object class="GtkBox" id="no_id_75">
                     <property name="visible">True</property>
@@ -872,13 +832,6 @@ Must be different than login</property>
                     </child>
                   </object>
                 </child>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">9</property>
-              </packing>
-            </child>
             <child>
               <object class="GtkBox" id="no_id_14">
                 <property name="visible">True</property>

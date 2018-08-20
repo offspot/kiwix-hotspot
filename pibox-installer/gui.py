@@ -245,9 +245,6 @@ class Application:
         # wifi password
         self.component.wifi_password_switch.connect("notify::active", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(not switch.get_active()))
 
-        # admin account
-        self.component.admin_account_switch.connect("notify::active", lambda switch, state: self.component.admin_account_revealer.set_reveal_child(switch.get_active()))
-
         # edupi resources
         self.component.edupi_switch.connect("notify::active", lambda switch, state: self.component.edupi_resources_revealer.set_reveal_child(switch.get_active()))
 
@@ -443,7 +440,6 @@ class Application:
         self.component.wifi_password_entry.set_text("kiwixplug-wifipwd")
 
         # admin account
-        self.component.admin_account_switch.set_active(False)
         self.component.admin_account_login_entry.set_text("admin")
         self.component.admin_account_pwd_entry.set_text("admin-password")
 
@@ -695,10 +691,6 @@ class Application:
         # admin account
         if "admin_account" in config \
                 and isinstance(config["admin_account"], dict):
-            if config["admin_account"].get("custom") is not None:
-                self.component.admin_account_switch.set_active(
-                    bool(config["admin_account"]["custom"]))
-
             for key, arg_key in {'login': 'login', 'password': 'pwd'}.items():
                 if config["admin_account"].get(key) is not None:
                     getattr(self.component, 'admin_account_{}_entry'
@@ -844,7 +836,6 @@ class Application:
                 "password": self.component.wifi_password_entry.get_text(),
             }),
             ("admin_account", {
-                "custom": self.component.admin_account_switch.get_active(),
                 "login": self.component.admin_account_login_entry.get_text(),
                 "password": self.component.admin_account_pwd_entry.get_text(),
             }),
@@ -908,19 +899,13 @@ class Application:
         validate_label(self.component.wifi_password_label, condition)
         all_valid = all_valid and condition
 
-        if not self.component.admin_account_switch.get_state():
-            admin_account = None
-            login_condition = True
-            pwd_condition = True
-        else:
-            admin_account = {
-                "login": self.component.admin_account_login_entry.get_text(),
-                "pwd": self.component.admin_account_pwd_entry.get_text(),
-            }
-            login_condition = len(admin_account["login"]) <= 31 and set(admin_account["login"]) <= set(string.ascii_uppercase + string.ascii_lowercase + string.digits + '-' + '_')
-            pwd_condition = len(admin_account["pwd"]) <= 31 and set(admin_account["pwd"]) <= set(string.ascii_uppercase + string.ascii_lowercase + string.digits + '-' + '_') and (admin_account["pwd"] != admin_account["login"])
-        self.component.admin_account_login_constraints_revealer.set_reveal_child(not login_condition)
-        self.component.admin_account_pwd_constraints_revealer.set_reveal_child(not pwd_condition)
+        admin_account = {
+            "login": self.component.admin_account_login_entry.get_text(),
+            "pwd": self.component.admin_account_pwd_entry.get_text(),
+        }
+        login_condition = len(admin_account["login"]) <= 31 and set(admin_account["login"]) <= set(string.ascii_uppercase + string.ascii_lowercase + string.digits + '-' + '_')
+        pwd_condition = len(admin_account["pwd"]) <= 31 and set(admin_account["pwd"]) <= set(string.ascii_uppercase + string.ascii_lowercase + string.digits + '-' + '_') and (admin_account["pwd"] != admin_account["login"])
+
         validate_label(self.component.admin_account_login_label, login_condition)
         validate_label(self.component.admin_account_pwd_label, pwd_condition)
         all_valid = all_valid and pwd_condition and login_condition

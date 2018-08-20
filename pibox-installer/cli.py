@@ -63,13 +63,12 @@ def set_config(config, args):
     # admin account
     if "admin_account" in config \
             and isinstance(config["admin_account"], dict):
-        if config["admin_account"].get("custom") is not None:
 
-            # we need both login and password
-            if config["admin_account"].get("login") is not None \
-                    and config["admin_account"].get("password") is not None:
-                setif('admin_account', [config["admin_account"]["login"],
-                                        config["admin_account"]["password"]])
+        # we need both login and password
+        if config["admin_account"].get("login") is not None \
+                and config["admin_account"].get("password") is not None:
+            setif('admin_account', [config["admin_account"]["login"],
+                                    config["admin_account"]["password"]])
 
     # build_dir
     if config.get("build_dir") is not None:
