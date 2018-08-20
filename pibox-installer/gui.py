@@ -589,6 +589,8 @@ class Application:
         dialog.destroy()
 
     def activate_menu_config(self, widget, for_save=False):
+        home_path = os.environ['HomePath' if sys.platform == "win32"  else 'HOME']
+
         def _save(dialog):
             filename = dialog.get_filename() \
                 if dialog.get_filename().endswith('.json') \
@@ -627,12 +629,14 @@ class Application:
                 title,
                 self.component.window,  # make it tied to parent and modal
                 action, "OK", "Cancel")
+            dialog.set_current_folder(home_path)
         else:
             dialog = Gtk.FileChooserDialog(
                 title, self.component.window,
                 action=action,
                 buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                          Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
+            dialog.set_current_folder(home_path)
         dialog.set_modal(True)  # does not seem to have effect
 
         filter_json = Gtk.FileFilter()
