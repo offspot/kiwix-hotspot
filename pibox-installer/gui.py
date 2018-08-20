@@ -19,7 +19,7 @@ from util import get_free_space_in_dir
 from util import relpathto
 from util import b64encode, b64decode
 import data
-import langcodes
+import iso639
 import string
 import humanfriendly
 import webbrowser
@@ -237,7 +237,7 @@ class Application:
             "activate", self.activate_menu_help)
 
         # imdisk menu is windows only
-        if sys.platform == "win32" or True:
+        if sys.platform == "win32":
             self.component.menu_imdisk.set_visible(True)
             self.component.menu_imdisk.connect(
                 "activate", self.activate_menu_imdisk)
@@ -323,8 +323,13 @@ class Application:
                 url = value["url"]
                 description = value.get("description") or "none"
                 size = str(value["size"])
-                languages_iso = (value.get("language") or "Unkown language").split(",")
-                languages = set(map(lambda l: langcodes.Language.get(l).language_name(), languages_iso))
+                languages = []
+                for iso_code in (value.get("language") or "Unknown language").split(","):
+                    try:
+                        languages.append(iso639.languages.get(part3=iso_code).name)
+                    except KeyError:
+                        pass
+                languages = set(languages)
                 typ = value["type"]
                 version = str(value["version"])
                 formatted_size = human_readable_size(int(size))

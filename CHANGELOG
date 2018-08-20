@@ -3,6 +3,10 @@
 * Supplied file (edupi_resource, logo, css, favicon) checked for existence
 * Fixed JSON export on Windows [regression]
 * Fixed ImDisk installation (Windows)
+* Added Manual ImDisk Installation/Uninstallation
+* Load/Save JSON always from the Home folder
+* Admin Account now mandatory (not switch) with convenient defaults
+* Fixed Windows 64b builds not being 64b
 
 2.0-rc4
 * Use decimal (GB) sizes for SD card selection

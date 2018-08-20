@@ -64,11 +64,14 @@ install:
   - 7z.exe x ..\setup.exe
   - set GIR=True
   # note: we use python34 because it is the last supported by pygi-aio
-  - rcmd.exe /c setup.bat C:\Python34 GTK
+  - if %platform%==x86 rcmd.exe /c setup.bat C:\Python34 GTK
+  - if %platform%==x64 rcmd.exe /c setup.bat C:\Python34-x64 GTK
   # note: we create a symbolic link for pyinstaller
-  - mklink /D C:\Python34\share C:\Python34\Lib\site-packages\gnome\share
+  - if %platform%==x86 mklink /D C:\Python34\share C:\Python34\Lib\site-packages\gnome\share
+  - if %platform%==x64 mklink /D C:\Python34-x64\share C:\Python34-x64\Lib\site-packages\gnome\share
   - cd ..\..
-  - dir C:\Python34\Lib\site-packages\gi
+  - if %platform%==x86 dir C:\Python34\Lib\site-packages\gi
+  - if %platform%==x64 dir C:\Python34-x64\Lib\site-packages\gi
 
   # Install gdk-pixbuf and add it to PATH because it is needed by pyinstaller
   - if %platform%==x86 C:\msys64\usr\bin\bash --login -c "pacman -S mingw-w64-i686-gdk-pixbuf2 --noconfirm"
@@ -78,9 +81,8 @@ install:
 
   # Install pyinstaller and requirements
   - cd C:\projects\pibox-installer
-  - C:\Python34\python.exe -m pip install pypiwin32==219
-  - C:\Python34\python.exe -m pip install pyinstaller==3.2.1
-  - C:\Python34\python.exe -m pip install -r requirements-windows.txt
+  - if %platform%==x86 C:\Python34\python.exe -m pip install pypiwin32==219 pyinstaller==3.2.1 -r requirements-windows.txt
+  - if %platform%==x64 C:\Python34-x64\python.exe -m pip install pypiwin32==219 pyinstaller==3.2.1 -r requirements-windows.txt
 
   # Install qemu
   - mkdir "C:\Program Files\qemu"
@@ -114,7 +116,7 @@ install:
   # Run pyinstaller and show warning
   - cd C:\projects\pibox-installer
   - if %platform%==x86 C:\Python34\python.exe C:\Python34\Scripts\pyinstaller-script.py --log-level=DEBUG pibox-installer-win32.spec
-  - if %platform%==x64 C:\Python34\python.exe C:\Python34\Scripts\pyinstaller-script.py --log-level=DEBUG pibox-installer-win64.spec
+  - if %platform%==x64 C:\Python34-x64\python.exe C:\Python34-x64\Scripts\pyinstaller-script.py --log-level=DEBUG pibox-installer-win64.spec
   - if %platform%==x86 type build\pibox-installer-win32\warnpibox-installer-win32.txt
   - if %platform%==x64 type build\pibox-installer-win64\warnpibox-installer-win64.txt
 

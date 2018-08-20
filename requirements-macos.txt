@@ -11,7 +11,7 @@ pyparsing==2.2.0
 pytz==2017.2
 PyYAML==4.2b2
 six==1.10.0
-langcodes==1.4.0
+iso-639==0.4.5
 path.py==11.0
 psutil==5.4.5
 humanfriendly==4.12

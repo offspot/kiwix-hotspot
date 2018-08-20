@@ -30,10 +30,12 @@ def system_has_exfat():
 
 if sys.platform == "win32":
     imdiskinst = os.path.join(data_dir, 'imdiskinst')
-    system32 = os.path.join(os.environ['SystemRoot'], 'SysNative')
-    system = os.path.join(os.environ['SystemRoot'], 'SysWOW64') \
-        if 'PROGRAMFILES(X86)' in os.environ else system32
-    imdisk_exe = os.path.join(system, 'imdisk.exe')
+    # Windows holds 3 folders:
+    # - Sytem32: files of the system architecture: 32b on x86, 64b on x64
+    # - SysWOW64: 32b files on x64
+    # - SysNative: virt folder to access 64b files from 32b bins on x64
+    system32 = os.path.join(os.environ['SystemRoot'], 'System32')
+    imdisk_exe = os.path.join(system32, 'imdisk.exe')
 elif sys.platform == "linux":
     udisksctl_exe = '/usr/bin/udisksctl'
     udisks_nou = '--no-user-interaction'
@@ -85,16 +87,12 @@ def install_imdisk(logger, force=False):
         return
     logger.std("Imdisk IS NOT present. Installing...")
 
-    # disable integrity checks (allow install of unsigned driver)
-    subprocess_pretty_call([os.path.join(system32, 'bcdedit.exe'),
-                           '/set', 'nointegritychecks', 'on'], logger)
-
     # install the driver and files
     cwd = os.getcwd()
     try:
         os.chdir(imdiskinst)
         ret, _ = subprocess_pretty_call([
-            os.path.join(system, 'rundll32.exe'),
+            'rundll32.exe',
             'setupapi.dll,InstallHinfSection',
             'DefaultInstall', '132',  '.\\imdisk.inf'], logger)
     except Exception:
@@ -104,7 +102,7 @@ def install_imdisk(logger, force=False):
 
     if ret != 0:
         raise OSError("Unable to install ImDisk driver. "
-                      "Please reboot your computer and retry")
+                      "Please install manually from the File menu.")
 
     # start services
     failed = []
@@ -114,7 +112,7 @@ def install_imdisk(logger, force=False):
     if failed:
         raise OSError("ImDisk installed but some "
                       "service/driver failed to start:  {}.\n"
-                      "Please reboot your computer and retry"
+                      "Please install manually from the File menu."
                       .format(" ".join(failed)))
 
     assert os.path.exists(imdisk_exe)
