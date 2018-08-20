@@ -38,7 +38,7 @@ def subprocess_pretty_call(cmd, logger, stdin=None,
         if sys.platform == "win32":
             if logger is not None:
                 logger.std("Call (as admin): " + str(cmd))
-            return run_as_win_admin(cmd)
+            return run_as_win_admin(cmd, logger)
 
         from_cli = logger is None or type(logger) == CLILogger
         cmd = get_admin_command(cmd, from_gui=not from_cli)
@@ -74,6 +74,12 @@ def subprocess_pretty_check_call(cmd, logger, stdin=None, as_admin=False):
                                   stdin=stdin, check=True, as_admin=as_admin)
 
 
+def subprocess_external(cmd, logger):
+    ''' spawn a new process without capturing nor watching it '''
+    logger.std("Opening: " + str(cmd))
+    subprocess.Popen(cmd)
+
+
 def is_admin():
     ''' whether current process is ran as Windows Admin or unix root '''
     if sys.platform == "win32":
@@ -86,7 +92,7 @@ def is_admin():
 
 def run_as_win_admin(command, logger):
     ''' run specified command with admin rights '''
-    params = " ".join(['"{}"'.format(x) for x in command[1:]])
+    params = " ".join(['"{}"'.format(x) for x in command[1:]]).strip()
     rc = ctypes.windll.shell32.ShellExecuteW(None, "runas",
                                              command[0],
                                              params, None, 1)

@@ -1,9 +1,8 @@
 from collections import OrderedDict
 import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk, GLib, GdkPixbuf, GObject
 from backend.catalog import YAML_CATALOGS
 from backend.content import get_expanded_size, get_collection, get_required_image_size, get_content, isremote
+from backend.mount import open_explorer_for_imdisk
 from run_installation import run_installation
 import pytz
 import tzlocal
@@ -24,6 +23,8 @@ import langcodes
 import string
 import humanfriendly
 import webbrowser
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, Gdk, GLib, GdkPixbuf, GObject
 
 VALID_RGBA = Gdk.RGBA(0., 0., 0., 0.)
 INVALID_RGBA = Gdk.RGBA(1, 0.5, 0.5, 1.)
@@ -86,6 +87,8 @@ class Logger(ProgressHelper):
         GLib.idle_add(self.main_thread_failed, error)
 
     def main_thread_text(self, text, end="\n", tag=None):
+        if not isinstance(text, str):
+            text = str(text)
         text += end
         text_iter = self.text_buffer.get_end_iter()
         if tag is None:
@@ -115,10 +118,10 @@ class Logger(ProgressHelper):
     def update_gui(self):
         # show text progress in console
         self.main_thread_text("[STAGE {nums}: {name} - {pc:.0f}%]"
-               .format(nums=self.stage_numbers,
-                       name=self.stage_name,
-                       pc=self.get_overall_progress() * 100),
-               tag=self.stg_tag)
+                              .format(nums=self.stage_numbers,
+                                      name=self.stage_name,
+                                      pc=self.get_overall_progress() * 100),
+                              tag=self.stg_tag)
 
         # update overall percentage on window title
         self.component.run_window.set_title(
@@ -232,6 +235,12 @@ class Application:
             "activate", self.activate_menu_config, True)
         self.component.menu_help.connect(
             "activate", self.activate_menu_help)
+
+        # imdisk menu is windows only
+        if sys.platform == "win32" or True:
+            self.component.menu_imdisk.set_visible(True)
+            self.component.menu_imdisk.connect(
+                "activate", self.activate_menu_imdisk)
 
         # wifi password
         self.component.wifi_password_switch.connect("notify::active", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(not switch.get_active()))
@@ -472,7 +481,6 @@ class Application:
 
         self.update_free_space()
 
-
     def iter_kalite_check_button(self):
         return [("fr", self.component.kalite_fr_check_button),
                 ("en", self.component.kalite_en_check_button),
@@ -493,8 +501,42 @@ class Application:
     def activate_menu_help(self, widget):
         webbrowser.open(data.help_url)
 
+    def activate_menu_imdisk(self, widget):
+        class ImDiskDialog(Gtk.Dialog):
+            def __init__(self, parent):
+                Gtk.Dialog.__init__(
+                    self, "Install or Uninstall ImDisk Manually", parent, 0,
+                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                     Gtk.STOCK_OK, Gtk.ResponseType.OK))
+
+                self.set_default_size(500, 300)
+
+                label = Gtk.Label()
+                label.set_markup(
+                    "\nBy selecting OK bellow, you will be directed to the "
+                    "ImDisk installation folder.\n"
+                    "<b>Right-click on <i>install.cmd</i></b> and choose to "
+                    "<u>Run as Administrator</u>.\n")
+                label.set_alignment(0, 0.5)
+                label2 = Gtk.Label()
+                label2.set_markup(
+                    "\nYou can also uninstall it from that folder by "
+                    "doing the same with <i>uninstall_imdisk.cmd</i>.\n")
+                label2.set_alignment(0, 0.5)
+                image = Gtk.Image.new_from_file(
+                    os.path.join(data.data_dir, 'imdisk.png'))
+                box = self.get_content_area()
+                box.add(label)
+                box.add(image)
+                box.add(label2)
+                self.show_all()
+        dialog = ImDiskDialog(self.component.window)
+        if dialog.run() == Gtk.ResponseType.OK:
+            open_explorer_for_imdisk(self.logger)
+        dialog.close()
+
     def installation_done(self, error):
-        ok = error == None
+        ok = error is None
         validate_label(self.component.done_label, ok)
         if ok:
             self.component.done_label.set_text("Installation done")
@@ -931,12 +973,12 @@ class Application:
         css = self.component.css_chooser.get_filename()
 
         build_dir = self.component.build_path_chooser.get_filename()
-        condition = build_dir != None
+        condition = build_dir is not None
         validate_label(self.component.build_path_chooser_label, condition)
         all_valid = all_valid and condition
 
         # Check if there is enough space in build_dir to build image
-        if build_dir != None:
+        if build_dir is not None:
             free_space = get_free_space_in_dir(build_dir)
             remaining_space = free_space - output_size
             if remaining_space < 0:
@@ -951,26 +993,26 @@ class Application:
         if all_valid:
             def target():
                 run_installation(
-                        name=project_name,
-                        timezone=timezone,
-                        language=language,
-                        wifi_pwd=wifi_pwd,
-                        kalite=kalite,
-                        wikifundi=wikifundi,
-                        aflatoun=aflatoun,
-                        edupi=edupi,
-                        edupi_resources=self.get_edupi_resources(),
-                        zim_install=zim_install,
-                        size=output_size,
-                        logger=self.logger,
-                        cancel_event=self.cancel_event,
-                        sd_card=sd_card,
-                        logo=logo,
-                        favicon=favicon,
-                        css=css,
-                        build_dir=build_dir,
-                        admin_account=admin_account,
-                        done_callback=lambda error: GLib.idle_add(self.installation_done, error))
+                    name=project_name,
+                    timezone=timezone,
+                    language=language,
+                    wifi_pwd=wifi_pwd,
+                    kalite=kalite,
+                    wikifundi=wikifundi,
+                    aflatoun=aflatoun,
+                    edupi=edupi,
+                    edupi_resources=self.get_edupi_resources(),
+                    zim_install=zim_install,
+                    size=output_size,
+                    logger=self.logger,
+                    cancel_event=self.cancel_event,
+                    sd_card=sd_card,
+                    logo=logo,
+                    favicon=favicon,
+                    css=css,
+                    build_dir=build_dir,
+                    admin_account=admin_account,
+                    done_callback=lambda error: GLib.idle_add(self.installation_done, error))
 
             self.component.window.hide()
             self.reset_run_window()
@@ -1070,7 +1112,7 @@ class Application:
         else:
             try:
                 size = int(self.component.size_entry.get_text()) * ONE_GB
-            except:
+            except Exception:
                 size = -1
 
         return size
@@ -1103,6 +1145,7 @@ class Application:
 
     def choosen_zim_filter_func(self, model, iter, data):
         return model[iter][8]
+
 
 try:
     assert len(YAML_CATALOGS)

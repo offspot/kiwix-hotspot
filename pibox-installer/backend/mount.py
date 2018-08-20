@@ -9,12 +9,12 @@ import time
 import string
 import random
 import tempfile
-import platform
 
 from data import data_dir
 from backend.content import get_content
 from backend.qemu import get_qemu_image_size
-from backend.util import subprocess_pretty_check_call, subprocess_pretty_call
+from backend.util import (subprocess_pretty_check_call, subprocess_pretty_call,
+                          subprocess_external)
 
 
 def system_has_exfat():
@@ -30,9 +30,9 @@ def system_has_exfat():
 
 if sys.platform == "win32":
     imdiskinst = os.path.join(data_dir, 'imdiskinst')
-    system32 = os.path.join(os.environ['SystemRoot'], 'System32')
+    system32 = os.path.join(os.environ['SystemRoot'], 'SysNative')
     system = os.path.join(os.environ['SystemRoot'], 'SysWOW64') \
-        if platform.architecture()[0] == '64bit' else system32
+        if 'PROGRAMFILES(X86)' in os.environ else system32
     imdisk_exe = os.path.join(system, 'imdisk.exe')
 elif sys.platform == "linux":
     udisksctl_exe = '/usr/bin/udisksctl'
@@ -79,9 +79,11 @@ def install_imdisk(logger, force=False):
     ''' install imdisk manually (replicating steps from install.cmd) '''
 
     # assume already installed
+    logger.std("Looking for {}".format(imdisk_exe))
     if os.path.exists(imdisk_exe) and not force:
-        logger.std("imdisk present at {}".format(imdisk_exe))
+        logger.std("ImDisk already present.")
         return
+    logger.std("Imdisk IS NOT present. Installing...")
 
     # disable integrity checks (allow install of unsigned driver)
     subprocess_pretty_call([os.path.join(system32, 'bcdedit.exe'),
@@ -115,38 +117,14 @@ def install_imdisk(logger, force=False):
                       "Please reboot your computer and retry"
                       .format(" ".join(failed)))
 
-
-def install_imdisk_via_cmd(logger):
-    ''' install imdisk via its .cmd file (silent mode)
-
-        doesn't provide much feedback '''
-
-    # set silent variable to prevent popup
-    os.environ['IMDISK_SILENT_SETUP'] = "1"
-    cwd = os.getcwd()
-    try:
-        os.chdir(imdiskinst)
-        subprocess_pretty_check_call(['cmd.exe', 'install.cmd'], logger)
-    except Exception:
-        pass
-    finally:
-        os.chdir(cwd)
+    assert os.path.exists(imdisk_exe)
 
 
-def uninstall_imdisk(logger):
-    ''' uninstall imdisk using its uninstaller script '''
-
-    # set silent variable to prevent popup
-    os.environ['IMDISK_SILENT_SETUP'] = "1"
-    cwd = os.getcwd()
-    try:
-        os.chdir(imdiskinst)
-        subprocess_pretty_check_call(
-            ['cmd.exe', 'uninstall_imdisk.cmd'], logger)
-    except Exception:
-        pass
-    finally:
-        os.chdir(cwd)
+def open_explorer_for_imdisk(logger):
+    subprocess_external([
+        os.path.join(os.environ['SystemRoot'], 'explorer.exe'),
+        '/select,', os.path.normpath(os.path.join(imdiskinst, 'install.cmd'))],
+        logger)
 
 
 def get_avail_drive_letter(logger):
@@ -196,7 +174,6 @@ def restore_mode(fpath, mode, logger):
     ''' sets specified mode to specified file '''
     subprocess_pretty_call(['chmod', '-v', mode, fpath], logger,
                            check=True, as_admin=True)
-
 
 
 def guess_next_loop_device(logger):
@@ -341,7 +318,8 @@ def format_data_partition(image_fpath, logger):
 
         try:
             subprocess_pretty_check_call(
-                [diskutil_exe, 'eraseVolume', 'exfat', 'data',  target_part], logger)
+                [diskutil_exe, 'eraseVolume', 'exfat', 'data',  target_part],
+                logger)
         finally:
             # ensure we release the loop device on mount failure
             unmount_data_partition(None, target_dev, logger)

@@ -317,6 +317,14 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkMenuItem" id="menu_imdisk">
+                        <property name="label">(un)Install ImDisk Manually</property>
+                        <property name="visible">False</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkMenuItem" id="menu_help">
                         <property name="label">Open Help / FAQ</property>
                         <property name="visible">True</property>
@@ -1241,15 +1249,15 @@ In File mode the image is created at build path, you can choose the size
                       </packing>
                     </child>
                     <child>
-                    	<object class="GtkFileChooserButton" id="edupi_resources_chooser">
-	                       <property name="visible">True</property>
-	                       <property name="can_focus">False</property>
-	                       <property name="create_folders">False</property>
-	                       <property name="filter">edupi_resources_filter</property>
-	                       <property name="title" translatable="yes"/>
-	                       <property name="tooltip_text" translatable="yes">ZIP file containing EduPi resources</property>
-	                     </object>
-	                     <packing>
+                        <object class="GtkFileChooserButton" id="edupi_resources_chooser">
+                           <property name="visible">True</property>
+                           <property name="can_focus">False</property>
+                           <property name="create_folders">False</property>
+                           <property name="filter">edupi_resources_filter</property>
+                           <property name="title" translatable="yes"/>
+                           <property name="tooltip_text" translatable="yes">ZIP file containing EduPi resources</property>
+                         </object>
+                         <packing>
                             <property name="expand">False</property>
                             <property name="fill">False</property>
                             <property name="pack_type">end</property>
