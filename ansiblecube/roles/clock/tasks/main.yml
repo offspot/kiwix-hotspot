@@ -22,9 +22,9 @@
 
 - name: create password file for clock
   environment:
-    USERNAME: "{{ admin_account }}"
-    PASSWORD: "{{ admin_password }}"
-  shell: python -c 'import os ; from random import choice; from crypt import crypt ; from string import ascii_letters, digits ; symbols = ascii_letters + digits ; salt = choice(symbols) + choice(symbols) ; print("{u}:{p}\n".format(u=os.environ.get("USERNAME", "admin"), p=crypt(os.environ.get("PASSWORD", "admin"), salt)))' > /var/www/.admin-passwd
+    ADMIN_ACCOUNT: "{{ admin_account }}"
+    ADMIN_PASSWORD: "{{ admin_password }}"
+  shell: python -c 'import os ; from random import choice; from crypt import crypt ; from string import ascii_letters, digits ; symbols = ascii_letters + digits ; salt = choice(symbols) + choice(symbols) ; print("{u}:{p}\n".format(u=os.environ.get("ADMIN_ACCOUNT", "admin"), p=crypt(os.environ.get("ADMIN_PASSWORD", "admin"), salt)))' > /var/www/.admin-passwd
   tags: ['setup', 'reconfigure']
 
 - name: Create /var/www/clock folder

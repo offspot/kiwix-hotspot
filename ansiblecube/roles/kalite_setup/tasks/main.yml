@@ -40,7 +40,9 @@
   environment:
     KALITE_PYTHON: "{{ kalite_env }}/bin/python"
     KALITE_HOME: "{{ kalite_root }}"
-  command: "{{ kalite_env }}/bin/kalite manage setup --username={{ admin_account }} --password={{ admin_password }} --noinput"
+    ADMIN_ACCOUNT: "{{ admin_account }}"
+    ADMIN_PASSWORD: "{{ admin_password }}"
+  command: "{{ kalite_env }}/bin/kalite manage setup --username=$ADMIN_ACCOUNT --password=$ADMIN_PASSWORD --noinput"
   when: admin_account is defined
   tags:
     - setup

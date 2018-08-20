@@ -163,7 +163,9 @@
 - name: Check if ideascube super user is installed
   become: yes
   become_user: "{{ username }}"
-  command: ideascube shell -c "from ideascube.models import User; print('****{}****'.format(User.objects.filter(serial='{{ admin_account }}').count()))"
+  environment:
+    ADMIN_ACCOUNT: "{{ admin_account }}"
+  command: ideascube shell -c "import os; from ideascube.models import User; print('****{}****'.format(User.objects.filter(serial=os.environ.get('ADMIN_ACCOUNT')).count()))"
   register: ideascube_admin_shell_output
   when: admin_account is defined
   tags: reconfigure
@@ -171,7 +173,10 @@
 - name: Install Ideascube super user
   become: yes
   become_user: "{{ username }}"
-  command: ideascube shell -c "from ideascube.models import User; User.objects.create_superuser('{{ admin_account }}', '{{ admin_password }}')"
+  environment:
+    ADMIN_ACCOUNT: "{{ admin_account }}"
+    ADMIN_PASSWORD: "{{ admin_password }}"
+  command: ideascube shell -c "import os; from ideascube.models import User; User.objects.create_superuser(os.environ.get('ADMIN_ACCOUNT'), os.environ.get('ADMIN_PASSWORD'))"
   when: admin_account is defined and ideascube_admin_shell_output.stdout.split('****')[1]|int == 0
   tags: reconfigure
 

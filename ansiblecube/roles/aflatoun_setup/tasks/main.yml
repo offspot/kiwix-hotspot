@@ -36,14 +36,24 @@
 - name: Initialize aflatoun and Create an admin user
   become: yes
   become_user: "{{ username }}"
-  shell: KALITE_PYTHON={{ aflatoun_env }}/bin/python KALITE_HOME={{ aflatoun_root }} {{ aflatoun_env }}/bin/kalite manage setup --username={{ admin_account }} --password={{ admin_password }} --noinput --no-assessment-items
+  environment:
+    KALITE_PYTHON: "{{ aflatoun_env }}/bin/python"
+    KALITE_HOME: "{{ aflatoun_root }}"
+    ADMIN_ACCOUNT: "{{ admin_account }}"
+    ADMIN_PASSWORD: "{{ admin_password }}"
+  shell: "{{ aflatoun_env }}/bin/kalite manage setup --username=$ADMIN_ACCOUNT --password=$ADMIN_PASSWORD --noinput --no-assessment-items"
   when: admin_account is defined
   tags: ['setup', 'reconfigure']
 
 - name: Initialize Aflatoun without creating an admin user
   become: yes
   become_user: "{{ username }}"
-  shell: KALITE_PYTHON={{ aflatoun_env }}/bin/python KALITE_HOME={{ aflatoun_root }} {{ aflatoun_env }}/bin/kalite manage setup --noinput --no-assessment-items
+  environment:
+    KALITE_PYTHON: "{{ aflatoun_env }}/bin/python"
+    KALITE_HOME: "{{ aflatoun_root }}"
+    ADMIN_ACCOUNT: "{{ admin_account }}"
+    ADMIN_PASSWORD: "{{ admin_password }}"
+  shell: "{{ aflatoun_env }}/bin/kalite manage setup --noinput --no-assessment-items"
   when: admin_account is not defined
   tags: ['setup', 'reconfigure']
 
