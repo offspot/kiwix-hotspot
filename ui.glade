@@ -317,6 +317,14 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkMenuItem" id="menu_imdisk">
+                        <property name="label">(un)Install ImDisk Manually</property>
+                        <property name="visible">False</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkMenuItem" id="menu_help">
                         <property name="label">Open Help / FAQ</property>
                         <property name="visible">True</property>

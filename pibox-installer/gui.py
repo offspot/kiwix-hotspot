@@ -4,6 +4,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib, GdkPixbuf, GObject
 from backend.catalog import YAML_CATALOGS
 from backend.content import get_expanded_size, get_collection, get_required_image_size, get_content, isremote
+from backend.mount import open_explorer_for_imdisk
 from run_installation import run_installation
 import pytz
 import tzlocal
@@ -86,6 +87,8 @@ class Logger(ProgressHelper):
         GLib.idle_add(self.main_thread_failed, error)
 
     def main_thread_text(self, text, end="\n", tag=None):
+        if not isinstance(text, str):
+            text = str(text)
         text += end
         text_iter = self.text_buffer.get_end_iter()
         if tag is None:
@@ -232,6 +235,12 @@ class Application:
             "activate", self.activate_menu_config, True)
         self.component.menu_help.connect(
             "activate", self.activate_menu_help)
+
+        # imdisk menu is windows only
+        if sys.platform == "win32" or True:
+            self.component.menu_imdisk.set_visible(True)
+            self.component.menu_imdisk.connect(
+                "activate", self.activate_menu_imdisk)
 
         # wifi password
         self.component.wifi_password_switch.connect("notify::active", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(not switch.get_active()))
@@ -492,6 +501,40 @@ class Application:
 
     def activate_menu_help(self, widget):
         webbrowser.open(data.help_url)
+
+    def activate_menu_imdisk(self, widget):
+        class ImDiskDialog(Gtk.Dialog):
+            def __init__(self, parent):
+                Gtk.Dialog.__init__(
+                    self, "Install or Uninstall ImDisk Manually", parent, 0,
+                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                     Gtk.STOCK_OK, Gtk.ResponseType.OK))
+
+                self.set_default_size(500, 300)
+
+                label = Gtk.Label()
+                label.set_markup(
+                    "\nBy selecting OK bellow, you will be directed to the "
+                    "ImDisk installation folder.\n"
+                    "<b>Right-click on <i>install.cmd</i></b> and choose to "
+                    "<u>Run as Administrator</u>.\n")
+                label.set_alignment(0, 0.5)
+                label2 = Gtk.Label()
+                label2.set_markup(
+                    "\nYou can also uninstall it from that folder by "
+                    "doing the same with <i>uninstall_imdisk.cmd</i>.\n")
+                label2.set_alignment(0, 0.5)
+                image = Gtk.Image.new_from_file(
+                    os.path.join(data.data_dir, 'imdisk.png'))
+                box = self.get_content_area()
+                box.add(label)
+                box.add(image)
+                box.add(label2)
+                self.show_all()
+        dialog = ImDiskDialog(self.component.window)
+        if dialog.run() == Gtk.ResponseType.OK:
+            open_explorer_for_imdisk(self.logger)
+        dialog.close()
 
     def installation_done(self, error):
         ok = error == None
