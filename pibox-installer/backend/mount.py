@@ -9,7 +9,6 @@ import time
 import string
 import random
 import tempfile
-import platform
 
 from data import data_dir
 from backend.content import get_content
@@ -30,9 +29,9 @@ def system_has_exfat():
 
 if sys.platform == "win32":
     imdiskinst = os.path.join(data_dir, 'imdiskinst')
-    system32 = os.path.join(os.environ['SystemRoot'], 'System32')
+    system32 = os.path.join(os.environ['SystemRoot'], 'SysNative')
     system = os.path.join(os.environ['SystemRoot'], 'SysWOW64') \
-        if platform.architecture()[0] == '64bit' else system32
+        if 'PROGRAMFILES(X86)' in os.environ else system32
     imdisk_exe = os.path.join(system, 'imdisk.exe')
 elif sys.platform == "linux":
     udisksctl_exe = '/usr/bin/udisksctl'
@@ -198,7 +197,6 @@ def restore_mode(fpath, mode, logger):
                            check=True, as_admin=True)
 
 
-
 def guess_next_loop_device(logger):
     try:
         lines = subprocess_pretty_call([udisksctl_exe, 'dump'], logger,
@@ -341,7 +339,8 @@ def format_data_partition(image_fpath, logger):
 
         try:
             subprocess_pretty_check_call(
-                [diskutil_exe, 'eraseVolume', 'exfat', 'data',  target_part], logger)
+                [diskutil_exe, 'eraseVolume', 'exfat', 'data',  target_part],
+                logger)
         finally:
             # ensure we release the loop device on mount failure
             unmount_data_partition(None, target_dev, logger)
