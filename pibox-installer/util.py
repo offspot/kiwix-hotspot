@@ -5,6 +5,7 @@ import threading
 import signal
 import sys
 import base64
+import string
 import hashlib
 import tempfile
 import ctypes
@@ -12,8 +13,11 @@ import platform
 import datetime
 import collections
 
+import pytz
 from path import Path
 import humanfriendly
+
+import data
 
 ONE_MiB = 2 ** 20
 ONE_GiB = 2 ** 30
@@ -387,3 +391,36 @@ def ensure_zip_exfat_compatible(fpath):
     except Exception as exp:
         return False, [str(exp)]
     return len(bad_fnames) == 0, bad_fnames
+
+
+def check_user_inputs(project_name, language, timezone,
+                      admin_login, admin_pwd, wifi_pwd=None):
+
+    allowed_chars = set(string.ascii_uppercase + string.ascii_lowercase
+                        + string.digits + '-' + ' ')
+    valid_project_name = len(project_name) >= 1 \
+        and len(project_name) <= 64 \
+        and set(project_name) <= allowed_chars
+
+    valid_language = language in dict(data.ideascube_languages).keys()
+
+    valid_timezone = timezone in pytz.common_timezones
+
+    valid_wifi_pwd = len(wifi_pwd) <= 31 \
+        and set(wifi_pwd) <= set(string.ascii_uppercase
+                                 + string.ascii_lowercase + string.digits
+                                 + '-' + '_') \
+        if wifi_pwd is not None else True
+
+    valid_admin_login = len(admin_login) <= 31 \
+        and set(admin_login) <= set(string.ascii_uppercase
+                                    + string.ascii_lowercase
+                                    + string.digits + '-' + '_')
+    valid_admin_pwd = len(admin_pwd) <= 31 \
+        and set(admin_pwd) <= set(string.ascii_uppercase
+                                  + string.ascii_lowercase
+                                  + string.digits + '-' + '_') \
+        and (admin_pwd != admin_login)
+
+    return valid_project_name, valid_language, valid_timezone, \
+        valid_wifi_pwd, valid_admin_login, valid_admin_pwd

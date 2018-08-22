@@ -14,7 +14,9 @@ from util import CancelEvent
 from util import get_free_space_in_dir
 from util import human_readable_size, get_cache
 from util import CLILogger, b64decode
+from util import check_user_inputs
 
+import tzlocal
 import humanfriendly
 
 CANCEL_TIMEOUT = 5
@@ -120,8 +122,8 @@ for catalog in YAML_CATALOGS:
 languages = [code for code, language in data.ideascube_languages]
 
 defaults = {
-    'name': "mybox",
-    'timezone': "Europe/Paris",
+    'name': "Kiwix Plug",
+    'timezone': str(tzlocal.get_localzone()),
     'language': "en",
     'size': "8GB",
     'build_dir': ".",
@@ -198,7 +200,7 @@ if args.catalog:
 if args.admin_account:
     admin_account = { "login": args.admin_account[0], "pwd": args.admin_account[1] }
 else:
-    admin_account = None
+    admin_account = {"login": "admin", "pwd": "admin-password"}
 
 # parse requested size
 try:
@@ -208,6 +210,32 @@ except Exception:
     sys.exit(1)
 else:
     args.human_size = human_readable_size(args.size, False)
+
+
+# check arguments
+valid_project_name, valid_language, \
+    valid_timezone, valid_wifi_pwd, \
+    valid_admin_login, valid_admin_pwd, valid_zim = check_user_inputs(
+        project_name=args.name,
+        language=args.language,
+        timezone=args.timezone,
+        wifi_pwd=args.wifi_pwd,
+        admin_login=admin_account['login'],
+        admin_pwd=admin_account['pwd'],
+        zim_install=args.zim_install)
+
+for key, is_valid in {
+    'name': valid_project_name,
+    'language': valid_language,
+    'timezone': valid_timezone,
+    'wifi_pwd': valid_wifi_pwd,
+    'admin_login': valid_admin_login,
+    'admin_password': valid_admin_pwd,
+    'zim_install': valid_zim,
+        }.items():
+    if not is_valid:
+        print("Invalid argument for `{key}`".format(key=key))
+        sys.exit(1)
 
 # display configuration and offer time to cancel
 print("Kiwix-plug installer configuration:")

@@ -18,9 +18,9 @@ from util import human_readable_size, ONE_GB, ONE_MiB
 from util import get_free_space_in_dir
 from util import relpathto
 from util import b64encode, b64decode
+from util import check_user_inputs
 import data
 import iso639
-import string
 import humanfriendly
 import webbrowser
 gi.require_version('Gtk', '3.0')
@@ -879,50 +879,60 @@ class Application:
     def run_installation_button_clicked(self, button):
         all_valid = True
 
+        # capture input
         project_name = self.component.project_name_entry.get_text()
-        allowed_chars = set(string.ascii_uppercase + string.ascii_lowercase + string.digits + '-' + ' ')
-        condition = len(project_name) >= 1 and len(project_name) <= 64 and set(project_name) <= allowed_chars
-        validate_label(self.component.project_name_label, condition)
-        self.component.project_name_constraints_revealer.set_reveal_child(not condition)
-        all_valid = all_valid and condition
+        language = data.ideascube_languages[
+            self.component.language_combobox.get_active()][0]
+        timezone = self.component.timezone_tree_store[
+            self.component.timezone_combobox.get_active()][0]
+        wifi_pwd = None if self.component.wifi_password_switch.get_state() \
+            else self.component.wifi_password_entry.get_text()
+        admin_login = self.component.admin_account_login_entry.get_text()
+        admin_pwd = self.component.admin_account_pwd_entry.get_text()
+        zim_install = [zim[0] for zim in self.component.zim_list_store
+                       if zim[8]]
 
-        language_id = self.component.language_combobox.get_active()
-        language = data.ideascube_languages[language_id][0]
-        condition = language_id != -1
-        validate_label(self.component.language_label, condition)
-        all_valid = all_valid and condition
+        # validate inputs
+        valid_project_name, valid_language, \
+            valid_timezone, valid_wifi_pwd, \
+            valid_admin_login, valid_admin_pwd = check_user_inputs(
+                project_name=self.component.project_name_entry.get_text(),
+                language=data.ideascube_languages[
+                    self.component.language_combobox.get_active()][0],
+                timezone=self.component.timezone_tree_store[
+                    self.component.timezone_combobox.get_active()][0],
+                wifi_pwd=None
+                if self.component.wifi_password_switch.get_state()
+                else self.component.wifi_password_entry.get_text(),
+                admin_login=self.
+                component.admin_account_login_entry.get_text(),
+                admin_pwd=self.component.admin_account_pwd_entry.get_text())
 
-        timezone_id = self.component.timezone_combobox.get_active()
-        timezone = self.component.timezone_tree_store[timezone_id][0]
-        condition = timezone_id != -1
-        validate_label(self.component.timezone_label, condition)
-        all_valid = all_valid and condition
+        # project name
+        validate_label(self.component.project_name_label, valid_project_name)
+        self.component.project_name_constraints_revealer.set_reveal_child(
+            not valid_project_name)
+        all_valid = all_valid and valid_project_name
 
-        if self.component.wifi_password_switch.get_state():
-            wifi_pwd = None
-            condition = True
-        else:
-            wifi_pwd = self.component.wifi_password_entry.get_text()
-            condition = len(wifi_pwd) <= 31 and set(wifi_pwd) <= set(string.ascii_uppercase + string.ascii_lowercase + string.digits)
-        self.component.wifi_password_constraints_revealer.set_reveal_child(not condition)
-        validate_label(self.component.wifi_password_label, condition)
-        all_valid = all_valid and condition
+        # language
+        validate_label(self.component.language_label, valid_language)
+        all_valid = all_valid and valid_language
 
-        admin_account = {
-            "login": self.component.admin_account_login_entry.get_text(),
-            "pwd": self.component.admin_account_pwd_entry.get_text(),
-        }
-        login_condition = len(admin_account["login"]) <= 31 and set(admin_account["login"]) <= set(string.ascii_uppercase + string.ascii_lowercase + string.digits + '-' + '_')
-        pwd_condition = len(admin_account["pwd"]) <= 31 and set(admin_account["pwd"]) <= set(string.ascii_uppercase + string.ascii_lowercase + string.digits + '-' + '_') and (admin_account["pwd"] != admin_account["login"])
+        # timezone
+        validate_label(self.component.timezone_label, valid_timezone)
+        all_valid = all_valid and valid_timezone
 
-        validate_label(self.component.admin_account_login_label, login_condition)
-        validate_label(self.component.admin_account_pwd_label, pwd_condition)
-        all_valid = all_valid and pwd_condition and login_condition
+        # wifi passwd
+        validate_label(self.component.wifi_password_label, valid_wifi_pwd)
+        self.component.wifi_password_constraints_revealer.set_reveal_child(
+            not valid_wifi_pwd)
+        all_valid = all_valid and valid_wifi_pwd
 
-        zim_install = []
-        for zim in self.component.zim_list_store:
-            if zim[8]:
-                zim_install.append(zim[0])
+        # admin account
+        validate_label(self.component.admin_account_login_label,
+                       valid_admin_login)
+        validate_label(self.component.admin_account_pwd_label, valid_admin_pwd)
+        all_valid = all_valid and valid_admin_login and valid_admin_login
 
         output_size = self.get_output_size()
         if self.component.output_stack.get_visible_child_name() == "sd_card":
@@ -1005,7 +1015,7 @@ class Application:
                     favicon=favicon,
                     css=css,
                     build_dir=build_dir,
-                    admin_account=admin_account,
+                    admin_account={"login": admin_login, "pwd": admin_pwd},
                     done_callback=lambda error: GLib.idle_add(self.installation_done, error))
 
             self.component.window.hide()
