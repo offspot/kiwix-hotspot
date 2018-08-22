@@ -35,7 +35,8 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
 
         logger.step("Ensure user files are present")
         for user_fpath in (edupi_resources, favicon, logo, css):
-            if user_fpath is not None and not os.path.exists(user_fpath):
+            if user_fpath is not None and not isremote(user_fpath) \
+                    and not os.path.exists(user_fpath):
                 raise ValueError("Specified file is not available ({})"
                                  .format(user_fpath))
 

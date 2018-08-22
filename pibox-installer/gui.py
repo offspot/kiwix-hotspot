@@ -222,7 +222,7 @@ class Application:
 
         self.component.edupi_resources_filter.set_name("ZIP File")  # opt
         self.component.edupi_resources_filter.add_pattern("*.zip")
-        self.component.css_chooser.add_filter(
+        self.component.edupi_resources_chooser.add_filter(
             self.component.edupi_resources_filter)
 
         # menu bar
@@ -1069,7 +1069,15 @@ class Application:
             kalite_languages=kalite,
             wikifundi_languages=wikifundi,
             aflatoun_languages=['fr', 'en'] if aflatoun else [])
-        required_image_size = get_required_image_size(collection)
+        try:
+            required_image_size = get_required_image_size(collection)
+        except FileNotFoundError:
+            self.display_error_message(
+                "Free Space Calculation Error",
+                "Unable to calculate free space due to a missing file.\n"
+                "Please, check if the EduPi resources file is still there.",
+                self.component.window)
+            return -1
 
         return self.get_output_size() - required_image_size
 
