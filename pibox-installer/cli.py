@@ -167,6 +167,7 @@ parser.add_argument("--admin-account",
                     help="create admin account [LOGIN, PWD]", nargs=2)
 parser.add_argument("--config", help="use a JSON config file to set parameters (superseeds cli parameters)")
 parser.add_argument("--ram", help="Max RAM for QEMU", default="2G")
+parser.add_argument("--sdcard", help="Device to copy image to")
 
 args = parser.parse_args()
 
@@ -215,14 +216,13 @@ else:
 # check arguments
 valid_project_name, valid_language, \
     valid_timezone, valid_wifi_pwd, \
-    valid_admin_login, valid_admin_pwd, valid_zim = check_user_inputs(
+    valid_admin_login, valid_admin_pwd = check_user_inputs(
         project_name=args.name,
         language=args.language,
         timezone=args.timezone,
         wifi_pwd=args.wifi_pwd,
         admin_login=admin_account['login'],
-        admin_pwd=admin_account['pwd'],
-        zim_install=args.zim_install)
+        admin_pwd=admin_account['pwd'])
 
 for key, is_valid in {
     'name': valid_project_name,
@@ -231,11 +231,14 @@ for key, is_valid in {
     'wifi_pwd': valid_wifi_pwd,
     'admin_login': valid_admin_login,
     'admin_password': valid_admin_pwd,
-    'zim_install': valid_zim,
         }.items():
     if not is_valid:
         print("Invalid argument for `{key}`".format(key=key))
         sys.exit(1)
+
+if args.sdcard and not os.path.exists(args.sdcard):
+    print("SD card device does not exist.")
+    sys.exit(1)
 
 # display configuration and offer time to cancel
 print("Kiwix-plug installer configuration:")
@@ -313,7 +316,7 @@ try:
             size=args.size,
             logger=logger,
             cancel_event=cancel_event,
-            sd_card=None,
+            sd_card=args.sdcard,
             logo=args.logo,
             favicon=args.favicon,
             css=args.css,
