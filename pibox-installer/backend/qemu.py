@@ -149,7 +149,7 @@ class Emulator:
                 if current_size % refresh_every == 0:
                     self._logger.progress(current_percentage / 100)
                     self._logger.std(
-                        "Copied {copied} of {total} ({pc:.2}%)"
+                        "Copied {copied} of {total} ({pc:.2f}%)"
                         .format(copied=human_readable_size(current_size),
                                 total=human_readable_size(total_size),
                                 pc=current_percentage))
@@ -164,6 +164,36 @@ class Emulator:
         self._logger.step("Sync")
         os.fsync(device)
         os.close(device)
+
+    def ensure_written(self, device_name):
+        self._logger.step("Verify data on SD card")
+
+        # reopen image and device (read-only)
+        if os.name == "posix":
+            image = os.open(self._image, os.O_RDONLY)
+            device = os.open(device_name, os.O_RDONLY)
+        elif os.name == "nt":
+            image = os.open(self._image, os.O_RDONLY | os.O_BINARY)
+            device = os.open(device_name, os.O_RDONLY | os.O_BINARY)
+        else:
+            self._logger.err("platform not supported")
+            return
+
+        # read a 4MiB random part from the image
+        buffer_size = ONE_MiB * 4
+        total_size = os.lseek(image, 0, os.SEEK_END)
+        offset = random.randint(0, total_size - buffer_size) * .8
+        os.lseek(image, offset, os.SEEK_SET)
+        challenge = os.read(image, buffer_size)
+        os.close(image)
+
+        # read same part from the SD card and compare
+        os.lseek(device, offset, os.SEEK_SET)
+        sd_challenge = os.read(device, buffer_size)
+        os.close(device)
+
+        assert sd_challenge == challenge
+
 
 class _RunningInstance:
     _emulation = None

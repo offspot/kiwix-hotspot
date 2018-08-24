@@ -7,6 +7,9 @@
 * Load/Save JSON always from the Home folder
 * Admin Account now mandatory (not switch) with convenient defaults
 * Fixed Windows 64b builds not being 64b
+* CLI inputs checked before process starts
+* Admin login/password not displayed in Logger nor kept in logs
+* SD card checked after copy to ensure content was written
 
 2.0-rc4
 * Use decimal (GB) sizes for SD card selection

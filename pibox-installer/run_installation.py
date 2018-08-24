@@ -277,6 +277,16 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
             logger.step("Writting image to SD-card ({})".format(sd_card))
             emulator.copy_image(sd_card)
 
+            # check that SD card was properly written
+            try:
+                emulator.ensure_written(sd_card)
+            except AssertionError:
+                logger.err("SD-card content is different than that of image.\n"
+                           "Please check the content of your card and "
+                           "verify that the card is not damaged ("
+                           "often turns read-only silently).")
+                raise Exception("SD-card content differs from image.")
+
     except Exception as e:
         logger.failed(str(e))
 
