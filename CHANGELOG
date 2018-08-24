@@ -10,6 +10,7 @@
 * CLI inputs checked before process starts
 * Admin login/password not displayed in Logger nor kept in logs
 * SD card checked after copy to ensure content was written
+* CLI now supports --sdcard
 
 2.0-rc4
 * Use decimal (GB) sizes for SD card selection
