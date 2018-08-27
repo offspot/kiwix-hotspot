@@ -839,26 +839,27 @@ class Application:
             ("project_name", self.component.project_name_entry.get_text()),
             ("language", language),
             ("timezone", timezone),
-            ("wifi", {
-                "protected":
-                    not self.component.wifi_password_switch.get_active(),
-                "password": self.component.wifi_password_entry.get_text(),
-            }),
-            ("admin_account", {
-                "login": self.component.admin_account_login_entry.get_text(),
-                "password": self.component.admin_account_pwd_entry.get_text(),
-            }),
+            ("wifi", OrderedDict([
+                ("protected",
+                    not self.component.wifi_password_switch.get_active()),
+                ("password", self.component.wifi_password_entry.get_text())
+            ])),
+            ("admin_account", OrderedDict([
+                ("login", self.component.admin_account_login_entry.get_text()),
+                ("password", self.component.admin_account_pwd_entry.get_text())
+            ])),
             ("build_dir",
                 relpathto(self.component.build_path_chooser.get_filename())),
-            ("size", None if size is None else human_readable_size(size, False)),
-            ("content", {
-                "zims": zim_install,  # content-ids list
-                "kalite": kalite_active_langs,  # languages list
-                "wikifundi": wikifundi_active_langs,  # languages list
-                "aflatoun": self.component.aflatoun_switch.get_active(),
-                "edupi": self.component.edupi_switch.get_active(),
-                "edupi_resources": edupi_resources,
-            }),
+            ("size",
+                None if size is None else human_readable_size(size, False)),
+            ("content", OrderedDict([
+                ("zims", zim_install),  # content-ids list
+                ("kalite", kalite_active_langs),  # languages list
+                ("wikifundi", wikifundi_active_langs),  # languages list
+                ("aflatoun", self.component.aflatoun_switch.get_active()),
+                ("edupi", self.component.edupi_switch.get_active()),
+                ("edupi_resources", edupi_resources),
+            ])),
             ("branding", branding),
         ])
 
