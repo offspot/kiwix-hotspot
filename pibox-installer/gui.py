@@ -577,6 +577,7 @@ class Application:
         dialog.destroy()
 
     def run_new_install_button_clicked(self, widget):
+        self.logger.reset()
         self.component.run_window.hide()
         self.component.window.show()
 

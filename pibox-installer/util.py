@@ -48,6 +48,9 @@ class ProgressHelper(object):
         total percentage is calculated using current stage and its progress'''
 
     def __init__(self):
+        self.reset()
+
+    def reset(self):
         self.stage_id = 'init'  # id of current stage
         self.stage_progress = None  # percentage of current stage progress
         self.will_write = False  # wether the process will run write stage
@@ -66,7 +69,8 @@ class ProgressHelper(object):
         self.ended_on = datetime.datetime.now()
 
     def clean_up_stage(self):
-        started_on = getattr(self, 'stage_started_on', self.started_on)
+        started_on = getattr(self, 'stage_started_on', self.started_on) \
+            or datetime.datetime.now()
         ended_on = datetime.datetime.now()
         self.durations[self.stage_id] = (started_on, ended_on,
                                          ended_on - started_on)
