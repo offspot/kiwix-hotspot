@@ -1,3 +1,6 @@
+2.0-rc6
+* JSON Exports's properties and sub-properties saved in a fixed order
+
 2.0-rc5
 * Domain tld changed to .hotstop (was .lan)
 * Supplied file (edupi_resource, logo, css, favicon) checked for existence

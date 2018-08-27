@@ -3,21 +3,16 @@
     "language": "fr",
     "timezone": "Europe/Paris",
     "wifi": {
-        "password": "piboxwifipwd",
-        "protected": false
+        "protected": false,
+        "password": "piboxwifipwd"
     },
     "admin_account": {
-        "custom": false,
-        "password": "adminadmin",
-        "login": "admin"
+        "login": "admin",
+        "password": "adminadmin"
     },
     "build_dir": null,
     "size": null,
     "content": {
-        "edupi": true,
-        "edupi_resources": "https://download.openzim.org/wikifundi/2.0/resources_en_fr_2018-07.zip",
-        "kalite": [],
-        "aflatoun": false,
         "zims": [
             "wikipedia_fr_medicine_nopic.fr",
             "vikidia_fr_all.fr",
@@ -27,9 +22,13 @@
             "wikisource_fr_all_novid.fr",
             "wiktionary_fr_all.fr"
         ],
+        "kalite": [],
         "wikifundi": [
             "fr"
-        ]
+        ],
+        "aflatoun": false,
+        "edupi": true,
+        "edupi_resources": "https://download.openzim.org/wikifundi/2.0/resources_en_fr_2018-07.zip"
     },
     "branding": {
         "logo": {

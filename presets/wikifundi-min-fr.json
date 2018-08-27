@@ -3,26 +3,25 @@
     "language": "fr",
     "timezone": "Europe/Paris",
     "wifi": {
-        "password": "piboxwifipwd",
-        "protected": false
+        "protected": false,
+        "password": "piboxwifipwd"
     },
     "admin_account": {
-        "password": "adminadmin",
-        "custom": false,
-        "login": "admin"
+        "login": "admin",
+        "password": "adminadmin"
     },
     "build_dir": null,
     "size": null,
     "content": {
+        "zims": [],
+        "kalite": [],
         "wikifundi": [
             "fr",
             "en"
         ],
-        "edupi": true,
-        "edupi_resources": "https://download.openzim.org/wikifundi/2.0/resources_en_fr_2018-07.zip",
         "aflatoun": false,
-        "zims": [],
-        "kalite": []
+        "edupi": true,
+        "edupi_resources": "https://download.openzim.org/wikifundi/2.0/resources_en_fr_2018-07.zip"
     },
     "branding": {
         "logo": {
