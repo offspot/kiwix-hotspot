@@ -15,6 +15,7 @@ import os
 import sys
 import re
 import shutil
+import traceback
 
 
 def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, aflatoun, wikifundi, edupi, edupi_resources, zim_install, size, logger, cancel_event, sd_card, favicon, logo, css, done_callback=None, build_dir=".", qemu_ram="2G"):
@@ -290,12 +291,15 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
     except Exception as e:
         logger.failed(str(e))
 
+        # display traceback on logger
+        logger.std("\n--- Exception Trace ---\n{exp}\n---"
+                   .format(exp=traceback.format_exc()))
+
         # Set final image filename
         if os.path.isfile(image_building_path):
             os.rename(image_building_path, image_error_path)
 
         error = e
-        raise
     else:
         # Set final image filename
         os.rename(image_building_path, image_final_path)
