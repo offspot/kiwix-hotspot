@@ -26,7 +26,7 @@ CUSTOM_CARDS = [
     {"category": "create",
      "url": "http://en.{{ wikifundi_fqdn }}",
      "title": "Wikifundi",
-     "description": "Offline editable environment that provides a similar experience to editing Wikipedia online",
+     "description": "Offline editable environment that provides a similar experience to editing Wikipedia online (in English)",
      "fa": "wikifundi",
      "is_staff": False
     },
@@ -35,17 +35,17 @@ CUSTOM_CARDS = [
     {"category": "create",
      "url": "http://fr.{{ wikifundi_fqdn }}",
      "title": "Wikifundi",
-     "description": "Environnement qui vous permet de créer des articles Wikipédia hors-ligne",
+     "description": "Environnement qui vous permet de créer des articles Wikipedia hors-ligne (en français)",
      "fa": "wikifundi",
      "is_staff": False
     },
 {% endif %}
 {% endif %}
 {% if edupi %}
-    {"category": "manage",
+    {"category": "read",
      "url": "http://{{ edupi_fqdn }}",
-     "title": "Edupi",
-     "description": "Content management application",
+     "title": "Resources with Edupi",
+     "description": "Shared Resources Access & Management",
      "fa": "folder",
      "is_staff": False
     },
