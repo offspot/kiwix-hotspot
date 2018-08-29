@@ -3,7 +3,7 @@ Description=Parsoid server
 
 [Service]
 WorkingDirectory={{ parsoid_root }}
-ExecStart=/usr/local/bin/node bin/server.js
+ExecStart=/usr/bin/node bin/server.js
 Restart=always
 TimeoutStopSec=60
 PIDFile=/var/run/parsoid.pid
