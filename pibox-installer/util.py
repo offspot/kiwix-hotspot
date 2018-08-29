@@ -230,11 +230,29 @@ class CancelEvent:
     def __init__(self):
         self._lock = threading.Lock()
         self._pids = []
+        self.thread = None
+        self.callback = None
+        self.callback_args = None
 
     def lock(self):
         return _CancelEventRegister(self._lock, self._pids)
 
+    def register_thread(self, thread, callback, callback_args):
+        self.thread = thread
+        self.callback = callback
+        self.callback_args = callback_args
+
+    def unregister_thread(self):
+        self.thread = None
+        self.callback = None
+        self.callback_args = None
+
     def cancel(self):
+        if self.thread is not None:
+            self.thread.join(timeout=0)
+            self.callback(*self.callback_args)
+            self.unregister_thread()
+
         self._lock.acquire()
         for pid in self._pids:
             os.kill(pid, signal.SIGTERM)
@@ -311,6 +329,9 @@ class CLILogger(ProgressHelper):
     def err(self, err):
         self.p(err, color="31")
 
+    def succ(self, succ):
+        self.p(succ, color="32")
+
     def raw_std(self, std):
         sys.stdout.write(std)
 
@@ -324,7 +345,7 @@ class CLILogger(ProgressHelper):
 
     def complete(self):
         super(CLILogger, self).complete()
-        self.p("Installation succeded.", color="32")
+        self.succ("Installation succeded.")
 
     def failed(self, error="?"):
         super(CLILogger, self).failed()

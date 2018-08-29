@@ -325,6 +325,14 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkMenuItem" id="menu_etcher">
+                        <property name="label">Flash Image onto SD-card</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkMenuItem" id="menu_help">
                         <property name="label">Open Help / FAQ</property>
                         <property name="visible">True</property>

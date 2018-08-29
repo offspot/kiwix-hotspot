@@ -9,6 +9,7 @@ import tzlocal
 import os
 import sys
 import json
+import platform
 import tempfile
 import threading
 from util import CancelEvent, ProgressHelper
@@ -21,6 +22,7 @@ from util import b64encode, b64decode
 from util import check_user_inputs
 import data
 import iso639
+import requests
 import humanfriendly
 import webbrowser
 gi.require_version('Gtk', '3.0')
@@ -74,6 +76,9 @@ class Logger(ProgressHelper):
     def err(self, err):
         GLib.idle_add(self.main_thread_err, err)
 
+    def succ(self, succ):
+        GLib.idle_add(self.main_thread_succ, succ)
+
     def raw_std(self, std):
         GLib.idle_add(self.main_thread_raw_std, std, end="")
 
@@ -102,6 +107,9 @@ class Logger(ProgressHelper):
 
     def main_thread_err(self, text):
         self.main_thread_text(text, "\n", self.err_tag)
+
+    def main_thread_succ(self, text):
+        self.main_thread_text(text, "\n", self.succ_tag)
 
     def main_thread_raw_std(self, text):
         self.main_thread_text(text)
@@ -143,7 +151,7 @@ class Logger(ProgressHelper):
 
     def main_thread_complete(self):
         super(Logger, self).complete()
-        self.main_thread_text("Installation succeded.", tag=self.succ_tag)
+        self.main_thread_succ("Installation succeded.")
         self.component.run_step_label.set_markup("<b>Done.</b>")
         self.progress(1)
 
@@ -241,6 +249,10 @@ class Application:
             self.component.menu_imdisk.set_visible(True)
             self.component.menu_imdisk.connect(
                 "activate", self.activate_menu_imdisk)
+
+        # etcher
+        self.component.menu_etcher.connect(
+                "activate", self.activate_menu_etcher)
 
         # wifi password
         self.component.wifi_password_switch.connect("notify::active", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(not switch.get_active()))
@@ -534,6 +546,69 @@ class Application:
         dialog = ImDiskDialog(self.component.window)
         if dialog.run() == Gtk.ResponseType.OK:
             open_explorer_for_imdisk(self.logger)
+        dialog.close()
+
+    def activate_menu_etcher(self, widget):
+        class EtcherDialog(Gtk.Dialog):
+            DL_CODE = 2111
+
+            def __init__(self, parent):
+                Gtk.Dialog.__init__(
+                    self, "Use Etcher to Flash your SD-card", parent, 0,
+                    ("Download Latest Etcher", self.DL_CODE,
+                     "Visit Website", Gtk.ResponseType.OK,
+                     Gtk.STOCK_OK, Gtk.ResponseType.CANCEL))
+
+                self.set_default_size(500, 300)
+
+                label = Gtk.Label()
+                label.set_markup(
+                    "\nUse <b>Etcher</b> to flash your image onto your SD-card"
+                    ". It will also <b>validate</b> that the SD-card "
+                    "has been <b>successfuly written</b>.\n"
+                    "You can even burn the same image "
+                    "on <b>several SD-cards at once</b>.\n")
+                label.set_alignment(0, 0.5)
+                label2 = Gtk.Label()
+                label2.set_markup(
+                    "\nPlease Download and Run <b>Etcher</b> separately.\n")
+                label2.set_alignment(0, 0.5)
+                image = Gtk.Image.new_from_file(
+                    os.path.join(data.data_dir, 'etcher.gif'))
+                box = self.get_content_area()
+                box.add(label)
+                box.add(image)
+                box.add(label2)
+                self.show_all()
+        dialog = EtcherDialog(self.component.window)
+        ret = dialog.run()
+        if ret == EtcherDialog.DL_CODE:
+            try:
+                req = requests.get("https://img.shields.io/github/release"
+                                   "/resin-io/etcher.json")
+                version = req.json().get("value")
+                base_url = ("https://github.com/resin-io/etcher/releases/"
+                            "download/{}/".format(version))
+
+                def get_fname():
+                    if sys.platform == "linux":
+                        if platform.machine() == 'x86_64':
+                            return "etcher-electron-{v}-x86_64.AppImage"
+                        return "etcher-electron-{v}-i386.AppImage"
+                    elif sys.platform == "win32":
+                        if platform.machine() == 'AMD64':
+                            return "Etcher-Portable-{v}-x64.exe"
+                        return "Etcher-Portable-{v}-x86.exe"
+                    elif sys.platform == "darwin":
+                        return "Etcher-{v}.dmg"
+                    raise NotImplementedError("platform not supported")
+
+                etcher_dl_url = base_url + get_fname().format(v=version[1:])
+            except Exception as exp:
+                etcher_dl_url = data.etcher_url
+            webbrowser.open(etcher_dl_url)
+        elif ret == Gtk.ResponseType.OK:
+            webbrowser.open(data.etcher_url)
         dialog.close()
 
     def installation_done(self, error):

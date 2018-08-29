@@ -7,6 +7,7 @@ from backend.download import download_content, unzip_file
 from backend.mount import mount_data_partition, unmount_data_partition, test_mount_procedure, format_data_partition, guess_next_loop_device
 from backend.mount import can_write_on, allow_write_on, restore_mode
 from backend.util import subprocess_pretty_check_call, subprocess_pretty_call
+from backend.util import run_sdcard_thread
 from backend.sysreq import host_matches_requirements, requirements_url
 import data
 from util import human_readable_size, get_cache, ensure_zip_exfat_compatible, EXFAT_FORBIDDEN_CHARS
@@ -14,6 +15,7 @@ from datetime import datetime
 import os
 import sys
 import re
+import time
 import shutil
 import traceback
 
@@ -80,6 +82,8 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
                 os.close(w)
                 logger.std("diskpart select disk {} and clean".format(device_number))
                 subprocess_pretty_check_call(["diskpart"], logger, stdin=r)
+                logger.std("sleeping for 15s to acknowledge diskpart changes")
+                time.sleep(15)
 
         # Download Base image
         logger.stage('master')
@@ -272,22 +276,6 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
             logger.step("Re-run ansiblecube for move-content")
             ansiblecube.run_phase_two(emulation, extra_vars, secret_keys)
 
-        # Write image to SD Card
-        if sd_card:
-            logger.stage('write')
-            logger.step("Writting image to SD-card ({})".format(sd_card))
-            emulator.copy_image(sd_card)
-
-            # check that SD card was properly written
-            try:
-                emulator.ensure_written(sd_card)
-            except AssertionError:
-                logger.err("SD-card content is different than that of image.\n"
-                           "Please check the content of your card and "
-                           "verify that the card is not damaged ("
-                           "often turns read-only silently).")
-                raise Exception("SD-card content differs from image.")
-
     except Exception as e:
         logger.failed(str(e))
 
@@ -304,11 +292,48 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
         # Set final image filename
         os.rename(image_building_path, image_final_path)
 
-        logger.complete()
-        error = None
+        try:
+            # Write image to SD Card
+            if sd_card:
+                logger.stage('write')
+                logger.step("Writting image to SD-card ({})".format(sd_card))
+                try:
+                    run_sdcard_thread(image_final_path, sd_card,
+                                      False, cancel_event, logger)
+                except Exception:
+                    logger.succ("Image created successfuly.")
+                    logger.err(
+                        "Writing your Image to your SD-card failed.\n"
+                        "Please use a third party tool to flash your image "
+                        "onto your SD-card. See File menu for links to Etcher."
+                    )
+                    raise Exception("Failed to write Image to SD-card")
+
+                # check that SD card was properly written
+                try:
+                    run_sdcard_thread(image_final_path, sd_card,
+                                      True, cancel_event, logger)
+                except AssertionError:
+                    logger.err(
+                        "SD-card content is different than that of image.\n"
+                        "Please check the content of your card and "
+                        "verify that the card is not damaged ("
+                        "often turns read-only silently).\n"
+                        "Alternatively, use Etcher (see File > Flash) to "
+                        "flash image onto SD-card and validate transfer.")
+                    raise Exception("SD-card content differs from image.")
+
+        except Exception as e:
+            logger.failed(str(e))
+
+            # display traceback on logger
+            logger.std("\n--- Exception Trace ---\n{exp}\n---"
+                       .format(exp=traceback.format_exc()))
+            error = e
+        else:
+            logger.complete()
+            error = None
     finally:
-
-
         if sys.platform == "linux" and loop_dev and previous_loop_mode:
             logger.step("Restoring loop device ({}) mode".format(loop_dev))
             restore_mode(loop_dev, previous_loop_mode, logger)
