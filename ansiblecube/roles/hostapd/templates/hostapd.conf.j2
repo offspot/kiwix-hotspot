@@ -16,11 +16,11 @@ max_num_sta={{ max_wifi_client }}
 auth_algs=1
 # dont hide the SSID
 ignore_broadcast_ssid=0
-{% if wpa_pass is defined %}
+{% if ansible_local.config.wpa_pass is defined %}
 # wpa version
 wpa=2
 # wpa passwd
-wpa_passphrase={{ wpa_pass }}
+wpa_passphrase={{ ansible_local.config.wpa_pass }}
 # wpa encryption
 wpa_key_mgmt=WPA-PSK
 wpa_pairwise=TKIP
