@@ -34,7 +34,7 @@ matrix:
     - brew update
     # checking our formulas out to how they were when python 3.6.5 was around
     - cd /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core
-    - git checkout e128fa1bce3377de32cbf11bd8e46f7334dfd7a6 Formula/python.rb Formula/pygobject3.rb Formula/gtk+3.rb Formula/glib.rb Formula/adwaita-icon-theme.rb
+    - git checkout e128fa1bce3377de32cbf11bd8e46f7334dfd7a6 Formula/python.rb Formula/pygobject3.rb Formula/gtk+3.rb Formula/glib.rb Formula/adwaita-icon-theme.rb Formula/gobject-introspection.rb
     - cd -
     - brew install pygobject3 --with-python3 gtk+3 adwaita-icon-theme
     - python3 -m pip install -r requirements-macos.txt
