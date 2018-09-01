@@ -1,6 +1,7 @@
 2.0-rc6
 * JSON Exports's properties and sub-properties saved in a fixed order
 * Failed process raises failed dialog properly [regression]
+* Fixed Mediawiki/Parsoid [regression]
 
 2.0-rc5
 * Domain tld changed to .hotstop (was .lan)

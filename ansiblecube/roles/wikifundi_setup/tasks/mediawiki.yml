@@ -90,7 +90,7 @@
 
 - name: download mediawiki
   get_url:
-    url: http://download.kiwix.org/dev/mediawiki-1.31.0-rc.0.tar.gz
+    url: http://download.kiwix.org/dev/mediawiki-1.31.0-rc.0__with-extensions.tar.gz
     dest: /tmp/mediawiki.tar.gz
   tags: setup
 
@@ -150,35 +150,6 @@
     chdir: "{{ mediawiki_root }}"
   tags: setup
 
-- name: download add_mw_extension script
-  copy:
-    src: add_mw_extension.py
-    dest: /usr/local/bin/add_mw_extension
-    mode: 0755
-  tags: setup
-
-- name: install mediawiki extension
-  command: /usr/local/bin/add_mw_extension {{ item }} REL1_31 {{ mediawiki_root }}
-  with_items:
-    - Nuke
-    - Scribunto
-    - UploadWizard
-    - TitleKey
-    - TitleBlacklist
-    - MwEmbedSupport
-    - TimedMediaHandler
-    - wikihiero
-    - Math
-    - timeline
-    - Echo
-    - MobileFrontend
-    - Thanks
-    - VisualEditor
-    - EventLogging
-    - GuidedTour
-    - GeoData
-  tags: setup
-
 - name: download composer
   get_url:
     url: http://download.kiwix.org/dev/composer_1.6.5.phar
@@ -195,17 +166,6 @@
   command: php composer.phar update --no-dev
   args:
     chdir: "{{ mediawiki_root }}"
-  tags: setup
-
-- name: download MetaDescriptionTag extension
-  unarchive:
-    src: https://github.com/kolzchut/mediawiki-extensions-MetaDescriptionTag/archive/master.zip
-    dest: "{{ mediawiki_root }}/extensions/"
-    remote_src: yes
-  tags: setup
-
-- name: move MetaDescriptionTag
-  command: mv {{ mediawiki_root }}/extensions/mediawiki-extensions-MetaDescriptionTag-master {{ mediawiki_root }}/extensions/MetaDescriptionTag
   tags: setup
 
 - name: clean Math extensions
