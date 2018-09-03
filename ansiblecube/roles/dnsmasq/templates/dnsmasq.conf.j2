@@ -1,8 +1,9 @@
 interface={{ hotspot_interface }}
-except-interface={{ lan_interface }}
+interface={{ lan_interface }}
 except-interface={{ lan_interface2 }}
 except-interface={{ client_interface }}
 dhcp-range=192.168.2.100,192.168.2.240,255.255.255.0,12h
+no-dhcp-interface={{ lan_interface }}
 
 expand-hosts
 bogus-priv

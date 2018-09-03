@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import socket
+
+
+def is_connected(hostname="www.google.com"):
+    try:
+        socket.create_connection((socket.gethostbyname(hostname), 80), timeout=2)
+        return True
+    except Exception:
+        pass
+    return False
+
+
+if __name__ == "__main__":
+    print("yes" if is_connected() else "no")

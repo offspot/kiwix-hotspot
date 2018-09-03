@@ -5,6 +5,9 @@
 * Better SD-card writer (faster, error-handling, cancellable)
 * Image is considered successful even if SD-writing failed
 * Etcher (external SD writer) menu entry advertised in case of SD-writing failure
+* Revamped Capture Portal behavior
+* Supports Internet Gateway mode
+* Supports Extended WiFi mode
 
 2.0-rc5
 * Domain tld changed to .hotstop (was .lan)

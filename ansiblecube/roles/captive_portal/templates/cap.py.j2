@@ -1,74 +1,124 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import re
 import subprocess
 
+def has_internet():
+    try:
+        with open("/tmp/has_internet", "r") as f:
+            return f.read().strip() == "yes"
+    except Exception:
+        return False
+
+
 TRANSLATIONS = {
-    'fr': {
-        'button': u"Ok",
-        'message': u"Vous allez maintenant être redirigé vers {{ fqdn }}",
+    "fr": {
+        "banner": u"Bienvenue sur «<em>{{ hotspot_name }}</em>» "
+        u"(<a href=\"http://{{ fqdn }}/\">{{ fqdn }}</a>)",
+        "title": u"<em>{{ project_name }}</em> est une ressource de "
+        u"contenus libres d'accès.",
+        "reminder": u"Merci de vous rappeler des points suivants :",
+        "access": u"L'accès à ces contenus ne se fait "
+        u"<strong>qu'à travers <em>http://{{ fqdn }}/</em></strong>. "
+        u"<u>Souvenez-vous en !</u>",
+        "internet": u"Cette ressource peut fournir un accès à Internet. "
+        u"Dans ce cas, il faudra vous <em>identifier</em> pour y accèder.",
+        "prompt": u"Cette page vous sera alors présenté <strong>après 15mn</strong> "
+        u"d'inactivité.",
+        "https": u"Surfant sur un site sécurisé, le navigateur pourrait vous afficher "
+        u"un <em>avertissement de sécurité</em> au lieu d'afficher cette page. "
+        u"Ouvrez-en simplement une nouvelle "
+        u"sur un site non-sécurisé et identifiez-vous à nouveau.",
+        "go_button": u"Aller à {{ fqdn }}",
+        "internet_button": u"M'identifier et accèder à Internet",
     },
-    'en': {
-        'button': u"Ok",
-        'message': u"You will now be redirected to {{ fqdn }}",
+    "en": {
+        "banner": u"Entering “<em>{{ hotspot_name }}</em>” "
+        u"(<a href=\"http://{{ fqdn }}/\">{{ fqdn }}</a>)",
+        "title": u"<em>{{ project_name }}</em> is a free-to-use, content-enabled box.",
+        "reminder": u"Please, keep the following in mind:",
+        "access": u"Access to this box's content is done "
+        u"<strong>solely via <em>http://{{ fqdn }}/</em></strong>. "
+        u"<u>Remember-it !</u>",
+        "internet": u"This box may also provide access to Internet. "
+        u"You need to <em>log-in</em> to the network to access it.",
+        "prompt": u"You will then be prompted with this page <strong>after "
+        u"every 15mn</strong> of inactivity.",
+        "https": u"When browsing a secure website, your browser might display "
+        u"a <em>Security Warning</em> instead of displaying this page. "
+        u"Just open a new page onto a non-secure website to log-in again.",
+        "go_button": u"Go to {{ fqdn }}",
+        "internet_button": u"Log me in and access Internet",
     },
 }
 
-header = u"""
+header = u"""<!DOCTYPE html>
 <html>
-<head>
-<meta charset="utf-8">
-<style>
-html, body { width: 100%; height: 100%; position: relative; }
-.myButton {
-    border: none;
-    border-radius: 2px;
-    padding: 0 10px;
-    text-decoration: none;
-    color: #fff;
-    font-size: 1.1em;
-    background-color: #6C7A89;
-    display: inline-block;
-    margin-top: 10px;
-    height: 50px;
-    line-height: 50px;
-    text-align: center;
-    cursor: pointer;
-}
-.myButton:hover {
-    background-color: #95A5A6;
-    color: #fff;
-}
-.myButton:active {
-    position:relative;
-    top:1px;
-}
-.center {
-position: absolute; top: calc(50% - 60px);left: calc(50% - 260px);
-width: 500px; height: 100px; border: 0px; padding: 10px;
-text-align:center;
-}
-</style>
-</head>"""
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <title>{{ hotspot_name }}</title>
+        <link rel="icon" href="/ideascube-static/branding/favicon.png">
+        <link rel="stylesheet" href="/ideascube-static/ideascube/vendor/font-awesome/css/font-awesome.min.css" />
+        <!--[if lte IE 8]>
+            <link rel="stylesheet" type="text/css" href="/ideascube-static/ideascube/vendor/purecss/pure-css-grids-old-ie-min.css">
+        <![endif]-->
+        <!--[if gt IE 8]><!-->
+            <link rel="stylesheet" type="text/css" href="/ideascube-static/ideascube/vendor/purecss/pure-css-grids-min.css">
+        <!--<![endif]-->
+        <link rel="stylesheet" type="text/css" href="/ideascube-static/ideascube/main.css" />
+        <link rel="stylesheet" type="text/css" href="/ideascube-static/branding/style.css" />
+    </head>"""
 
-body = u"""
-<body>
-<div class="center">
-<h3>{message}</h3>
-<a href="/letmein.html" class="myButton">{button}</a>
-</div>
-</body>
-"""
+parta = u"""
+    <body class="">
+        <header>
+            <section>
+              <a href="/">
+                <h1>
+                  <img src="/ideascube-static/branding/header-logo.png"></img>
+                </h1>
+              </a>
+              <span class="boxid">{{ project_name }}!</span>
+            </section>
+        </header>
+        <ul class="messages">
+<li class="success">{banner}</li>
+        </ul>
+        <div class="content">
+            <h2>{title}</h2>
+            <p style="text-decoration: underline;">{reminder}</p>
+            <ul><li>{access}</li>"""
 
-footer = u"</html>"
+partb = u"""<li>{internet}</li><li>{prompt}</li>"""
+
+partc = u"""<li>{https}</li></ul>
+            <p><a class="button" href="http://{{ fqdn }}">{go_button}</a>"""
+
+partd = u""" <a class="button neutral" href="/register">{internet_button}</a>"""
+
+parte = u"""</p></div>"""
+
+footer = u"""
+        <footer>
+            <div class="row">
+                <div class="col third i18n_switch"></div>
+                <div class="col half">
+                    <img src="/ideascube-static/ideascube/img/logoBSF.png" />
+                </div>
+            </div>
+        </footer>
+    </body>
+</html>"""
 
 
-def get_translation_for(accept_lang_header, default='en'):
+def get_translation_for(accept_lang_header, default="en"):
     chosen_lang = default
-    langs = [lang_item.replace('_', '-').split('-')[0].lower()
+    langs = [lang_item.replace("_", "-").split("-")[0].lower()
              for lang_code in accept_lang_header.split(",")
              for lang_item in lang_code.split(";")
-             if 'q=' not in lang_item]
+             if "q=" not in lang_item]
 
     for lang in langs:
         if lang in TRANSLATIONS.keys():
@@ -79,18 +129,29 @@ def get_translation_for(accept_lang_header, default='en'):
 
 
 def allow_host(ipaddress):
+    passlist_output = subprocess.check_output(
+        "sudo iptables -t nat -nL CAPTIVE_PASSLIST", shell=True)
+    passlist = [re.split(r"\s+", line)[3]
+                for line in passlist_output.split("\n") if "--" in line]
+    if ipaddress in passlist:
+        return
     subprocess.check_output(
         "sudo iptables -t nat -I CAPTIVE_PASSLIST 1 -s {ip} -j ACCEPT"
         .format(ip=ipaddress), shell=True)
 
 
 def application(env, start_response):
-    if env['REQUEST_URI'] == "/letmein.html":
-        allow_host(env['REMOTE_ADDR'])
-        start_response('302 Found', [('Location', "http://{{ fqdn }}")])
-        return ['1']
+    if env["REQUEST_URI"] == "/register":
+        allow_host(env["REMOTE_ADDR"])
+        start_response("302 Found", [("Location", "http://wikipedia.org")])
+        return ["1"]
 
-    start_response('200 OK', [('Content-Type', 'text/html')])
-    translation = get_translation_for(env.get('HTTP_ACCEPT_LANGUAGE'))
-    page = header + body.format(**translation) + footer
-    return [page.encode('utf-8')]
+    start_response("200 OK", [("Content-Type", "text/html")])
+    translation = get_translation_for(env.get("HTTP_ACCEPT_LANGUAGE"))
+    if has_internet():
+        parts = [parta, partb, partc, partd, parte]
+    else:
+        parts = [parta, partc, parte]
+    page = header + "\n".join([part.format(**translation) for part in parts]) + footer
+
+    return [page.encode("utf-8")]

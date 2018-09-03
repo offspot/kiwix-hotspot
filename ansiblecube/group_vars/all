@@ -71,7 +71,6 @@ sites_fqdn: sites.{{ fqdn }}
 time_fqdn: time.{{ fqdn }}
 
 # content & features
-captive_portal: true
 has_custom_branding: false
 custom_branding_path: /tmp
 kalite_languages: []

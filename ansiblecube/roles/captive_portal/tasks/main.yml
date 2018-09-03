@@ -10,6 +10,15 @@
     - uwsgi-plugin-python
   tags: master
 
+- name: Copy connectivity check script
+  copy:
+    src: connectivity-check
+    dest: /usr/local/bin/connectivity-check
+    owner: root
+    group: root
+    mode: 0755
+  tags: master
+
 - name: Create /var/www/captiveportal folder
   file:
     path: /var/www/captiveportal
@@ -58,7 +67,7 @@
   lineinfile: 
     dest: /etc/default/dnsmasq
     regexp: 'DNSMASQ_OPTS='
-    line: 'DNSMASQ_OPTS="--conf-file=/etc/dnsmasq-spoof.conf --local-ttl=600"'
+    line: 'DNSMASQ_OPTS="--conf-file=/etc/dnsmasq-spoof.conf --local-ttl=300"'
     state: present
   tags: master
               
@@ -82,12 +91,6 @@
 - name: Sign the certificate
   command: openssl x509 -req -sha256 -days 3650 -in /etc/nginx/ssl/ideascube.csr -signkey /etc/nginx/ssl/ideascube.key -out /etc/nginx/ssl/ideascube.crt
   tags: ['master', 'rename']  
-
-- name: Copy new catch-all redirect 301 vhost
-  template:
-    src: redirect.j2
-    dest: /etc/nginx/sites-enabled/redirect
-  tags: ['master', 'rename']
 
 - name: Add UWSGI specific configuration file
   copy:
@@ -127,17 +130,32 @@
     mode: 0755
   tags: master
 
-- name: Copy dnsmasq script for NetworkManager
-  template:
-    src: dnsmasq.j2
-    dest: /etc/NetworkManager/dispatcher.d/03dnsmasq
-    mode: 0755
-  notify: restart network manager
-  tags: ['master', 'rename']
-
-- name: Copy clear_iptables.sh to /usr/bin/local
+- name: Copy pibox-mode-switcher script for NetworkManager
   copy:
-    src: clear_iptables.sh
+    src: pibox-mode-switcher
+    dest: /usr/local/bin/pibox-mode-switcher
+    mode: 0755
+  tags: master
+
+- name: Link mode-switcher script to NetworkManager
+  file:
+    src: /usr/local/bin/pibox-mode-switcher
+    dest: /etc/NetworkManager/dispatcher.d/03dnsmasq
+    state: link
+  notify: restart network manager
+  tags: master
+
+- name: Add a cron entry to check connectivity
+  cron:
+    name: "Check connectivity status"
+    minute: "*/5"
+    job: "/usr/local/bin/pibox-mode-switcher"
+    state: present
+  tags: master
+
+- name: Copy clean_iptables.sh to /usr/local/bin
+  copy:
+    src: clean_iptables.sh
     dest: /usr/local/bin/clean_iptables.sh
     owner: root
     group: root
@@ -147,7 +165,7 @@
 - name: Add a cron entry to clean iptables rules
   cron:
     name: "Clear dead connections from CAPTIVE_PASSLIST"
-    minute: "*/5"
+    minute: "*/15"
     job: "/usr/local/bin/clean_iptables.sh"
     state: present
   tags: master
@@ -189,24 +207,24 @@
     jump: CAPTIVE_PASSLIST
   tags: master
 
-- name: DNAT HTTP to hotspot_ip:82
+- name: DNAT HTTP to hotspot_ip:80
   iptables:
     table: nat
     chain: CAPTIVE_HTTP
     protocol: tcp
     jump: DNAT
-    to_destination: "{{ hotspot_ip }}:82"
-    comment: Redirect HTTP traffic to server port 82
+    to_destination: "{{ hotspot_ip }}:80"
+    comment: Redirect HTTP traffic to server port 80
   tags: master
 
-- name: DNAT HTTPS to hotspot_ip:83
+- name: DNAT HTTPS to hotspot_ip:443
   iptables:
     table: nat
     chain: CAPTIVE_HTTPS
     protocol: tcp
     jump: DNAT
-    to_destination: "{{ hotspot_ip }}:83"
-    comment: Redirect HTTPS traffic to server port 83
+    to_destination: "{{ hotspot_ip }}:443"
+    comment: Redirect HTTPS traffic to server port 443
   tags: master
 
 - name: Last CAPTIVE_PASSLIST rules RETURN to calling chain

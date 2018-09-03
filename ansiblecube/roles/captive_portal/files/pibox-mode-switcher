@@ -1,0 +1,13 @@
+#!/bin/bash
+
+touch /tmp/has_internet
+previous=`cat /tmp/has_internet`
+current=$(/usr/local/bin/connectivity-check)
+echo "dnsmasq dispatcher connectivity check: $current"
+echo "$current" > /tmp/has_internet
+if [ "$current" != "$previous" ];
+then
+    if [ $current = "no" ]; then spoof="-spoof" ; else spoof="" ; fi
+    sed -i "s/^DNSMASQ_OPTS=.*/DNSMASQ_OPTS=\"--conf-file=\/etc\/dnsmasq${spoof}.conf --local-ttl=300\"/g" /etc/default/dnsmasq;
+    systemctl restart dnsmasq.service
+fi

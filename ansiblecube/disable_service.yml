@@ -4,3 +4,4 @@
     name: "{{ service }}"
     enabled: no
     state: stopped
+  tags: always

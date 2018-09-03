@@ -6,3 +6,7 @@
     autoremove: yes
     autoclean: yes
   tags: master
+
+- name: Setup eth0 connection
+  command: nmcli connection add ifname eth0 type ethernet autoconnect yes save yes
+  tags: master
