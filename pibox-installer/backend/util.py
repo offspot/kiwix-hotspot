@@ -158,7 +158,7 @@ def write_image_on_card(image_fd, device_fd, logger):
 
         # only update logger every 4 steps (100MiB)
         if step % 4 == 0:
-            logger.progress(step / steps)
+            logger.progress(step, steps)
             logger.std(
                 "Copied {copied} of {total} ({pc:.2f}%)"
                 .format(copied=human_readable_size(step * buffer_size),

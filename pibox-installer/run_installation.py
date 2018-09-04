@@ -160,7 +160,7 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
                            .format(p=dl_content['name'],
                                    s=human_readable_size(rf.downloaded_size)))
             retrieved += dl_content['archive_size']
-            logger.progress(retrieved / archives_total_size)
+            logger.progress(retrieved, archives_total_size)
 
         # check edupi resources compliance
         if edupi_resources:
@@ -257,7 +257,7 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
                 # size of expanded files for this category (for progress)
                 processed += sum([c['expanded_size']
                                   for c in content_dl_cb(**cb_kwargs)])
-                logger.progress(processed / expanded_total_size)
+                logger.progress(processed, expanded_total_size)
         except Exception as exp:
             try:
                 unmount_data_partition(mount_point, device, logger)
