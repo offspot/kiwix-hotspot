@@ -1,4 +1,9 @@
 ---
+# we need to disable dnsmasq for internet connectivity to work
+# will be enabled on seal tag later
+- include_tasks: disable_service.yml service=dnsmasq
+  tags: move-content
+
 - name: Install catalogs
   become: yes
   become_user: "{{ username }}"
