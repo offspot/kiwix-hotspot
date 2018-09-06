@@ -4,3 +4,4 @@
     name: "{{ service }}"
     enabled: yes
     state: restarted
+  tags: always

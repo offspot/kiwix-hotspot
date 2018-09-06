@@ -86,9 +86,18 @@ class ProgressHelper(object):
         self.stage_started_on = datetime.datetime.now()
         self.update()
 
-    def progress(self, percentage=None):
+    def progress(self, numerator, denominator=1):
         ''' record progress for the current stage '''
-        assert percentage is None or (percentage >= 0 and percentage <= 1)
+        if numerator is not None:
+            try:
+                percentage = numerator / denominator
+                assert percentage >= 0 and percentage <= 1
+            except AssertionError:
+                percentage = None
+            except ZeroDivisionError:
+                percentage = 1
+        else:
+            percentage = None
         self.stage_progress = percentage
         self.update()
 
