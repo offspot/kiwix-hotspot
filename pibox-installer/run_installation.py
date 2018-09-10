@@ -7,7 +7,7 @@ from backend.download import download_content, unzip_file
 from backend.mount import mount_data_partition, unmount_data_partition, test_mount_procedure, format_data_partition, guess_next_loop_device
 from backend.mount import can_write_on, allow_write_on, restore_mode
 from backend.util import subprocess_pretty_check_call, subprocess_pretty_call
-from backend.util import run_sdcard_thread
+from backend.util import ensure_card_written, ImageWriterThread
 from backend.sysreq import host_matches_requirements, requirements_url
 import data
 from util import human_readable_size, get_cache, ensure_zip_exfat_compatible, EXFAT_FORBIDDEN_CHARS
@@ -298,8 +298,33 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
                 logger.stage('write')
                 logger.step("Writting image to SD-card ({})".format(sd_card))
                 try:
-                    run_sdcard_thread(image_final_path, sd_card,
-                                      False, cancel_event, logger)
+                    imwriter = ImageWriterThread(
+                        args=(image_final_path, sd_card, logger))
+                    cancel_event.register_thread(thread=imwriter)
+                    imwriter.start()
+                    imwriter.join(timeout=2)  # make sure it started
+                    while imwriter.is_alive():
+                        pass
+                    imwriter.join(timeout=2)
+                    cancel_event.unregister_thread()
+                    if imwriter.exp is not None:
+                        raise imwriter.exp
+
+                    logger.std("Done writing ; preparing for verification.")
+                    time.sleep(5)
+                    ensure_card_written(image_final_path, sd_card, logger)
+
+                except ValueError:
+                    logger.succ("Image created successfuly.")
+                    logger.err(
+                        "SD-card content is different than that of image.\n"
+                        "Please check the content of your card and "
+                        "verify that the card is not damaged ("
+                        "often turns read-only silently).\n"
+                        "Alternatively, use Etcher (see File > Flash) to "
+                        "flash image onto SD-card and validate transfer."
+                    )
+                    raise Exception("SD-card content verification failed")
                 except Exception:
                     logger.succ("Image created successfuly.")
                     logger.err(
@@ -308,20 +333,6 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
                         "onto your SD-card. See File menu for links to Etcher."
                     )
                     raise Exception("Failed to write Image to SD-card")
-
-                # check that SD card was properly written
-                try:
-                    run_sdcard_thread(image_final_path, sd_card,
-                                      True, cancel_event, logger)
-                except AssertionError:
-                    logger.err(
-                        "SD-card content is different than that of image.\n"
-                        "Please check the content of your card and "
-                        "verify that the card is not damaged ("
-                        "often turns read-only silently).\n"
-                        "Alternatively, use Etcher (see File > Flash) to "
-                        "flash image onto SD-card and validate transfer.")
-                    raise Exception("SD-card content differs from image.")
 
         except Exception as e:
             logger.failed(str(e))

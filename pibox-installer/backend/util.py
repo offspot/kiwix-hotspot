@@ -143,59 +143,18 @@ def close_handles(image_fd, device_fd):
         pass
 
 
-def write_image_on_card(image_fd, device_fd, logger):
-    ''' copy image content onto device (raw) '''
-
-    logger.step("Copy image to sd card")
-
-    total_size = os.lseek(image_fd, 0, os.SEEK_END)
-    os.lseek(image_fd, 0, os.SEEK_SET)
-
-    buffer_size = 25 * ONE_MiB
-    steps = total_size // buffer_size
-
-    for step in range(0, steps):
-
-        # only update logger every 4 steps (100MiB)
-        if step % 4 == 0:
-            logger.progress(step, steps)
-            logger.std(
-                "Copied {copied} of {total} ({pc:.2f}%)"
-                .format(copied=human_readable_size(step * buffer_size),
-                        total=human_readable_size(total_size),
-                        pc=step / steps * 100))
-
-        try:
-            os.write(device_fd, os.read(image_fd, buffer_size))
-        except Exception as exp:
-            logger.std("Exception during write: {}".format(exp))
-            close_handles(image_fd, device_fd)
-            raise
-
-    if total_size % buffer_size:
-        logger.std("Writing last chunk...")
-        try:
-            os.write(device_fd, os.read(image_fd, total_size % buffer_size))
-        except Exception as exp:
-            logger.std("Exception during write: {}".format(exp))
-            close_handles(image_fd, device_fd)
-            raise
-
-    logger.progress(1)
-    logger.step("sync")
-    os.fsync(device_fd)
-    close_handles(image_fd, device_fd)
-
-
-def ensure_card_written(image_fd, device_fd, logger):
+def ensure_card_written(image_fpath, device_fpath, logger):
     ''' asserts image and device content is same (reads rand 4MiB from both '''
 
     logger.step("Verify data on SD card")
 
+    image_fd, device_fd = open_handles(image_fpath, device_fpath, read_only=True)
+
     # read a 4MiB random part from the image
     buffer_size = 4 * ONE_MiB
     total_size = os.lseek(image_fd, 0, os.SEEK_END)
-    offset = random.randint(0, int((total_size - buffer_size) * .8)) // 512
+    offset = random.randint(0, int((total_size - buffer_size) * .8))
+    offset -= (offset % 512)
     logger.std("reading {n}b from offset {s} out of {t}b."
                .format(n=buffer_size, s=offset, t=total_size))
 
@@ -203,27 +162,76 @@ def ensure_card_written(image_fd, device_fd, logger):
         # read same part from the SD card and compare
         os.lseek(image_fd, offset, os.SEEK_SET)
         os.lseek(device_fd, offset, os.SEEK_SET)
-        assert os.read(image_fd, buffer_size) == os.read(device_fd, buffer_size)
-    except AssertionError:
-        raise
-    except Exception as exp:
-        logger.std("Exception during read: {}".format(exp))
+        if not os.read(image_fd, buffer_size) == os.read(device_fd, buffer_size):
+            raise ValueError("Image and SD-card challenge do not match.")
+    except Exception:
         raise
     finally:
         close_handles(image_fd, device_fd)
 
 
-def run_sdcard_thread(image_fpath, device_fpath, verify_step, cancel_event, logger):
-    ''' starts a cancelable thread for SD-card I/O operations '''
+class ImageWriterThread(threading.Thread):
 
-    image_fd, device_fd = open_handles(image_fpath, device_fpath, read_only=verify_step)
-    thread = threading.Thread(
-        target=ensure_card_written if verify_step else write_image_on_card,
-        args=(image_fd, device_fd, logger))
-    thread.start()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._should_stop = False  # stop flag
+        self.exp = None  # exception to be re-raised by caller
 
-    cancel_event.register_thread(
-        thread=thread, callback=close_handles, callback_args=(image_fd, device_fd))
+    def stop(self):
+        self._should_stop = True
 
-    thread.join()  # wait for target to complete
-    cancel_event.unregister_thread()
+    def run(self):
+        image_fpath, device_fpath, logger = self._args
+
+        logger.step("Copy image to sd card")
+
+        image_fd, device_fd = open_handles(image_fpath, device_fpath)
+
+        total_size = os.lseek(image_fd, 0, os.SEEK_END)
+        os.lseek(image_fd, 0, os.SEEK_SET)
+
+        if os.name == "nt":
+            buffer_size = 512  # safer on windows
+            logger_break = 1000
+        else:
+            buffer_size = 25 * ONE_MiB
+            logger_break = 4
+        steps = total_size // buffer_size
+
+        for step in range(0, steps):
+
+            if self._should_stop:
+                break
+
+            # only update logger every 4 steps (100MiB)
+            if step % logger_break == 0:
+                logger.progress(step, steps)
+                logger.std(
+                    "Copied {copied} of {total} ({pc:.2f}%)"
+                    .format(copied=human_readable_size(step * buffer_size),
+                            total=human_readable_size(total_size),
+                            pc=step / steps * 100))
+
+            try:
+                os.write(device_fd, os.read(image_fd, buffer_size))
+            except Exception as exp:
+                logger.std("Exception during write: {}".format(exp))
+                close_handles(image_fd, device_fd)
+                self.exp = exp
+                raise
+
+        if not self._should_stop and total_size % buffer_size:
+            logger.std("Writing last chunk...")
+            try:
+                os.write(device_fd, os.read(image_fd, total_size % buffer_size))
+            except Exception as exp:
+                logger.std("Exception during write: {}".format(exp))
+                close_handles(image_fd, device_fd)
+                self.exp = exp
+                raise
+
+        logger.progress(1)
+        logger.step("sync")
+        if not self._should_stop:
+            os.fsync(device_fd)
+        close_handles(image_fd, device_fd)

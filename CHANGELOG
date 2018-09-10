@@ -1,3 +1,8 @@
+2.0-rc7
+* Fixed catalog update in Qemu (stage 5)
+* Better SD-card writer (faster, error-handling, cancellable)
+
+
 2.0-rc6
 * JSON Exports's properties and sub-properties saved in a fixed order
 * Failed process raises failed dialog properly [regression]

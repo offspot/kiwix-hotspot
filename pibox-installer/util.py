@@ -246,10 +246,8 @@ class CancelEvent:
     def lock(self):
         return _CancelEventRegister(self._lock, self._pids)
 
-    def register_thread(self, thread, callback, callback_args):
+    def register_thread(self, thread):
         self.thread = thread
-        self.callback = callback
-        self.callback_args = callback_args
 
     def unregister_thread(self):
         self.thread = None
@@ -258,8 +256,8 @@ class CancelEvent:
 
     def cancel(self):
         if self.thread is not None:
-            self.thread.join(timeout=0)
-            self.callback(*self.callback_args)
+            self.thread.stop()
+            self.thread.join(timeout=5)  # allow proper release of handles
             self.unregister_thread()
 
         self._lock.acquire()

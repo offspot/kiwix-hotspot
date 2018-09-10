@@ -96,7 +96,7 @@ elif sys.platform == "darwin":
             devices.append({
                 "bus_protocol": plist["BusProtocol"],
                 "device_identifier": plist["DeviceIdentifier"],
-                "device": plist["DeviceNode"],
+                "device": plist["DeviceNode"].replace('/dev/disk', '/dev/rdisk'),
                 "io_registry_entry_name": plist["IORegistryEntryName"],
                 "media_name": plist["MediaName"],
                 "media_type": plist["MediaType"],
