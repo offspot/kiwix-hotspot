@@ -12,7 +12,7 @@ from data import data_dir
 from util import (ReportHook, get_checksum, get_cache)
 from backend.util import subprocess_pretty_check_call, startup_info_args
 
-FAILURE_RETRIES = 3
+FAILURE_RETRIES = 6
 szip_exe = os.path.join(data_dir, '7za.exe')
 
 
@@ -94,7 +94,7 @@ def stream(url, write_to=None, callback=None, block_size=1024):
         read=FAILURE_RETRIES,  # read errors
         status=2,  # failure HTTP status (only those bellow)
         redirect=False,  # don't fail on redirections
-        backoff_factor=1,  # sleep factor between retries
+        backoff_factor=30,  # sleep factor between retries
         status_forcelist=[413, 429, 500, 502, 503, 504])
     retry_adapter = requests.adapters.HTTPAdapter(max_retries=retries)
     session.mount('http', retry_adapter)  # tied to http and https
