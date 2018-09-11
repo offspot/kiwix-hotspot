@@ -195,6 +195,7 @@
     dest: "{{ wikifundi_root }}/{{ item }}"
   with_items:
     - cc-by-sa.png
+    - A_WikiAfrica_project.png
     - favicon.ico
     - logo.png
     - logo-sq.png
