@@ -6,7 +6,7 @@ from backend.content import (get_collection, get_content,
 from backend.download import download_content, unzip_file
 from backend.mount import mount_data_partition, unmount_data_partition, test_mount_procedure, format_data_partition, guess_next_loop_device
 from backend.mount import can_write_on, allow_write_on, restore_mode
-from backend.util import subprocess_pretty_check_call, subprocess_pretty_call
+from backend.util import subprocess_pretty_check_call, prevent_sleep, restore_sleep_policy
 from backend.util import ensure_card_written, ImageWriterThread
 from backend.sysreq import host_matches_requirements, requirements_url
 import data
@@ -28,6 +28,9 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
     cache_folder = get_cache(build_dir)
 
     try:
+        logger.std("Preventing system from sleeping")
+        sleep_ref = prevent_sleep(logger)
+
         logger.step("Check System Requirements")
         logger.std("Please read {} for details".format(requirements_url))
         sysreq_ok, missing_deps = host_matches_requirements(build_dir)
@@ -345,6 +348,9 @@ def run_installation(name, timezone, language, wifi_pwd, admin_account, kalite, 
             logger.complete()
             error = None
     finally:
+        logger.std("Restoring system sleep policy")
+        restore_sleep_policy(sleep_ref, logger)
+
         if sys.platform == "linux" and loop_dev and previous_loop_mode:
             logger.step("Restoring loop device ({}) mode".format(loop_dev))
             restore_mode(loop_dev, previous_loop_mode, logger)

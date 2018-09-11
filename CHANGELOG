@@ -1,7 +1,8 @@
 2.0-rc7
 * Fixed catalog update in Qemu (stage 5)
 * Better SD-card writer (faster, error-handling, cancellable)
-
+* Additional delays between download retries
+* Prevents system from sleeping to avoid side effects
 
 2.0-rc6
 * JSON Exports's properties and sub-properties saved in a fixed order

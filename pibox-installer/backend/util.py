@@ -8,6 +8,23 @@ import subprocess
 from util import CLILogger, ONE_MiB, human_readable_size
 
 
+# windows-only flags to prevent sleep on executing thread
+WINDOWS_SLEEP_FLAGS = {
+    # Enables away mode. This value must be specified with ES_CONTINUOUS.
+    # Away mode should be used only by media-recording and media-distribution
+    # applications that must perform critical background processing
+    # on desktop computers while the computer appears to be sleeping.
+    'ES_AWAYMODE_REQUIRED': 0x00000040,
+    # Informs the system that the state being set should remain in effect until
+    # the next call that uses ES_CONTINUOUS and one of the other state flags is cleared.
+    'ES_CONTINUOUS': 0x80000000,
+    # Forces the display to be on by resetting the display idle timer.
+    'ES_DISPLAY_REQUIRED': 0x00000002,
+    # Forces the system to be in the working state by resetting the system idle timer.
+    'ES_SYSTEM_REQUIRED': 0x00000001,
+}
+
+
 class CheckCallException(Exception):
     def __init__(self, msg):
         Exception(self, msg)
@@ -235,3 +252,65 @@ class ImageWriterThread(threading.Thread):
         if not self._should_stop:
             os.fsync(device_fd)
         close_handles(image_fd, device_fd)
+
+
+def prevent_sleep(logger):
+    if sys.platform == "win32":
+        logger.std("Setting ES_SYSTEM_REQUIRED mode to current thread")
+        ctypes.windll.kernel32.SetThreadExecutionState(
+            WINDOWS_SLEEP_FLAGS['ES_CONTINUOUS'] |
+            WINDOWS_SLEEP_FLAGS['ES_SYSTEM_REQUIRED'] |
+            WINDOWS_SLEEP_FLAGS['ES_DISPLAY_REQUIRED'])
+        return
+
+    if sys.platform == "linux":
+        def make_unmapped_window(wm_name):
+            from Xlib import display
+            screen = display.Display().screen()
+            window = screen.root.create_window(0, 0, 1, 1, 0, screen.root_depth)
+            window.set_wm_name(wm_name)
+            window.set_wm_protocols([])
+            return window
+
+        logger.std("Suspending xdg-screensaver")
+        wid = None
+        try:
+            # Create window to use with xdg-screensaver
+            window = make_unmapped_window("caffeinate")
+            wid = hex(window.id)
+            cmd = ['/usr/bin/xdg-screensaver', 'suspend', wid]
+            logger.std("Calling {}".format(cmd))
+            p = subprocess.Popen(" ".join(cmd), shell=True)
+            p.wait()
+            if not p.returncode == 0:
+                raise OSError("xdg-screensaver returned {}".format(p.returncode))
+        except Exception as exp:
+            logger.err("Unable to disable sleep. Please do it manually.")
+        return wid
+
+    if sys.platform == "darwin":
+        cmd = ["/usr/bin/caffeinate", "-dsi"]
+        logger.std("Calling {}".format(cmd))
+        process = subprocess.Popen(cmd, **startup_info_args())
+
+        return process
+
+def restore_sleep_policy(reference, logger):
+    if sys.platform == "win32":
+        logger.std("Restoring ES_CONTINUOUS mode to current thread")
+        ctypes.windll.kernel32.SetThreadExecutionState(
+            WINDOWS_SLEEP_FLAGS['ES_CONTINUOUS'])
+        return
+
+    if sys.platform == "linux":
+        logger.std("Resuming xdg-screensaver (wid #{})".format(reference))
+        if reference is not None:
+            subprocess_pretty_call(
+                ['/usr/bin/xdg-screensaver', 'resume', reference], logger)
+        return
+
+    if sys.platform == "darwin":
+        logger.std("Stopping caffeinate process #{}".format(reference.pid))
+        reference.kill()
+        reference.wait(5)
+        return
