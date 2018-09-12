@@ -131,7 +131,7 @@ install:
   - copy /b "C:\Program Files\7zextra\7zS.sfx" + sfxconfig.txt + kiwix-plug_installer.7z kiwix-plug_installer.exe
   # change icon and add version info to exe
   - GoRC.exe /fo resources.res resources.rc
-  - copy ..\pibox-installer-logo.ico icon.ico
+  - copy ..\kiwix-plug_installer-logo.ico icon.ico
   - c:\projects\pibox-installer\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -script reshack.txt
   - cd C:\projects\pibox-installer\dist\kiwix-plug_installer
 

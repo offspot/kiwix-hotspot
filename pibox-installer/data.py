@@ -13,7 +13,7 @@ _vexpress_boot_dir = "pibox-installer-vexpress-boot"
 vexpress_boot_kernel = os.path.join(data_dir, _vexpress_boot_dir, "zImage")
 vexpress_boot_dtb = os.path.join(data_dir, _vexpress_boot_dir, "vexpress-v2p-ca15_a7.dtb")
 
-pibox_logo = os.path.join(data_dir, "pibox-installer-logo.png")
+pibox_logo = os.path.join(data_dir, "kiwix-plug_installer-logo.png")
 
 cache_folder_name = "cache"
 content_file = os.path.join(data_dir, 'contents.json')

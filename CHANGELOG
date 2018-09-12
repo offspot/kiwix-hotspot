@@ -1,3 +1,8 @@
+2.0-rc8
+* Fixed macOS build
+* Fixed a missing icon in WikiFundi
+* New Kiwix-plug_installer icon
+
 2.0-rc7
 * Fixed catalog update in Qemu (stage 5)
 * Better SD-card writer (faster, error-handling, cancellable)
