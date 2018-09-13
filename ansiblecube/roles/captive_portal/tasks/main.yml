@@ -130,25 +130,25 @@
     mode: 0755
   tags: master
 
-- name: Copy pibox-mode-switcher script for NetworkManager
+- name: Copy pibox-mode-switcher script
   copy:
     src: pibox-mode-switcher
     dest: /usr/local/bin/pibox-mode-switcher
     mode: 0755
   tags: master
 
-- name: Link mode-switcher script to NetworkManager
-  file:
-    src: /usr/local/bin/pibox-mode-switcher
-    dest: /etc/NetworkManager/dispatcher.d/03dnsmasq
-    state: link
-  notify: restart network manager
-  tags: master
-
 - name: Add a cron entry to check connectivity
   cron:
     name: "Check connectivity status"
     minute: "*/5"
+    job: "/usr/local/bin/pibox-mode-switcher"
+    state: present
+  tags: master
+
+- name: Add reboot cron entry for connectivity check
+  cron:
+    name: "Check connectivity status uppon startup"
+    special_time: reboot
     job: "/usr/local/bin/pibox-mode-switcher"
     state: present
   tags: master

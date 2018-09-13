@@ -1,5 +1,7 @@
 ---
 - name: Install dnsmasq
+  environment:
+    RUNLEVEL: 1
   apt:
     name: dnsmasq
     state: latest
@@ -7,11 +9,8 @@
     autoclean: yes
   tags: master
 
-- name: stop dnsmasq
-  service:
-    name: dnsmasq
-    enabled: no
-    state: stopped
+- include_tasks: disable_service.yml service=dnsmasq
+  tags: master
 
 - name: Copy dnsmasq.conf file
   template:
@@ -32,9 +31,3 @@
     dest: /etc/network/interfaces
     backup: yes
   tags: master
-
-- name: restart dsnmasq
-  service:
-    name: dnsmasq
-    state: restarted
-  tags: seal
