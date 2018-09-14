@@ -8,11 +8,11 @@
         "expanded_size": 1862270976
     },
     "pibox_base_image": {
-        "url": "{mirror}/plug/base/plug-master_2018-09-12.img.zip",
-        "name": "plug-master_2018-09-12.img.zip",
+        "url": "{mirror}/plug/base/plug-master_2018-09-13.img.zip",
+        "name": "plug-master_2018-09-13.img.zip",
         "root_partition_size": 7000000000,
-        "checksum": "f8f2b882ae70600899f55af168dbf268d1583c41c9c03da057c9e19046ff1ade",
-        "archive_size": 2883090125,
+        "checksum": "d5c47e22af01e5bee2ab7c4034ff6e62c651aea1f982b72129556f4230742b78",
+        "archive_size": 2938917221,
         "expanded_size": 8000000000
     },
     "aflatoun_content": {
