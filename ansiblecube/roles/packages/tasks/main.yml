@@ -45,6 +45,14 @@
     state: present
   tags: move-content
 
+- name: Fix edupi category CSS
+  lineinfile:
+    dest: /opt/venvs/ideascube/lib/python{{ python3_version }}/site-packages/ideascube/static/ideascube/cards.css
+    line: '.acces, .access { background-color: #FCE94F; }'
+    insertafter: EOF
+    state: present
+  tags: move-content
+
 - name: collect static for ideascube
   become: yes
   become_user: "{{ username }}"
