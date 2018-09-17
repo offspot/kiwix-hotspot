@@ -1009,7 +1009,11 @@ class Application:
         validate_label(self.component.admin_account_login_label,
                        valid_admin_login)
         validate_label(self.component.admin_account_pwd_label, valid_admin_pwd)
-        all_valid = all_valid and valid_admin_login and valid_admin_login
+        self.component.admin_account_login_constraints_revealer.set_reveal_child(
+            not valid_admin_login)
+        self.component.admin_account_pwd_constraints_revealer.set_reveal_child(
+            not valid_admin_pwd)
+        all_valid = all_valid and valid_admin_login and valid_admin_pwd
 
         output_size = self.get_output_size()
         if self.component.output_stack.get_visible_child_name() == "sd_card":

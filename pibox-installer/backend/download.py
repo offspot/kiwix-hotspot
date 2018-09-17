@@ -203,7 +203,8 @@ def unarchive(archive_fpath, dest_folder, logger):
         command = [szip_exe, 'x', '-o{}'.format(dest_folder), archive_fpath]
     else:
         tar_exe = '/usr/bin/tar' if sys.platform == "darwin" else '/bin/tar'
-        command = [tar_exe, '-C', dest_folder, '-x', '-f', archive_fpath]
+        # using -o and -m as exfat dont support mod times and ownership is different
+        command = [tar_exe, '-C', dest_folder, '-x', '-m', '-o', '-f', archive_fpath]
 
     subprocess_pretty_check_call(command, logger)
 

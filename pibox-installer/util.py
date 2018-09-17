@@ -451,8 +451,7 @@ def check_user_inputs(project_name, language, timezone,
     valid_admin_pwd = len(admin_pwd) <= 31 \
         and set(admin_pwd) <= set(string.ascii_uppercase
                                   + string.ascii_lowercase
-                                  + string.digits + '-' + '_') \
-        and (admin_pwd != admin_login)
+                                  + string.digits + '-' + '_')
 
     return valid_project_name, valid_language, valid_timezone, \
         valid_wifi_pwd, valid_admin_login, valid_admin_pwd
