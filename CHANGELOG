@@ -1,3 +1,6 @@
+2.0-rc10
+* Fixed wikifundi config regression
+
 2.0-rc9
 * Admin username and password less restrictive
 * Updated WikiFundi content
