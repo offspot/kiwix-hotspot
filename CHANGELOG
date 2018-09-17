@@ -1,3 +1,9 @@
+2.0-rc9
+* Admin username and password less restrictive
+* Updated WikiFundi content
+* Minor UI fixes (build_dir UI if incorrect), ideascube cards
+* Captive portal script not tied to NetworkManager
+
 2.0-rc8
 * Fixed macOS build
 * Fixed a missing icon in WikiFundi
