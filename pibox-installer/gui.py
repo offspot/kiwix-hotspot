@@ -1058,12 +1058,13 @@ class Application:
         css = self.component.css_chooser.get_filename()
 
         build_dir = self.component.build_path_chooser.get_filename()
-        condition = build_dir is not None
+        condition = build_dir is not None and os.path.exists(build_dir) \
+            and os.path.isdir(build_dir)
         validate_label(self.component.build_path_chooser_label, condition)
         all_valid = all_valid and condition
 
         # Check if there is enough space in build_dir to build image
-        if build_dir is not None:
+        if condition:
             free_space = get_free_space_in_dir(build_dir)
             remaining_space = free_space - output_size
             if remaining_space < 0:
