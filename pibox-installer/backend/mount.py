@@ -401,7 +401,7 @@ def unmount_data_partition(mount_point, device, logger):
                  '--block-device', device, udisks_nou], logger)
             try:
                 os.rmdir(mount_point)
-            except FileNotFoundError:
+            except (FileNotFoundError, PermissionError):
                 pass
         # delete the loop device (might have already been deletec)
         subprocess_pretty_call(

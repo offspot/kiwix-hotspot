@@ -1,3 +1,6 @@
+2.0-rc11
+* Fixed an unmount issue on Linux
+
 2.0-rc10
 * Fixed wikifundi config regression
 
