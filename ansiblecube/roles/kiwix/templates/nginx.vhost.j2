@@ -2,6 +2,7 @@ server {
     listen  80;
     server_name kiwix.{{ fqdn }} kiwix.{{ hostname }};
     location / {
+        rewrite ^/$ http://{{ fqdn }} permanent;  # redirect home to ideascube
         proxy_pass_header Server;
         proxy_set_header Host $http_host;
         proxy_redirect off;
