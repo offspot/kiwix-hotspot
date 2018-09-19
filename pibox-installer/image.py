@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim: ai ts=4 sts=4 et sw=4 nu
 
-''' prepares a base raspbian image into a pibox-master one via QEMU
+''' prepares a base raspbian image into a hotspot-master one via QEMU
     - enables SSH
     - copies ansiblecube into the guest
     - run ansiblecube with default values
@@ -90,7 +90,7 @@ def main(logger,
 
     # default output file name
     if image_fname is None:
-        image_fname = "pibox-master_{date}.img".format(
+        image_fname = "hotspot-master_{date}.img".format(
             date=datetime.datetime.now().strftime("%Y-%m-%d"))
     image_fpath = os.path.join(build_folder, image_fname)
 
@@ -128,7 +128,7 @@ def main(logger,
     logger.std("SUCCESS! {} was built successfuly".format(image_fpath))
 
 
-parser = argparse.ArgumentParser(description="Kiwix-plug base image creator")
+parser = argparse.ArgumentParser(description="Kiwix Hotspot base image creator")
 parser.add_argument("--root", help="root partition size (GB)", default=7)
 parser.add_argument("--size", help="Image (SD card) size (GB)", default=8)
 parser.add_argument("--build", help="Folder to create files in",

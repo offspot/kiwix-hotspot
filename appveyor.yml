@@ -1,6 +1,6 @@
 version: 1.0.{build}
 
-clone_folder: c:\projects\pibox-installer
+clone_folder: c:\projects\kiwix-hotspot
 
 image: Visual Studio 2015
 
@@ -46,9 +46,9 @@ install:
   - secure-file\tools\secure-file -decrypt pibox_installer_ci_rsa.appveyor_enc -secret %certificate_secret% -out pibox_installer_ci_rsa
   - ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -help
 
-  # Download pibox-installer-vexpress-boot
-  - appveyor DownloadFile "http://download.kiwix.org/dev/pibox-installer-vexpress-boot.zip"
-  - 7z.exe x pibox-installer-vexpress-boot.zip
+  # Download vexpress-boot
+  - appveyor DownloadFile "http://download.kiwix.org/dev/vexpress-boot.zip"
+  - 7z.exe x vexpress-boot.zip
 
   # Install pygobject
   # pygi-aio provides a way to install from cmd even if it is not documented
@@ -80,7 +80,7 @@ install:
   - if %platform%==x64 set PATH=%PATH%;C:\msys64\mingw64\bin
 
   # Install pyinstaller and requirements
-  - cd C:\projects\pibox-installer
+  - cd C:\projects\kiwix-hotspot
   - if %platform%==x86 C:\Python34\python.exe -m pip install pypiwin32==219 pyinstaller==3.2.1 -r requirements-windows.txt
   - if %platform%==x64 C:\Python34-x64\python.exe -m pip install pypiwin32==219 pyinstaller==3.2.1 -r requirements-windows.txt
 
@@ -114,35 +114,35 @@ install:
   - dir "C:\Program Files\imdiskinst"
 
   # Run pyinstaller and show warning
-  - cd C:\projects\pibox-installer
-  - if %platform%==x86 C:\Python34\python.exe C:\Python34\Scripts\pyinstaller-script.py --log-level=DEBUG pibox-installer-win32.spec
-  - if %platform%==x64 C:\Python34-x64\python.exe C:\Python34-x64\Scripts\pyinstaller-script.py --log-level=DEBUG pibox-installer-win64.spec
-  - if %platform%==x86 type build\pibox-installer-win32\warnpibox-installer-win32.txt
-  - if %platform%==x64 type build\pibox-installer-win64\warnpibox-installer-win64.txt
+  - cd C:\projects\kiwix-hotspot
+  - if %platform%==x86 C:\Python34\python.exe C:\Python34\Scripts\pyinstaller-script.py --log-level=DEBUG kiwix-hotspot-win32.spec
+  - if %platform%==x64 C:\Python34-x64\python.exe C:\Python34-x64\Scripts\pyinstaller-script.py --log-level=DEBUG kiwix-hotspot-win64.spec
+  - if %platform%==x86 type build\kiwix-hotspot-win32\warnkiwix-hotspot-win32.txt
+  - if %platform%==x64 type build\kiwix-hotspot-win64\warnkiwix-hotspot-win64.txt
 
   # Deploy
-  - cd C:\projects\pibox-installer\dist\kiwix-plug_installer
-  - 7z.exe a -m0=Copy C:\projects\pibox-installer\windows_bundle\kiwix-plug_installer.7z *
+  - cd C:\projects\kiwix-hotspot\dist\kiwix-hotspot
+  - 7z.exe a -m0=Copy C:\projects\kiwix-hotspot\windows_bundle\kiwix-hotspot.7z *
 
   # download tools
-  - cd C:\projects\pibox-installer\windows_bundle\
+  - cd C:\projects\kiwix-hotspot\windows_bundle\
   - appveyor DownloadFile "http://download.kiwix.org/dev/GoRC.exe" -FileName "GoRC.exe"
   # create SFX exe from 7z archive
-  - copy /b "C:\Program Files\7zextra\7zS.sfx" + sfxconfig.txt + kiwix-plug_installer.7z kiwix-plug_installer.exe
+  - copy /b "C:\Program Files\7zextra\7zS.sfx" + sfxconfig.txt + kiwix-hotspot.7z kiwix-hotspot.exe
   # change icon and add version info to exe
   - GoRC.exe /fo resources.res resources.rc
-  - copy ..\kiwix-plug_installer-logo.ico icon.ico
-  - c:\projects\pibox-installer\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -script reshack.txt
-  - cd C:\projects\pibox-installer\dist\kiwix-plug_installer
+  - copy ..\kiwix-hotspot-logo.ico icon.ico
+  - c:\projects\kiwix-hotspot\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -script reshack.txt
+  - cd C:\projects\kiwix-hotspot\dist\kiwix-hotspot
 
   # sign the build
-  - signtool.exe sign /f C:\projects\pibox-installer\kiwix.pfx /p %win_certificate_password% /t http://timestamp.verisign.com/scripts/timstamp.dll /d "Kiwix-plug installer" C:\projects\pibox-installer\windows_bundle\kiwix-plug_installer.exe
+  - signtool.exe sign /f C:\projects\kiwix-hotspot\kiwix.pfx /p %win_certificate_password% /t http://timestamp.verisign.com/scripts/timstamp.dll /d "Kiwix Hotspot" C:\projects\kiwix-hotspot\windows_bundle\kiwix-hotspot.exe
 
-  - if %platform%==x86 move C:\projects\pibox-installer\windows_bundle\kiwix-plug_installer.exe C:\msys64\home\appveyor\kiwix-plug_installer-win32.exe
-  - if %platform%==x64 move C:\projects\pibox-installer\windows_bundle\kiwix-plug_installer.exe C:\msys64\home\appveyor\kiwix-plug_installer-win64.exe
-  - move C:\projects\pibox-installer\pibox_installer_ci_rsa C:\msys64\home\appveyor\
+  - if %platform%==x86 move C:\projects\kiwix-hotspot\windows_bundle\kiwix-hotspot.exe C:\msys64\home\appveyor\kiwix-hotspot-win32.exe
+  - if %platform%==x64 move C:\projects\kiwix-hotspot\windows_bundle\kiwix-hotspot.exe C:\msys64\home\appveyor\kiwix-hotspot-win64.exe
+  - move C:\projects\kiwix-hotspot\pibox_installer_ci_rsa C:\msys64\home\appveyor\
 
-  - if %platform%==x86 C:\msys64\usr\bin\bash --login -c "DESTINATION=$(cat /c/destination-ps.txt | tr -d '\r' | tr -d '\n') ; scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa kiwix-plug_installer-win32.exe nightlybot@download.kiwix.org:$DESTINATION/kiwix-plug_installer-win32-$(cat branch.txt | sed 's/ //g').exe"
-  - if %platform%==x64 C:\msys64\usr\bin\bash --login -c "DESTINATION=$(cat /c/destination-ps.txt | tr -d '\r' | tr -d '\n') ; scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa kiwix-plug_installer-win64.exe nightlybot@download.kiwix.org:$DESTINATION/kiwix-plug_installer-win64-$(cat branch.txt | sed 's/ //g').exe"
+  - if %platform%==x86 C:\msys64\usr\bin\bash --login -c "DESTINATION=$(cat /c/destination-ps.txt | tr -d '\r' | tr -d '\n') ; scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa kiwix-hotspot-win32.exe nightlybot@download.kiwix.org:$DESTINATION/kiwix-hotspot-win32-$(cat branch.txt | sed 's/ //g').exe"
+  - if %platform%==x64 C:\msys64\usr\bin\bash --login -c "DESTINATION=$(cat /c/destination-ps.txt | tr -d '\r' | tr -d '\n') ; scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa kiwix-hotspot-win64.exe nightlybot@download.kiwix.org:$DESTINATION/kiwix-hotspot-win64-$(cat branch.txt | sed 's/ //g').exe"
 
-  - C:\msys64\usr\bin\bash --login -c "PIBOX_RELEASE=$(cat tag.txt | sed 's/ //g' | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*\(-rc[[:digit:]]\+\)\?') || true; if [ $PIBOX_RELEASE ]; then mkdir -p releases/$PIBOX_RELEASE/; cp kiwix-plug_installer-win*.exe releases/$PIBOX_RELEASE/; scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases/$PIBOX_RELEASE nightlybot@download.kiwix.org:/var/www/download.kiwix.org/release/kiwix-plug_installer/; fi"
+  - C:\msys64\usr\bin\bash --login -c "PIBOX_RELEASE=$(cat tag.txt | sed 's/ //g' | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*\(-rc[[:digit:]]\+\)\?') || true; if [ $PIBOX_RELEASE ]; then mkdir -p releases/$PIBOX_RELEASE/; cp kiwix-hotspot-win*.exe releases/$PIBOX_RELEASE/; scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases/$PIBOX_RELEASE nightlybot@download.kiwix.org:/var/www/download.kiwix.org/release/kiwix-hotspot/; fi"

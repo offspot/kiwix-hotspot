@@ -1,6 +1,6 @@
 # AnsibleCube
 
-This is a **very distant** fork of [ideascube/ansiblecube](https://github.com/ideascube/ansiblecube/) dedicated to [pibox-installer](https://framagit.org/ideascube/pibox-installer)'s use case.
+This is a **very distant** fork of [ideascube/ansiblecube](https://github.com/ideascube/ansiblecube/) dedicated to [kiwix-hotspot](https://framagit.org/ideascube/pibox-installer)'s use case.
 
 ## Goal
 
@@ -43,7 +43,7 @@ This is achieved by using a three steps scenario:
 
 This playbook is not meant to be run standalone on any system.
 
-Please check [make-base-image](https://framagit.org/ideascube/pibox-installer/tree/master/make-vexpress-boot) and more generally [pibox-installer](https://framagit.org/ideascube/pibox-installer) to see it in action.
+Please check [make-base-image](https://framagit.org/ideascube/pibox-installer/tree/master/make-vexpress-boot) and more generally [kiwix-hotspot](https://framagit.org/ideascube/pibox-installer) to see it in action.
 
 ## Tests
 

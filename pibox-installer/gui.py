@@ -47,7 +47,7 @@ def run():
 
 class ShortDialog(Gtk.Dialog):
     def __init__(self, parent, buttons, msg):
-        Gtk.Dialog.__init__(self, "kiwix-plug installer", parent, 0, buttons)
+        Gtk.Dialog.__init__(self, "Kiwix Hotspot", parent, 0, buttons)
         self.set_default_size(150, 100)
         label = Gtk.Label(msg)
         box = self.get_content_area()
@@ -133,7 +133,7 @@ class Logger(ProgressHelper):
 
         # update overall percentage on window title
         self.component.run_window.set_title(
-            "Kiwix-plug installer ({:.0f}%)"
+            "Kiwix Hotspot ({:.0f}%)"
             .format(self.get_overall_progress() * 100))
 
         # update stage name and number (Stage x/y)
@@ -705,11 +705,11 @@ class Application:
                 self.set_config(config)
 
         if for_save:
-            title = "Select a file to save Kiwix-plug config to"
+            title = "Select a file to save Kiwix Hotspot config to"
             action = Gtk.FileChooserAction.SAVE
             on_accept = _save
         else:
-            title = "Select Kiwix-plug config file to load"
+            title = "Select Kiwix Hotspot config file to load"
             action = Gtk.FileChooserAction.OPEN
             on_accept = _load
 

@@ -1,5 +1,5 @@
 ﻿;!@Install@!UTF-8!
-Title="Kiwix-plug installer"
+Title="Kiwix Hotspot"
 MiscFlags="4"
 RunProgram="launcher.exe"
 ;!@InstallEnd@!

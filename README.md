@@ -1,10 +1,10 @@
-# Kiwix-plug installer
+# Kiwix Hotspot
 
 This installer install [Ideascube](https://framagit.org/ideascube/ideascube) on an SD card for raspberrypi 2 or raspberrypi 3.
 
 Ideascube is a solution to serve offline content from the web such as Wikipedia, the Gutenberg library, TED talks.
 
-Kiwix-plug installer configure the RaspberryPi into a hotspot WiFi with Ideascube server and offline contents.
+Kiwix Hotspot configure the RaspberryPi into a hotspot WiFi with Ideascube server and offline contents.
 
 ## Download
 
@@ -22,15 +22,15 @@ presentation of the projet at Potsdam [Slides](http://wiki.kiwix.org/w/images/4/
 
 ## CLI usage
 
-run cli mode: `pibox-installer cli`
+run cli mode: `kiwix-hotspot cli`
 
-show help: `pibox-installer cli -h`
+show help: `kiwix-hotspot cli -h`
 
-show catalog: `pibox-installer cli --catalog`
+show catalog: `kiwix-hotspot cli --catalog`
 
-## Run pibox-installer from source
+## Run kiwix-hotspot from source
 
-you can read package pibox-installer to get help setting the environment
+you can read package kiwix-hotspot to get help setting the environment
 
 install dependencies:
 
@@ -38,22 +38,22 @@ install dependencies:
 * [qemu](http://www.qemu.org/download/): version >= 2.8, qemu-img and qemu-system-arm must be present in the directory (symlink or install there)
 * [pygobject](https://pygobject.readthedocs.io/en/latest/getting_started.html):
   on Windows you can also install it using [pygi-aio](https://sourceforge.net/projects/pygobjectwin32/)
-* [pibox-installer-vexpress-boot](http://download.kiwix.org/dev/pibox-installer-vexpress-boot.zip): unzip in the directory
+* [vexpress-boot](http://download.kiwix.org/dev/vexpress-boot.zip): unzip in the directory
 
 create a virtual a virtual environment that includes pygobject: `python3 -m venv --system-site-packages my_venv`
 
 activate the environment
 
 install pip dependencies: `pip3 install -r requirements-PLATFORM.txt`
-(note: on linux you may need some distribution packges, see package pibox-installer for more information)
+(note: on linux you may need some distribution packges, see package kiwix-hotspot for more information)
 
 run GUI application: `python3 pibox-installer`
 
 run CLI application: `python3 pibox-installer cli`
 
-## Build pibox-installer-vexpress-boot
+## Build vexpress-boot
 
-pibox-installer use a linux kernel for the QEMU emulation of vexpress machine.
+kiwix-hotspot use a linux kernel for the QEMU emulation of vexpress machine.
 This vexpress boot can be compiled on linux using make-vexpress-boot python3 script.
 
 requirements: `gcc-arm-linux-gnueabihf`, `bc` and `zip`
@@ -62,7 +62,7 @@ run: `python3 make-vexpress-boot`
 
 ## Build pibox base image
 
-pibox-installer uses a custom base image based off raspbian-lite with the following modifications (not exhaustive):
+kiwix-hotspot uses a custom base image based off raspbian-lite with the following modifications (not exhaustive):
 
 * `2018-04-19-raspbian-jessie-lite` 
 * SSH enabled
@@ -73,11 +73,11 @@ pibox-installer uses a custom base image based off raspbian-lite with the follow
 Should you want to build the base image:
 
 ``` sh
-pibox-installer image --root 7 --size 8 --out my-base.img
+kiwix-hotspot image --root 7 --size 8 --out my-base.img
 ```
 
 
-## Package pibox-installer
+## Package kiwix-hotspot
 
 see [appveyor.yml](appveyor.yml) for windows and [.travis.yml](.travis.yml) for mac and linux
 
@@ -87,13 +87,13 @@ presentation of the projet at Potsdam [Slides](http://wiki.kiwix.org/w/images/4/
 
 some notes about how the project is structured:
 
-pibox-installer is a python3 (tested on 3.4 and 3.5) application that use PyGobject for GUI and QEMU for emulating ARM machine.
+kiwix-hotspot is a python3 (tested on 3.4 and 3.5) application that use PyGobject for GUI and QEMU for emulating ARM machine.
 
 how it works:
 * ask user for configuration
 * download raspbian-lite and a Linux kernel compiled with make-vexpress-boot
 * resize the raspbian-lite image
-* emulate vexpress ARM machine with pibox-installer-vexpress-boot and raspbian-lite image
+* emulate vexpress ARM machine with vexpress-boot and raspbian-lite image
 * run ansiblecube inside the emulation
 * write output to SD card
 

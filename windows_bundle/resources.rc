@@ -7,11 +7,11 @@ VS_VERSION_INFO VERSIONINFO
         BLOCK "040904b0"
         {
             VALUE "CompanyName",        "Kiwix\0"
-            VALUE "FileDescription",    "Kiwix-plug installer\0"
+            VALUE "FileDescription",    "Kiwix Hotspot\0"
             VALUE "FileVersion",        "1.0.0.0\0"
             VALUE "LegalCopyright",     "Association Kiwix\0"
-            VALUE "OriginalFilename",   "kiwix-plug_installer.exe\0"
-            VALUE "ProductName",        "Kiwix-plug installer\0"
+            VALUE "OriginalFilename",   "kiwix-hotspot.exe\0"
+            VALUE "ProductName",        "Kiwix Hotspot\0"
             VALUE "ProductVersion",     "VERSION_STR\0"
         }
     }

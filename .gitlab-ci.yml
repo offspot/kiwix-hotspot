@@ -19,8 +19,8 @@ build-pibox-image:
     LANG: 'en_US.UTF-8'
   script:
     # download custom kernel
-    - wget http://download.kiwix.org/dev/pibox-installer-vexpress-boot.zip
-    - unzip pibox-installer-vexpress-boot.zip
+    - wget http://download.kiwix.org/dev/vexpress-boot.zip
+    - unzip vexpress-boot.zip
 
     # download a static qemu
     - wget http://download.kiwix.org/dev/qemu-2.12.0-linux-x86_64.tar.gz
@@ -32,12 +32,12 @@ build-pibox-image:
 
     # Install and run pyinstaller
     - pip3 install https://github.com/thiolliere/pyinstaller/archive/develop.zip
-    - pyinstaller --log-level=DEBUG pibox-installer-linux.spec
-    - cat build/pibox-installer-linux/warnpibox-installer-linux.txt
+    - pyinstaller --log-level=DEBUG kiwix-hotspot-linux.spec
+    - cat build/kiwix-hotspot-linux/warnkiwix-hotspot-linux.txt
 
     # start image builder
-    - eval "export OUT_IMG=plug-master_$(date +"%Y-%m-%d").img"
-    - dist/kiwix-plug_installer image --ram 8G --root 7 --size 8 --out ${OUT_IMG}
+    - eval "export OUT_IMG=hotspot-master_$(date +"%Y-%m-%d").img"
+    - dist/kiwix-hotspot image --ram 8G --root 7 --size 8 --out ${OUT_IMG}
     - zip -9 ${OUT_IMG}.zip ${OUT_IMG}
     - scp ${OUT_IMG}.zip upload@download.kiwix.org:/var/www/download.kiwix.org/plug/base/
   only:

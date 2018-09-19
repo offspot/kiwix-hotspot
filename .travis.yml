@@ -40,16 +40,16 @@ matrix:
     - python3 -m pip install -r requirements-macos.txt
     - python3 -m pip install https://github.com/pyinstaller/pyinstaller/archive/93eec04eb2fbfc714d2c3453e04fd126e6a86f52.zip
 
-    # Download pibox-installer-vexpress-boot
-    - wget http://download.kiwix.org/dev/pibox-installer-vexpress-boot.zip
-    - unzip pibox-installer-vexpress-boot.zip
+    # Download vexpress-boot
+    - wget http://download.kiwix.org/dev/vexpress-boot.zip
+    - unzip vexpress-boot.zip
 
     # Bundle QEMU
     - wget http://download.kiwix.org/dev/qemu-2.12.0_macOS.tar
     - tar xf qemu-2.12.0_macOS.tar
 
     # Run PyInstaller
-    - pyinstaller --log-level=DEBUG pibox-installer-macos.spec
+    - pyinstaller --log-level=DEBUG kiwix-hotspot-macos.spec
 
     # Sign application
     - security create-keychain -p mysecretpassword build.keychain
@@ -58,19 +58,19 @@ matrix:
     - security import pibox-installer.p12 -k build.keychain -P $MACOS_CERTIFICATE_PASSWORD -A
     - "security set-key-partition-list -S apple-tool:,apple: -s -k mysecretpassword build.keychain"
     - security find-identity -v
-    - "codesign -s \"Developer ID Application: Wikimedia CH (L7HWM3SP3L)\" dist/kiwix-plug_installer.app --deep"
+    - "codesign -s \"Developer ID Application: Wikimedia CH (L7HWM3SP3L)\" dist/kiwix-hotspot.app --deep"
 
     # Install and run create-dmg
     - npm install --global create-dmg@2.0.0 --python=python2.7
-    - create-dmg dist/kiwix-plug_installer.app || true
-    - mv kiwix-plug_installer-*.dmg kiwix-plug_installer-macos.dmg
+    - create-dmg dist/kiwix-hotspot.app || true
+    - mv kiwix-hotspot-*.dmg kiwix-hotspot-macos.dmg
 
     # CI build
-    - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ "a$PIBOX_RELEASE" = "a" ]; then scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa kiwix-plug_installer-macos.dmg nightlybot@download.kiwix.org:/var/www/tmp.kiwix.org/ci/kiwix-plug_installer-macos-$BRANCH.dmg; fi
+    - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ "a$PIBOX_RELEASE" = "a" ]; then scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa kiwix-hotspot-macos.dmg nightlybot@download.kiwix.org:/var/www/tmp.kiwix.org/ci/kiwix-hotspot-macos-$BRANCH.dmg; fi
     # nightly build (cron master)
-    - if [ "$TRAVIS_EVENT_TYPE" = "cron" ] && [ "a$PIBOX_RELEASE" = "a" ]; then SRCDIR=nightly/$(date +'%Y-%m-%d'); mkdir -p $SRCDIR; cp kiwix-plug_installer-macos.dmg $SRCDIR/; scp -r -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa $SRCDIR nightlybot@download.kiwix.org:/var/www/download.kiwix.org/nightly/; fi
+    - if [ "$TRAVIS_EVENT_TYPE" = "cron" ] && [ "a$PIBOX_RELEASE" = "a" ]; then SRCDIR=nightly/$(date +'%Y-%m-%d'); mkdir -p $SRCDIR; cp kiwix-hotspot-macos.dmg $SRCDIR/; scp -r -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa $SRCDIR nightlybot@download.kiwix.org:/var/www/download.kiwix.org/nightly/; fi
     # release build (tagged)
-    - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ $PIBOX_RELEASE ]; then mkdir -p releases/$PIBOX_RELEASE; cp kiwix-plug_installer-macos.dmg releases/$PIBOX_RELEASE/; scp -r -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases/$PIBOX_RELEASE nightlybot@download.kiwix.org:/var/www/download.kiwix.org/release/kiwix-plug_installer/; fi
+    - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ $PIBOX_RELEASE ]; then mkdir -p releases/$PIBOX_RELEASE; cp kiwix-hotspot-macos.dmg releases/$PIBOX_RELEASE/; scp -r -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases/$PIBOX_RELEASE nightlybot@download.kiwix.org:/var/www/download.kiwix.org/release/kiwix-hotspot/; fi
 
   - os: linux
     language: python
@@ -112,9 +112,9 @@ matrix:
     - sudo ldconfig
     - cd ..
 
-    # Download pibox-installer-vexpress-boot
-    - wget http://download.kiwix.org/dev/pibox-installer-vexpress-boot.zip
-    - unzip pibox-installer-vexpress-boot.zip
+    # Download vexpress-boot
+    - wget http://download.kiwix.org/dev/vexpress-boot.zip
+    - unzip vexpress-boot.zip
 
     # get static QEMU
     - wget http://download.kiwix.org/dev/qemu-2.12.0-linux-x86_64.tar.gz
@@ -126,17 +126,17 @@ matrix:
     # Install and run pyinstaller
     # note: we temporary use a fork that resolves pygobject issues
     - pip3 install https://github.com/thiolliere/pyinstaller/archive/develop.zip
-    - pyinstaller --log-level=DEBUG pibox-installer-linux.spec
-    - cat build/pibox-installer-linux/warnpibox-installer-linux.txt
+    - pyinstaller --log-level=DEBUG kiwix-hotspot-linux.spec
+    - cat build/kiwix-hotspot-linux/warnkiwix-hotspot-linux.txt
 
     # Archive
     - cd dist
-    - tar czvf kiwix-plug_installer-linux.tar.gz kiwix-plug_installer
+    - tar czvf kiwix-hotspot-linux.tar.gz kiwix-hotspot
     - cd ..
 
     # CI build
-    - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ "a$PIBOX_RELEASE" = "a" ]; then scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/kiwix-plug_installer-linux.tar.gz nightlybot@download.kiwix.org:/var/www/tmp.kiwix.org/ci/kiwix-plug_installer-linux-$BRANCH.tar.gz; fi
+    - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ "a$PIBOX_RELEASE" = "a" ]; then scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/kiwix-hotspot-linux.tar.gz nightlybot@download.kiwix.org:/var/www/tmp.kiwix.org/ci/kiwix-hotspot-linux-$BRANCH.tar.gz; fi
     # nightly build (cron master)
-    - if [ "$TRAVIS_EVENT_TYPE" = "cron" ] && [ "a$PIBOX_RELEASE" = "a" ]; then SRCDIR=nightly/$(date +'%Y-%m-%d'); mkdir -p $SRCDIR; cp dist/kiwix-plug_installer-linux.tar.gz $SRCDIR/; scp -r -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa $SRCDIR nightlybot@download.kiwix.org:/var/www/download.kiwix.org/nightly/; fi
+    - if [ "$TRAVIS_EVENT_TYPE" = "cron" ] && [ "a$PIBOX_RELEASE" = "a" ]; then SRCDIR=nightly/$(date +'%Y-%m-%d'); mkdir -p $SRCDIR; cp dist/kiwix-hotspot-linux.tar.gz $SRCDIR/; scp -r -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa $SRCDIR nightlybot@download.kiwix.org:/var/www/download.kiwix.org/nightly/; fi
     # release build (tagged)
-    - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ $PIBOX_RELEASE ]; then mkdir -p releases/$PIBOX_RELEASE; cp dist/kiwix-plug_installer-linux.tar.gz releases/$PIBOX_RELEASE/; scp -r -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases/$PIBOX_RELEASE nightlybot@download.kiwix.org:/var/www/download.kiwix.org/release/kiwix-plug_installer/; fi
+    - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ $PIBOX_RELEASE ]; then mkdir -p releases/$PIBOX_RELEASE; cp dist/kiwix-hotspot-linux.tar.gz releases/$PIBOX_RELEASE/; scp -r -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases/$PIBOX_RELEASE nightlybot@download.kiwix.org:/var/www/download.kiwix.org/release/kiwix-hotspot/; fi

@@ -241,7 +241,7 @@ if args.sdcard and not os.path.exists(args.sdcard):
     sys.exit(1)
 
 # display configuration and offer time to cancel
-print("Kiwix-plug installer configuration:")
+print("Kiwix Hotspot configuration:")
 keys = args.__dict__.keys()
 longest = max([len(key) for key in keys])
 for name in keys:

@@ -7,8 +7,8 @@ launch.sh
 .cache
 .pytest_cache
 $HOME
-pibox-installer-vexpress-boot.zip
-pibox-installer-vexpress-boot
+vexpress-boot.zip
+vexpress-boot
 pygi-aio-setup.exe
 pygi-aio-setup
 qemu-*

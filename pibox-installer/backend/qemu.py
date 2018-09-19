@@ -237,7 +237,7 @@ class _RunningInstance:
                 break
 
             self._logger.err(str(buf_states))
-            self._logger.err("internal error: please report this log to pibox-installer")
+            self._logger.err("internal error: please report this log")
             if tries > 3:
                 raise QemuException("wait signal timeout: %s" % signal)
             os.write(stdin_writer, b"pi\n")

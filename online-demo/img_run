@@ -31,10 +31,10 @@ fi
 
 if [ ! -f ~/zImage ] ; then
 	echo "kernel files not present, downloading"
-	wget -O ~/boot.zip http://download.kiwix.org/dev/pibox-installer-vexpress-boot.zip
+	wget -O ~/boot.zip http://download.kiwix.org/dev/vexpress-boot.zip
 	unzip boot.zip
-	mv ~/pibox-installer-vexpress-boot/* ~/.
-	rmdir ~/pibox-installer-vexpress-boot
+	mv ~/vexpress-boot/* ~/.
+	rmdir ~/vexpress-boot
 fi
 
 # max ram to use by QEMU guest (format: XM or XG)

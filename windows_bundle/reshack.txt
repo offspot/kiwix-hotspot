@@ -1,6 +1,6 @@
 [FILENAMES]
-Exe=    kiwix-plug_installer.exe
-SaveAs= kiwix-plug_installer.exe
+Exe=    kiwix-hotspot.exe
+SaveAs= kiwix-hotspot.exe
 Log=    CONSOLE
 [COMMANDS]
 -addoverwrite icon.ico, ICONGROUP,MAINICON,0
