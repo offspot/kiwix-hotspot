@@ -15,6 +15,14 @@
       <column type="gchararray"/>
     </columns>
   </object>
+  <object class="GtkListStore" id="sizes_tree_store">
+    <columns>
+      <!-- column-name size -->
+      <column type="gchararray"/>
+      <!-- column-name displayed size -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
   <object class="GtkFileFilter" id="logo_filter">
     <mime-types>
       <mime-type>image/png</mime-type>
@@ -1024,15 +1032,16 @@ In File mode the image is created at build path, you can choose the size
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkEntry" id="size_entry">
+                      <object class="GtkComboBox" id="size_combobox">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="model">sizes_tree_store</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
                         <property name="pack_type">end</property>
-                        <property name="position">0</property>
+                        <property name="position">1</property>
                       </packing>
                     </child>
                     <child>
@@ -1040,7 +1049,7 @@ In File mode the image is created at build path, you can choose the size
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Size of the image to build</property>
-                        <property name="label" translatable="yes">File size (GB) :</property>
+                        <property name="label" translatable="yes">File size:</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>

@@ -21,6 +21,7 @@ content_file = os.path.join(data_dir, 'contents.json')
 ansiblecube_path = os.path.join(data_dir, "ansiblecube")
 
 mirror = "http://download.kiwix.org"
+sdcard_sizes = (8, 16, 32, 64, 128, 200, 256)
 
 ideascube_languages = [
         ('am', u'አማርኛ'),

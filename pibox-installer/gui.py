@@ -268,6 +268,13 @@ class Application:
         self.component.language_combobox.pack_start(renderer, True)
         self.component.language_combobox.add_attribute(renderer, "text", 1)
 
+        # SD sizes for image size
+        for ngb in data.sdcard_sizes:
+            self.component.sizes_tree_store.append([str(ngb), "{} GB".format(ngb)])
+        renderer = Gtk.CellRendererText()
+        self.component.size_combobox.pack_start(renderer, True)
+        self.component.size_combobox.add_attribute(renderer, "text", 1)
+
         renderer = Gtk.CellRendererText()
         self.component.timezone_combobox.pack_start(renderer, True)
         self.component.timezone_combobox.add_attribute(renderer, "text", 0)
@@ -276,7 +283,8 @@ class Application:
         self.component.sd_card_combobox.connect("changed", lambda _: self.update_free_space())
         self.component.sd_card_refresh_button.connect("clicked", self.sd_card_refresh_button_clicked)
         self.component.output_stack.connect("notify::visible-child", lambda switch, state: self.update_free_space())
-        self.component.size_entry.connect("changed", lambda _: self.update_free_space())
+        self.component.size_combobox.connect("changed",
+                                             lambda _: self.update_free_space())
 
         types = [info["typ"] for info in sd_card_info.informations]
         self.component.sd_card_list_store = Gtk.ListStore(*types)
@@ -468,7 +476,7 @@ class Application:
         self.component.build_path_chooser.unselect_all()
 
         # size
-        self.component.size_entry.set_text('')
+        self.component.size_combobox.set_active(0)
 
         # content
         for key in ('kalite', 'wikifundi'):
@@ -811,7 +819,9 @@ class Application:
             except Exception:
                 size = None
             if size is not None:
-                self.component.size_entry.set_text(str(size))
+                sd_size = min(filter(lambda x: x >= size, data.sdcard_sizes),
+                              default=data.sdcard_sizes[-1])
+                self.component.size_combobox.set_active(data.sdcard_sizes.index(sd_size))
 
         # content
         if "content" in config and isinstance(config["content"], dict):
@@ -896,7 +906,7 @@ class Application:
             if button.get_active()]
 
         try:
-            size = int(self.component.size_entry.get_text()) * ONE_GB
+            size = data.sdcard_sizes[self.component.size_combobox.get_active()] * ONE_GB
         except Exception:
             size = None
 
@@ -1182,10 +1192,10 @@ class Application:
         validate_label(self.component.free_space_label1, condition)
         validate_label(self.component.free_space_label2, condition)
 
-        # size_entry should be at least base_image size
+        # size should be at least base_image size
         size = self.get_output_size()
         validate_label(
-            self.component.size_entry,
+            self.component.size_combobox,
             size >= get_content('pibox_base_image')['expanded_size'])
 
         for row in self.component.zim_list_store:
@@ -1205,7 +1215,7 @@ class Application:
                 size = int(self.component.sd_card_list_store[sd_card_id][get_size_index])
         else:
             try:
-                size = int(self.component.size_entry.get_text()) * ONE_GB
+                size = data.sdcard_sizes[self.component.size_combobox.get_active()] * ONE_GB
             except Exception:
                 size = -1
 
