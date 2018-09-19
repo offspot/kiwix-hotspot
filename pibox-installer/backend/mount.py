@@ -9,6 +9,7 @@ import time
 import string
 import random
 import tempfile
+import traceback
 
 from data import data_dir
 from backend.content import get_content
@@ -94,7 +95,7 @@ def install_imdisk(logger, force=False):
         ret, _ = subprocess_pretty_call([
             'rundll32.exe',
             'setupapi.dll,InstallHinfSection',
-            'DefaultInstall', '132',  '.\\imdisk.inf'], logger)
+            'DefaultInstall', '132', '.\\imdisk.inf'], logger)
     except Exception:
         ret = 1
     finally:
@@ -214,27 +215,40 @@ def test_mount_procedure(image_fpath, logger, thorough=False):
         install_imdisk(logger)  # make sure we have imdisk installed
 
     try:
+        logger.std(". mounting {}".format(image_fpath))
         mount_point, device = mount_data_partition(image_fpath, logger)
+        logger.std(". mounted {} on {}".format(device, mount_point))
 
         if thorough:
             # write a file on the partition
             value = random.randint(0, 1000)
+            logger.std(". writing `{}` inside {}".format(
+                value, os.path.join(mount_point, '.check-part')))
             with open(os.path.join(mount_point, '.check-part'), 'w') as f:
                 f.write(str(value))
+
             # unmount partitition
+            logger.std(". unmounting {}".format(mount_point))
             unmount_data_partition(mount_point, device, logger)
 
             # remount partition
+            logger.std(". remounting {}".format(image_fpath))
             mount_point, device = mount_data_partition(image_fpath, logger)
+            logger.std(". remounted {} on {}".format(device, mount_point))
 
             # read the file and check it's what we just wrote
             with open(os.path.join(mount_point, '.check-part'), 'r') as f:
-                return int(f.read()) == value
-    except Exception:
+                content = f.read()
+                logger.std(". read `{}` from file (was `{}`)".format(content, value))
+                return int(content) == value
+    except Exception as exp:
+        logger.err(exp)
+        logger.err(traceback.format_exc())
         return False
     finally:
         try:
             # unmount partition
+            logger.std("post-test unmounting {} and {}".format(mount_point, device))
             unmount_data_partition(mount_point, device, logger)
         except NameError:
             pass  # was not mounted
@@ -316,7 +330,7 @@ def format_data_partition(image_fpath, logger):
 
         try:
             subprocess_pretty_check_call(
-                [diskutil_exe, 'eraseVolume', 'exfat', 'data',  target_part],
+                [diskutil_exe, 'eraseVolume', 'exfat', 'data', target_part],
                 logger)
         finally:
             # ensure we release the loop device on mount failure
