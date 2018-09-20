@@ -43,10 +43,17 @@ install:
   - nuget install secure-file -ExcludeVersion
   - secure-file\tools\secure-file -decrypt pibox_installer_ci_rsa.appveyor_enc -secret %certificate_secret% -out pibox_installer_ci_rsa
 
+  - mkdir "C:\Program Files\7zextra"
+  - cd "C:\Program Files\7zextra"
+  - appveyor DownloadFile "http://download.kiwix.org/dev/7z920_extra.7z"
+  - 7z.exe x 7z920_extra.7z
+  - appveyor DownloadFile "http://download.kiwix.org/dev/7z1805-extra.7z"
+  - 7z.exe -y x 7z1805-extra.7z
+
+  - cd C:\projects\kiwix-hotspot\windows_bundle\
   - appveyor DownloadFile "http://download.kiwix.org/dev/resource_hacker.zip"
   - 7z x resource_hacker.zip
   - ResourceHacker.exe -help -log CON
-  - cd C:\projects\kiwix-hotspot\windows_bundle\
   - 7z.exe a -m0=Copy C:\projects\kiwix-hotspot\windows_bundle\kiwix-hotspot.7z C:\projects\kiwix-hotspot\presets\*
   - copy ..\kiwix-hotspot-logo.ico icon.ico
   - copy /b "C:\Program Files\7zextra\7zS.sfx" + sfxconfig.txt + kiwix-hotspot.7z kiwix-hotspot.exe
