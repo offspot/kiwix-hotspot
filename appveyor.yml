@@ -47,8 +47,9 @@ install:
   - 7z x resource_hacker.zip
   - ResourceHacker.exe -help -log CON
   - cd C:\projects\kiwix-hotspot\windows_bundle\
+  - 7z.exe a -m0=Copy C:\projects\kiwix-hotspot\windows_bundle\kiwix-hotspot.7z C:\projects\kiwix-hotspot\presets\*
   - copy ..\kiwix-hotspot-logo.ico icon.ico
-  - copy /b "C:\Program Files\7zextra\7zS.sfx" + sfxconfig.txt kiwix-hotspot.exe
+  - copy /b "C:\Program Files\7zextra\7zS.sfx" + sfxconfig.txt + kiwix-hotspot.7z kiwix-hotspot.exe
   - ResourceHacker.exe -open .\resources.rc -save .\resources.res -action compile -log CON
   - ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res resources.res -log CON
   - ResourceHacker.exe -save kiwix-hotspot.exe -action addskip -res icon.ico -mask ICONGROUP,MAINICON, -log CON
