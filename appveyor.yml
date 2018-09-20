@@ -12,7 +12,6 @@ environment:
 
 platform:
   - x64
-  - x86
 
 install:
   - set PATH=C:\Program Files (x86)\Windows Kits\10\bin\%platform%\;%PATH%
@@ -43,6 +42,11 @@ install:
   - openssl enc -d -aes-256-cbc -md sha256 -pass pass:%win_certificate_secret% -in kiwix.p12.enc -out kiwix.pfx
   - nuget install secure-file -ExcludeVersion
   - secure-file\tools\secure-file -decrypt pibox_installer_ci_rsa.appveyor_enc -secret %certificate_secret% -out pibox_installer_ci_rsa
+
+  - appveyor DownloadFile "http://download.kiwix.org/dev/resource_hacker.zip"
+  - 7z x resource_hacker.zip
+  - ResourceHacker.exe -help -log CON
+  - exitexit
 
   # Download vexpress-boot
   - appveyor DownloadFile "http://download.kiwix.org/dev/vexpress-boot.zip"
