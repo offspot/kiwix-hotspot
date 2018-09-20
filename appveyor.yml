@@ -54,13 +54,13 @@ install:
   #- appveyor DownloadFile "http://download.kiwix.org/dev/resource_hacker.zip"
   #- 7z x resource_hacker.zip
   - choco install reshack
-  - C:\Program Files (x86)\Resource Hacker\ResourceHacker.exe -help -log CON
+  - "C:\Program Files (x86)\Resource Hacker\ResourceHacker.exe" -help -log CON
   - 7z.exe a -m0=Copy C:\projects\kiwix-hotspot\windows_bundle\kiwix-hotspot.7z C:\projects\kiwix-hotspot\presets\*
   - copy ..\kiwix-hotspot-logo.ico icon.ico
   - copy /b "C:\Program Files\7zextra\7zS.sfx" + sfxconfig.txt + kiwix-hotspot.7z kiwix-hotspot.exe
-  - C:\Program Files (x86)\Resource Hacker\ResourceHacker.exe -open .\resources.rc -save .\resources.res -action compile -log CON
-  - C:\Program Files (x86)\Resource Hacker\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res resources.res -log CON
-  - C:\Program Files (x86)\Resource Hacker\ResourceHacker.exe -save kiwix-hotspot.exe -action addskip -res icon.ico -mask ICONGROUP,MAINICON, -log CON
+  - "C:\Program Files (x86)\Resource Hacker\ResourceHacker.exe" -open .\resources.rc -save .\resources.res -action compile -log CON
+  - "C:\Program Files (x86)\Resource Hacker\ResourceHacker.exe" -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res resources.res -log CON
+  - "C:\Program Files (x86)\Resource Hacker\ResourceHacker.exe" -save kiwix-hotspot.exe -action addskip -res icon.ico -mask ICONGROUP,MAINICON, -log CON
   - cd C:\projects\kiwix-hotspot\dist\kiwix-hotspot
 
   # # Download vexpress-boot
