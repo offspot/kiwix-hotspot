@@ -130,16 +130,16 @@ install:
   - copy /b "C:\Program Files\7zextra\7zS.sfx" + sfxconfig.txt + kiwix-hotspot.7z kiwix-hotspot.exe
   # change icon and add version info to exe
   - copy ..\kiwix-hotspot-logo.ico icon.ico
-  - cmd: C:\ProgramData\chocolatey\lib\reshack.portable\tools\ResourceHacker.exe -open resources.rc -save resources.res -action compile -log rh.txt
-  - cmd: timeout 10
-  - cmd: type rh.txt
+  - C:\ProgramData\chocolatey\lib\reshack.portable\tools\ResourceHacker.exe -open resources.rc -save resources.res -action compile -log rh.txt
+  - timeout 10
+  - type rh.txt
   # not changing version info due to a bug in Appveyor/ResourceHacker
-  - cmd: C:\ProgramData\chocolatey\lib\reshack.portable\tools\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addskip -res resources.res -mask VERSIONINFO,1, -log rh.txt
-  - cmd: timeout 20
-  - cmd: type rh.txt
-  - cmd: C:\ProgramData\chocolatey\lib\reshack.portable\tools\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res icon.ico -mask ICONGROUP,MAINICON, -log rh.txt
-  - cmd: timeout 10
-  - cmd: type rh.txt
+  - C:\ProgramData\chocolatey\lib\reshack.portable\tools\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res resources.res -mask VERSIONINFO,, -log rh.txt
+  - timeout 20
+  - type rh.txt
+  - C:\ProgramData\chocolatey\lib\reshack.portable\tools\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res icon.ico -mask ICONGROUP,MAINICON, -log rh.txt
+  - timeout 10
+  - type rh.txt
   - cd C:\projects\kiwix-hotspot\dist\kiwix-hotspot
 
   # sign the build
