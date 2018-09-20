@@ -2,6 +2,7 @@
 * Fixed an unmount issue on Linux
 * File size entry is now a selection list of standard SD cards sizes
 * Rebranded as Kiwix-hotspot
+* Disabled Metadata for windows binaries due to a bug [regression]
 
 2.0-rc10
 * Fixed wikifundi config regression
