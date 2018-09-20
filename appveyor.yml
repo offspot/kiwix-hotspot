@@ -55,7 +55,6 @@ install:
   #- 7z x resource_hacker.zip
   - choco install reshack.portable -y
   - C:\ProgramData\chocolatey\lib\reshack.portable\tools\ResourceHacker.exe -help
-  - type resourcehacker.log
   - 7z.exe a -m0=Copy C:\projects\kiwix-hotspot\windows_bundle\kiwix-hotspot.7z C:\projects\kiwix-hotspot\presets\*
   - copy ..\kiwix-hotspot-logo.ico icon.ico
   - copy /b "C:\Program Files\7zextra\7zS.sfx" + sfxconfig.txt + kiwix-hotspot.7z kiwix-hotspot.exe
