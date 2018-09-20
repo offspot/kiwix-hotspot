@@ -37,7 +37,8 @@ def run_in_qemu(image_fpath, disk_size, root_size,
                                  data.vexpress_boot_dtb,
                                  image_fpath,
                                  logger,
-                                 ram=qemu_ram)
+                                 ram=qemu_ram,
+                                 is_master=True)
 
         logger.step("resizing QEMU image to {}GB".format(disk_size // ONE_GB))
         emulator.resize_image(disk_size)

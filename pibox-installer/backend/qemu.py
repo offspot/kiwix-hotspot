@@ -68,17 +68,19 @@ class Emulator:
     _kernel = None
     _dtb = None
     _logger = None
+    _is_master = False
 
     # login=pi
     # password=raspberry
     # prompt end by ":~$ "
     # sudo doesn't require password
-    def __init__(self, kernel, dtb, image, logger, ram):
+    def __init__(self, kernel, dtb, image, logger, ram, is_master=False):
         self._kernel = kernel
         self._dtb = dtb
         self._image = image
         self._logger = logger
         self._binary = qemu_system_arm_exe_path
+        self._is_master = is_master
         self._set_ram(ram.lower())
 
     def _set_ram(self, requested_ram):
@@ -226,40 +228,58 @@ class _RunningInstance:
             cancel_register.register(self._qemu.pid)
 
         self._wait_signal(stdout_reader, stdout_writer, b"login: ", timeout)
-        os.write(stdin_writer, b"pi\n")
 
+        # start SSH daemon
+        if self._emulation._is_master:
+            self._logger.std("Starting SSH daemon manually")
+            os.write(stdin_writer, b"pi\n")
+
+            tries = 0
+            while True:
+                signal = b"Password: "
+                buf_states = self._wait_signal(stdout_reader, stdout_writer, signal, timeout, True)
+
+                if not buf_states:
+                    break
+
+                self._logger.err(str(buf_states))
+                self._logger.err("internal error: please report this log")
+                if tries > 3:
+                    raise QemuException("wait signal timeout: %s" % signal)
+                os.write(stdin_writer, b"pi\n")
+                tries += 1
+
+            os.write(stdin_writer, b"raspberry\n")
+            self._wait_signal(stdout_reader, stdout_writer, b":~$ ", timeout)
+            # TODO: This is a ugly hack. But writing all at once doesn't work
+            os.write(stdin_writer, b"sudo systemctl")
+            self._wait_signal(stdout_reader, stdout_writer, b"sudo systemctl", timeout)
+            os.write(stdin_writer, b" start ssh;")
+            self._wait_signal(stdout_reader, stdout_writer, b" start ssh;", timeout)
+            os.write(stdin_writer, b" exit\n")
+            self._wait_signal(stdout_reader, stdout_writer, b"login: ", timeout)
+
+        time.sleep(20)
+
+        # connect to SSH
         tries = 0
         while True:
-            signal = b"Password: "
-            buf_states = self._wait_signal(stdout_reader, stdout_writer, signal, timeout, True)
-
-            if not buf_states:
+            self._client = paramiko.SSHClient()
+            self._client.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())
+            try:
+                self._client.connect("localhost", port=ssh_port,
+                                     username="pi", password="raspberry",
+                                     allow_agent=False, look_for_keys=False)
+            except Exception as exp:
+                self._logger.err(exp)
+                tries += 1
+                if tries > 3:
+                    raise exp
+                time.sleep(5 * tries)
+                continue
+            else:
+                self._logger.std("Successfuly connected to Qemu over SSH")
                 break
-
-            self._logger.err(str(buf_states))
-            self._logger.err("internal error: please report this log")
-            if tries > 3:
-                raise QemuException("wait signal timeout: %s" % signal)
-            os.write(stdin_writer, b"pi\n")
-            tries += 1
-
-        os.write(stdin_writer, b"raspberry\n")
-        self._wait_signal(stdout_reader, stdout_writer, b":~$ ", timeout)
-        # TODO: This is a ugly hack. But writing all at once doesn't work
-        os.write(stdin_writer, b"sudo systemctl")
-        self._wait_signal(stdout_reader, stdout_writer, b"sudo systemctl", timeout)
-        os.write(stdin_writer, b" start ssh;")
-        self._wait_signal(stdout_reader, stdout_writer, b" start ssh;", timeout)
-        os.write(stdin_writer, b" exit\n")
-        self._wait_signal(stdout_reader, stdout_writer, b"login: ", timeout)
-
-        time.sleep(10);
-
-        self._client = paramiko.SSHClient()
-        self._client.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())
-        self._client.connect("localhost", port=ssh_port,
-                             username="pi", password="raspberry",
-                             allow_agent=False, look_for_keys=False)
 
     def _shutdown(self):
         self.exec_cmd("sudo sync")
