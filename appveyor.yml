@@ -134,12 +134,14 @@ install:
   - timeout 10
   - type rh.txt
   # not changing version info due to a bug in Appveyor/ResourceHacker
-  - C:\ProgramData\chocolatey\lib\reshack.portable\tools\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res resources.res -mask VERSIONINFO,1,2057 -log rh.txt
+  - C:\ProgramData\chocolatey\lib\reshack.portable\tools\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot2.exe -action addoverwrite -res resources.res -log rh.txt
   - timeout 20
   - type rh.txt
-  - C:\ProgramData\chocolatey\lib\reshack.portable\tools\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res icon.ico -mask ICONGROUP,MAINICON, -log rh.txt
+  - C:\ProgramData\chocolatey\lib\reshack.portable\tools\ResourceHacker.exe -open kiwix-hotspot2.exe -save kiwix-hotspot3.exe -action addoverwrite -res icon.ico -mask ICONGROUP,MAINICON, -log rh.txt
   - timeout 10
   - type rh.txt
+  - del kiwix-hotspot.exe
+  - move kiwix-hotspot3.exe kiwix-hotspot.exe
   - cd C:\projects\kiwix-hotspot\dist\kiwix-hotspot
 
   # sign the build
