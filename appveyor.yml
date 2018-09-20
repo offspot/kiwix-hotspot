@@ -42,9 +42,7 @@ install:
   - cmd: choco install openssl.light
   - openssl enc -d -aes-256-cbc -md sha256 -pass pass:%win_certificate_secret% -in kiwix.p12.enc -out kiwix.pfx
   - nuget install secure-file -ExcludeVersion
-  - nuget install ResourceHacker.CommandLineTool -ExcludeVersion
   - secure-file\tools\secure-file -decrypt pibox_installer_ci_rsa.appveyor_enc -secret %certificate_secret% -out pibox_installer_ci_rsa
-  - ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -help
 
   # Download vexpress-boot
   - appveyor DownloadFile "http://download.kiwix.org/dev/vexpress-boot.zip"
@@ -126,23 +124,15 @@ install:
 
   # download tools
   - cd C:\projects\kiwix-hotspot\windows_bundle\
-  #- appveyor DownloadFile "http://download.kiwix.org/dev/GoRC.exe" -FileName "GoRC.exe"
   - if %platform%==x64 appveyor DownloadFile "http://download.kiwix.org/dev/rcedit-x64.exe" -FileName "rcedit.exe"
   - if %platform%==x86 appveyor DownloadFile "http://download.kiwix.org/dev/rcedit-x86.exe" -FileName "rcedit.exe"
   # create SFX exe from 7z archive
   - copy /b "C:\Program Files\7zextra\7zS.sfx" + sfxconfig.txt kiwix-hotspot.exe
-  # change icon and add version info to exe
-  #- GoRC.exe /fo resources.res resources.rc
+  # change icon
   - copy ..\kiwix-hotspot-logo.ico icon.ico
-  - rcedit "kiwix-hotspot.exe" --set-version-string "FileDescription" "Kiwix Hotspot"
   - rcedit "kiwix-hotspot.exe" --set-icon icon.ico
-  # add 7z content again
+  # add 7z content
   - copy /b kiwix-hotspot.exe + sfxconfig.txt + kiwix-hotspot.7z kiwix-hotspot.exe
-  # - rcedit "kiwix-hotspot.exe" --set-requested-execution-level "requireAdministrator"
-  #- c:\projects\kiwix-hotspot\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -script reshack.txt
-  # - c:\projects\kiwix-hotspot\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -open resources.rc -save resources.res -action compile
-  # - c:\projects\kiwix-hotspot\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res resources.res
-  # - c:\projects\kiwix-hotspot\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addskip -res icon.ico -mask ICONGROUP,MAINICON,
   - cd C:\projects\kiwix-hotspot\dist\kiwix-hotspot
 
   # sign the build
