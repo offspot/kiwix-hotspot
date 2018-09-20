@@ -126,14 +126,15 @@ install:
 
   # download tools
   - cd C:\projects\kiwix-hotspot\windows_bundle\
-  - appveyor DownloadFile "http://download.kiwix.org/dev/GoRC.exe" -FileName "GoRC.exe"
   # create SFX exe from 7z archive
   - copy /b "C:\Program Files\7zextra\7zS.sfx" + sfxconfig.txt + kiwix-hotspot.7z kiwix-hotspot.exe
   # change icon and add version info to exe
-  - GoRC.exe /fo resources.res resources.rc
   - copy ..\kiwix-hotspot-logo.ico icon.ico
-  - c:\projects\kiwix-hotspot\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res resources.res -mask VERSIONINFO,1, -log CONSOLE
+  - c:\projects\kiwix-hotspot\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -open resources.rc -save resources.res -action compile -log CONSOLE
+  # not changing version info due to a bug in Appveyor/ResourceHacker
+  #- c:\projects\kiwix-hotspot\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res resources.res -mask VERSIONINFO,1, -log CONSOLE
   - c:\projects\kiwix-hotspot\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res icon.ico -mask ICONGROUP,MAINICON, -log CONSOLE
+  - timeout 5
   - cd C:\projects\kiwix-hotspot\dist\kiwix-hotspot
 
   # sign the build
