@@ -130,7 +130,7 @@ install:
   - if %platform%==x64 appveyor DownloadFile "http://download.kiwix.org/dev/rcedit-x64.exe" -FileName "rcedit.exe"
   - if %platform%==x86 appveyor DownloadFile "http://download.kiwix.org/dev/rcedit-x86.exe" -FileName "rcedit.exe"
   # create SFX exe from 7z archive
-  - copy /b "C:\Program Files\7zextra\7zS.sfx" + sfxconfig.txt + kiwix-hotspot.exe
+  - copy /b "C:\Program Files\7zextra\7zS.sfx" + sfxconfig.txt kiwix-hotspot.exe
   # change icon and add version info to exe
   #- GoRC.exe /fo resources.res resources.rc
   - copy ..\kiwix-hotspot-logo.ico icon.ico
