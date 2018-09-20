@@ -136,7 +136,7 @@ install:
   - copy ..\kiwix-hotspot-logo.ico icon.ico
   - rcedit "kiwix-hotspot.exe" --set-version-string "FileDescription" "Kiwix Hotspot"
   - rcedit "kiwix-hotspot.exe" --set-icon icon.ico
-  - rcedit "kiwix-hotspot.exe" --set-requested-execution-level "requireAdministrator"
+  # - rcedit "kiwix-hotspot.exe" --set-requested-execution-level "requireAdministrator"
   #- c:\projects\kiwix-hotspot\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -script reshack.txt
   # - c:\projects\kiwix-hotspot\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -open resources.rc -save resources.res -action compile
   # - c:\projects\kiwix-hotspot\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res resources.res
