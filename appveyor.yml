@@ -120,13 +120,13 @@ install:
   - if %platform%==x86 type build\kiwix-hotspot-win32\warnkiwix-hotspot-win32.txt
   - if %platform%==x64 type build\kiwix-hotspot-win64\warnkiwix-hotspot-win64.txt
 
-  # Deploy
+  # Create an archive of the files
   - cd C:\projects\kiwix-hotspot\dist\kiwix-hotspot
   - 7z.exe a -m0=Copy C:\projects\kiwix-hotspot\windows_bundle\kiwix-hotspot.7z *
 
   # download tools
   - cd C:\projects\kiwix-hotspot\windows_bundle\
-  - appveyor DownloadFile "http://download.kiwix.org/dev/GoRC.exe" -FileName "GoRC.exe"
+  #- appveyor DownloadFile "http://download.kiwix.org/dev/GoRC.exe" -FileName "GoRC.exe"
   - if %platform%==x64 appveyor DownloadFile "http://download.kiwix.org/dev/rcedit-x64.exe" -FileName "rcedit.exe"
   - if %platform%==x86 appveyor DownloadFile "http://download.kiwix.org/dev/rcedit-x86.exe" -FileName "rcedit.exe"
   # create SFX exe from 7z archive
@@ -136,6 +136,8 @@ install:
   - copy ..\kiwix-hotspot-logo.ico icon.ico
   - rcedit "kiwix-hotspot.exe" --set-version-string "FileDescription" "Kiwix Hotspot"
   - rcedit "kiwix-hotspot.exe" --set-icon icon.ico
+  # add 7z content again
+  - copy /b kiwix-hotspot.exe + kiwix-hotspot.7z kiwix-hotspot.exe
   # - rcedit "kiwix-hotspot.exe" --set-requested-execution-level "requireAdministrator"
   #- c:\projects\kiwix-hotspot\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -script reshack.txt
   # - c:\projects\kiwix-hotspot\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -open resources.rc -save resources.res -action compile
