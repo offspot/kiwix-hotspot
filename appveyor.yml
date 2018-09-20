@@ -42,9 +42,9 @@ install:
   - cmd: choco install openssl.light
   - openssl enc -d -aes-256-cbc -md sha256 -pass pass:%win_certificate_secret% -in kiwix.p12.enc -out kiwix.pfx
   - nuget install secure-file -ExcludeVersion
-  - nuget install ResourceHacker.CommandLineTool -ExcludeVersion
+  - choco install reshack.portable -y
   - secure-file\tools\secure-file -decrypt pibox_installer_ci_rsa.appveyor_enc -secret %certificate_secret% -out pibox_installer_ci_rsa
-  - ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -help
+  - C:\ProgramData\chocolatey\lib\reshack.portable\tools\ResourceHacker.exe -help
 
   # Download vexpress-boot
   - appveyor DownloadFile "http://download.kiwix.org/dev/vexpress-boot.zip"
@@ -130,11 +130,11 @@ install:
   - copy /b "C:\Program Files\7zextra\7zS.sfx" + sfxconfig.txt + kiwix-hotspot.7z kiwix-hotspot.exe
   # change icon and add version info to exe
   - copy ..\kiwix-hotspot-logo.ico icon.ico
-  - c:\projects\kiwix-hotspot\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -open resources.rc -save resources.res -action compile -log CONSOLE
+  - C:\ProgramData\chocolatey\lib\reshack.portable\tools\ResourceHacker.exe -open resources.rc -save resources.res -action compile -log CONSOLE
   # not changing version info due to a bug in Appveyor/ResourceHacker
-  - c:\projects\kiwix-hotspot\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res resources.res -mask VERSIONINFO,1, -log CONSOLE
+  - C:\ProgramData\chocolatey\lib\reshack.portable\tools\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res resources.res -mask VERSIONINFO,1, -log CONSOLE
   - timeout 10
-  - c:\projects\kiwix-hotspot\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res icon.ico -mask ICONGROUP,MAINICON, -log CONSOLE
+  - C:\ProgramData\chocolatey\lib\reshack.portable\tools\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res icon.ico -mask ICONGROUP,MAINICON, -log CONSOLE
   - timeout 5
   - cd C:\projects\kiwix-hotspot\dist\kiwix-hotspot
 
