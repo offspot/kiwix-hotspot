@@ -2,7 +2,7 @@ version: 1.0.{build}
 
 clone_folder: c:\projects\kiwix-hotspot
 
-image: Visual Studio 2015
+image: Visual Studio 2017
 
 build: off
 
@@ -132,7 +132,8 @@ install:
   - copy ..\kiwix-hotspot-logo.ico icon.ico
   - c:\projects\kiwix-hotspot\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -open resources.rc -save resources.res -action compile -log CONSOLE
   # not changing version info due to a bug in Appveyor/ResourceHacker
-  #- c:\projects\kiwix-hotspot\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res resources.res -mask VERSIONINFO,1, -log CONSOLE
+  - c:\projects\kiwix-hotspot\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res resources.res -mask VERSIONINFO,1, -log CONSOLE
+  - timeout 10
   - c:\projects\kiwix-hotspot\ResourceHacker.CommandLineTool\tools\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res icon.ico -mask ICONGROUP,MAINICON, -log CONSOLE
   - timeout 5
   - cd C:\projects\kiwix-hotspot\dist\kiwix-hotspot
