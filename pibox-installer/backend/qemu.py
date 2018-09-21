@@ -1,21 +1,26 @@
+# -*- coding: utf-8 -*-
+# vim: ai ts=4 sts=4 et sw=4 nu
+
 import os
+import re
+import sys
+import time
+import socket
+import psutil
+import random
+import posixpath
+import threading
 import subprocess
 import collections
-import sys
-import socket
-import paramiko
-import re
-import random
-import time
-import threading
-import posixpath
-import psutil
 import multiprocessing
-from util import ONE_GiB, ONE_MiB, human_readable_size
+
+import paramiko
+
 from .util import startup_info_args
 from .util import subprocess_pretty_check_call
+from util import ONE_GiB, ONE_MiB, human_readable_size
 
-timeout = 10*60
+timeout = 10 * 60
 
 if os.name == "nt":
     qemu_system_arm_exe = "qemu\qemu-system-arm.exe"
@@ -35,25 +40,31 @@ if qemu_cpu > 4:
     qemu_cpu = 4
 host_ram = int(psutil.virtual_memory().total)
 
+
 class QemuException(Exception):
     def __init__(self, msg):
         Exception(self, msg)
 
+
 def generate_random_name():
     r = ""
-    for _ in range(1,32):
+    for _ in range(1, 32):
         r += random.choice("0123456789ABCDEF")
     return r
 
+
 def get_free_port():
     with socket.socket() as s:
-        s.bind(("",0))
+        s.bind(("", 0))
         port = s.getsockname()[1]
 
     return port
 
+
 def get_qemu_image_size(image_fpath, logger):
-    output = subprocess_pretty_check_call([qemu_img_exe_path, "info", "-f", "raw", image_fpath], logger)
+    output = subprocess_pretty_check_call(
+        [qemu_img_exe_path, "info", "-f", "raw", image_fpath], logger
+    )
     matches = []
     for line_number, line in enumerate(output):
         if line_number == 2:
@@ -62,6 +73,7 @@ def get_qemu_image_size(image_fpath, logger):
     if len(matches) != 1:
         raise QemuException("cannot get image %s size from qemu-img info" % image_fpath)
     return int(matches[0])
+
 
 class Emulator:
     _image = None
@@ -84,23 +96,23 @@ class Emulator:
         self._set_ram(ram.lower())
 
     def _set_ram(self, requested_ram):
-        ''' applies requested RAM to qemu if it's available otherwise less '''
+        """ applies requested RAM to qemu if it's available otherwise less """
 
         # less than a GB is very short
         if host_ram / ONE_GiB <= 1.0:
-            self._ram = '256m'
+            self._ram = "256m"
             return
 
         # at most, use RAM minus 512m
         max_ram = int(host_ram - ONE_GiB / 2)
 
         # parse specified ram in Mega or Giga
-        if re.match(r'\d+[mg]$', requested_ram):
+        if re.match(r"\d+[mg]$", requested_ram):
             ram_amount, ram_unit = int(requested_ram[:-1]), requested_ram[-1]
         else:
             # no unit, assuming M
-            ram_amount, ram_unit = int(requested_ram), 'm'
-        if ram_unit == 'g':
+            ram_amount, ram_unit = int(requested_ram), "m"
+        if ram_unit == "g":
             ram_amount = ram_amount * (ONE_GiB)
 
         # use requested if it doesn't exceed max_ram
@@ -111,8 +123,7 @@ class Emulator:
             ram = 30 * ONE_GiB
 
         self._ram = "{ram}M".format(ram=int(ram / ONE_MiB))
-        self._logger.std(" using {ram} RAM"
-                         .format(ram=human_readable_size(ram)))
+        self._logger.std(" using {ram} RAM".format(ram=human_readable_size(ram)))
 
     def run(self, cancel_event):
         return _RunningInstance(self, self._logger, cancel_event)
@@ -121,7 +132,11 @@ class Emulator:
         return get_qemu_image_size(self._image, self._logger)
 
     def resize_image(self, size):
-        subprocess_pretty_check_call([qemu_img_exe_path, "resize", "-f", "raw", self._image, "{}".format(size)], self._logger)
+        subprocess_pretty_check_call(
+            [qemu_img_exe_path, "resize", "-f", "raw", self._image, "{}".format(size)],
+            self._logger,
+        )
+
 
 class _RunningInstance:
     _emulation = None
@@ -138,7 +153,7 @@ class _RunningInstance:
     def __enter__(self):
         try:
             self._boot()
-        except:
+        except Exception:
             if self._qemu:
                 self._qemu.kill()
             raise
@@ -147,12 +162,14 @@ class _RunningInstance:
     def __exit__(self, exc_type, exc_value, traceback):
         try:
             self._shutdown()
-        except:
+        except Exception:
             if self._qemu:
                 self._qemu.kill()
             raise
 
-    def _wait_signal(self, reader_fd, writer_fd, signal, timeout, return_buf_states_on_timeout=False):
+    def _wait_signal(
+        self, reader_fd, writer_fd, signal, timeout, return_buf_states_on_timeout=False
+    ):
         timeout_event = threading.Event()
 
         if return_buf_states_on_timeout:
@@ -174,7 +191,7 @@ class _RunningInstance:
 
             try:
                 decoded_buf = buf.decode("utf-8")
-            except:
+            except Exception:
                 pass
             else:
                 self._logger.raw_std(decoded_buf)
@@ -202,29 +219,39 @@ class _RunningInstance:
         with self._cancel_event.lock() as cancel_register:
             command = [
                 self._emulation._binary,
-                "-m", self._emulation._ram,
-                "-M", "vexpress-a15",
-                "-kernel", self._emulation._kernel,
-                "-dtb", self._emulation._dtb,
-                "-append", "root=/dev/mmcblk0p2 console=ttyAMA0 console=tty",
-                "-serial", "stdio",
+                "-m",
+                self._emulation._ram,
+                "-M",
+                "vexpress-a15",
+                "-kernel",
+                self._emulation._kernel,
+                "-dtb",
+                self._emulation._dtb,
+                "-append",
+                "root=/dev/mmcblk0p2 console=ttyAMA0 console=tty",
+                "-serial",
+                "stdio",
                 "-no-acpi",
-                "-drive", "format=raw,if=sd,file={}"
-                .format(self._emulation._image),
-                "-display", "none",
+                "-drive",
+                "format=raw,if=sd,file={}".format(self._emulation._image),
+                "-display",
+                "none",
                 "-no-reboot",
-                "-netdev", "user,id=eth1,hostfwd=tcp::{}-:22".format(ssh_port),
+                "-netdev",
+                "user,id=eth1,hostfwd=tcp::{}-:22".format(ssh_port),
                 "-device",
                 "virtio-net-device,netdev=eth1",
             ]
             if qemu_cpu > 1:
-                command += ["-smp", str(qemu_cpu),
-                            "--accel", "tcg,thread=multi"]
+                command += ["-smp", str(qemu_cpu), "--accel", "tcg,thread=multi"]
             self._logger.std("--\n{}\n--".format(" ".join(command)))
             self._qemu = subprocess.Popen(
                 command,
-                stdin=stdin_reader, stdout=stdout_writer,
-                stderr=subprocess.STDOUT, **startup_info_args())
+                stdin=stdin_reader,
+                stdout=stdout_writer,
+                stderr=subprocess.STDOUT,
+                **startup_info_args()
+            )
             cancel_register.register(self._qemu.pid)
 
         self._wait_signal(stdout_reader, stdout_writer, b"login: ", timeout)
@@ -237,7 +264,9 @@ class _RunningInstance:
             tries = 0
             while True:
                 signal = b"Password: "
-                buf_states = self._wait_signal(stdout_reader, stdout_writer, signal, timeout, True)
+                buf_states = self._wait_signal(
+                    stdout_reader, stdout_writer, signal, timeout, True
+                )
 
                 if not buf_states:
                     break
@@ -267,9 +296,14 @@ class _RunningInstance:
             self._client = paramiko.SSHClient()
             self._client.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())
             try:
-                self._client.connect("localhost", port=ssh_port,
-                                     username="pi", password="raspberry",
-                                     allow_agent=False, look_for_keys=False)
+                self._client.connect(
+                    "localhost",
+                    port=ssh_port,
+                    username="pi",
+                    password="raspberry",
+                    allow_agent=False,
+                    look_for_keys=False,
+                )
             except Exception as exp:
                 self._logger.err(exp)
                 tries += 1
@@ -301,16 +335,20 @@ class _RunningInstance:
         sftp_client = self._client.open_sftp()
         tmpremotepath = "/tmp/" + generate_random_name()
         sftp_client.mkdir(tmpremotepath)
-        self._logger.std("copy local dir {} to tmp dir {}".format(localpath, tmpremotepath))
+        self._logger.std(
+            "copy local dir {} to tmp dir {}".format(localpath, tmpremotepath)
+        )
 
         old_cwd = os.getcwd()
         os.chdir(localpath)
         for localdirpath, dirnames, filenames in os.walk("."):
-            remotedirpath = ''
+            remotedirpath = ""
             remotedirpath_unformatted = localdirpath
 
-            while remotedirpath_unformatted is not '':
-                remotedirpath_unformatted, tail = os.path.split(remotedirpath_unformatted)
+            while remotedirpath_unformatted is not "":
+                remotedirpath_unformatted, tail = os.path.split(
+                    remotedirpath_unformatted
+                )
                 remotedirpath = posixpath.join(tail, remotedirpath)
 
             for dirname in dirnames:
@@ -319,10 +357,15 @@ class _RunningInstance:
                 sftp_client.mkdir(dir_remote_path)
 
             for filename in filenames:
-                file_local_path = os.path.normpath(
-                    os.path.join(localdirpath, filename))
-                file_remote_path = posixpath.join(tmpremotepath, remotedirpath, filename)
-                self._logger.std("copy local file {} to tmp file {}".format(file_local_path, file_remote_path))
+                file_local_path = os.path.normpath(os.path.join(localdirpath, filename))
+                file_remote_path = posixpath.join(
+                    tmpremotepath, remotedirpath, filename
+                )
+                self._logger.std(
+                    "copy local file {} to tmp file {}".format(
+                        file_local_path, file_remote_path
+                    )
+                )
                 sftp_client.put(file_local_path, file_remote_path)
         sftp_client.close()
         os.chdir(old_cwd)
@@ -335,12 +378,21 @@ class _RunningInstance:
         # then we move to final path with sudo call
         sftp_client = self._client.open_sftp()
         tmpremotepath = "/tmp/" + generate_random_name()
-        self._logger.std("copy local file {} to tmp file {}".format(localpath, tmpremotepath))
+        self._logger.std(
+            "copy local file {} to tmp file {}".format(localpath, tmpremotepath)
+        )
         sftp_client.put(localpath, tmpremotepath)
         sftp_client.close()
         self.exec_cmd("sudo mv -T {} {}".format(tmpremotepath, remotepath))
 
-    def exec_cmd(self, command, displayed_command=None, capture_stdout=False, check=True, show_command=True):
+    def exec_cmd(
+        self,
+        command,
+        displayed_command=None,
+        capture_stdout=False,
+        check=True,
+        show_command=True,
+    ):
         if capture_stdout:
             stdout_buffer = ""
 
@@ -360,9 +412,13 @@ class _RunningInstance:
         for line in stderr.readlines():
             self._logger.err("STDERR: " + line.replace("\n", ""))
 
-        exit_status = stdout.channel.recv_exit_status();
+        exit_status = stdout.channel.recv_exit_status()
         if exit_status != 0 and check:
-            raise QemuException("ssh command failed with status {}. cmd: {}".format(exit_status, command))
+            raise QemuException(
+                "ssh command failed with status {}. cmd: {}".format(
+                    exit_status, command
+                )
+            )
 
         if capture_stdout:
             return stdout_buffer

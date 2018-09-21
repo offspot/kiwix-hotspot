@@ -1,3 +1,3 @@
 from PyInstaller.utils.hooks import collect_data_files
 
-datas = collect_data_files('iso639')
+datas = collect_data_files("iso639")

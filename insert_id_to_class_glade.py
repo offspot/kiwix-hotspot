@@ -3,8 +3,10 @@ import os
 import re
 import argparse
 
-parser = argparse.ArgumentParser(description="insert id to class in glade file for gtk3.10 compatibility")
-parser.add_argument('file', type=str, help="glade file")
+parser = argparse.ArgumentParser(
+    description="insert id to class in glade file for gtk3.10 compatibility"
+)
+parser.add_argument("file", type=str, help="glade file")
 args = parser.parse_args()
 
 with open(args.file, "r") as config:
@@ -21,5 +23,9 @@ with open(args.file, "w") as config:
         replaced_pattern = r"<object class=\"(\w*)\"(>|/>)"
         if len(re.findall(replaced_pattern, line)) == 1:
             max_identifier += 1
-            line = re.sub(replaced_pattern, "<object class=\"\g<1>\" id=\"no_id_{}\"\g<2>".format(max_identifier), line)
+            line = re.sub(
+                replaced_pattern,
+                '<object class="\g<1>" id="no_id_{}"\g<2>'.format(max_identifier),
+                line,
+            )
         config.write(line)

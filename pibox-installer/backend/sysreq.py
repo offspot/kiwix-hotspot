@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # vim: ai ts=4 sts=4 et sw=4 nu
 
@@ -6,17 +5,19 @@ import os
 import sys
 
 from backend.mount import system_has_exfat
+
 if sys.platform == "linux":
     from backend.mount import udisksctl_exe
 
-requirements_url = ("https://framagit.org/ideascube/pibox-installer"
-                    "/wikis/System-Requirements")
+requirements_url = (
+    "https://framagit.org/ideascube/pibox-installer/wikis/System-Requirements"
+)
 
 
 def host_matches_requirements(build_dir):
-    ''' whether the host is ready to start process
+    """ whether the host is ready to start process
 
-        returns bool, [error_message,] '''
+        returns bool, [error_message,] """
 
     # TODO: check that build_dir supports file_size > 4GB (not fat)
 
@@ -28,19 +29,18 @@ def host_matches_requirements(build_dir):
 
     if sys.platform == "linux":
         # udisks2
-        if not os.path.exists(udisksctl_exe) or \
-                not os.access(udisksctl_exe, os.X_OK):
+        if not os.path.exists(udisksctl_exe) or not os.access(udisksctl_exe, os.X_OK):
             missing_reqs.append("udisks2 (udisksctl) is required.")
 
         # exfat
-        mount_exfat = '/sbin/mount.exfat'
-        if not system_has_exfat() and (not os.path.exists(mount_exfat) or
-                                       not os.access(mount_exfat, os.X_OK)):
+        mount_exfat = "/sbin/mount.exfat"
+        if not system_has_exfat() and (
+            not os.path.exists(mount_exfat) or not os.access(mount_exfat, os.X_OK)
+        ):
             missing_reqs.append("exfat-fuse is required.")
 
-        mkfs_exfat = '/sbin/mkfs.exfat'
-        if not os.path.exists(mkfs_exfat) \
-                or not os.access(mkfs_exfat, os.X_OK):
+        mkfs_exfat = "/sbin/mkfs.exfat"
+        if not os.path.exists(mkfs_exfat) or not os.access(mkfs_exfat, os.X_OK):
             missing_reqs.append("exfat-utils is required.")
 
     return len(missing_reqs) == 0, missing_reqs

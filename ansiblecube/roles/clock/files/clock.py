@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-''' hardware clock management UI
+""" hardware clock management UI
 
     - set HW clock using system time
     - set HW clock manually
-    - set system time using HW clock '''
+    - set system time using HW clock """
 
 # https://linux.die.net/man/8/hwclock
 # https://afterthoughtsoftware.com/products/rasclock
@@ -50,14 +50,14 @@ body = u"""<body>
 
 footer = u"</html>"
 
-date_bin = '/bin/date'
-hwclock_bin = '/sbin/hwclock'
-tdctl_bin = '/usr/bin/timedatectl'
+date_bin = "/bin/date"
+hwclock_bin = "/sbin/hwclock"
+tdctl_bin = "/usr/bin/timedatectl"
 
 
 def get_output(command):
     try:
-        return subprocess.check_output(['sudo'] + command).strip()
+        return subprocess.check_output(["sudo"] + command).strip()
     except Exception as exp:
         return "ERROR: {}".format(exp)
 
@@ -65,36 +65,33 @@ def get_output(command):
 def application(env, start_response):
     output = ""
 
-    if env['REQUEST_URI'] == '/sys2hw':
+    if env["REQUEST_URI"] == "/sys2hw":
         # write system datetime into hardware clock
-        output = get_output([hwclock_bin, '-w'])
+        output = get_output([hwclock_bin, "-w"])
 
-    if env['REQUEST_URI'] == '/hw2sys':
+    if env["REQUEST_URI"] == "/hw2sys":
         # set system datetime using hardware clock
-        output = get_output([hwclock_bin, '-s'])
+        output = get_output([hwclock_bin, "-s"])
 
-    if env['REQUEST_URI'].startswith('/manual2hw'):
+    if env["REQUEST_URI"].startswith("/manual2hw"):
         # write a manual datetime into hardware clock
         try:
-            dt = urllib.unquote_plus(env['QUERY_STRING']) \
-                .split('datetime=')[1]
+            dt = urllib.unquote_plus(env["QUERY_STRING"]).split("datetime=")[1]
             # disable ntp otherwise we can't set manual date
-            get_output([tdctl_bin, 'set-ntp', 'no'])
+            get_output([tdctl_bin, "set-ntp", "no"])
             # set manual date
-            output = get_output([tdctl_bin, 'set-time', dt])
+            output = get_output([tdctl_bin, "set-time", dt])
             # re-enable ntp. if online, will overwrite our manual datetime
-            get_output([tdctl_bin, 'set-ntp', 'yes'])
+            get_output([tdctl_bin, "set-ntp", "yes"])
         except Exception as exp:
             output = "ERROR: {}".format(exp)
 
     context = {
-        'output': '<p style="color: blue; font-weight: bold;">{}</p>'
-        .format(output),
-        'system_time': get_output(
-            [date_bin, '+"%Y-%m-%d %H:%M:%S.000000%z"'])[1:-1],
-        'hardware_time': get_output([hwclock_bin, '-r']),
+        "output": '<p style="color: blue; font-weight: bold;">{}</p>'.format(output),
+        "system_time": get_output([date_bin, '+"%Y-%m-%d %H:%M:%S.000000%z"'])[1:-1],
+        "hardware_time": get_output([hwclock_bin, "-r"]),
     }
 
-    start_response('200 OK', [('Content-Type', 'text/html')])
+    start_response("200 OK", [("Content-Type", "text/html")])
     page = header + body.format(**context) + footer
-    return [page.encode('utf-8')]
+    return [page.encode("utf-8")]

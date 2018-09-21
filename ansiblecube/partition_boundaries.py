@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim: ai ts=4 sts=4 et sw=4 nu
 
-''' compute and print new partition boundaries for / dans /data
+""" compute and print new partition boundaries for / dans /data
 
     Used by providing an image's fdisk output and requested size for partitions
     fdisk -l <disk> | partition_boundaries.py <root_size> <disk_size>
@@ -17,17 +17,16 @@
         - data partition end
 
     output format: <root_start> <root_end> <data_start> <data_end>
-    '''
+    """
 
-from __future__ import (unicode_literals, absolute_import,
-                        division, print_function)
+from __future__ import unicode_literals, absolute_import, division, print_function
 import re
 import sys
 
 try:
     text_type = unicode  # Python 2
 except NameError:
-    text_type = str      # Python 3
+    text_type = str  # Python 3
 
 ONE_GB = int(1e9)
 
@@ -35,7 +34,7 @@ ONE_GB = int(1e9)
 def main(root_size=7, disk_size=8):
 
     # sanitize input
-    if disk_size == '-':
+    if disk_size == "-":
         disk_size = None
     elif not isinstance(disk_size, int):
         disk_size = int(disk_size)
@@ -46,7 +45,9 @@ def main(root_size=7, disk_size=8):
     try:
         data = get_partitions_boundaries(
             lines=sys.stdin.read().splitlines(),
-            root_size=root_size, disk_size=disk_size)
+            root_size=root_size,
+            disk_size=disk_size,
+        )
 
         print(" ".join([text_type(x) for x in data]))
 
@@ -62,24 +63,26 @@ def get_partitions_boundaries(lines, root_size, disk_size=None):
     end_margin = 4194304  # 4MiB
 
     def roundup(sector):
-        return rounddown(sector) + round_bound \
-            if sector % round_bound != 0 else sector
+        return rounddown(sector) + round_bound if sector % round_bound != 0 else sector
 
     def rounddown(sector):
-        return sector - (sector % round_bound) \
-            if sector % round_bound != 0 else sector
+        return sector - (sector % round_bound) if sector % round_bound != 0 else sector
 
     # parse all lines
     number_of_sector_match = []
     second_partition_match = []
-    target_reg = r'[0-9a-zA-Z\.\-\_]+\.img' \
-        if '.img' in "\n".join(lines) else r'\/dev\/[0-9a-z]+'
+    target_reg = (
+        r"[0-9a-zA-Z\.\-\_]+\.img"
+        if ".img" in "\n".join(lines)
+        else r"\/dev\/[0-9a-z]+"
+    )
     for line in lines:
         number_of_sector_match += re.findall(
-            r"^Disk {}:.*, (\d+) sectors$".format(target_reg), line)
+            r"^Disk {}:.*, (\d+) sectors$".format(target_reg), line
+        )
         second_partition_match += re.findall(
-            r"^{}\d +(\d+) +(\d+) +\d+ +\S+ +\d+ +Linux$".format(target_reg),
-            line)
+            r"^{}\d +(\d+) +(\d+) +\d+ +\S+ +\d+ +Linux$".format(target_reg), line
+        )
 
     # ensure we retrieved nb of sectors correctly
     if len(number_of_sector_match) != 1:
@@ -88,8 +91,7 @@ def get_partitions_boundaries(lines, root_size, disk_size=None):
 
     # ensure we retrieved the start of the root partition correctly
     if len(second_partition_match) != 1:
-        raise ValueError(
-            "cannot find start and/or end of root partition of disk")
+        raise ValueError("cannot find start and/or end of root partition of disk")
     second_partition_start = int(second_partition_match[0][0])
     second_partition_end = int(second_partition_match[0][1])
 
@@ -118,5 +120,5 @@ def get_partitions_boundaries(lines, root_size, disk_size=None):
     return root_start, root_end, data_start, data_end
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main(*sys.argv[1:])

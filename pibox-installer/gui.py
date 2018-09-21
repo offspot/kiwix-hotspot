@@ -1,41 +1,56 @@
-from collections import OrderedDict
-import gi
-from backend.catalog import YAML_CATALOGS
-from backend.content import get_expanded_size, get_collection, get_required_image_size, get_content, isremote
-from backend.mount import open_explorer_for_imdisk
-from run_installation import run_installation
-import pytz
-import tzlocal
+# -*- coding: utf-8 -*-
+# vim: ai ts=4 sts=4 et sw=4 nu
+
 import os
 import sys
 import json
 import platform
 import tempfile
 import threading
-from util import CancelEvent, ProgressHelper
-import sd_card_info
-from version import get_version_str
-from util import human_readable_size, ONE_GB, ONE_MiB
-from util import get_free_space_in_dir
-from util import relpathto
-from util import b64encode, b64decode
-from util import check_user_inputs
-from util import get_adjusted_image_size
-import data
+from collections import OrderedDict
+
+import gi
+import pytz
 import iso639
+import tzlocal
 import requests
 import humanfriendly
 import webbrowser
-gi.require_version('Gtk', '3.0')
+
+
+from backend.content import (
+    get_expanded_size,
+    get_collection,
+    get_required_image_size,
+    get_content,
+    isremote,
+)
+import data
+import sd_card_info
+from util import relpathto
+from util import check_user_inputs
+from version import get_version_str
+from util import b64encode, b64decode
+from util import get_free_space_in_dir
+from util import get_adjusted_image_size
+from backend.catalog import YAML_CATALOGS
+from util import CancelEvent, ProgressHelper
+from run_installation import run_installation
+from backend.mount import open_explorer_for_imdisk
+from util import human_readable_size, ONE_GB, ONE_MiB
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk, GLib, GdkPixbuf, GObject
 
 VALID_RGBA = Gdk.RGBA(0., 0., 0., 0.)
 INVALID_RGBA = Gdk.RGBA(1, 0.5, 0.5, 1.)
 mainloop = None
 
+
 def quit(*args, **kwargs):
     global mainloop
     mainloop.quit()
+
 
 def run():
     global mainloop
@@ -46,6 +61,7 @@ def run():
         print("\nKeyboardInterrupt, exiting.")
         quit()
 
+
 class ShortDialog(Gtk.Dialog):
     def __init__(self, parent, buttons, msg):
         Gtk.Dialog.__init__(self, "Kiwix Hotspot", parent, 0, buttons)
@@ -55,9 +71,11 @@ class ShortDialog(Gtk.Dialog):
         box.add(label)
         self.show_all()
 
+
 def hide_on_delete(widget, event):
     widget.hide()
     return True
+
 
 class Logger(ProgressHelper):
     def __init__(self, component):
@@ -126,21 +144,26 @@ class Logger(ProgressHelper):
 
     def update_gui(self):
         # show text progress in console
-        self.main_thread_text("[STAGE {nums}: {name} - {pc:.0f}%]"
-                              .format(nums=self.stage_numbers,
-                                      name=self.stage_name,
-                                      pc=self.get_overall_progress() * 100),
-                              tag=self.stg_tag)
+        self.main_thread_text(
+            "[STAGE {nums}: {name} - {pc:.0f}%]".format(
+                nums=self.stage_numbers,
+                name=self.stage_name,
+                pc=self.get_overall_progress() * 100,
+            ),
+            tag=self.stg_tag,
+        )
 
         # update overall percentage on window title
         self.component.run_window.set_title(
-            "Kiwix Hotspot ({:.0f}%)"
-            .format(self.get_overall_progress() * 100))
+            "Kiwix Hotspot ({:.0f}%)".format(self.get_overall_progress() * 100)
+        )
 
         # update stage name and number (Stage x/y)
         self.component.run_step_label.set_markup(
-            "<b>Stage {nums}</b>: {name}"
-            .format(nums=self.stage_numbers, name=self.stage_name))
+            "<b>Stage {nums}</b>: {name}".format(
+                nums=self.stage_numbers, name=self.stage_name
+            )
+        )
 
         # update the progress bar according to the stage's progress
         if self.stage_progress is not None:
@@ -163,12 +186,12 @@ class Logger(ProgressHelper):
         self.progress(1)
 
     def run_pulse(self):
-        ''' used for progress bar animation (unknown progress) '''
+        """ used for progress bar animation (unknown progress) """
         self._update_progress_text("")
         self.timeout_id = GObject.timeout_add(50, self.on_timeout)
 
     def on_timeout(self):
-        ''' used for progress bar animation (unknown progress) '''
+        """ used for progress bar animation (unknown progress) """
         if self.stage_progress is None:
             new_value = self.component.run_progressbar.get_fraction() + 0.035
             # inverse direction if end reached
@@ -176,9 +199,11 @@ class Logger(ProgressHelper):
                 new_value = 0
                 # switch from left-to-right to right-to-left at bounds
                 self.component.run_progressbar.set_inverted(
-                    not self.component.run_progressbar.get_inverted())
+                    not self.component.run_progressbar.get_inverted()
+                )
             self.component.run_progressbar.set_fraction(new_value)
             return True  # returns True so it continues to get called
+
 
 class Component:
     def __init__(self, builder):
@@ -192,11 +217,13 @@ class Component:
             return widget
         raise AttributeError(key)
 
+
 def validate_label(label, condition):
     if condition:
         label.modify_bg(Gtk.StateFlags.NORMAL)
     else:
         label.modify_bg(Gtk.StateFlags.NORMAL, INVALID_RGBA.to_color())
+
 
 class Application:
     def __init__(self, catalog):
@@ -216,50 +243,59 @@ class Application:
         self.component.favicon_filter.set_name("Favicon (ICO, PNG)")  # opt
         self.component.favicon_filter.add_pattern("*.png")
         self.component.favicon_filter.add_pattern("*.ico")
-        self.component.favicon_chooser.add_filter(
-            self.component.favicon_filter)
+        self.component.favicon_chooser.add_filter(self.component.favicon_filter)
 
         self.component.logo_filter.set_name("Logo (PNG)")  # opt
         self.component.logo_filter.add_pattern("*.png")
-        self.component.logo_chooser.add_filter(
-            self.component.logo_filter)
+        self.component.logo_chooser.add_filter(self.component.logo_filter)
 
         self.component.css_filter.set_name("CSS File")  # opt
         self.component.css_filter.add_pattern("*.css")
-        self.component.css_chooser.add_filter(
-            self.component.css_filter)
+        self.component.css_chooser.add_filter(self.component.css_filter)
 
         self.component.edupi_resources_filter.set_name("ZIP File")  # opt
         self.component.edupi_resources_filter.add_pattern("*.zip")
         self.component.edupi_resources_chooser.add_filter(
-            self.component.edupi_resources_filter)
+            self.component.edupi_resources_filter
+        )
 
         # menu bar
-        self.component.menu_quit.connect("activate", lambda widget: self.component.window.close())
+        self.component.menu_quit.connect(
+            "activate", lambda widget: self.component.window.close()
+        )
         self.component.menu_about.connect("activate", self.activate_menu_about)
 
         self.component.menu_load_config.connect(
-            "activate", self.activate_menu_config, False)
+            "activate", self.activate_menu_config, False
+        )
         self.component.menu_save_config.connect(
-            "activate", self.activate_menu_config, True)
-        self.component.menu_help.connect(
-            "activate", self.activate_menu_help)
+            "activate", self.activate_menu_config, True
+        )
+        self.component.menu_help.connect("activate", self.activate_menu_help)
 
         # imdisk menu is windows only
         if sys.platform == "win32":
             self.component.menu_imdisk.set_visible(True)
-            self.component.menu_imdisk.connect(
-                "activate", self.activate_menu_imdisk)
+            self.component.menu_imdisk.connect("activate", self.activate_menu_imdisk)
 
         # etcher
-        self.component.menu_etcher.connect(
-                "activate", self.activate_menu_etcher)
+        self.component.menu_etcher.connect("activate", self.activate_menu_etcher)
 
         # wifi password
-        self.component.wifi_password_switch.connect("notify::active", lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(not switch.get_active()))
+        self.component.wifi_password_switch.connect(
+            "notify::active",
+            lambda switch, state: self.component.wifi_password_revealer.set_reveal_child(
+                not switch.get_active()
+            ),
+        )
 
         # edupi resources
-        self.component.edupi_switch.connect("notify::active", lambda switch, state: self.component.edupi_resources_revealer.set_reveal_child(switch.get_active()))
+        self.component.edupi_switch.connect(
+            "notify::active",
+            lambda switch, state: self.component.edupi_resources_revealer.set_reveal_child(
+                switch.get_active()
+            ),
+        )
 
         # ideascube language
         for code, language in data.ideascube_languages:
@@ -281,11 +317,18 @@ class Application:
         self.component.timezone_combobox.add_attribute(renderer, "text", 0)
 
         # output
-        self.component.sd_card_combobox.connect("changed", lambda _: self.update_free_space())
-        self.component.sd_card_refresh_button.connect("clicked", self.sd_card_refresh_button_clicked)
-        self.component.output_stack.connect("notify::visible-child", lambda switch, state: self.update_free_space())
-        self.component.size_combobox.connect("changed",
-                                             lambda _: self.update_free_space())
+        self.component.sd_card_combobox.connect(
+            "changed", lambda _: self.update_free_space()
+        )
+        self.component.sd_card_refresh_button.connect(
+            "clicked", self.sd_card_refresh_button_clicked
+        )
+        self.component.output_stack.connect(
+            "notify::visible-child", lambda switch, state: self.update_free_space()
+        )
+        self.component.size_combobox.connect(
+            "changed", lambda _: self.update_free_space()
+        )
 
         types = [info["typ"] for info in sd_card_info.informations]
         self.component.sd_card_list_store = Gtk.ListStore(*types)
@@ -294,31 +337,51 @@ class Application:
         for counter in range(0, sd_card_info.visible_informations):
             cell_renderer = Gtk.CellRendererText()
             self.component.sd_card_combobox.pack_start(cell_renderer, True)
-            self.component.sd_card_combobox.add_attribute(cell_renderer, "text", counter)
+            self.component.sd_card_combobox.add_attribute(
+                cell_renderer, "text", counter
+            )
 
         # about dialog
-        self.component.about_dialog.set_logo(GdkPixbuf.Pixbuf.new_from_file_at_scale(data.pibox_logo, 200, -1, True))
+        self.component.about_dialog.set_logo(
+            GdkPixbuf.Pixbuf.new_from_file_at_scale(data.pibox_logo, 200, -1, True)
+        )
         self.component.about_dialog.set_version(get_version_str())
 
         # done window
-        self.component.done_window_ok_button.connect("clicked", lambda widget: self.component.done_window.hide())
+        self.component.done_window_ok_button.connect(
+            "clicked", lambda widget: self.component.done_window.hide()
+        )
         self.component.done_window.connect("delete-event", hide_on_delete)
 
         # space error window
-        self.component.space_error_window_ok_button.connect("clicked", self.space_error_window_ok_button_clicked)
+        self.component.space_error_window_ok_button.connect(
+            "clicked", self.space_error_window_ok_button_clicked
+        )
         self.component.space_error_window.connect("delete-event", hide_on_delete)
 
         # run window
-        self.component.run_installation_button.connect("clicked", self.run_installation_button_clicked)
+        self.component.run_installation_button.connect(
+            "clicked", self.run_installation_button_clicked
+        )
         self.component.run_window.connect("delete-event", self.run_window_delete_event)
-        self.component.run_text_view.get_buffer().connect("modified-changed", self.run_text_view_scroll_down)
+        self.component.run_text_view.get_buffer().connect(
+            "modified-changed", self.run_text_view_scroll_down
+        )
         self.component.run_quit_button.connect("clicked", self.run_quit_button_clicked)
-        self.component.run_abort_button.connect("clicked", self.run_abort_button_clicked)
-        self.component.run_copy_log_to_clipboard_button.connect("clicked", self.run_copy_log_to_clipboard_button_clicked)
-        self.component.run_new_install_button.connect("clicked", self.run_new_install_button_clicked)
+        self.component.run_abort_button.connect(
+            "clicked", self.run_abort_button_clicked
+        )
+        self.component.run_copy_log_to_clipboard_button.connect(
+            "clicked", self.run_copy_log_to_clipboard_button_clicked
+        )
+        self.component.run_new_install_button.connect(
+            "clicked", self.run_new_install_button_clicked
+        )
 
         # zim content
-        self.component.zim_choose_content_button.connect("clicked", self.zim_choose_content_button_clicked)
+        self.component.zim_choose_content_button.connect(
+            "clicked", self.zim_choose_content_button_clicked
+        )
 
         self.component.zim_list_store = Gtk.ListStore(
             str,  # key
@@ -332,7 +395,7 @@ class Application:
             bool,  # selected
             str,  # size
             bool,  # its language is selected
-            Gdk.RGBA  # background color
+            Gdk.RGBA,  # background color
         )
         self.component.zim_list_store.set_sort_column_id(1, Gtk.SortType.ASCENDING)
 
@@ -345,7 +408,9 @@ class Application:
                 description = value.get("description") or "none"
                 size = str(value["size"])
                 languages = []
-                for iso_code in (value.get("language") or "Unknown language").split(","):
+                for iso_code in (value.get("language") or "Unknown language").split(
+                    ","
+                ):
                     try:
                         languages.append(iso639.languages.get(part3=iso_code).name)
                     except KeyError:
@@ -355,21 +420,44 @@ class Application:
                 version = str(value["version"])
                 formatted_size = human_readable_size(int(size))
 
-                self.component.zim_list_store.append([key, name, url, description, formatted_size, languages, typ, version, False, size, True, VALID_RGBA])
+                self.component.zim_list_store.append(
+                    [
+                        key,
+                        name,
+                        url,
+                        description,
+                        formatted_size,
+                        languages,
+                        typ,
+                        version,
+                        False,
+                        size,
+                        True,
+                        VALID_RGBA,
+                    ]
+                )
                 all_languages |= languages
 
         self.component.zim_language_list_store = Gtk.ListStore(str)
-        self.component.zim_language_list_store.set_sort_column_id(0, Gtk.SortType.ASCENDING)
+        self.component.zim_language_list_store.set_sort_column_id(
+            0, Gtk.SortType.ASCENDING
+        )
         for language in all_languages:
             self.component.zim_language_list_store.append([language])
 
         # zim window
-        self.component.zim_window_done_button.connect("clicked", self.zim_done_button_clicked)
+        self.component.zim_window_done_button.connect(
+            "clicked", self.zim_done_button_clicked
+        )
         self.component.zim_window.connect("delete-event", hide_on_delete)
-        self.component.zim_tree_view.connect("row-activated", self.available_zim_clicked)
-        self.component.choosen_zim_tree_view.connect("row-activated", self.choosen_zim_clicked)
+        self.component.zim_tree_view.connect(
+            "row-activated", self.available_zim_clicked
+        )
+        self.component.choosen_zim_tree_view.connect(
+            "row-activated", self.choosen_zim_clicked
+        )
 
-        ## zim window available tree view
+        # zim window available tree view
         self.component.zim_tree_view.set_model(self.component.zim_list_store)
 
         renderer_text = Gtk.CellRendererText()
@@ -397,39 +485,74 @@ class Application:
         self.component.choosen_zim_tree_view.append_column(column_text)
 
         def get_project_size(name, lang):
-            langs = ['fr', 'en'] if name == 'aflatoun' else [lang]
-            return get_expanded_size(get_collection(
-                **{"{}_languages".format(name): langs}))
+            langs = ["fr", "en"] if name == "aflatoun" else [lang]
+            return get_expanded_size(
+                get_collection(**{"{}_languages".format(name): langs})
+            )
 
         # kalite
         for lang, button in self.iter_kalite_check_button():
-            button.set_label("{} ({})".format(button.get_label(), human_readable_size(get_project_size('kalite', lang))))
+            button.set_label(
+                "{} ({})".format(
+                    button.get_label(),
+                    human_readable_size(get_project_size("kalite", lang)),
+                )
+            )
             button.connect("toggled", lambda button: self.update_free_space())
 
         # wikifundi
         for lang, button in self.iter_wikifundi_check_button():
-            button.set_label("{} ({})".format(button.get_label(), human_readable_size(get_project_size('wikifundi', lang))))
+            button.set_label(
+                "{} ({})".format(
+                    button.get_label(),
+                    human_readable_size(get_project_size("wikifundi", lang)),
+                )
+            )
             button.connect("toggled", lambda button: self.update_free_space())
 
         # aflatoun
-        self.component.aflatoun_switch.connect("notify::active", lambda switch, state: self.update_free_space())
-        self.component.aflatoun_label.set_label("{} ({})".format(self.component.aflatoun_label.get_label(), human_readable_size(get_project_size('aflatoun', lang))))
+        self.component.aflatoun_switch.connect(
+            "notify::active", lambda switch, state: self.update_free_space()
+        )
+        self.component.aflatoun_label.set_label(
+            "{} ({})".format(
+                self.component.aflatoun_label.get_label(),
+                human_readable_size(get_project_size("aflatoun", lang)),
+            )
+        )
 
         # edupi
-        self.component.edupi_switch.connect("notify::active", lambda switch, state: self.update_free_space())
-        self.component.edupi_label.set_label("{} ({})".format(self.component.edupi_label.get_label(), human_readable_size(10 * ONE_MiB)))
-        self.component.edupi_resources_url_entry.connect("changed", lambda _: self.update_free_space())
-        self.component.edupi_resources_chooser.connect("file-set", lambda _: self.update_free_space())
+        self.component.edupi_switch.connect(
+            "notify::active", lambda switch, state: self.update_free_space()
+        )
+        self.component.edupi_label.set_label(
+            "{} ({})".format(
+                self.component.edupi_label.get_label(),
+                human_readable_size(10 * ONE_MiB),
+            )
+        )
+        self.component.edupi_resources_url_entry.connect(
+            "changed", lambda _: self.update_free_space()
+        )
+        self.component.edupi_resources_chooser.connect(
+            "file-set", lambda _: self.update_free_space()
+        )
 
         # language tree view
         renderer_text = Gtk.CellRendererText()
         column_text = Gtk.TreeViewColumn("Language", renderer_text, text=0)
         self.component.zim_language_tree_view.append_column(column_text)
 
-        self.component.zim_language_tree_view.get_selection().set_mode(Gtk.SelectionMode(3))
-        self.component.zim_language_tree_view.set_model(self.component.zim_language_list_store)
+        self.component.zim_language_tree_view.get_selection().set_mode(
+            Gtk.SelectionMode(3)
+        )
+        self.component.zim_language_tree_view.set_model(
+            self.component.zim_language_list_store
+        )
         self.component.zim_language_tree_view.get_selection().select_all()
-        self.component.zim_language_tree_view.get_selection().connect("changed", self.zim_language_selection_changed)
+        self.component.zim_language_tree_view.get_selection().connect(
+            "changed", self.zim_language_selection_changed
+        )
 
         self.refresh_disk_list()
 
@@ -438,7 +561,7 @@ class Application:
         self.component.window.show()
 
     def reset_config(self):
-        ''' restore UI to its initial (non-configured) state '''
+        """ restore UI to its initial (non-configured) state """
 
         # name
         self.component.project_name_entry.set_text("Kiwix Hotspot")
@@ -446,7 +569,7 @@ class Application:
         # language
         index = -1
         for i, (code, language) in enumerate(data.ideascube_languages):
-            if code == 'en':
+            if code == "en":
                 index = i
         self.component.language_combobox.set_active(index)
 
@@ -470,8 +593,8 @@ class Application:
         self.component.admin_account_pwd_entry.set_text("admin-password")
 
         # branding
-        for key in ('logo', 'favicon', 'css'):
-            getattr(self.component, '{}_chooser'.format(key)).unselect_all()
+        for key in ("logo", "favicon", "css"):
+            getattr(self.component, "{}_chooser".format(key)).unselect_all()
 
         # build_dir
         self.component.build_path_chooser.unselect_all()
@@ -480,16 +603,15 @@ class Application:
         self.component.size_combobox.set_active(0)
 
         # content
-        for key in ('kalite', 'wikifundi'):
-            for lang, button in getattr(self, 'iter_{}_check_button'
-                                              .format(key))():
+        for key in ("kalite", "wikifundi"):
+            for lang, button in getattr(self, "iter_{}_check_button".format(key))():
                 button.set_active(False)
 
-        for key in ('edupi', 'aflatoun'):
-            getattr(self.component, '{}_switch'.format(key)).set_active(False)
+        for key in ("edupi", "aflatoun"):
+            getattr(self.component, "{}_switch".format(key)).set_active(False)
 
         # edupi resources
-        self.component.edupi_resources_url_entry.set_text('')
+        self.component.edupi_resources_url_entry.set_text("")
         self.component.edupi_resources_chooser.unselect_all()
 
         # static contents
@@ -504,20 +626,27 @@ class Application:
         self.update_free_space()
 
     def iter_kalite_check_button(self):
-        return [("fr", self.component.kalite_fr_check_button),
-                ("en", self.component.kalite_en_check_button),
-                ("es", self.component.kalite_es_check_button)]
+        return [
+            ("fr", self.component.kalite_fr_check_button),
+            ("en", self.component.kalite_en_check_button),
+            ("es", self.component.kalite_es_check_button),
+        ]
 
     def iter_wikifundi_check_button(self):
-        return [("fr", self.component.wikifundi_fr_check_button),
-                ("en", self.component.wikifundi_en_check_button)]
+        return [
+            ("fr", self.component.wikifundi_fr_check_button),
+            ("en", self.component.wikifundi_en_check_button),
+        ]
 
     def space_error_window_ok_button_clicked(self, widget):
         self.component.space_error_window.hide()
 
     def activate_menu_about(self, widget):
         response = self.component.about_dialog.run()
-        if response == Gtk.ResponseType.DELETE_EVENT or response == Gtk.ResponseType.CANCEL:
+        if (
+            response == Gtk.ResponseType.DELETE_EVENT
+            or response == Gtk.ResponseType.CANCEL
+        ):
             self.component.about_dialog.hide()
 
     def activate_menu_help(self, widget):
@@ -527,9 +656,17 @@ class Application:
         class ImDiskDialog(Gtk.Dialog):
             def __init__(self, parent):
                 Gtk.Dialog.__init__(
-                    self, "Install or Uninstall ImDisk Manually", parent, 0,
-                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                     Gtk.STOCK_OK, Gtk.ResponseType.OK))
+                    self,
+                    "Install or Uninstall ImDisk Manually",
+                    parent,
+                    0,
+                    (
+                        Gtk.STOCK_CANCEL,
+                        Gtk.ResponseType.CANCEL,
+                        Gtk.STOCK_OK,
+                        Gtk.ResponseType.OK,
+                    ),
+                )
 
                 self.set_default_size(500, 300)
 
@@ -538,20 +675,24 @@ class Application:
                     "\nBy selecting OK bellow, you will be directed to the "
                     "ImDisk installation folder.\n"
                     "<b>Right-click on <i>install.cmd</i></b> and choose to "
-                    "<u>Run as Administrator</u>.\n")
+                    "<u>Run as Administrator</u>.\n"
+                )
                 label.set_alignment(0, 0.5)
                 label2 = Gtk.Label()
                 label2.set_markup(
                     "\nYou can also uninstall it from that folder by "
-                    "doing the same with <i>uninstall_imdisk.cmd</i>.\n")
+                    "doing the same with <i>uninstall_imdisk.cmd</i>.\n"
+                )
                 label2.set_alignment(0, 0.5)
                 image = Gtk.Image.new_from_file(
-                    os.path.join(data.data_dir, 'imdisk.png'))
+                    os.path.join(data.data_dir, "imdisk.png")
+                )
                 box = self.get_content_area()
                 box.add(label)
                 box.add(image)
                 box.add(label2)
                 self.show_all()
+
         dialog = ImDiskDialog(self.component.window)
         if dialog.run() == Gtk.ResponseType.OK:
             open_explorer_for_imdisk(self.logger)
@@ -563,10 +704,19 @@ class Application:
 
             def __init__(self, parent):
                 Gtk.Dialog.__init__(
-                    self, "Use Etcher to Flash your SD-card", parent, 0,
-                    ("Download Latest Etcher", self.DL_CODE,
-                     "Visit Website", Gtk.ResponseType.OK,
-                     Gtk.STOCK_OK, Gtk.ResponseType.CANCEL))
+                    self,
+                    "Use Etcher to Flash your SD-card",
+                    parent,
+                    0,
+                    (
+                        "Download Latest Etcher",
+                        self.DL_CODE,
+                        "Visit Website",
+                        Gtk.ResponseType.OK,
+                        Gtk.STOCK_OK,
+                        Gtk.ResponseType.CANCEL,
+                    ),
+                )
 
                 self.set_default_size(500, 300)
 
@@ -576,36 +726,43 @@ class Application:
                     ". It will also <b>validate</b> that the SD-card "
                     "has been <b>successfuly written</b>.\n"
                     "You can even burn the same image "
-                    "on <b>several SD-cards at once</b>.\n")
+                    "on <b>several SD-cards at once</b>.\n"
+                )
                 label.set_alignment(0, 0.5)
                 label2 = Gtk.Label()
                 label2.set_markup(
-                    "\nPlease Download and Run <b>Etcher</b> separately.\n")
+                    "\nPlease Download and Run <b>Etcher</b> separately.\n"
+                )
                 label2.set_alignment(0, 0.5)
                 image = Gtk.Image.new_from_file(
-                    os.path.join(data.data_dir, 'etcher.gif'))
+                    os.path.join(data.data_dir, "etcher.gif")
+                )
                 box = self.get_content_area()
                 box.add(label)
                 box.add(image)
                 box.add(label2)
                 self.show_all()
+
         dialog = EtcherDialog(self.component.window)
         ret = dialog.run()
         if ret == EtcherDialog.DL_CODE:
             try:
-                req = requests.get("https://img.shields.io/github/release"
-                                   "/resin-io/etcher.json")
+                req = requests.get(
+                    "https://img.shields.io/github/release" "/resin-io/etcher.json"
+                )
                 version = req.json().get("value")
-                base_url = ("https://github.com/resin-io/etcher/releases/"
-                            "download/{}/".format(version))
+                base_url = (
+                    "https://github.com/resin-io/etcher/releases/"
+                    "download/{}/".format(version)
+                )
 
                 def get_fname():
                     if sys.platform == "linux":
-                        if platform.machine() == 'x86_64':
+                        if platform.machine() == "x86_64":
                             return "etcher-electron-{v}-x86_64.AppImage"
                         return "etcher-electron-{v}-i386.AppImage"
                     elif sys.platform == "win32":
-                        if platform.machine() == 'AMD64':
+                        if platform.machine() == "AMD64":
                             return "Etcher-Portable-{v}-x64.exe"
                         return "Etcher-Portable-{v}-x86.exe"
                     elif sys.platform == "darwin":
@@ -652,7 +809,16 @@ class Application:
         self.cancel_run()
 
     def run_abort_button_clicked(self, widget):
-        dialog = ShortDialog(self.component.run_window, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK), "Are you sure you want to abort the installation ?\nyou will not be able to resume.")
+        dialog = ShortDialog(
+            self.component.run_window,
+            (
+                Gtk.STOCK_CANCEL,
+                Gtk.ResponseType.CANCEL,
+                Gtk.STOCK_OK,
+                Gtk.ResponseType.OK,
+            ),
+            "Are you sure you want to abort the installation ?\nyou will not be able to resume.",
+        )
         response = dialog.run()
 
         if response == Gtk.ResponseType.OK:
@@ -665,13 +831,12 @@ class Application:
         self.component.run_window.hide()
         self.component.window.show()
 
-    def display_error_message(self, title, message=None,
-                              parent=None, flags=None):
+    def display_error_message(self, title, message=None, parent=None, flags=None):
         if parent is None:
             parent = self.component.window
         dialog = Gtk.MessageDialog(
-            parent, flags, Gtk.MessageType.ERROR,
-            Gtk.ButtonsType.OK, title)
+            parent, flags, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, title
+        )
         if message is not None:
             dialog.format_secondary_text(message)
         dialog.set_modal(True)
@@ -679,29 +844,33 @@ class Application:
         dialog.destroy()
 
     def activate_menu_config(self, widget, for_save=False):
-        home_path = os.environ['HomePath' if sys.platform == "win32"  else 'HOME']
+        home_path = os.environ["HomePath" if sys.platform == "win32" else "HOME"]
 
         def _save(dialog):
-            filename = dialog.get_filename() \
-                if dialog.get_filename().endswith('.json') \
+            filename = (
+                dialog.get_filename()
+                if dialog.get_filename().endswith(".json")
                 else "{}.json".format(dialog.get_filename())
+            )
             try:
-                with open(filename, 'w') as fd:
+                with open(filename, "w") as fd:
                     json.dump(self.get_config(), fd, indent=4)
             except Exception:
                 self.display_error_message(
                     "Unable to save JSON configuration to file",
-                    "Please check that the path is reachable and writable.")
+                    "Please check that the path is reachable and writable.",
+                )
 
         def _load(dialog):
             try:
-                with open(dialog.get_filename(), 'r') as fd:
+                with open(dialog.get_filename(), "r") as fd:
                     config = json.load(fd)
             except Exception:
                 self.display_error_message(
                     "Unable to load JSON configuration",
                     "Please check that the file is readable "
-                    "and in proper JSON format")
+                    "and in proper JSON format",
+                )
             else:
                 self.set_config(config)
 
@@ -714,18 +883,27 @@ class Application:
             action = Gtk.FileChooserAction.OPEN
             on_accept = _load
 
-        if hasattr(Gtk, 'FileChooserNative'):
+        if hasattr(Gtk, "FileChooserNative"):
             dialog = Gtk.FileChooserNative.new(
                 title,
                 self.component.window,  # make it tied to parent and modal
-                action, "OK", "Cancel")
+                action,
+                "OK",
+                "Cancel",
+            )
             dialog.set_current_folder(home_path)
         else:
             dialog = Gtk.FileChooserDialog(
-                title, self.component.window,
+                title,
+                self.component.window,
                 action=action,
-                buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                         Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
+                buttons=(
+                    Gtk.STOCK_CANCEL,
+                    Gtk.ResponseType.CANCEL,
+                    Gtk.STOCK_OK,
+                    Gtk.ResponseType.ACCEPT,
+                ),
+            )
             dialog.set_current_folder(home_path)
         dialog.set_modal(True)  # does not seem to have effect
 
@@ -750,13 +928,12 @@ class Application:
 
         # project_name
         if "project_name" in config:
-            self.component.project_name_entry.set_text(
-                config.get("project_name"))
+            self.component.project_name_entry.set_text(config.get("project_name"))
 
         # language
         try:
-            value = dict(data.ideascube_languages)[config['language']]
-            item_tuple = (config['language'], value)
+            value = dict(data.ideascube_languages)[config["language"]]
+            item_tuple = (config["language"], value)
             item_id = data.ideascube_languages.index(item_tuple)
         except KeyError:
             pass
@@ -765,9 +942,11 @@ class Application:
 
         # timezone
         try:
-            item_id = [row_id for row_id, row_data
-                       in enumerate(self.component.timezone_tree_store)
-                       if row_data[0] == config['timezone']][0]
+            item_id = [
+                row_id
+                for row_id, row_data in enumerate(self.component.timezone_tree_store)
+                if row_data[0] == config["timezone"]
+            ][0]
         except (KeyError, IndexError):
             pass
         else:
@@ -777,82 +956,94 @@ class Application:
         if "wifi" in config and isinstance(config["wifi"], dict):
             if "protected" in config["wifi"]:
                 self.component.wifi_password_switch.set_active(
-                    not bool(config["wifi"]["protected"]))
+                    not bool(config["wifi"]["protected"])
+                )
             if "password" in config["wifi"]:
-                self.component.wifi_password_entry.set_text(
-                    config["wifi"]["password"])
+                self.component.wifi_password_entry.set_text(config["wifi"]["password"])
 
         # admin account
-        if "admin_account" in config \
-                and isinstance(config["admin_account"], dict):
-            for key, arg_key in {'login': 'login', 'password': 'pwd'}.items():
+        if "admin_account" in config and isinstance(config["admin_account"], dict):
+            for key, arg_key in {"login": "login", "password": "pwd"}.items():
                 if config["admin_account"].get(key) is not None:
-                    getattr(self.component, 'admin_account_{}_entry'
-                            .format(arg_key)) \
-                        .set_text(config["admin_account"][key])
+                    getattr(
+                        self.component, "admin_account_{}_entry".format(arg_key)
+                    ).set_text(config["admin_account"][key])
 
         # branding
         if "branding" in config and isinstance(config["branding"], dict):
             folder = tempfile.mkdtemp()
-            for key in ('logo', 'favicon', 'css'):
+            for key in ("logo", "favicon", "css"):
                 if config["branding"].get(key) is not None:
                     try:
                         fpath = b64decode(
-                            fname=config["branding"][key]['fname'],
-                            data=config["branding"][key]['data'], to=folder)
+                            fname=config["branding"][key]["fname"],
+                            data=config["branding"][key]["data"],
+                            to=folder,
+                        )
                     except Exception:
                         pass
                     else:
-                        getattr(self.component, '{}_chooser'.format(key)) \
-                            .set_filename(fpath)
+                        getattr(self.component, "{}_chooser".format(key)).set_filename(
+                            fpath
+                        )
 
         # build_dir
         if config.get("build_dir") is not None:
             self.component.build_path_chooser.set_filename(
-                os.path.abspath(config["build_dir"]))
+                os.path.abspath(config["build_dir"])
+            )
 
         # size
         if config.get("size") is not None:
             try:
-                size = humanfriendly.parse_size(config["size"]) \
-                    if isinstance(config['size'], str) else config['size']
+                size = (
+                    humanfriendly.parse_size(config["size"])
+                    if isinstance(config["size"], str)
+                    else config["size"]
+                )
                 size = int(size / ONE_GB)
             except Exception:
                 size = None
             if size is not None:
-                sd_size = min(filter(lambda x: x >= size, data.sdcard_sizes),
-                              default=data.sdcard_sizes[-1])
-                self.component.size_combobox.set_active(data.sdcard_sizes.index(sd_size))
+                sd_size = min(
+                    filter(lambda x: x >= size, data.sdcard_sizes),
+                    default=data.sdcard_sizes[-1],
+                )
+                self.component.size_combobox.set_active(
+                    data.sdcard_sizes.index(sd_size)
+                )
 
         # content
         if "content" in config and isinstance(config["content"], dict):
 
             # langs-related contents
-            for key in ('kalite', 'wikifundi'):
-                if key in config["content"] \
-                        and isinstance(config["content"][key], list):
+            for key in ("kalite", "wikifundi"):
+                if key in config["content"] and isinstance(
+                    config["content"][key], list
+                ):
                     for lang, button in getattr(
-                            self, 'iter_{}_check_button'.format(key))():
+                        self, "iter_{}_check_button".format(key)
+                    )():
                         button.set_active(lang in config["content"][key])
 
             # boolean contents (switches)
-            for key in ('edupi', 'aflatoun'):
+            for key in ("edupi", "aflatoun"):
                 if config["content"].get(key) is not None:
-                    getattr(self.component, '{}_switch'.format(key)) \
-                        .set_active(config["content"][key])
+                    getattr(self.component, "{}_switch".format(key)).set_active(
+                        config["content"][key]
+                    )
 
             # edupi resources
             if config["content"].get("edupi_resources") is not None:
                 rsc = config["content"].get("edupi_resources")
                 if isremote(rsc):
-                    self.component.edupi_resources_url_entry \
-                        .set_text(str(rsc))
+                    self.component.edupi_resources_url_entry.set_text(str(rsc))
                 else:
-                    self.component.edupi_resources_chooser \
-                        .set_filename(str(rsc))
+                    self.component.edupi_resources_chooser.set_filename(str(rsc))
 
-            if "zims" in config["content"] \
-                    and isinstance(config["content"]["zims"], list):
+            if "zims" in config["content"] and isinstance(
+                config["content"]["zims"], list
+            ):
 
                 nb_zims = len(self.component.zim_tree_view.get_model())
                 index = 0
@@ -864,8 +1055,7 @@ class Application:
                         break
                     selected = zim[0] in config["content"]["zims"]
 
-                    self.component.zim_tree_view.get_model()[index][8] = \
-                        selected
+                    self.component.zim_tree_view.get_model()[index][8] = selected
 
                     if selected:
                         nb_selected += 1
@@ -899,12 +1089,16 @@ class Application:
                 zim_install.append(zim[0])
 
         kalite_active_langs = [
-            lang for lang, button in self.iter_kalite_check_button()
-            if button.get_active()]
+            lang
+            for lang, button in self.iter_kalite_check_button()
+            if button.get_active()
+        ]
 
         wikifundi_active_langs = [
-            lang for lang, button in self.iter_wikifundi_check_button()
-            if button.get_active()]
+            lang
+            for lang, button in self.iter_wikifundi_check_button()
+            if button.get_active()
+        ]
 
         try:
             size = data.sdcard_sizes[self.component.size_combobox.get_active()] * ONE_GB
@@ -912,43 +1106,70 @@ class Application:
             size = None
 
         branding = {}
-        for key in ('logo', 'favicon', 'css'):
-            fpath = getattr(self.component,
-                            '{}_chooser'.format(key)).get_filename()
+        for key in ("logo", "favicon", "css"):
+            fpath = getattr(self.component, "{}_chooser".format(key)).get_filename()
             if fpath is not None and os.path.exists(fpath):
                 try:
-                    branding[key] = {'fname': os.path.basename(fpath),
-                                     'data': b64encode(fpath)}
+                    branding[key] = {
+                        "fname": os.path.basename(fpath),
+                        "data": b64encode(fpath),
+                    }
                 except Exception:
                     pass
 
-        return OrderedDict([
-            ("project_name", self.component.project_name_entry.get_text()),
-            ("language", language),
-            ("timezone", timezone),
-            ("wifi", OrderedDict([
-                ("protected",
-                    not self.component.wifi_password_switch.get_active()),
-                ("password", self.component.wifi_password_entry.get_text())
-            ])),
-            ("admin_account", OrderedDict([
-                ("login", self.component.admin_account_login_entry.get_text()),
-                ("password", self.component.admin_account_pwd_entry.get_text())
-            ])),
-            ("build_dir",
-                relpathto(self.component.build_path_chooser.get_filename())),
-            ("size",
-                None if size is None else human_readable_size(size, False)),
-            ("content", OrderedDict([
-                ("zims", zim_install),  # content-ids list
-                ("kalite", kalite_active_langs),  # languages list
-                ("wikifundi", wikifundi_active_langs),  # languages list
-                ("aflatoun", self.component.aflatoun_switch.get_active()),
-                ("edupi", self.component.edupi_switch.get_active()),
-                ("edupi_resources", edupi_resources),
-            ])),
-            ("branding", branding),
-        ])
+        return OrderedDict(
+            [
+                ("project_name", self.component.project_name_entry.get_text()),
+                ("language", language),
+                ("timezone", timezone),
+                (
+                    "wifi",
+                    OrderedDict(
+                        [
+                            (
+                                "protected",
+                                not self.component.wifi_password_switch.get_active(),
+                            ),
+                            ("password", self.component.wifi_password_entry.get_text()),
+                        ]
+                    ),
+                ),
+                (
+                    "admin_account",
+                    OrderedDict(
+                        [
+                            (
+                                "login",
+                                self.component.admin_account_login_entry.get_text(),
+                            ),
+                            (
+                                "password",
+                                self.component.admin_account_pwd_entry.get_text(),
+                            ),
+                        ]
+                    ),
+                ),
+                (
+                    "build_dir",
+                    relpathto(self.component.build_path_chooser.get_filename()),
+                ),
+                ("size", None if size is None else human_readable_size(size, False)),
+                (
+                    "content",
+                    OrderedDict(
+                        [
+                            ("zims", zim_install),  # content-ids list
+                            ("kalite", kalite_active_langs),  # languages list
+                            ("wikifundi", wikifundi_active_langs),  # languages list
+                            ("aflatoun", self.component.aflatoun_switch.get_active()),
+                            ("edupi", self.component.edupi_switch.get_active()),
+                            ("edupi_resources", edupi_resources),
+                        ]
+                    ),
+                ),
+                ("branding", branding),
+            ]
+        )
 
     def reset_run_window(self):
         self.component.run_install_done_buttons_revealer.set_reveal_child(False)
@@ -970,36 +1191,41 @@ class Application:
         # capture input
         project_name = self.component.project_name_entry.get_text()
         language = data.ideascube_languages[
-            self.component.language_combobox.get_active()][0]
+            self.component.language_combobox.get_active()
+        ][0]
         timezone = self.component.timezone_tree_store[
-            self.component.timezone_combobox.get_active()][0]
-        wifi_pwd = None if self.component.wifi_password_switch.get_state() \
+            self.component.timezone_combobox.get_active()
+        ][0]
+        wifi_pwd = (
+            None
+            if self.component.wifi_password_switch.get_state()
             else self.component.wifi_password_entry.get_text()
+        )
         admin_login = self.component.admin_account_login_entry.get_text()
         admin_pwd = self.component.admin_account_pwd_entry.get_text()
-        zim_install = [zim[0] for zim in self.component.zim_list_store
-                       if zim[8]]
+        zim_install = [zim[0] for zim in self.component.zim_list_store if zim[8]]
 
         # validate inputs
-        valid_project_name, valid_language, \
-            valid_timezone, valid_wifi_pwd, \
-            valid_admin_login, valid_admin_pwd = check_user_inputs(
-                project_name=self.component.project_name_entry.get_text(),
-                language=data.ideascube_languages[
-                    self.component.language_combobox.get_active()][0],
-                timezone=self.component.timezone_tree_store[
-                    self.component.timezone_combobox.get_active()][0],
-                wifi_pwd=None
-                if self.component.wifi_password_switch.get_state()
-                else self.component.wifi_password_entry.get_text(),
-                admin_login=self.
-                component.admin_account_login_entry.get_text(),
-                admin_pwd=self.component.admin_account_pwd_entry.get_text())
+        valid_project_name, valid_language, valid_timezone, valid_wifi_pwd, valid_admin_login, valid_admin_pwd = check_user_inputs(
+            project_name=self.component.project_name_entry.get_text(),
+            language=data.ideascube_languages[
+                self.component.language_combobox.get_active()
+            ][0],
+            timezone=self.component.timezone_tree_store[
+                self.component.timezone_combobox.get_active()
+            ][0],
+            wifi_pwd=None
+            if self.component.wifi_password_switch.get_state()
+            else self.component.wifi_password_entry.get_text(),
+            admin_login=self.component.admin_account_login_entry.get_text(),
+            admin_pwd=self.component.admin_account_pwd_entry.get_text(),
+        )
 
         # project name
         validate_label(self.component.project_name_label, valid_project_name)
         self.component.project_name_constraints_revealer.set_reveal_child(
-            not valid_project_name)
+            not valid_project_name
+        )
         all_valid = all_valid and valid_project_name
 
         # language
@@ -1013,17 +1239,19 @@ class Application:
         # wifi passwd
         validate_label(self.component.wifi_password_label, valid_wifi_pwd)
         self.component.wifi_password_constraints_revealer.set_reveal_child(
-            not valid_wifi_pwd)
+            not valid_wifi_pwd
+        )
         all_valid = all_valid and valid_wifi_pwd
 
         # admin account
-        validate_label(self.component.admin_account_login_label,
-                       valid_admin_login)
+        validate_label(self.component.admin_account_login_label, valid_admin_login)
         validate_label(self.component.admin_account_pwd_label, valid_admin_pwd)
         self.component.admin_account_login_constraints_revealer.set_reveal_child(
-            not valid_admin_login)
+            not valid_admin_login
+        )
         self.component.admin_account_pwd_constraints_revealer.set_reveal_child(
-            not valid_admin_pwd)
+            not valid_admin_pwd
+        )
         all_valid = all_valid and valid_admin_login and valid_admin_pwd
 
         output_size = self.get_output_size()
@@ -1048,13 +1276,21 @@ class Application:
         validate_label(self.component.free_space_name_label, condition)
         all_valid = all_valid and condition
 
-        kalite_active_langs = [lang for lang, button in self.iter_kalite_check_button() if button.get_active()]
+        kalite_active_langs = [
+            lang
+            for lang, button in self.iter_kalite_check_button()
+            if button.get_active()
+        ]
         if len(kalite_active_langs) != 0:
             kalite = kalite_active_langs
         else:
             kalite = None
 
-        wikifundi_active_langs = [lang for lang, button in self.iter_wikifundi_check_button() if button.get_active()]
+        wikifundi_active_langs = [
+            lang
+            for lang, button in self.iter_wikifundi_check_button()
+            if button.get_active()
+        ]
         if len(wikifundi_active_langs) != 0:
             wikifundi = wikifundi_active_langs
         else:
@@ -1069,8 +1305,11 @@ class Application:
         css = self.component.css_chooser.get_filename()
 
         build_dir = self.component.build_path_chooser.get_filename()
-        condition = build_dir is not None and os.path.exists(build_dir) \
+        condition = (
+            build_dir is not None
+            and os.path.exists(build_dir)
             and os.path.isdir(build_dir)
+        )
         validate_label(self.component.build_path_chooser_label, condition)
         all_valid = all_valid and condition
 
@@ -1080,14 +1319,21 @@ class Application:
             remaining_space = free_space - output_size
             if remaining_space < 0:
                 self.component.space_error_image_location_label.set_text(build_dir)
-                self.component.space_error_total_space_required_label.set_text(human_readable_size(output_size))
-                self.component.space_error_space_available_label.set_text(human_readable_size(free_space))
-                self.component.space_error_space_missing_label.set_text(human_readable_size(-remaining_space))
+                self.component.space_error_total_space_required_label.set_text(
+                    human_readable_size(output_size)
+                )
+                self.component.space_error_space_available_label.set_text(
+                    human_readable_size(free_space)
+                )
+                self.component.space_error_space_missing_label.set_text(
+                    human_readable_size(-remaining_space)
+                )
 
                 self.component.space_error_window.show()
                 all_valid = False
 
         if all_valid:
+
             def target():
                 run_installation(
                     name=project_name,
@@ -1109,7 +1355,10 @@ class Application:
                     css=css,
                     build_dir=build_dir,
                     admin_account={"login": admin_login, "pwd": admin_pwd},
-                    done_callback=lambda error: GLib.idle_add(self.installation_done, error))
+                    done_callback=lambda error: GLib.idle_add(
+                        self.installation_done, error
+                    ),
+                )
 
             self.component.window.hide()
             self.reset_run_window()
@@ -1131,9 +1380,11 @@ class Application:
         self.component.sd_card_list_store.clear()
 
         for id, device in enumerate(sd_card_info.get_iterator()):
-            items = [info["typ"](device[info["name"]]) for info in sd_card_info.informations]
+            items = [
+                info["typ"](device[info["name"]]) for info in sd_card_info.informations
+            ]
             self.component.sd_card_list_store.append(items)
-            device_name = str(device['device']).rstrip('\0')
+            device_name = str(device["device"]).rstrip("\0")
             if device_name == selected_device:
                 self.component.sd_card_combobox.set_active(id)
 
@@ -1171,7 +1422,8 @@ class Application:
             packages=zim_list,
             kalite_languages=kalite,
             wikifundi_languages=wikifundi,
-            aflatoun_languages=['fr', 'en'] if aflatoun else [])
+            aflatoun_languages=["fr", "en"] if aflatoun else [],
+        )
         try:
             required_image_size = get_required_image_size(collection)
         except FileNotFoundError:
@@ -1179,7 +1431,8 @@ class Application:
                 "Free Space Calculation Error",
                 "Unable to calculate free space due to a missing file.\n"
                 "Please, check if the EduPi resources file is still there.",
-                self.component.window)
+                self.component.window,
+            )
             return -1
 
         return self.get_output_size() - required_image_size
@@ -1197,7 +1450,8 @@ class Application:
         size = self.get_output_size()
         validate_label(
             self.component.size_combobox,
-            size >= get_content('pibox_base_image')['expanded_size'])
+            size >= get_content("pibox_base_image")["expanded_size"],
+        )
 
         for row in self.component.zim_list_store:
             if free_space - int(row[9]) >= 0:
@@ -1213,10 +1467,15 @@ class Application:
                 size = -1
             else:
                 get_size_index = sd_card_info.get_size_index()
-                size = int(self.component.sd_card_list_store[sd_card_id][get_size_index])
+                size = int(
+                    self.component.sd_card_list_store[sd_card_id][get_size_index]
+                )
         else:
             try:
-                size = get_adjusted_image_size(data.sdcard_sizes[self.component.size_combobox.get_active()] * ONE_GB)
+                size = get_adjusted_image_size(
+                    data.sdcard_sizes[self.component.size_combobox.get_active()]
+                    * ONE_GB
+                )
             except Exception:
                 size = -1
 
@@ -1255,7 +1514,11 @@ class Application:
 try:
     assert len(YAML_CATALOGS)
 except Exception as exception:
-    dialog = ShortDialog(None, (Gtk.STOCK_OK, Gtk.ResponseType.OK), "Catalog downloads failed, you may check your internet connection")
+    dialog = ShortDialog(
+        None,
+        (Gtk.STOCK_OK, Gtk.ResponseType.OK),
+        "Catalog downloads failed, you may check your internet connection",
+    )
     dialog.run()
     print(exception, file=sys.stderr)
     dialog.destroy()

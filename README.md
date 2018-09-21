@@ -83,6 +83,17 @@ see [appveyor.yml](appveyor.yml) for windows and [.travis.yml](.travis.yml) for 
 
 ## Contribute
 
+We now use [black](https://black.readthedocs.io) Coding Style and Formatting tool. Please make sure your contributions passes `black`.
+
+Sample `pre-commit` git hook:
+
+``` sh
+#!/bin/sh
+#
+# check black coding style compliance and display offending lines
+exec black --check --diff .
+```
+
 presentation of the projet at Potsdam [Slides](http://wiki.kiwix.org/w/images/4/43/Pibox_installer_potsdam_2017_presentation.pdf)
 
 some notes about how the project is structured:
