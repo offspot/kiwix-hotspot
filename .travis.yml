@@ -58,12 +58,12 @@ matrix:
     - security import pibox-installer.p12 -k build.keychain -P $MACOS_CERTIFICATE_PASSWORD -A
     - "security set-key-partition-list -S apple-tool:,apple: -s -k mysecretpassword build.keychain"
     - security find-identity -v
-    - "codesign -s \"Developer ID Application: Wikimedia CH (L7HWM3SP3L)\" dist/kiwix-hotspot.app --deep"
+    - "codesign -s \"Developer ID Application: Wikimedia CH (L7HWM3SP3L)\" \"dist/Kiwix Hotspot.app\" --deep"
 
     # Install and run create-dmg
     - npm install --global create-dmg@2.0.0 --python=python2.7
-    - create-dmg dist/kiwix-hotspot.app || true
-    - mv kiwix-hotspot-*.dmg kiwix-hotspot-macos.dmg
+    - create-dmg dist/Kiwix\ Hotspot.app || true
+    - mv Kiwix-Hotspot-*.dmg kiwix-hotspot-macos.dmg
 
     # CI build
     - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ "a$PIBOX_RELEASE" = "a" ]; then scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa kiwix-hotspot-macos.dmg nightlybot@download.kiwix.org:/var/www/tmp.kiwix.org/ci/kiwix-hotspot-macos-$BRANCH.dmg; fi

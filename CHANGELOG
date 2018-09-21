@@ -1,3 +1,6 @@
+2.0-rc12
+* macOS binary name (Kiwix Hotspot instead of kiwix-hotspot)
+
 2.0-rc11
 * Fixed an unmount issue on Linux
 * File size entry is now a selection list of standard SD cards sizes
