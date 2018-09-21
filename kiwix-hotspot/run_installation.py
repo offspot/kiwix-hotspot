@@ -309,6 +309,9 @@ def run_installation(
                 emulation, extra_vars, secret_keys, logo=logo, favicon=favicon, css=css
             )
 
+        # wait for QEMU to release file (windows mostly)
+        time.sleep(10)
+
         # mount image's 3rd partition on host
         logger.stage("copy")
 
@@ -355,6 +358,10 @@ def run_installation(
             logger.step("Re-run ansiblecube for move-content")
             ansiblecube.run_phase_two(emulation, extra_vars, secret_keys)
 
+        # wait for QEMU to release file (windows mostly)
+        logger.succ("Image creation successful.")
+        time.sleep(10)
+
     except Exception as e:
         logger.failed(str(e))
 
@@ -369,10 +376,10 @@ def run_installation(
 
         error = e
     else:
-        # Set final image filename
-        os.rename(image_building_path, image_final_path)
-
         try:
+            # Set final image filename
+            os.rename(image_building_path, image_final_path)
+
             # Write image to SD Card
             if sd_card:
                 logger.stage("write")
