@@ -20,6 +20,7 @@ from util import get_free_space_in_dir
 from util import relpathto
 from util import b64encode, b64decode
 from util import check_user_inputs
+from util import get_adjusted_image_size
 import data
 import iso639
 import requests
@@ -1215,7 +1216,7 @@ class Application:
                 size = int(self.component.sd_card_list_store[sd_card_id][get_size_index])
         else:
             try:
-                size = data.sdcard_sizes[self.component.size_combobox.get_active()] * ONE_GB
+                size = get_adjusted_image_size(data.sdcard_sizes[self.component.size_combobox.get_active()] * ONE_GB)
             except Exception:
                 size = -1
 

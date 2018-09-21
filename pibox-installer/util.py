@@ -455,3 +455,17 @@ def check_user_inputs(project_name, language, timezone,
 
     return valid_project_name, valid_language, valid_timezone, \
         valid_wifi_pwd, valid_admin_login, valid_admin_pwd
+
+
+def get_adjusted_image_size(size):
+    ''' save some space to accomodate real SD card sizes
+
+        the larger the SD card, the larger the loss space is '''
+
+    if size / ONE_GB <= 16:
+        rate = .98
+    elif size / ONE_GB <= 64:
+        rate = .97
+    else:
+        rate = .96
+    return int(size * rate)

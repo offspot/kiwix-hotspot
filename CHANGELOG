@@ -1,5 +1,6 @@
 2.0-rc12
 * macOS binary name (Kiwix Hotspot instead of kiwix-hotspot)
+* Safer image sizes based on SD card sizes
 
 2.0-rc11
 * Fixed an unmount issue on Linux

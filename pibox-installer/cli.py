@@ -15,6 +15,7 @@ from util import get_free_space_in_dir
 from util import human_readable_size, get_cache
 from util import CLILogger, b64decode
 from util import check_user_inputs
+from util import get_adjusted_image_size
 
 import tzlocal
 import humanfriendly
@@ -211,6 +212,8 @@ except Exception:
     sys.exit(1)
 else:
     args.human_size = human_readable_size(args.size, False)
+# adjust image size for content
+args.output_size = get_adjusted_image_size(args.size)
 
 
 # check arguments
@@ -278,14 +281,14 @@ if args.size < base_image_size:
           file=sys.stderr)
     sys.exit(3)
 
-if args.size < required_image_size:
+if args.output_size < required_image_size:
     print("image size ({img}) is not large enough for the content ({req})"
           .format(img=human_readable_size(args.size, False),
                   req=human_readable_size(required_image_size, False)),
           file=sys.stderr)
     sys.exit(3)
 
-if avail_space_in_build_dir < args.size:
+if avail_space_in_build_dir < args.output_size:
     print("Not enough space available at {dir} ({free}) to build image ({img})"
           .format(dir=args.build_dir,
                   free=human_readable_size(avail_space_in_build_dir),
