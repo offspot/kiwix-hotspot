@@ -134,8 +134,8 @@ def build_extra_vars(
     """ extra-vars friendly format of the ansiblecube configuration """
 
     extra_vars = {
-        "root_partition_size": root_partition_size // ONE_GB,
-        "disk_size": disk_size // ONE_GB,
+        "root_partition_size": root_partition_size,
+        "disk_size": disk_size,
         "project_name": name,
         "timezone": timezone,
         "language": language,

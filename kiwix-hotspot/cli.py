@@ -230,13 +230,12 @@ else:
 # parse requested size
 try:
     args.size = humanfriendly.parse_size(args.size)
+    args.output_size = get_adjusted_image_size(args.size)  # adjust image size for HW
 except Exception:
     print("Unable to understand required size ({})".format(args.size))
     sys.exit(1)
 else:
-    args.human_size = human_readable_size(args.size, False)
-# adjust image size for content
-args.output_size = get_adjusted_image_size(args.size)
+    args.human_size = human_readable_size(args.output_size, False)
 
 
 # check arguments
@@ -351,7 +350,7 @@ try:
         edupi=args.edupi == "yes",
         edupi_resources=args.edupi_resources,
         zim_install=args.zim_install,
-        size=args.size,
+        size=args.output_size,
         logger=logger,
         cancel_event=cancel_event,
         sd_card=args.sdcard,

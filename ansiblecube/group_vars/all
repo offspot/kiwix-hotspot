@@ -19,8 +19,8 @@ disk: /dev/mmcblk0
 root_partition: "{{ disk }}p2"
 data_partition: "{{ disk }}p3"
 data_path: /data
-disk_size: 4
-root_partition_size: 3
+disk_size: 7760000000
+root_partition_size: 7000000000
 username: ideascube
 password: $6$YcJS1HjRAv/$1bUosoPalzHEvfpx71UhnG6vCeckTGbA5U1i6UpA8X21Jrv7fYRPyNrq/YWuiBp3xQWd5kRRhrKKPHcbTkkfQ/
 mirror: https://download.kiwix.org

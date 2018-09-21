@@ -31,16 +31,18 @@ except NameError:
 ONE_GB = int(1e9)
 
 
-def main(root_size=7, disk_size=8):
+def main(root_size, disk_size):
 
     # sanitize input
-    if disk_size == "-":
-        disk_size = None
-    elif not isinstance(disk_size, int):
+    if not isinstance(disk_size, int):
         disk_size = int(disk_size)
+    if disk_size < 1024:
+        disk_size *= ONE_GB
 
     if not isinstance(root_size, int):
         root_size = int(root_size)
+    if root_size < 1024:
+        root_size *= ONE_GB
 
     try:
         data = get_partitions_boundaries(
@@ -56,7 +58,7 @@ def main(root_size=7, disk_size=8):
         sys.exit(1)
 
 
-def get_partitions_boundaries(lines, root_size, disk_size=None):
+def get_partitions_boundaries(lines, root_size, disk_size):
 
     sector_size = 512
     round_bound = 128
@@ -100,7 +102,7 @@ def get_partitions_boundaries(lines, root_size, disk_size=None):
     if is_full:
         pass  # whether root part was already expanded
 
-    size_up_to_root_b = root_size * ONE_GB
+    size_up_to_root_b = root_size
     nb_clusters_endofroot = size_up_to_root_b // sector_size
 
     # align partitions (otherwise exfat-fuse gets often corrupt)
@@ -113,7 +115,7 @@ def get_partitions_boundaries(lines, root_size, disk_size=None):
 
     # end second partition on a predicatble cluster
     # full_size - root_size (root_end) - margin
-    data_bytes = disk_size * ONE_GB - root_size * ONE_GB - end_margin
+    data_bytes = disk_size - root_size - end_margin
     data_clusters = data_bytes // sector_size
     data_end = data_start + data_clusters
 

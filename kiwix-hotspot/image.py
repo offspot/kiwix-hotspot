@@ -17,12 +17,12 @@ import data
 from util import human_readable_size
 from backend import qemu
 from backend.content import get_content
-from util import CLILogger, CancelEvent, ONE_GB
 from backend.download import download_content, unzip_file
 from backend.ansiblecube import (
     run_for_image,
     ansiblecube_path as ansiblecube_emulation_path,
 )
+from util import CLILogger, CancelEvent, ONE_GB, get_adjusted_image_size
 
 MIN_ROOT_SIZE = 7 * ONE_GB
 
@@ -41,7 +41,9 @@ def run_in_qemu(image_fpath, disk_size, root_size, logger, cancel_event, qemu_ra
             is_master=True,
         )
 
-        logger.step("resizing QEMU image to {}GB".format(disk_size // ONE_GB))
+        logger.step(
+            "resizing QEMU image to {}GB".format(human_readable_size(disk_size, False))
+        )
         emulator.resize_image(disk_size)
 
         # Run emulation
@@ -73,7 +75,7 @@ def main(logger, disk_size, root_size, build_folder, qemu_ram, image_fname=None)
     # convert sizes to bytes and make sure those are usable
     try:
         root_size = int(root_size) * ONE_GB
-        disk_size = int(disk_size) * ONE_GB
+        disk_size = get_adjusted_image_size(int(disk_size) * ONE_GB)
 
         if root_size < MIN_ROOT_SIZE:
             raise ValueError(
@@ -87,6 +89,12 @@ def main(logger, disk_size, root_size, build_folder, qemu_ram, image_fname=None)
     except Exception as exp:
         logger.err("Erroneous size option: {}".format(exp))
         sys.exit(1)
+
+    logger.step(
+        "Starting master creation: {} ({} root)".format(
+            human_readable_size(disk_size, False), human_readable_size(root_size, False)
+        )
+    )
 
     # default output file name
     if image_fname is None:

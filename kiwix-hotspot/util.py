@@ -509,10 +509,9 @@ def get_adjusted_image_size(size):
 
         the larger the SD card, the larger the loss space is """
 
-    if size / ONE_GB <= 16:
-        rate = .98
-    elif size / ONE_GB <= 64:
-        rate = .97
-    else:
-        rate = .96
+    # if size is not a rounded GB multiple, assume it's OK
+    if not size % ONE_GB == 0:
+        return size
+
+    rate = .97 if size / ONE_GB <= 16 else .96
     return int(size * rate)
