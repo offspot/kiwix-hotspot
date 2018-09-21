@@ -4,7 +4,7 @@
     "timezone": "Europe/Paris",
     "wifi": {
         "protected": false,
-        "password": "piboxwifipwd"
+        "password": "hotspot-password"
     },
     "admin_account": {
         "login": "admin",

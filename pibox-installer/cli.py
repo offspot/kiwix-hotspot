@@ -122,7 +122,7 @@ for catalog in YAML_CATALOGS:
 languages = [code for code, language in data.ideascube_languages]
 
 defaults = {
-    'name': "Kiwix Plug",
+    'name': "Kiwix Hotspot",
     'timezone': str(tzlocal.get_localzone()),
     'language': "en",
     'size': "8GB",

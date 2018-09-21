@@ -11,9 +11,8 @@ elif sys.argv[1] == "image":
     sys.argv.pop(1)
     runpy.run_module("image")
 else:
-    parser = argparse.ArgumentParser(
-        description="ideascube/kiwix installer for raspberrypi.")
+    parser = argparse.ArgumentParser(description="Kiwix Hotspot creation tool")
     sub_parser = parser.add_subparsers()
-    sub_parser.add_parser("cli", help="run CLI mode")
-    sub_parser.add_parser("image", help="prepare a base image")
+    sub_parser.add_parser("cli", help="run it on the console")
+    sub_parser.add_parser("image", help="prepare a master image")
     parser.parse_args()

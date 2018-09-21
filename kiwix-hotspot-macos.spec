@@ -46,7 +46,7 @@ coll = COLLECT(exe,
 app = BUNDLE(coll,
              name='Kiwix Hotspot.app',
              icon='kiwix-hotspot-logo.icns',
-             bundle_identifier='org.kiwix.plug',
+             bundle_identifier='org.kiwix.hotspot',
              info_plist={
                  'CFBundleDisplayName': 'Kiwix Hotspot',
                  'CFBundleShortVersionString': get_version_str(),

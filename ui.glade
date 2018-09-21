@@ -388,7 +388,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="tooltip_text" translatable="yes">Machine and WiFi name</property>
-                    <property name="label" translatable="yes">Plug name :</property>
+                    <property name="label" translatable="yes">Hotspot name :</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -400,7 +400,7 @@
                   <object class="GtkEntry" id="project_name_entry">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="text" translatable="yes">Kiwix Plug</property>
+                    <property name="text" translatable="yes">Kiwix Hotspot</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -664,7 +664,7 @@ It can be modified after installation using the file:
                       <object class="GtkEntry" id="wifi_password_entry">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="text" translatable="yes">kiwixplug-wifipwd</property>
+                        <property name="text" translatable="yes">hotspot-password</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>

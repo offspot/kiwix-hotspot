@@ -11,14 +11,14 @@
 echo "remove cron task clearing-up accepted IP list"
 sudo sh -c 'crontab -u root -l |grep -v clean_iptables.sh |crontab -u root -'
 
-/usr/bin/wget https://framagit.org/ideascube/pibox-installer/raw/master/online-demo/plugdemo -O /usr/local/bin/plugdemo
-chmod +x /usr/local/bin/plugdemo
+/usr/bin/wget https://framagit.org/ideascube/pibox-installer/raw/master/online-demo/hotspot-demo -O /usr/local/bin/hotspot-demo
+chmod +x /usr/local/bin/hotspot-demo
 
-/usr/local/bin/plugdemo
+/usr/local/bin/hotspot-demo
 
-sudo ln -s /usr/local/bin/plugdemo /etc/network/if-up.d/plugdemo
+sudo ln -s /usr/local/bin/hotspot-demo /etc/network/if-up.d/hotspot-demo
 
-sudo sh -c 'echo "@reboot /usr/local/bin/plugdemo" >> /etc/crontab'
+sudo sh -c 'echo "@reboot /usr/local/bin/hotspot-demo" >> /etc/crontab'
 
 echo "rename image for demo"
-cd /var/lib/ansible/local && sudo /usr/local/bin/ansible-playbook --inventory hosts --tags rename,seal  --extra-vars "tld=kiwix.org project_name=plug-demo" main.yml
+cd /var/lib/ansible/local && sudo /usr/local/bin/ansible-playbook --inventory hosts --tags rename,seal  --extra-vars "tld=kiwix.org project_name=demo.hotspot" main.yml

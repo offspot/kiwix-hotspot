@@ -440,7 +440,7 @@ class Application:
         ''' restore UI to its initial (non-configured) state '''
 
         # name
-        self.component.project_name_entry.set_text("Kiwix Plug")
+        self.component.project_name_entry.set_text("Kiwix Hotspot")
 
         # language
         index = -1
@@ -462,7 +462,7 @@ class Application:
 
         # wifi
         self.component.wifi_password_switch.set_active(True)
-        self.component.wifi_password_entry.set_text("kiwixplug-wifipwd")
+        self.component.wifi_password_entry.set_text("hotspot-password")
 
         # admin account
         self.component.admin_account_login_entry.set_text("admin")

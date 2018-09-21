@@ -85,7 +85,7 @@
   tags: master
 
 - name: Create Certificate Signing Request
-  command: openssl req -new -sha256 -key /etc/nginx/ssl/ideascube.key -out /etc/nginx/ssl/ideascube.csr -subj "/C=CH/ST=Vaud/L=Lausanne/O=Kiwix/OU=Kiwix Plug/CN={{ fqdn }}"
+  command: openssl req -new -sha256 -key /etc/nginx/ssl/ideascube.key -out /etc/nginx/ssl/ideascube.csr -subj "/C=CH/ST=Vaud/L=Lausanne/O=Kiwix/OU=Kiwix Hotspot/CN={{ fqdn }}"
   tags: ['master', 'rename']
 
 - name: Sign the certificate

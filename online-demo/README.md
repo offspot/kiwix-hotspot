@@ -15,7 +15,7 @@ Qemu's default network stack is limited and has poor performances. In order to e
  * set a static IP (`192.168.1.3`) on the tap (`eth0` in the VM) on the same network.
  * add host (bridge) IP to the cleared list of captive portal (iptables)
  * remove the cron task which clears that list periodically
- * run the ansible playbook with `rename` tag to configure for `plug-demo.kiwix.org`
+ * run the ansible playbook with `rename` tag to configure for `demo.hotspot.kiwix.org`
 
 # Setup
 
@@ -27,7 +27,7 @@ Qemu's default network stack is limited and has poor performances. In order to e
 * host is a (deb-friendly) `x86_64`
 * host is not already using `tap0` nor `br0`
 * host is not already using port `5022`
-* test domain (`plug-demo.kiwix.org` and subdomains point to host)
+* test domain (`demo.hotspot.kiwix.org` and subdomains point to host)
 
 Please, update the scripts to your needs.
 
@@ -45,7 +45,7 @@ mv qemu-{system-arm,img} /usr/local/bin/
 useradd -g www-data -l -m -N -s /bin/bash qdemo
 
 # add fake domains to hosts to be able to test outside nginx
-echo "192.168.1.3        ideascube.hotspot plug-demo.kiwix.org kiwix.plug-demo.kiwix.org khanacademy.plug-demo.kiwix.org aflatoun.plug-demo.kiwix.org edupi.plug-demo.kiwix.org wikifundi.plug-demo.kiwix.org sites.plug-demo.kiwix.org plug-demo kiwix.plug-demo khanacademy.plug-demo aflatoun.plug-demo edupi.plug-demo wikifundi.plug-demo sites.plug-demo" >> /etc/hosts
+echo "192.168.1.3        ideascube.hotspot demo.hotspot.kiwix.org kiwix.demo.hotspot.kiwix.org khanacademy.demo.hotspot.kiwix.org aflatoun.demo.hotspot.kiwix.org edupi.demo.hotspot.kiwix.org wikifundi.demo.hotspot.kiwix.org sites.demo.hotspot.kiwix.org" >> /etc/hosts
 
 # download and execute at-boot script
 wget https://framagit.org/ideascube/pibox-installer/raw/master/online-demo/host-setup.sh -O /root/host-setup.sh && chmod +x /root/host-setup.sh && /root/host-setup.sh
@@ -54,8 +54,8 @@ wget https://framagit.org/ideascube/pibox-installer/raw/master/online-demo/host-
 echo "@reboot /root/host-setup.sh" >> /etc/crontab
 
 # download and install nginx vhost
-wget https://framagit.org/ideascube/pibox-installer/raw/master/online-demo/nginx-vhost -O /etc/nginx/sites-available/plug-demo.kiwix.org
-ln -s /etc/nginx/sites-available/nginx-vhost /etc/nginx/sites-enabled/plug-demo.kiwix.org
+wget https://framagit.org/ideascube/pibox-installer/raw/master/online-demo/nginx-vhost -O /etc/nginx/sites-available/demo.hotspot.kiwix.org
+ln -s /etc/nginx/sites-available/nginx-vhost /etc/nginx/sites-enabled/demo.hotspot.kiwix.org
 nginx -s reload
 
 # download and install qemu-shortcut
@@ -89,12 +89,12 @@ ssh pi@192.168.1.3
 ssh pi@localhost -p 5022
 # full network is exposed to host
 curl http://192.168.1.3/
-curl -L http://plug-demo.kiwix.org/
+curl -L http://demo.hotspot.kiwix.org/
 # shutdown the VM
 ssh pi@demo "sudo shutdown -P 0"
 ```
 
-Test the VM from outside: http://plug-demo.kiwix.org
+Test the VM from outside: http://demo.hotspot.kiwix.org
 
 # Useful commands
 

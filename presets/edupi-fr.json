@@ -4,14 +4,13 @@
     "timezone": "Europe/Paris",
     "wifi": {
         "protected": false,
-        "password": "piboxwifipwd"
+        "password": "hotspot-password"
     },
     "admin_account": {
         "login": "admin",
         "password": "admin"
     },
-    "build_dir": "../media/backup",
-    "size": "53 GB",
+    "size": "128 GB",
     "content": {
         "zims": [
             "phet_fr.fr",
