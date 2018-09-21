@@ -36,7 +36,7 @@ install:
       } Else {
         $version="CI (" + $scommit + ")"
       }
-      (Get-Content pibox-installer\data.py).replace('devel', $version) | Set-Content pibox-installer\data.py
+      (Get-Content kiwix-hotspot\data.py).replace('devel', $version) | Set-Content kiwix-hotspot\data.py
 
   # decrypt certificates
   - cmd: choco install openssl.light

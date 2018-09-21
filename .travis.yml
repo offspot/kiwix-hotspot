@@ -28,9 +28,9 @@ matrix:
     - BRANCH=${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}
     - SCOMMIT=$(git rev-parse --short ${TRAVIS_COMMIT})
     - if [ $PIBOX_RELEASE ]; then PIBOX_VERSION=${PIBOX_RELEASE:1}; elif [ "$TRAVIS_EVENT_TYPE" = "cron" ]; then PIBOX_VERSION="nightly ($SCOMMIT)"; else PIBOX_VERSION="CI ($SCOMMIT)"; fi
-    - sed -i.bak "s/VERSION = \"devel\"/VERSION = \"${PIBOX_VERSION}\"/g" pibox-installer/data.py
+    - sed -i.bak "s/VERSION = \"devel\"/VERSION = \"${PIBOX_VERSION}\"/g" kiwix-hotspot/data.py
 
-    # Package pibox-installer
+    # Package kiwix-hotspot
     - brew update
     # checking our formulas out to how they were when python 3.6.5 was around
     - cd /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core
@@ -100,7 +100,7 @@ matrix:
     - BRANCH=${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}
     - SCOMMIT=$(git rev-parse --short ${TRAVIS_COMMIT})
     - if [ $PIBOX_RELEASE ]; then PIBOX_VERSION=${PIBOX_RELEASE:1}; elif [ "$TRAVIS_EVENT_TYPE" = "cron" ]; then PIBOX_VERSION="nightly ($SCOMMIT)"; else PIBOX_VERSION="CI ($SCOMMIT)"; fi
-    - sed -i.bak "s/VERSION = \"devel\"/VERSION = \"${PIBOX_VERSION}\"/g" pibox-installer/data.py
+    - sed -i.bak "s/VERSION = \"devel\"/VERSION = \"${PIBOX_VERSION}\"/g" kiwix-hotspot/data.py
 
     # update XZ (trusty version -5.0.5 is too old)
     - wget http://download.kiwix.org/dev/xz-5.2.4.tar.gz

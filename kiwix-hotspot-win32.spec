@@ -3,7 +3,7 @@
 import os
 import sys
 import site
-sys.path += [os.path.join(os.getcwd(), 'pibox-installer')]
+sys.path += [os.path.join(os.getcwd(), 'kiwix-hotspot')]
 from version import get_version_str, get_short_version_str
 
 # update version number for exe metadata
@@ -17,7 +17,7 @@ with open(rsc, 'w') as f:
 block_cipher = None
 typelib_path = os.path.join(site.getsitepackages()[1], 'gnome', 'lib', 'girepository-1.0')
 
-a = Analysis(['pibox-installer/__main__.py'],
+a = Analysis(['kiwix-hotspot/__main__.py'],
              pathex=['.'],
              binaries=[(os.path.join(typelib_path, tl), 'gi_typelibs') for tl in os.listdir(typelib_path)],
              datas=[('ui.glade', '.'),

@@ -47,9 +47,9 @@ activate the environment
 install pip dependencies: `pip3 install -r requirements-PLATFORM.txt`
 (note: on linux you may need some distribution packges, see package kiwix-hotspot for more information)
 
-run GUI application: `python3 pibox-installer`
+run GUI application: `python3 kiwix-hotspot`
 
-run CLI application: `python3 pibox-installer cli`
+run CLI application: `python3 kiwix-hotspot cli`
 
 ## Build vexpress-boot
 

@@ -3,7 +3,7 @@
 block_cipher = None
 
 
-a = Analysis(['pibox-installer/__main__.py'],
+a = Analysis(['kiwix-hotspot/__main__.py'],
              pathex=['.'],
              binaries=[('qemu-system-arm', '.'), ('qemu-img', '.')],
              datas=[('ui.glade', '.'),
