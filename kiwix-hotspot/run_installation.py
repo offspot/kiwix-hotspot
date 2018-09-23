@@ -360,7 +360,7 @@ def run_installation(
 
         # wait for QEMU to release file (windows mostly)
         logger.succ("Image creation successful.")
-        time.sleep(10)
+        time.sleep(20)
 
     except Exception as e:
         logger.failed(str(e))
@@ -378,7 +378,20 @@ def run_installation(
     else:
         try:
             # Set final image filename
-            os.rename(image_building_path, image_final_path)
+            tries = 0
+            while True:
+                try:
+                    os.rename(image_building_path, image_final_path)
+                except Exception as exp:
+                    logger.err(exp)
+                    tries += 1
+                    if tries > 3:
+                        raise exp
+                    time.sleep(5 * tries)
+                    continue
+                else:
+                    logger.std("Renamed image file to {}".format(image_final_path))
+                    break
 
             # Write image to SD Card
             if sd_card:

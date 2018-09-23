@@ -322,7 +322,7 @@ class _RunningInstance:
         try:
             self._qemu.wait(timeout)
         except subprocess.TimeoutExpired:
-            pass
+            self._qemu.terminate()
         with self._cancel_event.lock() as cancel_register:
             cancel_register.unregister(self._qemu.pid)
         self._qemu = None
