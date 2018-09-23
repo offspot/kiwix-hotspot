@@ -895,9 +895,10 @@ digits '0' to '9', hyphen '-' and underscore '_'</property>
                     <property name="can_focus">False</property>
                     <property name="tooltip_text" translatable="yes">The path where the image is build</property>
                     <property name="label" translatable="yes">Build path :</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
-                    <property name="expand">False</property>
+                    <property name="expand">True</property>
                     <property name="fill">True</property>
                     <property name="position">0</property>
                   </packing>
@@ -914,6 +915,20 @@ digits '0' to '9', hyphen '-' and underscore '_'</property>
                     <property name="fill">True</property>
                     <property name="pack_type">end</property>
                     <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                <object class="GtkButton" id="clean_cache_button">
+                    <property name="label" translatable="yes">Clean</property>
+                    <property name="tooltip_text" translatable="yes">Save space by Cleaning-up your Cache</property>
+                    <property name="visible">False</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
               </object>

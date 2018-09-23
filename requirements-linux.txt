@@ -18,3 +18,4 @@ psutil==5.4.5
 humanfriendly==4.12
 requests==2.18.4
 xlib==0.21
+scandir==1.9.0

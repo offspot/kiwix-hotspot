@@ -17,6 +17,13 @@ import datetime
 import threading
 import collections
 
+try:
+    scandir_func = os.scandir
+except AttributeError:
+    import scandir
+
+    scandir_func = scandir.scandir
+
 import pytz
 from path import Path
 import humanfriendly
@@ -357,14 +364,14 @@ class CLILogger(ProgressHelper):
     def __init__(self):
         super(CLILogger, self).__init__()
 
-    def step(self, step):
-        self.p("--> {}".format(step), color="34")
+    def step(self, step, end=None):
+        self.p("--> {}".format(step), color="34", end=end)
 
-    def err(self, err):
-        self.p(err, color="31")
+    def err(self, err, end=None):
+        self.p(err, color="31", end=end)
 
-    def succ(self, succ):
-        self.p(succ, color="32")
+    def succ(self, succ, end=None):
+        self.p(succ, color="32", end=end)
 
     def raw_std(self, std):
         sys.stdout.write(std)
@@ -515,3 +522,14 @@ def get_adjusted_image_size(size):
 
     rate = .97 if size / ONE_GB <= 16 else .96
     return int(size * rate)
+
+
+def get_folder_size(path):
+    """ total size in bytes of a folder (recurse file stat) """
+    total = 0
+    for entry in scandir_func(path):
+        if entry.is_file():
+            total += os.path.getsize(entry.path)
+        elif entry.is_dir():
+            total += get_folder_size(entry.path)
+    return total

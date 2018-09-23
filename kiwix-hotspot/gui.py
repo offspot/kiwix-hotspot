@@ -7,6 +7,7 @@ import json
 import platform
 import tempfile
 import threading
+import multiprocessing
 from collections import OrderedDict
 
 import gi
@@ -28,6 +29,8 @@ from backend.content import (
 import data
 import sd_card_info
 from util import relpathto
+from util import get_cache
+from util import CLILogger
 from util import check_user_inputs
 from version import get_version_str
 from util import b64encode, b64decode
@@ -38,6 +41,8 @@ from util import CancelEvent, ProgressHelper
 from run_installation import run_installation
 from backend.mount import open_explorer_for_imdisk
 from util import human_readable_size, ONE_GB, ONE_MiB
+from backend.cache import clean_cache, reset_cache
+from backend.cache import get_cache_size_and_free_space
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk, GLib, GdkPixbuf, GObject
@@ -281,6 +286,9 @@ class Application:
         # etcher
         self.component.menu_etcher.connect("activate", self.activate_menu_etcher)
 
+        # cache
+        self.component.clean_cache_button.connect("clicked", self.activate_menu_cache)
+
         # wifi password
         self.component.wifi_password_switch.connect(
             "notify::active",
@@ -315,6 +323,9 @@ class Application:
         renderer = Gtk.CellRendererText()
         self.component.timezone_combobox.pack_start(renderer, True)
         self.component.timezone_combobox.add_attribute(renderer, "text", 0)
+
+        # build-path
+        self.component.build_path_chooser.connect("file-set", self.changed_build_path)
 
         # output
         self.component.sd_card_combobox.connect(
@@ -776,6 +787,160 @@ class Application:
         elif ret == Gtk.ResponseType.OK:
             webbrowser.open(data.etcher_url)
         dialog.close()
+
+    def changed_build_path(self, widget):
+        """ display Clean cache button only if build-path is set """
+        self.component.clean_cache_button.set_visible(
+            bool(self.component.build_path_chooser.get_filename().strip())
+        )
+
+    def activate_menu_cache(self, widget):
+        build_folder = self.component.build_path_chooser.get_filename()
+        cache_folder = get_cache(build_folder)
+        cache_size, nb_files, free_space = get_cache_size_and_free_space(
+            build_folder, cache_folder
+        )
+
+        class CacheDialog(Gtk.Dialog):
+            WIPE_CODE = 2111
+
+            def __init__(self, parent):
+                Gtk.Dialog.__init__(
+                    self,
+                    "Reclaim space by cleaning-up your cache",
+                    parent,
+                    0,
+                    (
+                        "Wipe Cache (quick)",
+                        self.WIPE_CODE,
+                        "Clean Cache (slow)",
+                        Gtk.ResponseType.OK,
+                        "Close",
+                        Gtk.ResponseType.CANCEL,
+                    ),
+                )
+
+                self.parent = parent
+                self.set_default_size(300, 100)
+
+                label = Gtk.Label()
+                label.set_markup(
+                    "\nKiwix Hotspot maintains <b>a cache of all downloaded files</b> "
+                    "and reuse them on future runs.\n"
+                    "\nYou can either <b>wipe the cache completely</b> "
+                    "or <b>only remove obsolete files</b>.\n"
+                    "Obsoletes files are previous version of ZIMs or content packs.\n\n"
+                    "Wiping is almost instantaneous.\n"
+                    "Cleaning takes several minutes as "
+                    "it analyzes files to determine which ones should be kept.\n\n"
+                    "Your cache folder is: <i>{cache}</i>.\n"
+                    "<u>Cache Disk Usage</u>: <b>{du}</b> ({nb} files)\n"
+                    "<u>Free Space</u>: <b>{df}</b>\n".format(
+                        cache=cache_folder,
+                        du=human_readable_size(cache_size),
+                        df=human_readable_size(free_space),
+                        nb=nb_files,
+                    )
+                )
+                label.set_alignment(0, 0.5)
+
+                self.thread = None
+                self.run_progressbar = Gtk.ProgressBar()
+                self.cancel_button = Gtk.Button("Cancel")
+                self.cancel_button.connect("clicked", self.stop_cache_operation)
+
+                box = self.get_content_area()
+                box.add(label)
+                box.add(self.run_progressbar)
+                box.add(self.cancel_button)
+                box.add(Gtk.Label(""))  # spacer
+                self.show_all()
+                self.run_progressbar.set_visible(False)
+                self.cancel_button.set_visible(False)
+
+            def start_cache_operation(self, is_wipe):
+                # do nothing if the thread is running
+                if self.thread is not None and self.thread.is_alive():
+                    return
+
+                # show progress bar and cancel button
+                self.run_progressbar.set_visible(True)
+                self.cancel_button.set_label(
+                    "Cancel {}".format("Wiping" if is_wipe else "Cleaning...")
+                )
+                self.cancel_button.set_visible(True)
+
+                # start progress bar animation
+                self.timeout_id = GObject.timeout_add(50, self.on_timeout)
+
+                self.thread = multiprocessing.Process(
+                    target=reset_cache if is_wipe else clean_cache,
+                    args=(CLILogger(), build_folder, cache_folder),
+                )
+                self.thread.start()
+
+            def on_timeout(self):
+                # display post-thread dialog on cancelled thread
+                if self.thread is not None and not self.thread.is_alive():
+                    self.display_post_cache_operation_dialog()
+                    return False
+                elif self.thread is None:  # stop progress anim if thread not running
+                    return False
+
+                new_value = self.run_progressbar.get_fraction() + 0.035
+                # inverse direction if end reached
+                if new_value > 1:
+                    new_value = 0
+                    # switch from left-to-right to right-to-left at bounds
+                    self.run_progressbar.set_inverted(
+                        not self.run_progressbar.get_inverted()
+                    )
+                self.run_progressbar.set_fraction(new_value)
+                return True  # returns True so it continues to get called
+
+            def stop_cache_operation(self, *args, **kwargs):
+                if self.thread is not None and self.thread.is_alive():
+                    self.thread.terminate()
+                    self.thread = None
+                    self.cancel_button.set_visible(False)
+                    self.run_progressbar.set_visible(False)
+                self.close()
+
+            def display_post_cache_operation_dialog(self):
+                msg_box = Gtk.MessageDialog(
+                    self.parent,
+                    None,
+                    Gtk.MessageType.INFO,
+                    Gtk.ButtonsType.OK,
+                    "Cache Operation Completed",
+                )
+                cache_size, nb_files, free_space = get_cache_size_and_free_space(
+                    build_folder, cache_folder
+                )
+                content = (
+                    "Cache folder: {cache}.\n"
+                    "Cache Disk Usage: {du} ({nb} files)\n"
+                    "Free Space: {df}\n\n".format(
+                        cache=cache_folder,
+                        du=human_readable_size(cache_size),
+                        df=human_readable_size(free_space),
+                        nb=nb_files,
+                    )
+                )
+                msg_box.format_secondary_text(content)
+                msg_box.set_modal(True)
+                msg_box.run()
+                msg_box.destroy()
+                self.close()
+
+        dialog = CacheDialog(self.component.window)
+        ret = dialog.run()
+        if ret == CacheDialog.WIPE_CODE:
+            dialog.start_cache_operation(True)
+        elif ret == Gtk.ResponseType.OK:
+            dialog.start_cache_operation(False)
+        else:
+            dialog.close()
 
     def installation_done(self, error):
         ok = error is None
