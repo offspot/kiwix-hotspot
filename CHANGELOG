@@ -2,6 +2,7 @@
 * macOS binary name (Kiwix Hotspot instead of kiwix-hotspot)
 * Safer image sizes based on SD card sizes
 * Disabled some logs on target system to increase SD card lifespan
+* Updated Wikifundi language packs (2018-09-24)
 
 2.0-rc11
 * Fixed an unmount issue on Linux

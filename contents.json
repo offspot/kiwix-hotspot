@@ -45,17 +45,17 @@
         "url": "{mirror}/other/wikifundi/2.0/mediawiki_data_fr_2018-09.tar.bz2",
         "name": "mediawiki_data_fr_2018-09.tar.bz2",
         "folder_name": "data",
-        "checksum": "1b443acdb19f2b948b299737199a9bcec4a06abc4da5ea7d0fd9ae3e5dab8a1c",
-        "archive_size": 2269458101,
-        "expanded_size": 2962948096
+        "checksum": "a4e369b62ffecf78419c049eefba97bd5c35b0155732930b545f008494eeef6e",
+        "archive_size": 2283113409,
+        "expanded_size": 2987884544
     },
     "wikifundi_langpack_en": {
         "url": "{mirror}/other/wikifundi/2.0/mediawiki_data_en_2018-09.tar.bz2",
         "name": "mediawiki_data_en_2018-09.tar.bz2",
         "folder_name": "data",
-        "checksum": "8f6490cf27a47c1dc3a72ba0d50e49c9e448b1e96704d4b32c40287ae8851a1a",
-        "archive_size": 2265299708,
-        "expanded_size": 3252125696
+        "checksum": "40782afd4ead9275ca7ae56ca93dc690c889cea9446cddba17cc6e7df704847b",
+        "archive_size": 2357275817,
+        "expanded_size": 3316383744
     },
     "kalite_langpack_fr": {
         "url": "{mirror}/other/kalite/langpack_fr_0.17.zip",
