@@ -279,7 +279,7 @@ def get_virtual_device(image_fpath, logger):
 
     if sys.platform == "linux":
         # find out offset for third partition from the root part size
-        base_image = get_content("pibox_base_image")
+        base_image = get_content("hotspot_master_image")
         disk_size = get_qemu_image_size(image_fpath, logger)
         offset, size = get_start_offset(
             base_image.get("root_partition_size"), disk_size

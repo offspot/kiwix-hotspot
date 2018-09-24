@@ -418,7 +418,7 @@ def get_expanded_size(collection):
 def get_required_image_size(collection):
     required_size = sum(
         [
-            get_content("pibox_base_image").get("root_partition_size"),
+            get_content("hotspot_master_image").get("root_partition_size"),
             get_expanded_size(collection),
         ]
     )
@@ -433,7 +433,7 @@ def get_required_building_space(collection, cache_folder, image_size=None):
     # the master image
     # we neglect the master's expanded size as it is going to be moved
     # to the image path and resized in-place (never reduced)
-    base_image_size = get_content("pibox_base_image").get("archive_size")
+    base_image_size = get_content("hotspot_master_image").get("archive_size")
 
     # the created image
     if image_size is None:

@@ -297,7 +297,7 @@ try:
 except FileNotFoundError as exp:
     print("Supplied File Not Found: {}".format(exp.filename), file=sys.stderr)
     sys.exit(1)
-base_image_size = get_content("pibox_base_image")["expanded_size"]
+base_image_size = get_content("hotspot_master_image")["expanded_size"]
 
 if args.size < base_image_size:
     print(

@@ -1615,7 +1615,7 @@ class Application:
         size = self.get_output_size()
         validate_label(
             self.component.size_combobox,
-            size >= get_content("pibox_base_image")["expanded_size"],
+            size >= get_content("hotspot_master_image")["expanded_size"],
         )
 
         for row in self.component.zim_list_store:

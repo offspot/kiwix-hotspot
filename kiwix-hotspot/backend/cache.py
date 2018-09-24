@@ -126,7 +126,7 @@ def reset_cache(logger, build_folder, cache_folder, **kwargs):
 
     if kwargs.get("keep_master"):
 
-        master = get_content("pibox_base_image")
+        master = get_content("hotspot_master_image")
         master_fpath = os.path.join(cache_folder, master["name"])
         if (
             os.path.exists(master_fpath)

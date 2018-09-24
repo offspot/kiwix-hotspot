@@ -148,7 +148,7 @@ def run_installation(
         # Download Base image
         logger.stage("master")
         logger.step("Retrieving base image file")
-        base_image = get_content("pibox_base_image")
+        base_image = get_content("hotspot_master_image")
         rf = download_content(base_image, logger, build_dir)
         if not rf.successful:
             logger.err("Failed to download base image.\n{e}".format(e=rf.exception))
