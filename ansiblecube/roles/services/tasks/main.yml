@@ -35,7 +35,8 @@
 
 - include_tasks: enable_service.yml service=dnsmasq
 
-# TODO: set to no
+- include_tasks: disable_service.yml service=rsyslog
+
 - name: Disable SSH
   systemd:
     name: ssh
