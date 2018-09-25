@@ -4,7 +4,6 @@
 import os
 import re
 import json
-import math
 import shutil
 import itertools
 
@@ -13,7 +12,7 @@ import requests
 from data import content_file, mirror
 from backend.catalog import YAML_CATALOGS
 from backend.download import get_content_cache, unarchive
-from util import get_temp_folder, get_checksum, ONE_GiB, ONE_GB
+from util import get_temp_folder, get_checksum, ONE_GiB, ONE_MiB
 
 # prepare CONTENTS from JSON file
 with open(content_file, "r") as fp:
@@ -411,7 +410,8 @@ def get_expanded_size(collection):
             for item in get_all_contents_for(collection)
         ]
     )
-    margin = min([2 * ONE_GiB, total_size * 0.1])
+    # add a 5% margin ; make sure it's at least 2GB
+    margin = min([2 * ONE_GiB, total_size * 0.05])
     return total_size + margin
 
 
@@ -423,8 +423,7 @@ def get_required_image_size(collection):
         ]
     )
 
-    # round it up to next GiB
-    return math.ceil(required_size / ONE_GB) * ONE_GB
+    return required_size + ONE_MiB * 256  # make sure we have some free space
 
 
 def get_required_building_space(collection, cache_folder, image_size=None):
