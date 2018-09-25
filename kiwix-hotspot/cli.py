@@ -290,7 +290,7 @@ avail_space_in_build_dir = get_free_space_in_dir(args.build_dir)
 try:
     # how much space do we need to build the image?
     space_required_to_build = get_required_building_space(
-        collection, cache_folder, args.size
+        collection, cache_folder, args.output_size
     )
     # how large should the image be?
     required_image_size = get_required_image_size(collection)
@@ -310,20 +310,21 @@ if args.size < base_image_size:
 
 if args.output_size < required_image_size:
     print(
-        "image size ({img}) is not large enough for the content ({req})".format(
+        "image size ({img}/{img2}) is not large enough for the content ({req})".format(
             img=human_readable_size(args.size, False),
+            img2=human_readable_size(args.output_size, False),
             req=human_readable_size(required_image_size, False),
         ),
         file=sys.stderr,
     )
     sys.exit(3)
 
-if avail_space_in_build_dir < args.output_size:
+if avail_space_in_build_dir < space_required_to_build:
     print(
-        "Not enough space available at {dir} ({free}) to build image ({img})".format(
+        "Not enough space available at {dir} ({free}) to build image ({req})".format(
             dir=args.build_dir,
             free=human_readable_size(avail_space_in_build_dir),
-            img=human_readable_size(args.size),
+            req=human_readable_size(space_required_to_build),
         ),
         file=sys.stderr,
     )

@@ -4,6 +4,7 @@
 * Disabled some logs on target system to increase SD card lifespan
 * Updated Wikifundi language packs (2018-09-24)
 * Added a Cache Folder Management tool
+* Fixed space required assements issue on CLI mode
 
 2.0-rc11
 * Fixed an unmount issue on Linux
