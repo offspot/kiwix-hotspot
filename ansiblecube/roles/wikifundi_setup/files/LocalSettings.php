@@ -358,8 +358,8 @@ $wgAllowUserJs = true;
 # Wikipedia namespace
 define("NS_FOO", 3000);
 define("NS_FOO_TALK", 3001);
-$wgExtraNamespaces[NS_FOO] = "Wikipédia";
-$wgExtraNamespaces[NS_FOO_TALK] = "Wikipédia_talk"; // Note underscores in the namespace name.
+$wgExtraNamespaces[NS_FOO] = "Wikipedia";
+$wgExtraNamespaces[NS_FOO_TALK] = "Wikipedia_talk"; // Note underscores in the namespace name.
 
 # Not limit for attempting to login
 $wgPasswordAttemptThrottle = false;
