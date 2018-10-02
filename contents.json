@@ -42,20 +42,20 @@
         "expanded_size": 2097152
     },
     "wikifundi_langpack_fr": {
-        "url": "{mirror}/other/wikifundi/2.0/mediawiki_data_fr_2018-09.tar.bz2",
-        "name": "mediawiki_data_fr_2018-09.tar.bz2",
+        "url": "{mirror}/other/wikifundi/2.0/mediawiki_data_fr_2018-10.tar.bz2",
+        "name": "mediawiki_data_fr_2018-10.tar.bz2",
         "folder_name": "data",
-        "checksum": "a4e369b62ffecf78419c049eefba97bd5c35b0155732930b545f008494eeef6e",
-        "archive_size": 2283113409,
-        "expanded_size": 2987884544
+        "checksum": "1857ceda86ddc4f32a25bcd69a7e750719ef9d3d8da5ccc4eef62e44c6745379",
+        "archive_size": 2279634368,
+        "expanded_size": 2984116224
     },
     "wikifundi_langpack_en": {
-        "url": "{mirror}/other/wikifundi/2.0/mediawiki_data_en_2018-09.tar.bz2",
-        "name": "mediawiki_data_en_2018-09.tar.bz2",
+        "url": "{mirror}/other/wikifundi/2.0/mediawiki_data_en_2018-10.tar.bz2",
+        "name": "mediawiki_data_en_2018-10.tar.bz2",
         "folder_name": "data",
-        "checksum": "40782afd4ead9275ca7ae56ca93dc690c889cea9446cddba17cc6e7df704847b",
-        "archive_size": 2357275817,
-        "expanded_size": 3316383744
+        "checksum": "ecd0aad5e3aa9f3a4a5bcb7ff9f816e05210ffd7ed3c75b0664c5c006cee5a21",
+        "archive_size": 2272508586,
+        "expanded_size": 3268476928
     },
     "kalite_langpack_fr": {
         "url": "{mirror}/other/kalite/langpack_fr_0.17.zip",
