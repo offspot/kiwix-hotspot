@@ -35,6 +35,12 @@
   notify: restart nginx
   tags: master
 
+- name: install welcome redirect
+  template:
+    src: welcome.j2
+    dest: /etc/nginx/sites-enabled/welcome
+  tags: ['master', 'rename']
+
 - name: install default placeholder vhost for services
   template:
     src: placeholder.j2

@@ -9,6 +9,7 @@ max_wifi_client: 15
 hostname: ideasbox
 tld: "hotspot"
 fqdn: "{{ hostname }}.{{ tld }}"
+welcome_fqdn: "goto.kiwix.{{ tld }}"
 cert_domain: ideascube.{{ tld }}
 hotspot_name: ideasbox
 project_name: ideasbox

@@ -1,0 +1,5 @@
+server {
+    listen       80;
+    server_name {{ welcome_fqdn }};
+    return 301 http://{{ fqdn }};
+}
