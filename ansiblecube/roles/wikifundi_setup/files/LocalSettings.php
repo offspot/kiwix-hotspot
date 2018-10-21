@@ -175,6 +175,8 @@ wfLoadExtension( 'wikihiero' );
 
 # Maths
 wfLoadExtension('Math');
+$wgMathValidModes = array( 'png' );
+$wgDefaultUserOptions['math'] = 'png';
 
 # Timeline
 putenv("GDFONTPATH=/usr/share/fonts/truetype/freefont");

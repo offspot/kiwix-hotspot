@@ -25,7 +25,7 @@
 
 - name: Install dependencies (tex, for MathRenderer)
   apt:
-    name: texlive,texlive-fonts-recommended,texlive-lang-greek,texlive-latex-recommended,build-essential,dvipng,ocaml,cjk-latex
+    name: texlive,texlive-fonts-recommended,texlive-lang-greek,texlive-latex-recommended,texlive-latex-extra,build-essential,dvipng,ocaml,cjk-latex
     state: latest
     autoremove: yes
     autoclean: yes
@@ -93,7 +93,7 @@
 
 - name: download mediawiki
   get_url:
-    url: http://download.kiwix.org/dev/mediawiki-1.31.0-rc.0__with-extensions.tar.gz
+    url: "{{ mirror }}/dev/mediawiki-1.31.0-rc.0__with-extensions.tar.gz"
     dest: /tmp/mediawiki.tar.gz
   tags: setup
 
@@ -116,7 +116,7 @@
 - name: download parsoid
   unarchive:
     remote_src: yes
-    src: http://download.kiwix.org/dev/parsoid_0.9.0.tar.gz
+    src: "{{ mirror }}/dev/parsoid_0.9.0.tar.gz"
     dest: "{{ parsoid_root }}"
   tags: setup
 
@@ -155,7 +155,7 @@
 
 - name: download composer
   get_url:
-    url: http://download.kiwix.org/dev/composer_1.6.5.phar
+    url: "{{ mirror }}/dev/composer_1.6.5.phar"
     dest: "{{ mediawiki_root }}/composer.phar"
   tags: setup
 
@@ -178,6 +178,18 @@
   with_items:
     - math
     - texvccheck
+  tags: setup
+
+- name: fix math extension paths
+  replace:
+    name: "{{ mediawiki_root }}/extensions/Math/math/render.ml"
+    regexp: '"{{ item }} '
+    replace: '"/usr/bin/{{ item }} '
+  with_items:
+    - latex
+    - dvips
+    - convert
+    - dvipng
   tags: setup
 
 - name: fix permission on folder
