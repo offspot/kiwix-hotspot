@@ -10,9 +10,9 @@ import itertools
 import requests
 
 from data import content_file, mirror
-from backend.catalog import YAML_CATALOGS
+from backend.catalog import get_catalogs
 from backend.download import get_content_cache, unarchive
-from util import get_temp_folder, get_checksum, ONE_GiB, ONE_MiB
+from util import get_temp_folder, get_checksum, ONE_GiB, ONE_MiB, CLILogger
 
 # prepare CONTENTS from JSON file
 with open(content_file, "r") as fp:
@@ -195,7 +195,7 @@ def get_aflatoun_contents(languages=[]):
 
 def get_package_content(package_id):
     """ content-like dict for packages (zim file or static site) """
-    for catalog in YAML_CATALOGS:
+    for catalog in get_catalogs(CLILogger()):
         try:
             package = catalog["all"][package_id]
             package.update({"ext": "zip" if package["type"] != "zim" else "zim"})

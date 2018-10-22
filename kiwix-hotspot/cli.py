@@ -23,7 +23,7 @@ from util import check_user_inputs
 from util import CLILogger, b64decode
 from util import get_free_space_in_dir
 from util import get_adjusted_image_size
-from backend.catalog import YAML_CATALOGS
+from backend.catalog import get_catalogs
 from run_installation import run_installation
 from util import human_readable_size, get_cache
 
@@ -127,15 +127,12 @@ def set_config(config, args):
             setif("edupi_resources", rsc if isremote(rsc) else os.path.abspath(rsc))
 
 
-try:
-    assert len(YAML_CATALOGS)
-except Exception as exception:
-    print(exception, file=sys.stderr)
+if get_catalogs(logger) is None:
     print("Catalog downloads failed, you may check your internet connection")
     sys.exit(2)
 
 zim_choices = []
-for catalog in YAML_CATALOGS:
+for catalog in get_catalogs(logger):
     for (key, value) in catalog["all"].items():
         zim_choices.append(key)
 
@@ -218,7 +215,7 @@ for key, value in defaults.items():
         setattr(args, key, value)
 
 if args.catalog:
-    for catalog in YAML_CATALOGS:
+    for catalog in get_catalogs(logger):
         print(yaml.dump(catalog, default_flow_style=False, default_style=""))
     sys.exit(0)
 

@@ -7,14 +7,14 @@ import shutil
 from util import human_readable_size
 from backend.content import CONTENTS
 from backend.content import get_content
-from backend.catalog import YAML_CATALOGS
+from backend.catalog import get_catalogs
 from util import get_cache, get_folder_size, get_free_space_in_dir, get_checksum
 
 
-def package_is_latest_version(fpath, fname):
+def package_is_latest_version(fpath, fname, logger):
     """ whether a package (ZIM or ZIP) is in the current catalog """
 
-    for catalog in YAML_CATALOGS:
+    for catalog in get_catalogs(logger):
         for (package_id, package) in catalog["all"].items():
             package.update({"ext": "zip" if package["type"] != "zim" else "zim"})
             package.update({"langid": package.get("langid") or package_id})
@@ -26,7 +26,7 @@ def package_is_latest_version(fpath, fname):
     return False
 
 
-def is_latest_version(fpath, fname):
+def is_latest_version(fpath, fname, logger):
     """ whether the filename is a usable content """
 
     if fname.startswith("package_"):
@@ -53,7 +53,7 @@ def get_cache_file_details(logger, cache_folder, fname):
         alien = True
     if isdir:
         alien = True  # our cache contains only files
-    latest = is_latest_version(fpath, fname)
+    latest = is_latest_version(fpath, fname, logger)
 
     return {
         "fname": fname,

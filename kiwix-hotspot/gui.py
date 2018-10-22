@@ -36,7 +36,7 @@ from version import get_version_str
 from util import b64encode, b64decode
 from util import get_free_space_in_dir
 from util import get_adjusted_image_size
-from backend.catalog import YAML_CATALOGS
+from backend.catalog import get_catalogs
 from util import CancelEvent, ProgressHelper
 from run_installation import run_installation
 from backend.mount import open_explorer_for_imdisk
@@ -231,8 +231,8 @@ def validate_label(label, condition):
 
 
 class Application:
-    def __init__(self, catalog):
-        self.catalog = catalog
+    def __init__(self):
+        self.catalogs = None
 
         builder = Gtk.Builder()
         builder.add_from_file(data.ui_glade)
@@ -410,9 +410,96 @@ class Application:
         )
         self.component.zim_list_store.set_sort_column_id(1, Gtk.SortType.ASCENDING)
 
+        def get_project_size(name, lang):
+            langs = ["fr", "en"] if name == "aflatoun" else [lang]
+            return get_expanded_size(
+                get_collection(**{"{}_languages".format(name): langs})
+            )
+
+        # kalite
+        for lang, button in self.iter_kalite_check_button():
+            button.set_label(
+                "{} ({})".format(
+                    button.get_label(),
+                    human_readable_size(get_project_size("kalite", lang)),
+                )
+            )
+            button.connect("toggled", lambda button: self.update_free_space())
+
+        # wikifundi
+        for lang, button in self.iter_wikifundi_check_button():
+            button.set_label(
+                "{} ({})".format(
+                    button.get_label(),
+                    human_readable_size(get_project_size("wikifundi", lang)),
+                )
+            )
+            button.connect("toggled", lambda button: self.update_free_space())
+
+        # aflatoun
+        self.component.aflatoun_switch.connect(
+            "notify::active", lambda switch, state: self.update_free_space()
+        )
+        self.component.aflatoun_label.set_label(
+            "{} ({})".format(
+                self.component.aflatoun_label.get_label(),
+                human_readable_size(get_project_size("aflatoun", lang)),
+            )
+        )
+
+        # edupi
+        self.component.edupi_switch.connect(
+            "notify::active", lambda switch, state: self.update_free_space()
+        )
+        self.component.edupi_label.set_label(
+            "{} ({})".format(
+                self.component.edupi_label.get_label(),
+                human_readable_size(10 * ONE_MiB),
+            )
+        )
+        self.component.edupi_resources_url_entry.connect(
+            "changed", lambda _: self.update_free_space()
+        )
+        self.component.edupi_resources_chooser.connect(
+            "file-set", lambda _: self.update_free_space()
+        )
+
+        self.refresh_disk_list()
+
+        self.reset_config()  # will calculate free space
+
+        self.component.window.show()
+
+        self.catalogs_thread = threading.Thread(target=self.download_catalogs)
+        self.catalogs_thread.start()
+
+    def download_catalogs(self):
+        print("downloading catalogs...")
+        self.catalogs = get_catalogs(CLILogger())
+        print("catalogs downloaded")
+        if self.catalogs is not None:
+            self.build_zim_store()
+        return self.catalogs is not None
+
+    def ensure_catalogs(self):
+        if self.catalogs_thread.is_alive():
+            print("waiting for the download thread to complete")
+            self.catalogs_thread.join()
+        if self.catalogs is None:
+            if not self.download_catalogs():
+                self.display_error_message(
+                    title="Catalogs Download Failed",
+                    message="Could not download the Content Catalogs. Please check your Internet connection and/or Proxy Settings (File menu).",
+                    parent=self.component.window,
+                )
+                return False
+        return True
+
+    def build_zim_store(self):
+        print("building zim store")
         all_languages = set()
 
-        for one_catalog in catalog:
+        for one_catalog in self.catalogs:
             for (key, value) in one_catalog["all"].items():
                 name = value["name"]
                 url = value["url"]
@@ -495,60 +582,6 @@ class Application:
         column_text = Gtk.TreeViewColumn("Description", renderer_text, text=3)
         self.component.choosen_zim_tree_view.append_column(column_text)
 
-        def get_project_size(name, lang):
-            langs = ["fr", "en"] if name == "aflatoun" else [lang]
-            return get_expanded_size(
-                get_collection(**{"{}_languages".format(name): langs})
-            )
-
-        # kalite
-        for lang, button in self.iter_kalite_check_button():
-            button.set_label(
-                "{} ({})".format(
-                    button.get_label(),
-                    human_readable_size(get_project_size("kalite", lang)),
-                )
-            )
-            button.connect("toggled", lambda button: self.update_free_space())
-
-        # wikifundi
-        for lang, button in self.iter_wikifundi_check_button():
-            button.set_label(
-                "{} ({})".format(
-                    button.get_label(),
-                    human_readable_size(get_project_size("wikifundi", lang)),
-                )
-            )
-            button.connect("toggled", lambda button: self.update_free_space())
-
-        # aflatoun
-        self.component.aflatoun_switch.connect(
-            "notify::active", lambda switch, state: self.update_free_space()
-        )
-        self.component.aflatoun_label.set_label(
-            "{} ({})".format(
-                self.component.aflatoun_label.get_label(),
-                human_readable_size(get_project_size("aflatoun", lang)),
-            )
-        )
-
-        # edupi
-        self.component.edupi_switch.connect(
-            "notify::active", lambda switch, state: self.update_free_space()
-        )
-        self.component.edupi_label.set_label(
-            "{} ({})".format(
-                self.component.edupi_label.get_label(),
-                human_readable_size(10 * ONE_MiB),
-            )
-        )
-        self.component.edupi_resources_url_entry.connect(
-            "changed", lambda _: self.update_free_space()
-        )
-        self.component.edupi_resources_chooser.connect(
-            "file-set", lambda _: self.update_free_space()
-        )
-
         # language tree view
         renderer_text = Gtk.CellRendererText()
         column_text = Gtk.TreeViewColumn("Language", renderer_text, text=0)
@@ -565,11 +598,12 @@ class Application:
             "changed", self.zim_language_selection_changed
         )
 
-        self.refresh_disk_list()
+        # apply chosen zim filter
+        choosen_zim_filter = self.component.zim_list_store.filter_new()
+        choosen_zim_filter.set_visible_func(self.choosen_zim_filter_func)
+        self.component.choosen_zim_tree_view.set_model(choosen_zim_filter)
 
-        self.reset_config()  # will calculate free space
-
-        self.component.window.show()
+        self.update_free_space()
 
     def reset_config(self):
         """ restore UI to its initial (non-configured) state """
@@ -1497,6 +1531,8 @@ class Application:
                 self.component.space_error_window.show()
                 all_valid = False
 
+        all_valid = all_valid and self.ensure_catalogs()
+
         if all_valid:
 
             def target():
@@ -1554,7 +1590,8 @@ class Application:
                 self.component.sd_card_combobox.set_active(id)
 
     def zim_choose_content_button_clicked(self, button):
-        self.component.zim_window.show()
+        if self.ensure_catalogs():
+            self.component.zim_window.show()
 
     def get_edupi_resources(self):
         local_rsc = self.component.edupi_resources_chooser.get_filename()
@@ -1676,19 +1713,6 @@ class Application:
         return model[iter][8]
 
 
-try:
-    assert len(YAML_CATALOGS)
-except Exception as exception:
-    dialog = ShortDialog(
-        None,
-        (Gtk.STOCK_OK, Gtk.ResponseType.OK),
-        "Catalog downloads failed, you may check your internet connection",
-    )
-    dialog.run()
-    print(exception, file=sys.stderr)
-    dialog.destroy()
-    sys.exit(1)
-
-Application(YAML_CATALOGS)
+Application()
 
 run()
