@@ -7,7 +7,6 @@ import tempfile
 import posixpath
 
 from data import mirror
-from util import ONE_GB
 from backend.catalog import CATALOGS
 from backend.content import get_content
 
@@ -84,7 +83,7 @@ def run_for_image(machine, root_partition_size, disk_size):
     # install latest ansible and important python dependencies
     machine.exec_cmd(
         "sudo sudo python -m pip install -U "
-        "pip virtualenv jinja2 paramiko pyyaml httplib2 ansible"
+        "pip virtualenv jinja2 paramiko pyyaml httplib2 ansible==2.6.6"
     )
 
     # prepare ansible files
