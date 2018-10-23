@@ -112,7 +112,14 @@ class RequestedFile(object):
         )
 
 
-def stream(url, write_to=None, callback=None, block_size=1024, proxies=None):
+def stream(
+    url,
+    write_to=None,
+    callback=None,
+    block_size=1024,
+    proxies=None,
+    only_first_block=False,
+):
     """ download an URL without blocking
 
         - retries download on failure (with increasing wait delay)
@@ -137,6 +144,10 @@ def stream(url, write_to=None, callback=None, block_size=1024, proxies=None):
     )
 
     total_size = int(req.headers.get("content-length", 0))
+    # adjust if we are only requesting first block
+    if only_first_block and total_size > block_size:
+        total_size = block_size
+
     total_downloaded = 0
     if write_to is not None:
         fd = open(write_to, "wb")
@@ -148,6 +159,10 @@ def stream(url, write_to=None, callback=None, block_size=1024, proxies=None):
         total_downloaded += len(data)
         if write_to:
             fd.write(data)
+
+        # stop downloading/reading if we're just testing first block
+        if only_first_block:
+            break
 
     if write_to:
         fd.close()
@@ -198,7 +213,9 @@ def test_connection(proxies=None):
             ("HTTP", http_proxy_test_url),
             ("HTTPS", https_proxy_test_url),
         ):
-            size, fd = stream(url, proxies=proxies, callback=hook)
+            size, fd = stream(
+                url, proxies=proxies, callback=hook, only_first_block=True
+            )
     except Exception:
         return False, kind
     else:

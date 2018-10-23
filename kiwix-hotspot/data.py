@@ -26,8 +26,8 @@ ansiblecube_path = os.path.join(data_dir, "ansiblecube")
 mirror = "http://download.kiwix.org"
 sdcard_sizes = (8, 16, 32, 64, 128, 200, 256)
 
-http_proxy_test_url = "http://download.kiwix.org/favicon.ico"
-https_proxy_test_url = "https://download.kiwix.org/favicon.ico"
+http_proxy_test_url = "http://download.kiwix.org/library/ideascube.yml"
+https_proxy_test_url = "https://download.kiwix.org/library/ideascube.yml"
 
 ideascube_languages = [
     ("am", u"አማርኛ"),
