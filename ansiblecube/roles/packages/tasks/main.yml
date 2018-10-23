@@ -7,7 +7,7 @@
 - name: Install catalogs
   become: yes
   become_user: "{{ username }}"
-  command: ideascube catalog remotes add "{{ item.name }}" "{{ item.description }}" "{{ item.url }}"
+  command: ideascube catalog remotes add "{{ item.name }}" "{{ item.description }}" "{{ item.local_url }}"
   with_items: "{{ ansible_local.config.catalogs }}"
   tags: move-content
 
