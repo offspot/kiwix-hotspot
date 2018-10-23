@@ -6,11 +6,18 @@ import json
 import tempfile
 import posixpath
 
+import yaml
+
 from data import mirror
-from backend.catalog import CATALOGS
 from backend.content import get_content
+from backend.catalog import CATALOGS, get_catalogs
 
 ansiblecube_path = "/var/lib/ansible/local"
+# update CATALOGS to include our in-qemu local URL
+for catalog in CATALOGS:
+    catalog.update(
+        {"local_url": "file:///home/pi/catalog_{}.yml".format(catalog["name"])}
+    )
 
 
 def run(machine, tags, extra_vars={}, secret_keys=[]):
@@ -181,6 +188,18 @@ def run_phase_one(machine, extra_vars, secret_keys, logo=None, favicon=None, css
         machine.put_file(item, "/tmp/{}".format(fname))
 
     extra_vars.update({"has_custom_branding": has_custom_branding})
+
+    # save YAML catalogs into local files inside VM for use by ideascube
+    for index, catalog in enumerate(CATALOGS):
+        with tempfile.NamedTemporaryFile(suffix=".yml") as fd:
+            yaml.safe_dump(
+                get_catalogs(machine._logger)[index],
+                fd,
+                default_flow_style=False,
+                allow_unicode=True,
+                encoding="utf-8",
+            )
+            machine.put_file(fd.name, catalog["local_url"].replace("file://", ""))
 
     run(machine, tags, extra_vars, secret_keys)
 

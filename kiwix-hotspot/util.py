@@ -4,6 +4,7 @@
 import os
 import re
 import sys
+import json
 import data
 import signal
 import base64
@@ -16,6 +17,7 @@ import tempfile
 import datetime
 import threading
 import collections
+from urllib.parse import urlparse
 
 try:
     scandir_func = os.scandir
@@ -28,10 +30,14 @@ import pytz
 from path import Path
 import humanfriendly
 
+if sys.platform == "win32":
+    from win32com.shell import shellcon, shell
+
 ONE_MiB = 2 ** 20
 ONE_GiB = 2 ** 30
 ONE_GB = int(1e9)
 EXFAT_FORBIDDEN_CHARS = ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]
+PREFERENCES = None
 
 
 STAGES = collections.OrderedDict(
@@ -533,3 +539,70 @@ def get_folder_size(path):
         elif entry.is_dir():
             total += get_folder_size(entry.path)
     return total
+
+
+def split_proxy(proxy_url):
+    """ return a (username:password@host, port) tuple from proxy URL """
+    try:
+        url = urlparse(proxy_url)
+        if url.port:
+            return url.netloc[: -(len(str(url.port)) + 1)], str(url.port)
+        return url.netloc, ""
+    except Exception:
+        parts = proxy_url.rsplit(":", 1)
+        return parts[0], parts[1] if len(parts) > 1 else ""
+
+
+def get_prefs_path():
+    """ full path to our preferences JSON file """
+    fname = "kiwix-hotspot.prefs"
+    homedir = os.path.expanduser("~")
+    if sys.platform == "win32":
+        try:
+            prefsdir = shell.SHGetFolderPath(0, shellcon.CSIDL_LOCAL_APPDATA, 0, 0)
+        except Exception:
+            prefsdir = homedir
+    elif sys.platform == "linux":
+        prefsdir = os.path.join(homedir, ".config")
+    elif sys.platform == "darwin":
+        prefsdir = os.path.join(homedir, "Library", "Application Support")
+    else:
+        raise NotImplementedError("OS Not Supported")
+
+    os.makedirs(prefsdir, exist_ok=True)  # create folder should it not exist
+    return os.path.join(prefsdir, fname)
+
+
+def read_preferences():
+    """ read and parse JSON preference file """
+    fpath = get_prefs_path()
+    if os.path.exists(fpath):
+        try:
+            with open(fpath, "r") as fd:
+                return json.load(fd)
+        except Exception as exp:
+            print("Failed to parse prefs at {}: {}".format(fpath, exp))
+    return {}
+
+
+def get_prefs(force_reload=False):
+    """ cached-shortcut to PREFERENCES """
+    global PREFERENCES
+    if PREFERENCES is None or force_reload:
+        PREFERENCES = read_preferences()
+    return PREFERENCES
+
+
+def save_prefs(prefs, auto_reload=True):
+    """ save a passed preferences dict to the preferences file on disk """
+    fpath = get_prefs_path()
+    try:
+        with open(fpath, "w") as fd:
+            json.dump(prefs, fd, indent=4)
+    except Exception as exp:
+        print("Failed to save prefs to {}: {}".format(fpath, exp))
+        return False
+
+    if auto_reload:
+        get_prefs(force_reload=True)
+    return True

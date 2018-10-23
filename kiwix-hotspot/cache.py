@@ -14,7 +14,7 @@ import argparse
 
 from backend.content import CONTENTS
 from util import CLILogger, get_cache
-from backend.catalog import YAML_CATALOGS
+from backend.catalog import get_catalogs
 from backend.cache import list_cache_files, clean_cache, reset_cache
 
 
@@ -22,7 +22,7 @@ def init(logger):
     """ verify that the CATALOGS and CONTENTS list are populated (not empty) """
     logger.step("initializing...", end="")
     nb_contents = len(CONTENTS)
-    nb_packages = sum([len(c["all"]) for c in YAML_CATALOGS])
+    nb_packages = sum([len(c["all"]) for c in get_catalogs(logger)])
     nums = "({}+{})".format(nb_contents, nb_packages)
     if not nb_contents or not nb_packages:
         logger.err("FAILED. Check your internet connection. {}".format(nums))
