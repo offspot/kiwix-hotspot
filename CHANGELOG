@@ -1,6 +1,7 @@
 2.0-rc13
 * Updated Wikifundi language packs (2018-10-02)
 * Fixed latex in WikiFundi
+* Added Proxy Configuration Support
 
 2.0-rc12
 * macOS binary name (Kiwix Hotspot instead of kiwix-hotspot)
