@@ -309,6 +309,14 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkMenuItem" id="menu_proxies">
+                        <property name="label">Proxy Settings</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkMenuItem" id="menu_load_config">
                         <property name="label">Load configuration from file</property>
                         <property name="visible">True</property>
@@ -1475,6 +1483,233 @@ In File mode the image is created at build path, you can choose the size
             <property name="position">0</property>
           </packing>
         </child>
+        <child>
+          <placeholder/>
+        </child>
+      </object>
+    </child>
+    <child>
+      <placeholder/>
+    </child>
+  </object>
+  <object class="GtkWindow" id="proxies_dialog">
+    <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Proxy Settings</property>
+    <property name="modal">True</property>
+    <property name="window_position">center-on-parent</property>
+    <property name="transient_for">window</property>
+    <child>
+      <object class="GtkBox" id="no_id_78">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="margin_left">5</property>
+        <property name="margin_right">5</property>
+        <property name="margin_top">5</property>
+        <property name="margin_bottom">5</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">10</property>
+        <child>
+          <object class="GtkLabel" id="no_id_79">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">If your network requires the use of a proxy, specify it bellow:</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox" id="no_id_80">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="orientation">horizontal</property>
+            <property name="spacing">5</property>
+            <child>
+                <object class="GtkLabel" id="no_id_81">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">HTTP</property>
+                </object>
+                <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">0</property>
+                </packing>
+            </child>
+            <child>
+                <object class="GtkEntry" id="http_proxy_entry">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                </object>
+                <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                </packing>
+            </child>
+            <child>
+                <object class="GtkLabel" id="no_id_87">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Port</property>
+                </object>
+                <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">2</property>
+                </packing>
+            </child>
+            <child>
+                <object class="GtkEntry" id="http_proxy_port_entry">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="width_chars">5</property>
+                    <property name="max_width_chars">5</property>
+                </object>
+                <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">4</property>
+                </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>      
+        </child>
+
+        <child>
+          <object class="GtkBox" id="no_id_83">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="orientation">horizontal</property>
+            <property name="spacing">5</property>
+            <child>
+                <object class="GtkLabel" id="no_id_84">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">HTTPS</property>
+                </object>
+                <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                </packing>
+            </child>
+            <child>
+                <object class="GtkEntry" id="https_proxy_entry">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                </object>
+                <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                </packing>
+            </child>
+            <child>
+                <object class="GtkLabel" id="no_id_88">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Port</property>
+                </object>
+                <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
+                </packing>
+            </child>
+            <child>
+                <object class="GtkEntry" id="https_proxy_port_entry">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="width_chars">5</property>
+                    <property name="max_width_chars">5</property>
+                </object>
+                <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">3</property>
+                </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>      
+        </child>
+
+        <child>
+          <object class="GtkBox" id="no_id_86">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="orientation">horizontal</property>
+            <property name="spacing">5</property>
+
+            <child>
+                <object class="GtkButton" id="reset_proxies_button">
+                    <property name="label" translatable="yes">Reset (No Proxy)</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="margin_bottom">5</property>
+                    <property name="tooltip_text" translatable="yes">Remove Proxy Settings (use direct access)</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                    <property name="pack_type">end</property>
+                  </packing>
+            </child>
+
+            <child>
+                <object class="GtkButton" id="test_proxies_button">
+                    <property name="label" translatable="yes">Test</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="margin_bottom">5</property>
+                    <property name="tooltip_text" translatable="yes">Test above settings</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                    <property name="pack_type">end</property>
+                  </packing>
+            </child>
+
+            <child>
+                <object class="GtkButton" id="save_proxies_button">
+                    <property name="label" translatable="yes">Update Proxy</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="margin_bottom">5</property>
+                    <property name="tooltip_text" translatable="yes">Save those settings and use them</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                    <property name="pack_type">end</property>
+                  </packing>
+            </child>
+
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">3</property>
+          </packing>
+        </child>
+
+
         <child>
           <placeholder/>
         </child>

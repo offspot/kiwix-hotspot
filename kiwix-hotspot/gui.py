@@ -36,6 +36,7 @@ from version import get_version_str
 from util import b64encode, b64decode
 from util import get_free_space_in_dir
 from util import get_adjusted_image_size
+from util import split_proxy, save_prefs
 from backend.catalog import get_catalogs
 from util import CancelEvent, ProgressHelper
 from run_installation import run_installation
@@ -43,6 +44,7 @@ from backend.mount import open_explorer_for_imdisk
 from util import human_readable_size, ONE_GB, ONE_MiB
 from backend.cache import clean_cache, reset_cache
 from backend.cache import get_cache_size_and_free_space
+from backend.download import get_proxies, test_connection
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk, GLib, GdkPixbuf, GObject
@@ -283,6 +285,24 @@ class Application:
             self.component.menu_imdisk.set_visible(True)
             self.component.menu_imdisk.connect("activate", self.activate_menu_imdisk)
 
+        # proxies
+        self.component.menu_proxies.connect(
+            "activate", lambda widget: self.component.proxies_dialog.show()
+        )
+        self.component.reset_proxies_button.connect(
+            "clicked", self.reset_proxies_button_clicked
+        )
+        self.component.save_proxies_button.connect(
+            "clicked", self.save_proxies_button_clicked
+        )
+        self.component.test_proxies_button.connect(
+            "clicked", self.test_proxies_button_clicked
+        )
+        self.component.proxies_dialog.connect(
+            "show", lambda widget: self._set_proxies_entries()
+        )
+        self.component.proxies_dialog.connect("delete-event", hide_on_delete)
+
         # etcher
         self.component.menu_etcher.connect("activate", self.activate_menu_etcher)
 
@@ -473,17 +493,27 @@ class Application:
         self.catalogs_thread = threading.Thread(target=self.download_catalogs)
         self.catalogs_thread.start()
 
+    def ensure_connection(self):
+        """ test and return Connection Status. Display Error of failure """
+        conn_working, failed_protocol = test_connection()
+        if not conn_working:
+            self.display_error_message(
+                "Internet Connection Failed ({})".format(failed_protocol),
+                "Unable to contact Kiwix Server.\nPlease check your Internet Connection and/or Proxy Settings (from the File menu).",
+                self.component.window,
+            )
+            return False
+        return True
+
     def download_catalogs(self):
-        print("downloading catalogs...")
         self.catalogs = get_catalogs(CLILogger())
-        print("catalogs downloaded")
         if self.catalogs is not None:
             self.build_zim_store()
         return self.catalogs is not None
 
     def ensure_catalogs(self):
         if self.catalogs_thread.is_alive():
-            print("waiting for the download thread to complete")
+            # let's wait for the catalog thread to complete
             self.catalogs_thread.join()
         if self.catalogs is None:
             if not self.download_catalogs():
@@ -496,7 +526,6 @@ class Application:
         return True
 
     def build_zim_store(self):
-        print("building zim store")
         all_languages = set()
 
         for one_catalog in self.catalogs:
@@ -696,6 +725,105 @@ class Application:
 
     def activate_menu_help(self, widget):
         webbrowser.open(data.help_url)
+
+    def _set_proxies_entries(self, proxies=None):
+        """ fill proxies_dialog entries with proxies conf (passed or prefs) """
+        proxies = proxies if proxies is not None else get_proxies()
+        http_loc, http_port = split_proxy(proxies.get("http", ""))
+        self.component.http_proxy_entry.set_text(http_loc)
+        self.component.http_proxy_port_entry.set_text(http_port)
+
+        https_loc, https_port = split_proxy(proxies.get("https", ""))
+        self.component.https_proxy_entry.set_text(https_loc)
+        self.component.https_proxy_port_entry.set_text(https_port)
+
+    def _get_proxies_entries(self):
+        """ return proxies conf from the proxies_dialog entries """
+        http_proxy = self.component.http_proxy_entry.get_text().strip()
+        http_proxy_port = self.component.http_proxy_port_entry.get_text().strip()
+        https_proxy = self.component.https_proxy_entry.get_text().strip()
+        https_proxy_port = self.component.https_proxy_port_entry.get_text().strip()
+
+        proxies = {}
+        if http_proxy and http_proxy_port:
+            proxies.update(
+                {
+                    "http": "http://{netloc}:{port}".format(
+                        netloc=http_proxy, port=http_proxy_port
+                    )
+                }
+            )
+        if https_proxy and https_proxy_port:
+            proxies.update(
+                {
+                    "https": "http://{netloc}:{port}".format(
+                        netloc=https_proxy, port=https_proxy_port
+                    )
+                }
+            )
+        return proxies
+
+    def test_proxies_button_clicked(self, widget):
+        """ test connection using the (non-saved) proxy conf in the proxies dialog """
+        proxies = self._get_proxies_entries()
+        conn_working, failed_protocol = test_connection(proxies=proxies)
+        if conn_working:
+            mtype = Gtk.MessageType.INFO
+            title = "Connection Successful"
+            message = (
+                "We could reach Kiwix server using those settings.\n"
+                "You can now save them and pursue."
+            )
+        else:
+            mtype = Gtk.MessageType.ERROR
+            title = "Connection Failed ({})".format(failed_protocol)
+            message = (
+                "Unable to contact Kiwix server using those Settings.\n"
+                "Either your Internet Connection is not working or those settings are incorrect."
+            )
+
+        msg_box = Gtk.MessageDialog(
+            self.component.proxies_dialog, None, mtype, Gtk.ButtonsType.OK, title
+        )
+        msg_box.format_secondary_text(message)
+        msg_box.set_modal(True)
+        msg_box.run()
+        msg_box.destroy()
+
+    def reset_proxies_button_clicked(self, widget):
+        """ set proxies conf and prefs to not use proxy at all """
+
+        # reset UI
+        self._set_proxies_entries({})
+
+        # save prefs and reload proxies
+        save_prefs({}, auto_reload=True)
+        get_proxies(load_env=False, force_reload=True)
+
+        # close dialog
+        self.component.proxies_dialog.hide()
+
+    def save_proxies_button_clicked(self, widget):
+        """ save in prefs and use proxies conf from proxies_dialog """
+
+        proxies = self._get_proxies_entries()
+        prefs = {}
+
+        if proxies.get("http"):
+            prefs.update({"HTTP_PROXY": proxies.get("http")})
+
+        if proxies.get("https"):
+            prefs.update({"HTTPS_PROXY": proxies.get("https")})
+
+        # save prefs and reload proxies
+        save_prefs(prefs, auto_reload=True)
+        get_proxies(load_env=False, force_reload=True)
+
+        # reflect changes on UI
+        self._set_proxies_entries()
+
+        # close dialog
+        self.component.proxies_dialog.hide()
 
     def activate_menu_imdisk(self, widget):
         class ImDiskDialog(Gtk.Dialog):
@@ -1531,7 +1659,7 @@ class Application:
                 self.component.space_error_window.show()
                 all_valid = False
 
-        all_valid = all_valid and self.ensure_catalogs()
+        all_valid = all_valid and self.ensure_connection()
 
         if all_valid:
 
