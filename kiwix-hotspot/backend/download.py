@@ -11,12 +11,40 @@ import subprocess
 
 import requests
 
-from data import data_dir
-from util import ReportHook, get_checksum, get_cache
+from data import data_dir, http_proxy_test_url, https_proxy_test_url
+from util import ReportHook, get_checksum, get_cache, get_prefs
 from backend.util import subprocess_pretty_check_call, startup_info_args
 
 FAILURE_RETRIES = 6
 szip_exe = os.path.join(data_dir, "7za.exe")
+PROXIES = None
+
+
+def read_proxies(load_env=True):
+    """ read proxy configuration from pref file or ENV """
+
+    proxies = {}
+    if get_prefs().get("HTTP_PROXY", None):
+        proxies.update({"http": get_prefs().get("HTTP_PROXY")})
+    if get_prefs().get("HTTPS_PROXY", None):
+        proxies.update({"https": get_prefs().get("HTTPS_PROXY")})
+
+    if load_env:
+        # environment variables overwrites preferences
+        if os.getenv("HTTP_PROXY", None):
+            proxies.update({"http": os.getenv("HTTP_PROXY")})
+        if os.getenv("HTTPS_PROXY", None):
+            proxies.update({"https": os.getenv("HTTPS_PROXY")})
+
+    return proxies
+
+
+def get_proxies(load_env=True, force_reload=False):
+    """ cached-shortcut to PROXIES """
+    global PROXIES
+    if PROXIES is None or force_reload:
+        PROXIES = read_proxies()
+    return PROXIES
 
 
 class RequestedFile(object):
@@ -84,7 +112,7 @@ class RequestedFile(object):
         )
 
 
-def stream(url, write_to=None, callback=None, block_size=1024):
+def stream(url, write_to=None, callback=None, block_size=1024, proxies=None):
     """ download an URL without blocking
 
         - retries download on failure (with increasing wait delay)
@@ -104,7 +132,9 @@ def stream(url, write_to=None, callback=None, block_size=1024):
     )
     retry_adapter = requests.adapters.HTTPAdapter(max_retries=retries)
     session.mount("http", retry_adapter)  # tied to http and https
-    req = session.get(url, stream=True)
+    req = session.get(
+        url, stream=True, proxies=proxies if proxies is not None else PROXIES
+    )
 
     total_size = int(req.headers.get("content-length", 0))
     total_downloaded = 0
@@ -125,7 +155,11 @@ def stream(url, write_to=None, callback=None, block_size=1024):
         fd.seek(0)
 
     if total_size != 0 and total_downloaded != total_size:
-        raise AssertionError("Downloaded size is different than expected")
+        raise AssertionError(
+            "Downloaded size ({}) is different than expected ({})".format(
+                total_downloaded, total_size
+            )
+        )
 
     return total_downloaded, write_to if write_to else fd
 
@@ -155,6 +189,20 @@ def download_if_missing(url, fpath, logger, checksum=None):
         return RequestedFile.from_disk(url, fpath)
 
     return download_file(url, fpath, logger, checksum)
+
+
+def test_connection(proxies=None):
+    try:
+        hook = ReportHook(print).reporthook
+        for kind, url in (
+            ("HTTP", http_proxy_test_url),
+            ("HTTPS", https_proxy_test_url),
+        ):
+            size, fd = stream(url, proxies=proxies, callback=hook)
+    except Exception:
+        return False, kind
+    else:
+        return size > 0, None
 
 
 def get_content_cache(content, folder, is_cache_folder=False):
