@@ -1173,6 +1173,9 @@ class Application:
     def activate_menu_config(self, widget, for_save=False):
         home_path = os.environ["HomePath" if sys.platform == "win32" else "HOME"]
 
+        if not for_save and not self.ensure_catalogs():
+            return
+
         def _save(dialog):
             filename = (
                 dialog.get_filename()
