@@ -546,11 +546,17 @@ def split_proxy(proxy_url):
     try:
         url = urlparse(proxy_url)
         if url.port:
-            return url.netloc[: -(len(str(url.port)) + 1)], str(url.port)
-        return url.netloc, ""
+            netloc = url.netloc[: -(len(str(url.port)) + 1)]  # remove port from netloc
+            port = str(url.port)
+        else:
+            netloc = url.netloc
+            port = ""
     except Exception:
+        # could not parse URL, attempt something
         parts = proxy_url.rsplit(":", 1)
-        return parts[0], parts[1] if len(parts) > 1 else ""
+        netloc = parts[0].split("://", 1)[-1]
+        port = parts[1] if len(parts) > 1 else ""
+    return netloc, port
 
 
 def get_prefs_path():
