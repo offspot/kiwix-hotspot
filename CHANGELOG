@@ -2,6 +2,7 @@
 * Updated Wikifundi language packs (2018-10-02)
 * Fixed latex in WikiFundi
 * Added Proxy Configuration Support
+* Removed StaticSites catalog as it is no longer available online
 
 2.0-rc12
 * macOS binary name (Kiwix Hotspot instead of kiwix-hotspot)
