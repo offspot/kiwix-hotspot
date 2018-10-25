@@ -19,3 +19,4 @@ qemu-img
 qemu-system-arm
 xz-*.tar.gz
 xz-*
+etcher-cli

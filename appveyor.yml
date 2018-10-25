@@ -112,6 +112,14 @@ install:
   - del imdiskinst.exe
   - dir "C:\Program Files\imdiskinst"
 
+  # Download Etcher-cli
+  - mkdir "C:\Program Files\etcher-cli"
+  - cd "C:\Program Files\etcher-cli"
+  - if %platform%==x86 appveyor DownloadFile "http://download.kiwix.org/dev/Etcher-cli-1.1.2-win32-x86.zip" -FileName "etcher-cli.zip"
+  - if %platform%==x64 appveyor DownloadFile "http://download.kiwix.org/dev/Etcher-cli-1.1.2-win32-x64.zip" -FileName "etcher-cli.zip"
+  - 7z.exe x etcher-cli.zip
+  - del etcher-cli.zip
+
   # Run pyinstaller and show warning
   - cd C:\projects\kiwix-hotspot
   - if %platform%==x86 C:\Python34\python.exe C:\Python34\Scripts\pyinstaller-script.py --log-level=DEBUG kiwix-hotspot-win32.spec

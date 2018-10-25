@@ -4,6 +4,7 @@
 * Added Proxy Configuration Support
 * Removed StaticSites catalog as it is no longer available online
 * Changed JSON format for WiFi: single `wifi_password` entry
+* Using etcher-cli to flash and verify SD-card (all platforms)
 
 2.0-rc12
 * macOS binary name (Kiwix Hotspot instead of kiwix-hotspot)

@@ -3,11 +3,15 @@
 
 import os
 import sys
+import time
+import signal
 import ctypes
 import random
+import tempfile
 import threading
 import subprocess
 
+import data
 from util import CLILogger, ONE_MiB, human_readable_size
 
 
@@ -40,9 +44,10 @@ def startup_info_args():
         # distraction.
         si = subprocess.STARTUPINFO()
         si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        cf = subprocess.CREATE_NEW_PROCESS_GROUP
     else:
-        si = None
-    return {"startupinfo": si}
+        si = cf = None
+    return {"startupinfo": si, "creationflags": cf}
 
 
 def subprocess_pretty_call(
@@ -130,7 +135,7 @@ def run_as_win_admin(command, logger):
     return rc
 
 
-def get_admin_command(command, from_gui):
+def get_admin_command(command, from_gui, log_to=None):
     """ updated command to run it as root on macos or linux
 
         from_gui: whether called via GUI. Using cli sudo if not """
@@ -142,64 +147,16 @@ def get_admin_command(command, from_gui):
         return [
             "/usr/bin/osascript",
             "-e",
-            'do shell script "{command} 2>&1" '
-            "with administrator privileges".format(command=" ".join(command)),
+            'do shell script "{command} 2>&1 {redir}" '
+            "with administrator privileges".format(
+                command=" ".join(command), redir=">{}".format(log_to) if log_to else ""
+            ),
         ]
     if sys.platform == "linux":
         return ["pkexec"] + command
 
 
-def open_handles(image_fpath, device_fpath, read_only=False):
-    img_flag = os.O_RDONLY
-    dev_flag = os.O_RDONLY if read_only else os.O_WRONLY
-    if os.name == "posix":
-        return (os.open(image_fpath, img_flag), os.open(device_fpath, dev_flag))
-    elif os.name == "nt":
-        dev_flag = dev_flag | os.O_BINARY
-        return (os.open(image_fpath, img_flag), os.open(device_fpath, dev_flag))
-    else:
-        raise NotImplementedError("Platform not supported")
-
-
-def close_handles(image_fd, device_fd):
-    try:
-        os.close(image_fd)
-        os.close(device_fd)
-    except Exception:
-        pass
-
-
-def ensure_card_written(image_fpath, device_fpath, logger):
-    """ asserts image and device content is same (reads rand 4MiB from both """
-
-    logger.step("Verify data on SD card")
-
-    image_fd, device_fd = open_handles(image_fpath, device_fpath, read_only=True)
-
-    # read a 4MiB random part from the image
-    buffer_size = 4 * ONE_MiB
-    total_size = os.lseek(image_fd, 0, os.SEEK_END)
-    offset = random.randint(0, int((total_size - buffer_size) * .8))
-    offset -= offset % 512
-    logger.std(
-        "reading {n}b from offset {s} out of {t}b.".format(
-            n=buffer_size, s=offset, t=total_size
-        )
-    )
-
-    try:
-        # read same part from the SD card and compare
-        os.lseek(image_fd, offset, os.SEEK_SET)
-        os.lseek(device_fd, offset, os.SEEK_SET)
-        if not os.read(image_fd, buffer_size) == os.read(device_fd, buffer_size):
-            raise ValueError("Image and SD-card challenge do not match.")
-    except Exception:
-        raise
-    finally:
-        close_handles(image_fd, device_fd)
-
-
-class ImageWriterThread(threading.Thread):
+class EtcherWriterThread(threading.Thread):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._should_stop = False  # stop flag
@@ -208,63 +165,82 @@ class ImageWriterThread(threading.Thread):
     def stop(self):
         self._should_stop = True
 
-    def run(self):
+    def run(self,):
         image_fpath, device_fpath, logger = self._args
 
-        logger.step("Copy image to sd card")
+        logger.step("Copy image to sd card using etcher-cli")
 
-        image_fd, device_fd = open_handles(image_fpath, device_fpath)
+        from_cli = logger is None or type(logger) == CLILogger
+        # on macOS, GUI sudo captures stdout so we use a log file
+        log_to_file = not from_cli and sys.platform == "darwin"
+        if log_to_file:
+            log_file = tempfile.NamedTemporaryFile(suffix=".log")
 
-        total_size = os.lseek(image_fd, 0, os.SEEK_END)
-        os.lseek(image_fd, 0, os.SEEK_SET)
+        cmd = get_admin_command(
+            [
+                os.path.join(data.data_dir, "etcher-cli", "etcher"),
+                "-c",
+                "-y",
+                "-u",
+                "-d",
+                '"{}"'.format(device_fpath)
+                if sys.platform == "win32"  # \\.\PHYSICALDRIVE1 string needs quotes
+                else device_fpath,
+                image_fpath,
+            ],
+            from_gui=not from_cli,
+            log_to=log_file.name if log_to_file else None,
+        )
+        process = subprocess.Popen(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **startup_info_args()
+        )
+        logger.std("Starting Etcher: " + str(process.args))
 
-        if os.name == "nt":
-            buffer_size = 512  # safer on windows
-            logger_break = 1000
-        else:
-            buffer_size = 25 * ONE_MiB
-            logger_break = 4
-        steps = total_size // buffer_size
-
-        for step in range(0, steps):
-
-            if self._should_stop:
+        while process.poll() is None:
+            if self._should_stop:  # on cancel
+                logger.std(". cancelling...")
                 break
 
-            # only update logger every 4 steps (100MiB)
-            if step % logger_break == 0:
-                logger.progress(step, steps)
-                logger.std(
-                    "Copied {copied} of {total} ({pc:.2f}%)".format(
-                        copied=human_readable_size(step * buffer_size),
-                        total=human_readable_size(total_size),
-                        pc=step / steps * 100,
-                    )
+            if log_to_file:
+                with open(log_file.name, "r") as f:
+                    content = f.read()
+                    if content:
+                        logger.raw_std(f.read())
+            else:
+                for line in process.stdout:
+                    logger.raw_std(line.decode("utf-8", "ignore"))
+            time.sleep(2)
+
+        if log_to_file:
+            log_file.close()
+
+        try:
+            logger.std(". has process exited?")
+            process.wait(timeout=2)
+        except subprocess.TimeoutExpired:
+            logger.std(". process exited")
+            # send ctrl^c
+            if sys.platform == "win32":
+                logger.std(". sending ctrl^C")
+                process.send_signal(signal.CTRL_C_EVENT)
+                process.send_signal(signal.CTRL_BREAK_EVENT)
+                time.sleep(2)
+            if process.poll() is None:
+                logger.std(". sending SIGTERM")
+                process.terminate()  # send SIGTERM
+                time.sleep(2)
+            if process.poll() is None:
+                logger.std(". sending SIGKILL")
+                process.kill()  # send SIGKILL (SIGTERM again on windows)
+                time.sleep(2)
+        else:
+            logger.std(". process exited")
+            if not process.returncode == 0:
+                self.exp = CheckCallException(
+                    "Process returned {}".format(process.returncode)
                 )
-
-            try:
-                os.write(device_fd, os.read(image_fd, buffer_size))
-            except Exception as exp:
-                logger.std("Exception during write: {}".format(exp))
-                close_handles(image_fd, device_fd)
-                self.exp = exp
-                raise
-
-        if not self._should_stop and total_size % buffer_size:
-            logger.std("Writing last chunk...")
-            try:
-                os.write(device_fd, os.read(image_fd, total_size % buffer_size))
-            except Exception as exp:
-                logger.std("Exception during write: {}".format(exp))
-                close_handles(image_fd, device_fd)
-                self.exp = exp
-                raise
-
+        logger.std(". process done")
         logger.progress(1)
-        logger.step("sync")
-        if not self._should_stop:
-            os.fsync(device_fd)
-        close_handles(image_fd, device_fd)
 
 
 def prevent_sleep(logger):

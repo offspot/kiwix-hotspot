@@ -107,7 +107,7 @@ elif sys.platform == "darwin":
                 {
                     "bus_protocol": plist["BusProtocol"],
                     "device_identifier": plist["DeviceIdentifier"],
-                    "device": plist["DeviceNode"].replace("/dev/disk", "/dev/rdisk"),
+                    "device": plist["DeviceNode"],
                     "io_registry_entry_name": plist["IORegistryEntryName"],
                     "media_name": plist["MediaName"],
                     "media_type": plist["MediaType"],
