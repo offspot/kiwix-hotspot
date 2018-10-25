@@ -7,16 +7,10 @@
         "login": "admin",
         "password": "adminadmin"
     },
-    "size": "128 GB",
+    "size": "16 GB",
     "content": {
         "zims": [
-            "vikidia_fr_all.fr",
-            "wikimooc_fr_all.fr",
-            "wikipedia_fr_all_novid.fr",
-            "wikiquote_fr_all_novid.fr",
-            "wikisource_fr_all_novid.fr",
-            "wiktionary_fr_all.fr",
-            "wikipedia_fr_medicine.fr"
+            "vikidia_fr_all.fr"
         ],
         "kalite": [],
         "wikifundi": [
