@@ -408,7 +408,7 @@
                   <object class="GtkEntry" id="project_name_entry">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="text" translatable="yes">Kiwix Hotspot</property>
+                    <property name="text" translatable="yes">Kiwix</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>

@@ -71,10 +71,13 @@ def set_config(config, args):
                 else:
                     setif(key, os.path.abspath(fpath))
 
-    # wifi
+    # wifi (previous format)
     if "wifi" in config and isinstance(config["wifi"], dict):
         if "password" in config["wifi"] and config["wifi"].get("protected", True):
             setif("wifi_pwd", config["wifi"]["password"])
+    # wifi (new format)
+    if "wifi_password" in config:
+        setif("wifi_pwd", config["wifi_password"])
 
     # admin account
     if "admin_account" in config and isinstance(config["admin_account"], dict):

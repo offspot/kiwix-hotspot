@@ -638,7 +638,7 @@ class Application:
         """ restore UI to its initial (non-configured) state """
 
         # name
-        self.component.project_name_entry.set_text("Kiwix Hotspot")
+        self.component.project_name_entry.set_text("Kiwix")
 
         # language
         index = -1
@@ -1282,7 +1282,7 @@ class Application:
         else:
             self.component.timezone_combobox.set_active(item_id)
 
-        # wifi
+        # wifi (previous format)
         if "wifi" in config and isinstance(config["wifi"], dict):
             if "protected" in config["wifi"]:
                 self.component.wifi_password_switch.set_active(
@@ -1290,6 +1290,13 @@ class Application:
                 )
             if "password" in config["wifi"]:
                 self.component.wifi_password_entry.set_text(config["wifi"]["password"])
+        # wifi (new format)
+        if "wifi_password" in config:
+            self.component.wifi_password_switch.set_active(
+                config["wifi_password"] is None
+            )
+            if config["wifi_password"] is not None:
+                self.component.wifi_password_entry.set_text(config["wifi_password"])
 
         # admin account
         if "admin_account" in config and isinstance(config["admin_account"], dict):
@@ -1453,16 +1460,10 @@ class Application:
                 ("language", language),
                 ("timezone", timezone),
                 (
-                    "wifi",
-                    OrderedDict(
-                        [
-                            (
-                                "protected",
-                                not self.component.wifi_password_switch.get_active(),
-                            ),
-                            ("password", self.component.wifi_password_entry.get_text()),
-                        ]
-                    ),
+                    "wifi_password",
+                    None
+                    if self.component.wifi_password_switch.get_active()
+                    else self.component.wifi_password_entry.get_text(),
                 ),
                 (
                     "admin_account",
