@@ -507,8 +507,6 @@ class Application:
 
     def download_catalogs(self):
         self.catalogs = get_catalogs(CLILogger())
-        if self.catalogs is not None:
-            self.build_zim_store()
         return self.catalogs is not None
 
     def ensure_catalogs(self):
@@ -523,6 +521,9 @@ class Application:
                     parent=self.component.window,
                 )
                 return False
+        # now that we have the catalogs, build the ZIM store if not already done
+        if not len(self.component.zim_list_store):
+            self.build_zim_store()
         return True
 
     def build_zim_store(self):

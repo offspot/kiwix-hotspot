@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vim: ai ts=4 sts=4 et sw=4 nu
 
+import os
 import tempfile
 
 import yaml
@@ -24,12 +25,13 @@ def fetch_catalogs(logger):
     logger.std("downloading catalogs...")
     try:
         for catalog in CATALOGS:
-            fpath = tempfile.NamedTemporaryFile(suffix=".yml")
-            dlf = download_file(catalog.get("url"), fpath.name, logger)
-            fpath.seek(0)  # reset as we'll read it right away
+            tmpfile = tempfile.NamedTemporaryFile(suffix=".yml", delete=False)
+            dlf = download_file(catalog.get("url"), tmpfile.name, logger)
+            tmpfile.seek(0)  # reset as we'll read it right away
             if dlf.successful:
-                catalogs.append(yaml.load(fpath.read()))
-                fpath.close()
+                catalogs.append(yaml.load(tmpfile.read()))
+                tmpfile.close()
+                os.unlink(tmpfile.name)
             else:
                 raise ValueError("Unable to download {}".format(catalog.get("url")))
     except Exception as exp:

@@ -6,13 +6,12 @@ import sys
 import time
 import signal
 import ctypes
-import random
 import tempfile
 import threading
 import subprocess
 
 import data
-from util import CLILogger, ONE_MiB, human_readable_size
+from util import CLILogger
 
 
 # windows-only flags to prevent sleep on executing thread
@@ -46,7 +45,8 @@ def startup_info_args():
         si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
         cf = subprocess.CREATE_NEW_PROCESS_GROUP
     else:
-        si = cf = None
+        si = None
+        cf = 0
     return {"startupinfo": si, "creationflags": cf}
 
 
@@ -176,21 +176,23 @@ class EtcherWriterThread(threading.Thread):
         if log_to_file:
             log_file = tempfile.NamedTemporaryFile(suffix=".log")
 
-        cmd = get_admin_command(
-            [
-                os.path.join(data.data_dir, "etcher-cli", "etcher"),
-                "-c",
-                "-y",
-                "-u",
-                "-d",
-                '"{}"'.format(device_fpath)
-                if sys.platform == "win32"  # \\.\PHYSICALDRIVE1 string needs quotes
-                else device_fpath,
-                image_fpath,
-            ],
-            from_gui=not from_cli,
-            log_to=log_file.name if log_to_file else None,
-        )
+        cmd = [
+            os.path.join(data.data_dir, "etcher-cli", "etcher"),
+            "-c",
+            "-y",
+            "-u",
+            "-d",
+            device_fpath,
+            image_fpath,
+        ]
+        # handle sudo or GUI alternative for linux and macOS
+        if sys.platform in ("linux", "darwin"):
+            cmd = get_admin_command(
+                cmd,
+                from_gui=not from_cli,
+                log_to=log_file.name if log_to_file else None,
+            )
+
         process = subprocess.Popen(
             cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **startup_info_args()
         )
