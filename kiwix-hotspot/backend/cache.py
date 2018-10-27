@@ -30,7 +30,7 @@ def is_latest_version(fpath, fname, logger):
     """ whether the filename is a usable content """
 
     if fname.startswith("package_"):
-        return package_is_latest_version(fpath, fname)
+        return package_is_latest_version(fpath, fname, logger)
 
     for key, content in CONTENTS.items():
         if not content["name"] == fname:
