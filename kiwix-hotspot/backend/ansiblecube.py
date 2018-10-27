@@ -191,7 +191,7 @@ def run_phase_one(machine, extra_vars, secret_keys, logo=None, favicon=None, css
 
     # save YAML catalogs into local files inside VM for use by ideascube
     for index, catalog in enumerate(CATALOGS):
-        with tempfile.NamedTemporaryFile(suffix=".yml") as fd:
+        with tempfile.NamedTemporaryFile(suffix=".yml", delete=False) as fd:
             yaml.safe_dump(
                 get_catalogs(machine._logger)[index],
                 fd,
@@ -200,6 +200,7 @@ def run_phase_one(machine, extra_vars, secret_keys, logo=None, favicon=None, css
                 encoding="utf-8",
             )
             machine.put_file(fd.name, catalog["local_url"].replace("file://", ""))
+            os.unlink(fd.name)
 
     run(machine, tags, extra_vars, secret_keys)
 

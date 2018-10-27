@@ -174,7 +174,7 @@ class EtcherWriterThread(threading.Thread):
         # on macOS, GUI sudo captures stdout so we use a log file
         log_to_file = not from_cli and sys.platform == "darwin"
         if log_to_file:
-            log_file = tempfile.NamedTemporaryFile(suffix=".log")
+            log_file = tempfile.NamedTemporaryFile(suffix=".log", delete=False)
 
         cmd = [
             os.path.join(data.data_dir, "etcher-cli", "etcher"),
@@ -215,6 +215,7 @@ class EtcherWriterThread(threading.Thread):
 
         if log_to_file:
             log_file.close()
+            os.unlink(log_file)
 
         try:
             logger.std(". has process exited?")
