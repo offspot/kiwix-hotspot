@@ -1258,7 +1258,7 @@ class Application:
         self.reset_config()
 
         # project_name
-        if "project_name" in config:
+        if config.get("project_name") is not None:
             self.component.project_name_entry.set_text(config.get("project_name"))
 
         # language
@@ -1284,15 +1284,15 @@ class Application:
             self.component.timezone_combobox.set_active(item_id)
 
         # wifi (previous format)
-        if "wifi" in config and isinstance(config["wifi"], dict):
-            if "protected" in config["wifi"]:
+        if "wifi" in config.keys() and isinstance(config["wifi"], dict):
+            if "protected" in config["wifi"].keys():
                 self.component.wifi_password_switch.set_active(
                     not bool(config["wifi"]["protected"])
                 )
-            if "password" in config["wifi"]:
+            if "password" in config["wifi"].keys():
                 self.component.wifi_password_entry.set_text(config["wifi"]["password"])
         # wifi (new format)
-        if "wifi_password" in config:
+        if "wifi_password" in config.keys():
             self.component.wifi_password_switch.set_active(
                 config["wifi_password"] is None
             )
@@ -1300,7 +1300,9 @@ class Application:
                 self.component.wifi_password_entry.set_text(config["wifi_password"])
 
         # admin account
-        if "admin_account" in config and isinstance(config["admin_account"], dict):
+        if "admin_account" in config.keys() and isinstance(
+            config["admin_account"], dict
+        ):
             for key, arg_key in {"login": "login", "password": "pwd"}.items():
                 if config["admin_account"].get(key) is not None:
                     getattr(
@@ -1308,7 +1310,7 @@ class Application:
                     ).set_text(config["admin_account"][key])
 
         # branding
-        if "branding" in config and isinstance(config["branding"], dict):
+        if "branding" in config.keys() and isinstance(config["branding"], dict):
             folder = tempfile.mkdtemp()
             for key in ("logo", "favicon", "css"):
                 if config["branding"].get(key) is not None:
@@ -1352,11 +1354,11 @@ class Application:
                 )
 
         # content
-        if "content" in config and isinstance(config["content"], dict):
+        if "content" in config.keys() and isinstance(config["content"], dict):
 
             # langs-related contents
             for key in ("kalite", "wikifundi"):
-                if key in config["content"] and isinstance(
+                if key in config["content"].keys() and isinstance(
                     config["content"][key], list
                 ):
                     for lang, button in getattr(
@@ -1379,7 +1381,7 @@ class Application:
                 else:
                     self.component.edupi_resources_chooser.set_filename(str(rsc))
 
-            if "zims" in config["content"] and isinstance(
+            if "zims" in config["content"].keys() and isinstance(
                 config["content"]["zims"], list
             ):
 

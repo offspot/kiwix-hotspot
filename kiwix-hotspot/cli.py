@@ -52,11 +52,11 @@ def set_config(config, args):
         "language": "language",
         "size": "size",
     }.items():
-        if key in config and config.get(key) is not None:
+        if key in config.keys() and config.get(key) is not None:
             setif(arg_key, str(config.get(key)))
 
     # branding files
-    if "branding" in config and isinstance(config["branding"], dict):
+    if "branding" in config.keys() and isinstance(config["branding"], dict):
         folder = tempfile.mkdtemp()
         for key in ("logo", "favicon", "css"):
             if config["branding"].get(key) is not None:
@@ -72,15 +72,17 @@ def set_config(config, args):
                     setif(key, os.path.abspath(fpath))
 
     # wifi (previous format)
-    if "wifi" in config and isinstance(config["wifi"], dict):
-        if "password" in config["wifi"] and config["wifi"].get("protected", True):
+    if "wifi" in config.keys() and isinstance(config["wifi"], dict):
+        if "password" in config["wifi"].keys() and config["wifi"].get(
+            "protected", True
+        ):
             setif("wifi_pwd", config["wifi"]["password"])
     # wifi (new format)
-    if "wifi_password" in config:
+    if "wifi_password" in config.keys():
         setif("wifi_pwd", config["wifi_password"])
 
     # admin account
-    if "admin_account" in config and isinstance(config["admin_account"], dict):
+    if "admin_account" in config.keys() and isinstance(config["admin_account"], dict):
 
         # we need both login and password
         if (
@@ -97,7 +99,7 @@ def set_config(config, args):
         setif("build_dir", os.path.abspath(config["build_dir"]))
 
     # content
-    if "content" in config and isinstance(config["content"], dict):
+    if "content" in config.keys() and isinstance(config["content"], dict):
 
         # list contents (langs)
         for key, arg_key in {
@@ -105,7 +107,9 @@ def set_config(config, args):
             "wikifundi": "wikifundi",
             "zims": "zim_install",
         }.items():
-            if key in config["content"] and isinstance(config["content"][key], list):
+            if key in config["content"].keys() and isinstance(
+                config["content"][key], list
+            ):
                 value = config["content"][key]
                 # check that all elements are valid choices
                 wrong = [x for x in value if x not in get_choices(arg_key)]
