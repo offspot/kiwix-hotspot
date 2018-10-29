@@ -31,7 +31,7 @@
     line: "$wgVirtualRestConfig['modules']['parsoid'] = array('url' => 'http://localhost:8000', 'domain' => '{{ item }}.{{ wikifundi_fqdn }}', 'prefix' => 'mediawiki_kiwix', 'forwardCookies' => true);"
     insertbefore: '\?>'
   with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
-  tags: move-content
+  tags: ['move-content', 'rename']
 
 - name: add upload path to LocalSettings.custom
   lineinfile:
