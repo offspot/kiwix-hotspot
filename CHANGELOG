@@ -4,6 +4,7 @@
 * Safer JSON import
 * Fixed etcher-cli log display on macOS
 * Added http://version.<name>.hotspot to display Kiwix Hotspot version on Plug
+* Fixed conflict between favicon and logo if both have same name in JSON file
 
 2.0-rc13
 * Updated Wikifundi language packs (2018-10-24)

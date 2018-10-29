@@ -57,14 +57,13 @@ def set_config(config, args):
 
     # branding files
     if "branding" in config.keys() and isinstance(config["branding"], dict):
-        folder = tempfile.mkdtemp()
         for key in ("logo", "favicon", "css"):
             if config["branding"].get(key) is not None:
                 try:
                     fpath = b64decode(
                         fname=config["branding"][key]["fname"],
                         data=config["branding"][key]["data"],
-                        to=folder,
+                        to=tempfile.mkdtemp(),
                     )
                 except Exception:
                     pass
