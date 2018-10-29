@@ -198,24 +198,34 @@ class EtcherWriterThread(threading.Thread):
         )
         logger.std("Starting Etcher: " + str(process.args))
 
+        # intervals in second
+        sleep_interval = 2
+        log_interval = 60
+
+        counter = 0
         while process.poll() is None:
+            counter += 1
             if self._should_stop:  # on cancel
                 logger.std(". cancelling...")
                 break
 
+            time.sleep(sleep_interval)
+            # increment sleep counter until we reach log interval
+            if counter < log_interval // sleep_interval:
+                counter += 1
+                continue
+
+            # reset counter and display log
+            counter = 0
             if log_to_file:
-                with open(log_file.name, "r") as f:
-                    content = f.read()
-                    if content:
-                        logger.raw_std(f.read())
+                subprocess_pretty_call(["/bin/cat", log_file.name], logger, decode=True)
             else:
                 for line in process.stdout:
                     logger.raw_std(line.decode("utf-8", "ignore"))
-            time.sleep(2)
 
         if log_to_file:
             log_file.close()
-            os.unlink(log_file)
+            os.unlink(log_file.name)
 
         try:
             logger.std(". has process exited?")
