@@ -9,6 +9,7 @@ import posixpath
 import yaml
 
 from data import mirror
+from version import get_version_str
 from backend.content import get_content
 from backend.catalog import CATALOGS, get_catalogs
 
@@ -25,6 +26,7 @@ def run(machine, tags, extra_vars={}, secret_keys=[]):
 
     # predefined defaults we want to superseed whichever in ansiblecube
     ansible_vars = {
+        "installer_version": get_version_str(),
         "mirror": mirror,
         "catalogs": CATALOGS,
         "kernel_version": get_content("raspbian_image").get("kernel_version"),

@@ -10,12 +10,14 @@ hostname: ideasbox
 tld: "hotspot"
 fqdn: "{{ hostname }}.{{ tld }}"
 welcome_fqdn: "goto.kiwix.{{ tld }}"
+version_fqdn: "version.{{ fqdn }}"
 cert_domain: ideascube.{{ tld }}
 hotspot_name: ideasbox
 project_name: ideasbox
 ideascube_id: pibox
 
 # System
+installer_version: devel
 disk: /dev/mmcblk0
 root_partition: "{{ disk }}p2"
 data_partition: "{{ disk }}p3"

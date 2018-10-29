@@ -20,6 +20,12 @@
     dest: /var/www/404.html
   tags: ['master', 'rename']
 
+- name: install version.html
+  template:
+    src: version.html.j2
+    dest: /var/www/version/index.html
+  tags: ['master', 'rename']
+
 - name: Remove default nginx vhost config file (if configured).
   file:
     path: /etc/nginx/sites-enabled/default
@@ -39,6 +45,13 @@
   template:
     src: welcome.j2
     dest: /etc/nginx/sites-enabled/welcome
+  tags: ['master', 'rename']
+
+
+- name: install version vhost
+  template:
+    src: version.j2
+    dest: /etc/nginx/sites-enabled/version
   tags: ['master', 'rename']
 
 - name: install default placeholder vhost for services

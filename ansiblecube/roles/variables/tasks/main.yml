@@ -52,12 +52,14 @@
       sites_server_name: sites.{{hostname}}
       time_server_name: time.{{hostname}}
       kiwix_fqdn: kiwix.{{ fqdn }}
-      kalite_fqdn: khanacademy.{{fqdn}}
-      aflatoun_fqdn: aflatoun.{{fqdn}}
-      edupi_fqdn: edupi.{{fqdn}}
-      wikifundi_fqdn: wikifundi.{{fqdn}}
-      sites_fqdn: sites.{{fqdn}}
-      time_fqdn: time.{{fqdn}}
+      kalite_fqdn: khanacademy.{{ fqdn }}
+      aflatoun_fqdn: aflatoun.{{ fqdn }}
+      edupi_fqdn: edupi.{{ fqdn }}
+      wikifundi_fqdn: wikifundi.{{ fqdn }}
+      sites_fqdn: sites.{{ fqdn }}
+      time_fqdn: time.{{ fqdn }}
+      welcome_fqdn: "goto.kiwix.{{ tld }}"
+      version_fqdn: "version.{{ fqdn }}"
     name: Update names and fqdns for all projects
 
   - lineinfile:
