@@ -25,12 +25,19 @@
   with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
   tags: move-content
 
+- stat:
+    path: "{{ mediawiki_root }}/LocalSettings.custom.{{ item }}.php"
+  with_items: "{{ wikifundi_languages | default(omit) }}"
+  register: localsettings_files
+  tags: ['move-content', 'rename']
+
 - name: add parsoid config to LocalSettings.custom
   lineinfile:
-    dest: "{{ mediawiki_root }}/LocalSettings.custom.{{ item }}.php"
-    line: "$wgVirtualRestConfig['modules']['parsoid'] = array('url' => 'http://localhost:8000', 'domain' => '{{ item }}.{{ wikifundi_fqdn }}', 'prefix' => 'mediawiki_kiwix', 'forwardCookies' => true);"
+    dest: "{{ mediawiki_root }}/LocalSettings.custom.{{ item.item }}.php"
+    line: "$wgVirtualRestConfig['modules']['parsoid'] = array('url' => 'http://localhost:8000', 'domain' => '{{ item.item }}.{{ wikifundi_fqdn }}', 'prefix' => 'mediawiki_kiwix', 'forwardCookies' => true);"
     insertbefore: '\?>'
-  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  when: item.stat.exists
+  with_items: "{{ localsettings_files.results }}"
   tags: ['move-content', 'rename']
 
 - name: add upload path to LocalSettings.custom
