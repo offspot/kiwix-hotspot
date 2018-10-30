@@ -20,6 +20,7 @@ from backend.content import (
 )
 from util import CancelEvent
 from util import check_user_inputs
+from version import get_version_str
 from util import CLILogger, b64decode
 from util import get_free_space_in_dir
 from util import get_adjusted_image_size
@@ -32,6 +33,7 @@ import humanfriendly
 
 CANCEL_TIMEOUT = 5
 logger = CLILogger()
+logger.std("Kiwix Hotspot {v}".format(v=get_version_str()))
 
 
 def set_config(config, args):
@@ -145,7 +147,7 @@ for catalog in get_catalogs(logger):
 languages = [code for code, language in data.ideascube_languages]
 
 defaults = {
-    "name": "Kiwix Hotspot",
+    "name": "Kiwix",
     "timezone": str(tzlocal.get_localzone()),
     "language": "en",
     "size": "8GB",
@@ -268,7 +270,7 @@ if args.sdcard and not os.path.exists(args.sdcard):
     sys.exit(1)
 
 # display configuration and offer time to cancel
-print("Kiwix Hotspot configuration:")
+print("Configuration:")
 keys = args.__dict__.keys()
 longest = max([len(key) for key in keys])
 for name in keys:

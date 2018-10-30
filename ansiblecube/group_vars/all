@@ -17,7 +17,7 @@ project_name: ideasbox
 ideascube_id: pibox
 
 # System
-installer_version: devel
+installer_version: unknown
 disk: /dev/mmcblk0
 root_partition: "{{ disk }}p2"
 data_partition: "{{ disk }}p3"
