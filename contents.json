@@ -45,9 +45,9 @@
         "url": "{mirror}/other/wikifundi/2.0/mediawiki_data_fr_2018-10.tar.bz2",
         "name": "mediawiki_data_fr_2018-10.tar.bz2",
         "folder_name": "data",
-        "checksum": "e9bb7964cc1aad03836f4a9034596bd4fb10e51585cfeeb0d028eed24792f5ee",
-        "archive_size": 2271108376,
-        "expanded_size": 2977103872
+        "checksum": "a8c6f4eab407fc1d03214dd3da7a2cf384b80aa051ed763f09260c4e3ee5c8fe",
+        "archive_size": 2313637086,
+        "expanded_size": 3167059968
     },
     "wikifundi_langpack_en": {
         "url": "{mirror}/other/wikifundi/2.0/mediawiki_data_en_2018-10.tar.bz2",
