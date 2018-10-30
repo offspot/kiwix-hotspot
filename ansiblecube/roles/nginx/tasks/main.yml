@@ -23,7 +23,7 @@
 - name: install version.html
   template:
     src: version.html.j2
-    dest: /var/www/version/index.html
+    dest: /var/www/version.html
   tags: ['master', 'rename']
 
 - name: Remove default nginx vhost config file (if configured).
