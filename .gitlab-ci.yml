@@ -19,11 +19,11 @@ build-pibox-image:
     LANG: 'en_US.UTF-8'
   script:
     # download custom kernel
-    - wget http://download.kiwix.org/dev/vexpress-boot.zip
+    - wget http://mirror.download.kiwix.org/dev/vexpress-boot.zip
     - unzip vexpress-boot.zip
 
     # download a static qemu
-    - wget http://download.kiwix.org/dev/qemu-2.12.0-linux-x86_64.tar.gz
+    - wget http://mirror.download.kiwix.org/dev/qemu-2.12.0-linux-x86_64.tar.gz
     - tar xf qemu-2.12.0-linux-x86_64.tar.gz
 
     # Install python dependancies

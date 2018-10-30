@@ -41,15 +41,15 @@ matrix:
     - python3 -m pip install https://github.com/pyinstaller/pyinstaller/archive/93eec04eb2fbfc714d2c3453e04fd126e6a86f52.zip
 
     # Download vexpress-boot
-    - wget http://download.kiwix.org/dev/vexpress-boot.zip
+    - wget http://mirror.download.kiwix.org/dev/vexpress-boot.zip
     - unzip vexpress-boot.zip
 
     # Bundle QEMU
-    - wget http://download.kiwix.org/dev/qemu-2.12.0_macOS.tar
+    - wget http://mirror.download.kiwix.org/dev/qemu-2.12.0_macOS.tar
     - tar xf qemu-2.12.0_macOS.tar
 
     # Bundle Etcher-cli
-    - wget http://download.kiwix.org/dev/etcher-cli-1.4.5-darwin-x64.tar.gz
+    - wget http://mirror.download.kiwix.org/dev/etcher-cli-1.4.5-darwin-x64.tar.gz
     - mkdir -p etcher-cli
     - tar xf etcher-cli-1.4.5-darwin-x64.tar.gz -C etcher-cli --strip-components=1
 
@@ -108,7 +108,7 @@ matrix:
     - sed -i.bak "s/VERSION = \"devel\"/VERSION = \"${PIBOX_VERSION}\"/g" kiwix-hotspot/data.py
 
     # update XZ (trusty version -5.0.5 is too old)
-    - wget http://download.kiwix.org/dev/xz-5.2.4.tar.gz
+    - wget http://mirror.download.kiwix.org/dev/xz-5.2.4.tar.gz
     - tar xf xz-5.2.4.tar.gz
     - cd xz-5.2.4
     - ./configure --enable-shared
@@ -118,15 +118,15 @@ matrix:
     - cd ..
 
     # Download vexpress-boot
-    - wget http://download.kiwix.org/dev/vexpress-boot.zip
+    - wget http://mirror.download.kiwix.org/dev/vexpress-boot.zip
     - unzip vexpress-boot.zip
 
     # get static QEMU
-    - wget http://download.kiwix.org/dev/qemu-2.12.0-linux-x86_64.tar.gz
+    - wget http://mirror.download.kiwix.org/dev/qemu-2.12.0-linux-x86_64.tar.gz
     - tar xf qemu-2.12.0-linux-x86_64.tar.gz
 
     # Bundle Etcher-cli
-    - wget http://download.kiwix.org/dev/etcher-cli-1.4.5-linux-x64.tar.gz
+    - wget http://mirror.download.kiwix.org/dev/etcher-cli-1.4.5-linux-x64.tar.gz
     - mkdir -p etcher-cli
     - tar xf etcher-cli-1.4.5-linux-x64.tar.gz -C etcher-cli --strip-components=1
 

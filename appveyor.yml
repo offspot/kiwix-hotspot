@@ -46,14 +46,14 @@ install:
   - secure-file\tools\secure-file -decrypt pibox_installer_ci_rsa.appveyor_enc -secret %certificate_secret% -out pibox_installer_ci_rsa
 
   # Download vexpress-boot
-  - appveyor DownloadFile "http://download.kiwix.org/dev/vexpress-boot.zip"
+  - appveyor DownloadFile "http://mirror.download.kiwix.org/dev/vexpress-boot.zip"
   - 7z.exe x vexpress-boot.zip
 
   # Install pygobject
   # pygi-aio provides a way to install from cmd even if it is not documented
   # the only package to install is GTK with GIR
   # note: we don't use msys2 because pyinstaller fails to install on msys2
-  - appveyor DownloadFile "http://download.kiwix.org/dev/pygi-aio-3.18.2_rev12-setup_549872deadabb77a91efbc56c50fe15f969e5681.exe" -FileName "pygi-aio-setup.exe"
+  - appveyor DownloadFile "http://mirror.download.kiwix.org/dev/pygi-aio-3.18.2_rev12-setup_549872deadabb77a91efbc56c50fe15f969e5681.exe" -FileName "pygi-aio-setup.exe"
   - mkdir pygi-aio-setup
   - cd pygi-aio-setup
   - set SOURCEPATH=%cd%
@@ -86,8 +86,8 @@ install:
   # Install qemu
   - mkdir "C:\Program Files\qemu"
   - cd "C:\Program Files\qemu"
-  - if %platform%==x86 appveyor DownloadFile "http://download.kiwix.org/dev/qemu-w32-setup-20180430.exe" -FileName "qemu-setup.exe"
-  - if %platform%==x64 appveyor DownloadFile "http://download.kiwix.org/dev/qemu-w64-setup-20180430.exe" -FileName "qemu-setup.exe"
+  - if %platform%==x86 appveyor DownloadFile "http://mirror.download.kiwix.org/dev/qemu-w32-setup-20180430.exe" -FileName "qemu-setup.exe"
+  - if %platform%==x64 appveyor DownloadFile "http://mirror.download.kiwix.org/dev/qemu-w64-setup-20180430.exe" -FileName "qemu-setup.exe"
   - 7z x qemu-setup.exe
   - del qemu-setup.exe
   - move qemu-system-arm.exe qemu-arm.exe
@@ -99,15 +99,15 @@ install:
   # bundle 7zip
   - mkdir "C:\Program Files\7zextra"
   - cd "C:\Program Files\7zextra"
-  - appveyor DownloadFile "http://download.kiwix.org/dev/7z920_extra.7z"
+  - appveyor DownloadFile "http://mirror.download.kiwix.org/dev/7z920_extra.7z"
   - 7z.exe x 7z920_extra.7z
-  - appveyor DownloadFile "http://download.kiwix.org/dev/7z1805-extra.7z"
+  - appveyor DownloadFile "http://mirror.download.kiwix.org/dev/7z1805-extra.7z"
   - 7z.exe -y x 7z1805-extra.7z
 
   # Copy Imdisk Installer
   - mkdir "C:\Program Files\imdiskinst"
   - cd "C:\Program Files\imdiskinst"
-  - appveyor DownloadFile "http://download.kiwix.org/dev/imdiskinst.exe" -FileName "imdiskinst.exe"
+  - appveyor DownloadFile "http://mirror.download.kiwix.org/dev/imdiskinst.exe" -FileName "imdiskinst.exe"
   - 7z x imdiskinst.exe
   - del imdiskinst.exe
   - dir "C:\Program Files\imdiskinst"
@@ -115,8 +115,8 @@ install:
   # Download Etcher-cli
   - mkdir "C:\Program Files\etcher-cli"
   - cd "C:\Program Files\etcher-cli"
-  - if %platform%==x86 appveyor DownloadFile "http://download.kiwix.org/dev/Etcher-cli-1.1.2-win32-x86.zip" -FileName "etcher-cli.zip"
-  - if %platform%==x64 appveyor DownloadFile "http://download.kiwix.org/dev/Etcher-cli-1.1.2-win32-x64.zip" -FileName "etcher-cli.zip"
+  - if %platform%==x86 appveyor DownloadFile "http://mirror.download.kiwix.org/dev/Etcher-cli-1.1.2-win32-x86.zip" -FileName "etcher-cli.zip"
+  - if %platform%==x64 appveyor DownloadFile "http://mirror.download.kiwix.org/dev/Etcher-cli-1.1.2-win32-x64.zip" -FileName "etcher-cli.zip"
   - 7z.exe x etcher-cli.zip
   - del etcher-cli.zip
 
