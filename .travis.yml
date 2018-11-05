@@ -6,6 +6,7 @@ before_install:
 addons:
   ssh_known_hosts:
   - download.kiwix.org
+  - tmp.kiwix.org
 
 matrix:
   include:
