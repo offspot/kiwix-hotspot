@@ -1,3 +1,8 @@
+2.0-rc15
+* Fixed concurrent access error on Windows
+* Replaced diskpart step with clean MBR flashing
+* Added CLI version check (--version)
+
 2.0-rc14
 * Fixed clean cache regression
 * Fixed PermissionError on QEMU phase One

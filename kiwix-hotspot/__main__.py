@@ -7,6 +7,8 @@ import sys
 import runpy
 from multiprocessing import freeze_support
 
+from version import get_version_str
+
 freeze_support()  # needed for Windows to support multiprocessing once frozen
 
 if len(sys.argv) == 1:
@@ -24,8 +26,15 @@ elif sys.argv[1] == "cache":
     main()
 else:
     parser = argparse.ArgumentParser(description="Kiwix Hotspot creation tool")
+    parser.add_argument(
+        "--version", help="display version and exit", action="store_true"
+    )
     sub_parser = parser.add_subparsers()
     sub_parser.add_parser("cli", help="run it on the console")
     sub_parser.add_parser("image", help="prepare a master image")
     sub_parser.add_parser("cache", help="manage cache folder to reclaim disk space")
-    parser.parse_args()
+    args = parser.parse_args()
+
+    if args.version:
+        print("Kiwix Hotspot:", get_version_str())
+        sys.exit(0)
