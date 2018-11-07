@@ -37,11 +37,7 @@ from backend.mount import (
 )
 from backend.util import EtcherWriterThread
 from backend.mount import can_write_on, allow_write_on, restore_mode
-from backend.util import (
-    subprocess_pretty_check_call,
-    prevent_sleep,
-    restore_sleep_policy,
-)
+from backend.util import flash_image_with_etcher, prevent_sleep, restore_sleep_policy
 from backend.sysreq import host_matches_requirements, requirements_url
 
 
@@ -121,26 +117,12 @@ def run_installation(
 
         # Prepare SD Card
         if sd_card:
-            logger.step("Prepare SD-card ({})".format(sd_card))
-            if sys.platform == "darwin":
-                subprocess_pretty_check_call(
-                    ["diskutil", "unmountDisk", sd_card], logger
-                )
-            elif sys.platform == "win32":
-                logger.step("Format SD card {}".format(sd_card))
-                matches = re.findall(r"\\\\.\\PHYSICALDRIVE(\d*)", sd_card)
-                if len(matches) != 1:
-                    raise ValueError("Error while getting physical drive number")
-                device_number = matches[0]
-
-                r, w = os.pipe()
-                os.write(w, str.encode("select disk {}\n".format(device_number)))
-                os.write(w, b"clean\n")
-                os.close(w)
-                logger.std("diskpart select disk {} and clean".format(device_number))
-                subprocess_pretty_check_call(["diskpart"], logger, stdin=r)
-                logger.std("sleeping for 15s to acknowledge diskpart changes")
-                time.sleep(15)
+            logger.step("Flash clean MBR onto SD-card ({})".format(sd_card))
+            flash_image_with_etcher(
+                image_fpath=os.path.join(data.data_dir, "mbr.img"),
+                device_fpath=sd_card,
+                logger=logger,
+            )
 
         # Download Base image
         logger.stage("master")

@@ -170,28 +170,9 @@ class EtcherWriterThread(threading.Thread):
 
         logger.step("Copy image to sd card using etcher-cli")
 
-        from_cli = logger is None or type(logger) == CLILogger
-        # on macOS, GUI sudo captures stdout so we use a log file
-        log_to_file = not from_cli and sys.platform == "darwin"
-        if log_to_file:
-            log_file = tempfile.NamedTemporaryFile(suffix=".log", delete=False)
-
-        cmd = [
-            os.path.join(data.data_dir, "etcher-cli", "etcher"),
-            "-c",
-            "-y",
-            "-u",
-            "-d",
-            device_fpath,
-            image_fpath,
-        ]
-        # handle sudo or GUI alternative for linux and macOS
-        if sys.platform in ("linux", "darwin"):
-            cmd = get_admin_command(
-                cmd,
-                from_gui=not from_cli,
-                log_to=log_file.name if log_to_file else None,
-            )
+        cmd, log_to_file, log_file = get_etcher_command(
+            image_fpath, device_fpath, logger
+        )
 
         process = subprocess.Popen(
             cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **startup_info_args()
@@ -225,7 +206,10 @@ class EtcherWriterThread(threading.Thread):
 
         if log_to_file:
             log_file.close()
-            os.unlink(log_file.name)
+            try:
+                os.unlink(log_file.name)
+            except Exception as exp:
+                logger.err(str(exp))
 
         try:
             logger.std(". has process exited?")
@@ -322,3 +306,42 @@ def restore_sleep_policy(reference, logger):
         reference.kill()
         reference.wait(5)
         return
+
+
+def get_etcher_command(image_fpath, device_fpath, logger):
+    from_cli = logger is None or type(logger) == CLILogger
+
+    # on macOS, GUI sudo captures stdout so we use a log file
+    log_to_file = not from_cli and sys.platform == "darwin"
+    if log_to_file:
+        log_file = tempfile.NamedTemporaryFile(suffix=".log", delete=False)
+    else:
+        log_file = None
+
+    cmd = [
+        os.path.join(data.data_dir, "etcher-cli", "etcher"),
+        "-c",
+        "-y",
+        "-u",
+        "-d",
+        device_fpath,
+        image_fpath,
+    ]
+    # handle sudo or GUI alternative for linux and macOS
+    if sys.platform in ("linux", "darwin"):
+        cmd = get_admin_command(
+            cmd, from_gui=not from_cli, log_to=log_file.name if log_to_file else None
+        )
+
+    return cmd, log_to_file, log_file
+
+
+def flash_image_with_etcher(image_fpath, device_fpath, logger):
+    cmd, log_to_file, log_file = get_etcher_command(image_fpath, device_fpath, logger)
+    subprocess_pretty_check_call(cmd, logger)
+    if log_to_file:
+        log_file.close()
+        try:
+            os.unlink(log_file.name)
+        except Exception as exp:
+            logger.err(str(exp))
