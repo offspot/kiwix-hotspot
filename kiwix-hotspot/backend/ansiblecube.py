@@ -202,7 +202,10 @@ def run_phase_one(machine, extra_vars, secret_keys, logo=None, favicon=None, css
                 encoding="utf-8",
             )
             machine.put_file(fd.name, catalog["local_url"].replace("file://", ""))
-            os.unlink(fd.name)
+            try:
+                os.unlink(fd.name)
+            except Exception as exp:
+                machine._logger.err(str(exp))
 
     run(machine, tags, extra_vars, secret_keys)
 
