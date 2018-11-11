@@ -1,3 +1,6 @@
+2.0-rc16
+* fixed etcher-cli call on macOS GUI (space escaping)
+
 2.0-rc15
 * Fixed concurrent access error on Windows
 * Replaced diskpart step with clean MBR flashing

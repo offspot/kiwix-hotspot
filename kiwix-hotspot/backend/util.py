@@ -4,6 +4,7 @@
 import os
 import sys
 import time
+import shlex
 import signal
 import ctypes
 import tempfile
@@ -327,6 +328,11 @@ def get_etcher_command(image_fpath, device_fpath, logger):
         device_fpath,
         image_fpath,
     ]
+    # escape etcher-cli and image paths on OSX (to accomodate oascript)
+    if sys.platform == "darwin":
+        cmd[0] = shlex.quote(cmd[0])
+        cmd[-1] = shlex.quote(cmd[-1])
+
     # handle sudo or GUI alternative for linux and macOS
     if sys.platform in ("linux", "darwin"):
         cmd = get_admin_command(
