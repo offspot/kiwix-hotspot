@@ -188,7 +188,7 @@ class Logger(ProgressHelper):
 
     def main_thread_failed(self, error):
         super(Logger, self).failed()
-        self.step("Failed: {}".format(error))
+        self.step("Failed: {}".format(error[0:30]))
         self.err("Installation failed: {}".format(error))
         self.progress(1)
 
