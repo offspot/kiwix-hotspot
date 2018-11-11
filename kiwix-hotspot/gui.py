@@ -40,6 +40,7 @@ from util import split_proxy, save_prefs
 from backend.catalog import get_catalogs
 from util import CancelEvent, ProgressHelper
 from run_installation import run_installation
+from backend.util import sd_has_single_partition, flash_image_with_etcher
 from backend.mount import open_explorer_for_imdisk
 from util import human_readable_size, ONE_GB, ONE_MiB
 from backend.cache import clean_cache, reset_cache
@@ -309,6 +310,9 @@ class Application:
         # cache
         self.component.clean_cache_button.connect("clicked", self.activate_menu_cache)
 
+        # sd clean
+        self.component.clean_sd_button.connect("clicked", self.activate_sd_clean)
+
         # wifi password
         self.component.wifi_password_switch.connect(
             "notify::active",
@@ -350,6 +354,9 @@ class Application:
         # output
         self.component.sd_card_combobox.connect(
             "changed", lambda _: self.update_free_space()
+        )
+        self.component.sd_card_combobox.connect(
+            "changed", lambda w: self.activate_sd_clean_button(w)
         )
         self.component.sd_card_refresh_button.connect(
             "clicked", self.sd_card_refresh_button_clicked
@@ -1105,6 +1112,138 @@ class Application:
         else:
             dialog.close()
 
+    def activate_sd_clean(self, widget):
+        sd_card = self.get_sd_card()
+
+        class SDCleanDialog(Gtk.Dialog):
+            def __init__(self, parent, parent_ui):
+                Gtk.Dialog.__init__(
+                    self,
+                    "Wipe your SD-card clean before for installation",
+                    parent,
+                    0,
+                    (
+                        "Wipe {}".format(sd_card),
+                        Gtk.ResponseType.OK,
+                        "Close",
+                        Gtk.ResponseType.CANCEL,
+                    ),
+                )
+
+                self.parent = parent
+                self.parent_ui = parent_ui
+                self.set_default_size(300, 100)
+
+                label = Gtk.Label()
+                label.set_markup(
+                    "\nFor Kiwix Hotspot to work properly,\n"
+                    "you need your SD-card to be cleaned before starting,\n"
+                    "hence having just a single FAT-like partition.\n\n"
+                    "This process you only take a few minutes.\n"
+                    "If this does not end within 10mn,\n"
+                    "cancel-it and try clean your SD-card using a different tool.\n\n"
+                )
+                label.set_alignment(0, 0.5)
+
+                self.thread = None
+                self.retcode = multiprocessing.Value("i", -1)
+                self.run_progressbar = Gtk.ProgressBar()
+                self.cancel_button = Gtk.Button("Cancel")
+                self.cancel_button.connect("clicked", self.stop_clean_operation)
+
+                box = self.get_content_area()
+                box.add(label)
+                box.add(self.run_progressbar)
+                box.add(self.cancel_button)
+                box.add(Gtk.Label(""))  # spacer
+                self.show_all()
+                self.run_progressbar.set_visible(False)
+                self.cancel_button.set_visible(False)
+
+            def start_clean_operation(self):
+                # do nothing if the thread is running
+                if self.thread is not None and self.thread.is_alive():
+                    return
+
+                # show progress bar and cancel button
+                self.run_progressbar.set_visible(True)
+                self.cancel_button.set_label("Cancel Wiping")
+                self.cancel_button.set_visible(True)
+
+                # start progress bar animation
+                self.timeout_id = GObject.timeout_add(50, self.on_timeout)
+
+                self.thread = multiprocessing.Process(
+                    target=flash_image_with_etcher,
+                    args=(
+                        os.path.join(data.data_dir, "mbr.img"),
+                        sd_card,
+                        self.retcode,
+                    ),
+                )
+                self.thread.start()
+
+            def on_timeout(self):
+                # display post-thread dialog on cancelled thread
+                if self.thread is not None and not self.thread.is_alive():
+                    self.display_post_clean_operation_dialog()
+                    return False
+                elif self.thread is None:  # stop progress anim if thread not running
+                    return False
+
+                new_value = self.run_progressbar.get_fraction() + 0.035
+                # inverse direction if end reached
+                if new_value > 1:
+                    new_value = 0
+                    # switch from left-to-right to right-to-left at bounds
+                    self.run_progressbar.set_inverted(
+                        not self.run_progressbar.get_inverted()
+                    )
+                self.run_progressbar.set_fraction(new_value)
+                return True  # returns True so it continues to get called
+
+            def stop_clean_operation(self, *args, **kwargs):
+                if self.thread is not None and self.thread.is_alive():
+                    self.thread.terminate()
+                    self.thread = None
+                    self.cancel_button.set_visible(False)
+                    self.run_progressbar.set_visible(False)
+                self.close()
+
+            def display_post_clean_operation_dialog(self):
+                if self.retcode.value == 0:
+                    title = "SD-card Cleaning Completed"
+                    content = (
+                        "Your SD-card ({}) has been wiped.\n\n"
+                        "You now need to unplug then replug your device.\n"
+                        "Once done, come back and hit the refresh button."
+                    ).format(sd_card)
+                else:
+                    title = "SD-card Cleaning Failed"
+                    content = (
+                        "You SD-card HAS NOT been wiped.\n\n"
+                        "Please use a different tool to clean it."
+                    )
+
+                msg_box = Gtk.MessageDialog(
+                    self.parent, None, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, title
+                )
+
+                msg_box.format_secondary_text(content)
+                msg_box.set_modal(True)
+                msg_box.run()
+                msg_box.destroy()
+                self.close()
+                self.parent_ui.sd_card_refresh_button_clicked("")
+
+        dialog = SDCleanDialog(self.component.window, self)
+        ret = dialog.run()
+        if ret == Gtk.ResponseType.OK:
+            dialog.start_clean_operation()
+        else:
+            dialog.close()
+            self.sd_card_refresh_button_clicked("")
+
     def installation_done(self, error):
         ok = error is None
         validate_label(self.component.done_label, ok)
@@ -1518,6 +1657,17 @@ class Application:
         clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         clipboard.set_text(text_buffer.get_text(start, end, hidden), -1)
 
+    def get_sd_card(self):
+        if self.component.output_stack.get_visible_child_name() == "sd_card":
+            sd_card_id = self.component.sd_card_combobox.get_active()
+
+            if sd_card_id == -1:
+                return None
+            else:
+                device_index = sd_card_info.get_device_index()
+                return self.component.sd_card_list_store[sd_card_id][device_index]
+        return None
+
     def run_installation_button_clicked(self, button):
         all_valid = True
 
@@ -1588,22 +1738,21 @@ class Application:
         all_valid = all_valid and valid_admin_login and valid_admin_pwd
 
         output_size = self.get_output_size()
+
+        sd_card = self.get_sd_card()
         if self.component.output_stack.get_visible_child_name() == "sd_card":
-            sd_card_id = self.component.sd_card_combobox.get_active()
-            condition = sd_card_id != -1
+            condition = sd_card is not None
             validate_label(self.component.sd_card_label, condition)
             all_valid = all_valid and condition
-
-            if sd_card_id == -1:
-                sd_card = None
-            else:
-                device_index = sd_card_info.get_device_index()
-                sd_card = self.component.sd_card_list_store[sd_card_id][device_index]
         else:
-            sd_card = None
             condition = output_size > 0
             validate_label(self.component.size_label, condition)
             all_valid = all_valid and condition
+
+        # check that SD card has a single partition (clean state)
+        condition = sd_has_single_partition(sd_card, self.logger)
+        validate_label(self.component.sd_card_label, condition)
+        all_valid = all_valid and condition
 
         condition = self.update_free_space() >= 0
         validate_label(self.component.free_space_name_label, condition)
@@ -1699,6 +1848,10 @@ class Application:
             self.reset_run_window()
             self.component.run_window.show()
             threading.Thread(target=target, daemon=True).start()
+
+    def activate_sd_clean_button(self, button):
+        has_card = self.component.sd_card_combobox.get_active() != -1
+        self.component.clean_sd_button.set_visible(has_card)
 
     def sd_card_refresh_button_clicked(self, button):
         self.refresh_disk_list()

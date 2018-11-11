@@ -36,8 +36,8 @@ from backend.mount import (
     guess_next_loop_device,
 )
 from backend.util import EtcherWriterThread
+from backend.util import prevent_sleep, restore_sleep_policy
 from backend.mount import can_write_on, allow_write_on, restore_mode
-from backend.util import flash_image_with_etcher, prevent_sleep, restore_sleep_policy
 from backend.sysreq import host_matches_requirements, requirements_url
 
 
@@ -114,15 +114,6 @@ def run_installation(
                 previous_loop_mode = allow_write_on(loop_dev, logger)
             else:
                 previous_loop_mode = None
-
-        # Prepare SD Card
-        if sd_card:
-            logger.step("Flash clean MBR onto SD-card ({})".format(sd_card))
-            flash_image_with_etcher(
-                image_fpath=os.path.join(data.data_dir, "mbr.img"),
-                device_fpath=sd_card,
-                logger=logger,
-            )
 
         # Download Base image
         logger.stage("master")

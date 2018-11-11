@@ -999,7 +999,7 @@ In File mode the image is created at build path, you can choose the size
                       <object class="GtkLabel" id="sd_card_label">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="tooltip_text" translatable="yes">SD card</property>
+                        <property name="tooltip_text" translatable="yes">SD-card must contain only a single FAT-like partition</property>
                         <property name="label" translatable="yes">SD card :</property>
                       </object>
                       <packing>
@@ -1012,6 +1012,7 @@ In File mode the image is created at build path, you can choose the size
                       <object class="GtkBox" id="no_id_18">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="spacing">5</property>
                         <child>
                           <object class="GtkButton" id="sd_card_refresh_button">
                             <property name="label" translatable="yes">Refresh</property>
@@ -1034,6 +1035,19 @@ In File mode the image is created at build path, you can choose the size
                             <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                        <object class="GtkButton" id="clean_sd_button">
+                            <property name="label" translatable="yes">Wipe</property>
+                            <property name="tooltip_text" translatable="yes">Wipe SD-card clean</property>
+                            <property name="visible">False</property>
+                            <property name="can_focus">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">2</property>
                           </packing>
                         </child>
                       </object>

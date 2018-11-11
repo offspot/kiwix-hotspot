@@ -2,6 +2,7 @@
 # vim: ai ts=4 sts=4 et sw=4 nu
 
 import os
+import re
 import sys
 import time
 import shlex
@@ -171,8 +172,9 @@ class EtcherWriterThread(threading.Thread):
 
         logger.step("Copy image to sd card using etcher-cli")
 
+        from_cli = logger is None or type(logger) == CLILogger
         cmd, log_to_file, log_file = get_etcher_command(
-            image_fpath, device_fpath, logger
+            image_fpath, device_fpath, logger, from_cli
         )
 
         process = subprocess.Popen(
@@ -309,8 +311,7 @@ def restore_sleep_policy(reference, logger):
         return
 
 
-def get_etcher_command(image_fpath, device_fpath, logger):
-    from_cli = logger is None or type(logger) == CLILogger
+def get_etcher_command(image_fpath, device_fpath, logger, from_cli):
 
     # on macOS, GUI sudo captures stdout so we use a log file
     log_to_file = not from_cli and sys.platform == "darwin"
@@ -342,12 +343,72 @@ def get_etcher_command(image_fpath, device_fpath, logger):
     return cmd, log_to_file, log_file
 
 
-def flash_image_with_etcher(image_fpath, device_fpath, logger):
-    cmd, log_to_file, log_file = get_etcher_command(image_fpath, device_fpath, logger)
-    subprocess_pretty_check_call(cmd, logger)
+def flash_image_with_etcher(image_fpath, device_fpath, retcode):
+    """ flash an image onto SD-card
+
+        use only with small image as there is no output capture on OSX
+        and it is not really cancellable.
+        retcode is a multiprocessing.Value """
+    logger = CLILogger()
+    cmd, log_to_file, log_file = get_etcher_command(
+        image_fpath, device_fpath, logger, False
+    )
+    returncode, _ = subprocess_pretty_call(cmd, check=False, logger=logger)
+    retcode.value = returncode
     if log_to_file:
-        log_file.close()
         try:
+            subprocess_pretty_call(["/bin/cat", log_file.name], logger, decode=True)
+            log_file.close()
             os.unlink(log_file.name)
         except Exception as exp:
             logger.err(str(exp))
+    return returncode == 0
+
+
+def sd_has_single_partition(sd_card, logger):
+    """ whether sd_card consists of a single partition (expected to be clean) """
+    try:
+        if sys.platform == "darwin":
+            disk_prefix = re.sub(r"\/dev\/disk([0-9]+)", r"disk\1s", sd_card)
+            lines = subprocess_pretty_call(
+                ["diskutil", "list", sd_card], logger, check=True, decode=True
+            )
+            nb_partitions = len(
+                [
+                    line.strip().rsplit(" ", 1)[-1].replace(disk_prefix, "").strip()
+                    for line in lines
+                    if disk_prefix in line
+                ]
+            )
+            return nb_partitions == 1
+        elif sys.platform == "win32":
+            disk_prefix = re.sub(
+                r".+PHYSICALDRIVE([0-9+])", r"Disk #\1, Partition #", sd_card
+            )
+            lines = subprocess_pretty_call(
+                ["wmic", "partition"], logger, check=True, decode=True
+            )
+            nb_partitions = len(
+                [
+                    re.sub(r".+" + disk_prefix + r"([0-9]+).+", r"\1", line)
+                    for line in lines
+                    if disk_prefix in line
+                ]
+            )
+            return nb_partitions == 1
+        elif sys.platform == "linux":
+            disk_prefix = re.sub(r"\/dev\/([a-z0-9]+)", r"─\1", sd_card)
+            lines = subprocess_pretty_call(
+                ["/bin/lsblk", sd_card], logger, check=True, decode=True
+            )
+            nb_partitions = len(
+                [
+                    line.strip().split(" ", 1)[0].replace(disk_prefix, "").strip()
+                    for line in lines
+                    if disk_prefix in line
+                ]
+            )
+            return nb_partitions == 1
+    except Exception as exp:
+        logger.err(str(exp))
+        return False
