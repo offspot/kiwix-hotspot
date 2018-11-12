@@ -197,6 +197,7 @@ parser.add_argument(
     "--config",
     help="use a JSON config file to set parameters (superseeds cli parameters)",
 )
+parser.add_argument("--filename", help="Output file name (without suffix)")
 parser.add_argument("--ram", help="Max RAM for QEMU", default="2G")
 parser.add_argument("--sdcard", help="Device to copy image to")
 
@@ -370,6 +371,7 @@ try:
         css=args.css,
         admin_account=admin_account,
         build_dir=args.build_dir,
+        filename=args.filename,
         qemu_ram=args.ram,
     )
 except Exception:

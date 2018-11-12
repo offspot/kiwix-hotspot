@@ -62,6 +62,7 @@ def run_installation(
     css,
     done_callback=None,
     build_dir=".",
+    filename=None,
     qemu_ram="2G",
 ):
 
@@ -98,13 +99,14 @@ def run_installation(
         logger.step("Prepare Image file")
 
         # set image names
-        today = datetime.today().strftime("%Y_%m_%d-%H_%M_%S")
+        if not filename:
+            filename = "hotspot-{}".format(
+                datetime.today().strftime("%Y_%m_%d-%H_%M_%S")
+            )
 
-        image_final_path = os.path.join(build_dir, "hotspot-{}.img".format(today))
-        image_building_path = os.path.join(
-            build_dir, "hotspot-{}.BUILDING.img".format(today)
-        )
-        image_error_path = os.path.join(build_dir, "hotspot-{}.ERROR.img".format(today))
+        image_final_path = os.path.join(build_dir, filename + ".img")
+        image_building_path = os.path.join(build_dir, filename + ".BUILDING.img")
+        image_error_path = os.path.join(build_dir, filename + ".ERROR.img")
 
         # loop device mode on linux (for mkfs in userspace)
         if sys.platform == "linux":

@@ -2,6 +2,7 @@
 * Fixed bug prevent non-sdcard builds via GUI
 * Better SD-card partition check dialog
 * Added partition number check to CLI
+* Added --filename option to specify output filename via CLI
 
 2.0-rc16
 * Fixed etcher-cli call on macOS GUI (space escaping)
