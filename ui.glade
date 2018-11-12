@@ -1109,6 +1109,18 @@ In File mode the image is created at build path, you can choose the size
               </packing>
             </child>
             <child>
+              <object class="GtkLabel" id="sd_card_error_label">
+                <property name="visible">False</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">Your SD-card is not clean. Please Wipe it so it only contains a single FAT-like partition.</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">14</property>
+              </packing>
+            </child>
+            <child>
               <object class="GtkBox" id="no_id_20">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -1142,7 +1154,7 @@ In File mode the image is created at build path, you can choose the size
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">14</property>
+                <property name="position">15</property>
               </packing>
             </child>
             <child>
@@ -1180,7 +1192,7 @@ In File mode the image is created at build path, you can choose the size
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">15</property>
+                <property name="position">16</property>
               </packing>
             </child>
             <child>
@@ -1216,7 +1228,7 @@ In File mode the image is created at build path, you can choose the size
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">16</property>
+                <property name="position">17</property>
               </packing>
             </child>
             <child>
@@ -1276,7 +1288,7 @@ In File mode the image is created at build path, you can choose the size
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">17</property>
+                <property name="position">18</property>
               </packing>
             </child>
             <child>
@@ -1355,7 +1367,7 @@ In File mode the image is created at build path, you can choose the size
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">18</property>
+                <property name="position">19</property>
               </packing>
             </child>
             <child>
@@ -1420,7 +1432,7 @@ In File mode the image is created at build path, you can choose the size
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">19</property>
+                <property name="position">20</property>
               </packing>
             </child>
             <child>
@@ -1456,7 +1468,7 @@ In File mode the image is created at build path, you can choose the size
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">20</property>
+                <property name="position">21</property>
               </packing>
             </child>
           </object>
