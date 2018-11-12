@@ -1744,15 +1744,15 @@ class Application:
             condition = sd_card is not None
             validate_label(self.component.sd_card_label, condition)
             all_valid = all_valid and condition
+
+            # check that SD card has a single partition (clean state)
+            condition = sd_has_single_partition(sd_card, self.logger)
+            validate_label(self.component.sd_card_label, condition)
+            all_valid = all_valid and condition
         else:
             condition = output_size > 0
             validate_label(self.component.size_label, condition)
             all_valid = all_valid and condition
-
-        # check that SD card has a single partition (clean state)
-        condition = sd_has_single_partition(sd_card, self.logger)
-        validate_label(self.component.sd_card_label, condition)
-        all_valid = all_valid and condition
 
         condition = self.update_free_space() >= 0
         validate_label(self.component.free_space_name_label, condition)

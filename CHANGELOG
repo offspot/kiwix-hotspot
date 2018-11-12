@@ -1,5 +1,8 @@
+2.0-rc17
+* Fixed bug prevent non-sdcard builds via GUI
+
 2.0-rc16
-* fixed etcher-cli call on macOS GUI (space escaping)
+* Fixed etcher-cli call on macOS GUI (space escaping)
 * Added partition number check on startup (must be one)
 * Added SD-card wipe dialog 
 
