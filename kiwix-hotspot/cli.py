@@ -27,6 +27,7 @@ from util import get_adjusted_image_size
 from backend.catalog import get_catalogs
 from run_installation import run_installation
 from util import human_readable_size, get_cache
+from backend.util import sd_has_single_partition
 
 import tzlocal
 import humanfriendly
@@ -267,6 +268,10 @@ for key, is_valid in {
 
 if args.sdcard and not os.path.exists(args.sdcard):
     print("SD card device does not exist.")
+    sys.exit(1)
+
+if args.sdcard and not sd_has_single_partition(args.sdcard, logger):
+    print("SD card is not clean (must have a single FAT-like partition). Please wipe.")
     sys.exit(1)
 
 # display configuration and offer time to cancel
