@@ -356,7 +356,7 @@ class Application:
             "changed", lambda _: self.update_free_space()
         )
         self.component.sd_card_combobox.connect(
-            "changed", lambda w: self.activate_sd_clean_button(w)
+            "changed", lambda w: self.on_sdcard_selection_change(w)
         )
         self.component.sd_card_refresh_button.connect(
             "clicked", self.sd_card_refresh_button_clicked
@@ -1749,6 +1749,7 @@ class Application:
             condition = sd_has_single_partition(sd_card, self.logger)
             validate_label(self.component.sd_card_label, condition)
             validate_label(self.component.sd_card_error_label, condition)
+            self.component.sd_card_error_label.set_visible(not condition)
             all_valid = all_valid and condition
         else:
             condition = output_size > 0
@@ -1850,20 +1851,14 @@ class Application:
             self.component.run_window.show()
             threading.Thread(target=target, daemon=True).start()
 
-    def activate_sd_clean_button(self, button):
+    def on_sdcard_selection_change(self, button):
         has_card = self.component.sd_card_combobox.get_active() != -1
         self.component.clean_sd_button.set_visible(has_card)
 
-        # update label for selected SD-card
-        sd_card = self.get_sd_card()
-        if sd_card:
-            # check that SD card has a single partition (clean state)
-            condition = sd_has_single_partition(sd_card, self.logger)
-        else:
-            condition = True
-        validate_label(self.component.sd_card_label, condition)
-        validate_label(self.component.sd_card_error_label, condition)
-        self.component.sd_card_error_label.set_visible(not condition)
+        # remove warnings on combo change
+        validate_label(self.component.sd_card_label, True)
+        validate_label(self.component.sd_card_error_label, True)
+        self.component.sd_card_error_label.set_visible(False)
 
     def sd_card_refresh_button_clicked(self, button):
         self.refresh_disk_list()

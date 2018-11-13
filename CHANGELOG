@@ -1,3 +1,7 @@
+2.0-rc18
+* Moved SD-card partition check back to button action
+* SD-card partition check timesout after 10s to prevent some freezes
+
 2.0-rc17
 * Fixed bug prevent non-sdcard builds via GUI
 * Better SD-card partition check dialog

@@ -111,6 +111,13 @@ def subprocess_pretty_check_call(cmd, logger, stdin=None, as_admin=False):
     )
 
 
+def subprocess_timed_output(cmd, logger, timeout=10):
+    logger.std("Getting output of " + str(cmd))
+    return subprocess.check_output(
+        cmd, universal_newlines=True, timeout=timeout
+    ).splitlines()
+
+
 def subprocess_external(cmd, logger):
     """ spawn a new process without capturing nor watching it """
     logger.std("Opening: " + str(cmd))
@@ -370,9 +377,7 @@ def sd_has_single_partition(sd_card, logger):
     try:
         if sys.platform == "darwin":
             disk_prefix = re.sub(r"\/dev\/disk([0-9]+)", r"disk\1s", sd_card)
-            lines = subprocess_pretty_call(
-                ["diskutil", "list", sd_card], logger, check=True, decode=True
-            )
+            lines = subprocess_timed_output(["diskutil", "list", sd_card], logger)
             nb_partitions = len(
                 [
                     line.strip().rsplit(" ", 1)[-1].replace(disk_prefix, "").strip()
@@ -385,9 +390,7 @@ def sd_has_single_partition(sd_card, logger):
             disk_prefix = re.sub(
                 r".+PHYSICALDRIVE([0-9+])", r"Disk #\1, Partition #", sd_card
             )
-            lines = subprocess_pretty_call(
-                ["wmic", "partition"], logger, check=True, decode=True
-            )
+            lines = subprocess_timed_output(["wmic", "partition"], logger)
             nb_partitions = len(
                 [
                     re.sub(r".+" + disk_prefix + r"([0-9]+).+", r"\1", line)
@@ -398,9 +401,7 @@ def sd_has_single_partition(sd_card, logger):
             return nb_partitions == 1
         elif sys.platform == "linux":
             disk_prefix = re.sub(r"\/dev\/([a-z0-9]+)", r"─\1", sd_card)
-            lines = subprocess_pretty_call(
-                ["/bin/lsblk", sd_card], logger, check=True, decode=True
-            )
+            lines = subprocess_timed_output(["/bin/lsblk", sd_card], logger)
             nb_partitions = len(
                 [
                     line.strip().split(" ", 1)[0].replace(disk_prefix, "").strip()
