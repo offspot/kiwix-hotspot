@@ -42,7 +42,7 @@ ideascube_languages = [
     ("sw", u"Kiswahili"),
 ]
 
-help_url = "https://framagit.org/ideascube/pibox-installer/wikis/faq"
+help_url = "https://github.com/kiwix/kiwix-hotspot/wiki/FAQ"
 etcher_url = "https://etcher.io/"
 
 VERSION = "devel"

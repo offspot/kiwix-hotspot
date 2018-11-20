@@ -48,18 +48,18 @@ useradd -g www-data -l -m -N -s /bin/bash qdemo
 echo "192.168.1.3        ideascube.hotspot demo.hotspot.kiwix.org kiwix.demo.hotspot.kiwix.org khanacademy.demo.hotspot.kiwix.org aflatoun.demo.hotspot.kiwix.org edupi.demo.hotspot.kiwix.org wikifundi.demo.hotspot.kiwix.org sites.demo.hotspot.kiwix.org" >> /etc/hosts
 
 # download and execute at-boot script
-wget https://framagit.org/ideascube/pibox-installer/raw/master/online-demo/host-setup.sh -O /root/host-setup.sh && chmod +x /root/host-setup.sh && /root/host-setup.sh
+wget https://raw.githubusercontent.com/kiwix/kiwix-hotspot/master/online-demo/host-setup.sh -O /root/host-setup.sh && chmod +x /root/host-setup.sh && /root/host-setup.sh
 
 # add cron task for this script
 echo "@reboot /root/host-setup.sh" >> /etc/crontab
 
 # download and install nginx vhost
-wget https://framagit.org/ideascube/pibox-installer/raw/master/online-demo/nginx-vhost -O /etc/nginx/sites-available/demo.hotspot.kiwix.org
+wget https://raw.githubusercontent.com/kiwix/kiwix-hotspot/master/online-demo/nginx-vhost -O /etc/nginx/sites-available/demo.hotspot.kiwix.org
 ln -s /etc/nginx/sites-available/nginx-vhost /etc/nginx/sites-enabled/demo.hotspot.kiwix.org
 nginx -s reload
 
 # download and install qemu-shortcut
-wget https://framagit.org/ideascube/pibox-installer/raw/master/online-demo/img_run -O /usr/local/bin/img_run
+wget https://raw.githubusercontent.com/kiwix/kiwix-hotspot/master/online-demo/img_run -O /usr/local/bin/img_run
 chmod +x /usr/local/bin/img_run
 ```
 
@@ -76,7 +76,7 @@ img_run https://kiwix.ml/images/pibox-kiwix_2018-05-04.img.zip
 sudo systemctl start ssh
 
 # setup the VM (only once). SSH password is `raspberry`
-ssh pi@locahost -p 5022 "sudo ifconfig eth0 192.168.1.3 up && sudo route add default gw 192.168.1.1 && wget https://framagit.org/ideascube/pibox-installer/raw/image/online-demo/guest-setup.sh -O /tmp/guest-setup.sh && sudo sh /tmp/guest-setup.sh"
+ssh pi@locahost -p 5022 "sudo ifconfig eth0 192.168.1.3 up && sudo route add default gw 192.168.1.1 && wget https://raw.githubusercontent.com/kiwix/kiwix-hotspot/master/online-demo/guest-setup.sh -O /tmp/guest-setup.sh && sudo sh /tmp/guest-setup.sh"
 ```
 
 Now host can talk to guest:

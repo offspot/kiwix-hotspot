@@ -8,8 +8,13 @@ import pytest
 def test_ansible_playbook_syntax(tmpdir, role):
     hosts = os.path.join(os.getcwd(), "hosts")
     roles = os.path.join(os.getcwd(), "roles")
-    for fname in ("clean_apt.yml", "disable_service.yml",
-                  "enable_service.yml", "enable_vhost.yml", "mark_role.yml"):
+    for fname in (
+        "clean_apt.yml",
+        "disable_service.yml",
+        "enable_service.yml",
+        "enable_vhost.yml",
+        "mark_role.yml",
+    ):
         shutil.copy(os.path.join(os.getcwd(), fname), os.path.join(tmpdir, fname))
 
     config = tmpdir.join("ansible.cfg")

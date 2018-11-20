@@ -1490,7 +1490,7 @@ In File mode the image is created at build path, you can choose the size
     <property name="transient_for">window</property>
     <property name="program_name">Kiwix Hotspot</property>
     <property name="version">devel</property>
-    <property name="website">https://framagit.org/ideascube/pibox-installer</property>
+    <property name="website">https://github.com/kiwix/kiwix-hotspot</property>
     <property name="logo_icon_name">image-missing</property>
     <property name="license_type">gpl-3-0</property>
     <child internal-child="vbox">

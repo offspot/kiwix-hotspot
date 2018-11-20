@@ -9,9 +9,7 @@ from backend.mount import system_has_exfat
 if sys.platform == "linux":
     from backend.mount import udisksctl_exe
 
-requirements_url = (
-    "https://framagit.org/ideascube/pibox-installer/wikis/System-Requirements"
-)
+requirements_url = "https://github.com/kiwix/kiwix-hotspot/wiki/System-Requirements"
 
 
 def host_matches_requirements(build_dir):

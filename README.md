@@ -6,17 +6,15 @@ Ideascube is a solution to serve offline content from the web such as Wikipedia,
 
 Kiwix Hotspot configure the RaspberryPi into a hotspot WiFi with Ideascube server and offline contents.
 
-## Download
+## Issues
 
-[**repos.ideascube.org/pibox/**](http://repos.ideascube.org/pibox/)
-
-note: binaries for windows are not signed, to open on windows just click for more information and you are able to run it.
+Please report issues [on framagit](https://framagit.org/ideascube/pibox-installer/issues).
 
 ## Principle
 
 The installer emulate the rasbperrypi architecture armhf in QEMU.
 
-Inside the emulator it builds [Ideascube](https://framagit.org/ideascube/ideascube) with [Ansiblecube](https://github.com/ideascube/ansiblecube).
+Inside the emulator it builds [ideascube](https://framagit.org/ideascube/ideascube) with [ansiblecube](https://github.com/kiwix/kiwix-hotspot/tree/master/ansiblecube).
 
 presentation of the projet at Potsdam [Slides](http://wiki.kiwix.org/w/images/4/43/Pibox_installer_potsdam_2017_presentation.pdf)
 
@@ -114,21 +112,18 @@ insert_id_to_class_glade.py is a python3 script that insert id to class in glade
 
 how the application is packaged:
 
-* on windows:
+**On Windows**
 
-  we use a self extracting archive 7zS.sfx because pyinstaller in onefile on windows
-  fails to give admin rights and also there was an issue if we set no console.
+we use a self extracting archive 7zS.sfx because pyinstaller in onefile on windows fails to give admin rights and also there was an issue if we set no console. assets are in `/windows_bundle`.
 
-  assets are in windows_bundle
+**On Linux**
 
-* on linux:
+`qemu` is built statically
 
-  qemu is build statically
+**On macOS**
 
-* on macos:
-
-  qemu is build dynamically and bundling is made with macdylibbundler
+`qemu` is build dynamically and bundle is made with `macdylibbundler`
 
 ## License
 
-GPLv3 or (at your option) any later version, see [LICENSE](https://framagit.org/ideascube/pibox-installer/blob/master/LICENSE) for more details.
+GPLv3 or (at your option) any later version, see [LICENSE](https://github.com/kiwix/kiwix-hotspot/blob/master/LICENSE) for more details.

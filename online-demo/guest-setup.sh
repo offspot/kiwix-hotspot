@@ -11,7 +11,7 @@
 echo "remove cron task clearing-up accepted IP list"
 sudo sh -c 'crontab -u root -l |grep -v clean_iptables.sh |crontab -u root -'
 
-/usr/bin/wget https://framagit.org/ideascube/pibox-installer/raw/master/online-demo/hotspot-demo -O /usr/local/bin/hotspot-demo
+/usr/bin/wget https://raw.githubusercontent.com/kiwix/kiwix-hotspot/master/online-demo/hotspot-demo -O /usr/local/bin/hotspot-demo
 chmod +x /usr/local/bin/hotspot-demo
 
 /usr/local/bin/hotspot-demo
