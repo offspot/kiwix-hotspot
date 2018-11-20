@@ -11,8 +11,7 @@ addons:
 matrix:
   include:
   - language: python
-    python:
-      - "2.7"
+    python: 3.6
     sudo: false
     install:
     - pip install -r ansiblecube/tests/requirements-dev.txt
