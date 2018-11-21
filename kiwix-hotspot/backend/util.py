@@ -209,7 +209,20 @@ class EtcherWriterThread(threading.Thread):
             # reset counter and display log
             counter = 0
             if log_to_file:
-                subprocess_pretty_call(["/bin/cat", log_file.name], logger, decode=True)
+                try:
+                    with open(log_file.name, "r") as f:
+                        lines = f.readlines()
+                        lines.pop()
+                        # working
+                        if "Validating" in lines[-1] or "Flashing" in lines[-1]:
+                            logger.std(lines[-1].replace("\x1b[1A", "").strip())
+                        elif "[1A" in lines[-1]:  # still working but between progress
+                            logger.std(lines[-2].replace("\x1b[1A", "").strip())
+                        else:  # probably at end of file
+                            for line in lines[-5:]:
+                                logger.std(line.replace("\x1b[1A", "").strip())
+                except Exception as exp:
+                    logger.err("Failed to read etcher log output: {}".format(exp))
             else:
                 for line in process.stdout:
                     logger.raw_std(line.decode("utf-8", "ignore"))
