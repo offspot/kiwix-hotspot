@@ -30,6 +30,8 @@ import pytz
 from path import Path
 import humanfriendly
 
+from data import cache_folder_name
+
 if sys.platform == "win32":
     from win32com.shell import shellcon, shell
 
@@ -418,7 +420,7 @@ def get_checksum(fpath, func=hashlib.sha256):
 
 
 def get_cache(build_folder):
-    fpath = os.path.join(build_folder, "cache")
+    fpath = os.path.join(build_folder, cache_folder_name)
     os.makedirs(fpath, exist_ok=True)
     return fpath
 

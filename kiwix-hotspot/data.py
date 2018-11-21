@@ -18,7 +18,7 @@ vexpress_boot_dtb = os.path.join(
 
 pibox_logo = os.path.join(data_dir, "kiwix-hotspot-logo.png")
 
-cache_folder_name = "cache"
+cache_folder_name = "kiwix-hotspot.cache"
 content_file = os.path.join(data_dir, "contents.json")
 
 ansiblecube_path = os.path.join(data_dir, "ansiblecube")
