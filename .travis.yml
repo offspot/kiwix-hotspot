@@ -49,9 +49,9 @@ matrix:
     - tar xf qemu-2.12.0_macOS.tar
 
     # Bundle Etcher-cli
-    - wget http://mirror.download.kiwix.org/dev/etcher-cli-1.4.5-darwin-x64.tar.gz
+    - wget http://download.kiwix.org/dev/balena-etcher-cli-1.4.8-darwin-x64.tar.gz
     - mkdir -p etcher-cli
-    - tar xf etcher-cli-1.4.5-darwin-x64.tar.gz -C etcher-cli --strip-components=1
+    - tar xf balena-etcher-cli-1.4.8-darwin-x64.tar.gz -C etcher-cli --strip-components=1
 
     # Run PyInstaller
     - pyinstaller --log-level=DEBUG kiwix-hotspot-macos.spec
@@ -126,9 +126,9 @@ matrix:
     - tar xf qemu-2.12.0-linux-x86_64.tar.gz
 
     # Bundle Etcher-cli
-    - wget http://mirror.download.kiwix.org/dev/etcher-cli-1.4.5-linux-x64.tar.gz
+    - wget http://download.kiwix.org/dev/balena-etcher-cli-1.4.8-linux-x64.tar.gz
     - mkdir -p etcher-cli
-    - tar xf etcher-cli-1.4.5-linux-x64.tar.gz -C etcher-cli --strip-components=1
+    - tar xf balena-etcher-cli-1.4.8-linux-x64.tar.gz -C etcher-cli --strip-components=1
 
     # Install python dependancies
     - pip3 install -r requirements-linux.txt

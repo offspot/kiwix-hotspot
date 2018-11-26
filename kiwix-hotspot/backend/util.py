@@ -340,7 +340,11 @@ def get_etcher_command(image_fpath, device_fpath, logger, from_cli):
         log_file = None
 
     cmd = [
-        os.path.join(data.data_dir, "etcher-cli", "etcher"),
+        os.path.join(
+            data.data_dir,
+            "etcher-cli",
+            "etcher" if sys.platform == "win32" else "balena-etcher",
+        ),
         "-c",
         "-y",
         "-u",

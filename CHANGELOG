@@ -3,6 +3,7 @@
 * Better etcher log output on macOS
 * Log now timestamped
 * Log now includes full configuration and version
+* Updated etcher-cli to 1.4.8 (macOS and linux only)
 
 2.0
 * Updated python dependencies
