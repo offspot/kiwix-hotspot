@@ -24,19 +24,10 @@ for catalog in CATALOGS:
 def run(machine, tags, extra_vars={}, secret_keys=[]):
     """ run ansiblecube in given machine with specified tags and extra-vars """
 
-    # predefined defaults we want to superseed whichever in ansiblecube
-    ansible_vars = {
-        "installer_version": get_version_str(),
-        "mirror": mirror,
-        "catalogs": CATALOGS,
-        "kernel_version": get_content("raspbian_image").get("kernel_version"),
-    }
-    ansible_vars.update(extra_vars)
-
     # save extra_vars to a file on guest
     extra_vars_path = posixpath.join(ansiblecube_path, "extra_vars.json")
     with tempfile.NamedTemporaryFile("w", delete=False) as fp:
-        json.dump(ansible_vars, fp, indent=4)
+        json.dump(extra_vars, fp, indent=4)
         fp.close()
         machine.put_file(fp.name, extra_vars_path)
         os.unlink(fp.name)
@@ -54,7 +45,7 @@ def run(machine, tags, extra_vars={}, secret_keys=[]):
     machine._logger.std("ansiblecube extra_vars")
     machine._logger.raw_std(
         json.dumps(
-            {k: "****" if k in secret_keys else v for k, v in ansible_vars.items()},
+            {k: "****" if k in secret_keys else v for k, v in extra_vars.items()},
             indent=4,
         )
     )
@@ -142,6 +133,11 @@ def build_extra_vars(
     """ extra-vars friendly format of the ansiblecube configuration """
 
     extra_vars = {
+        # predefined defaults we want to superseed whichever in ansiblecube
+        "installer_version": get_version_str(),
+        "mirror": mirror,
+        "catalogs": CATALOGS,
+        "kernel_version": get_content("raspbian_image").get("kernel_version"),
         "root_partition_size": root_partition_size,
         "disk_size": disk_size,
         "project_name": name,
@@ -169,7 +165,7 @@ def build_extra_vars(
                 "admin_password": admin_account["pwd"],
             }
         )
-        secret_keys = ["admin_account", "admin_password"]
+        secret_keys = ["admin_password"]
     else:
         secret_keys = []
 

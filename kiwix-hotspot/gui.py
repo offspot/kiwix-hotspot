@@ -121,6 +121,7 @@ class Logger(ProgressHelper):
     def main_thread_text(self, text, end="\n", tag=None):
         if not isinstance(text, str):
             text = str(text)
+        text = self._add_time(text)
         text += end
         text_iter = self.text_buffer.get_end_iter()
         if tag is None:

@@ -66,6 +66,12 @@ class ProgressHelper(object):
         progress percentage is kept by stage (0 to 1).
         total percentage is calculated using current stage and its progress"""
 
+    @staticmethod
+    def _add_time(text):
+        return "{time} {text}".format(
+            time=datetime.datetime.now().strftime("[%X]"), text=text
+        )
+
     def __init__(self):
         self.reset()
 
@@ -389,7 +395,9 @@ class CLILogger(ProgressHelper):
 
     def p(self, text, color=None, end=None, flush=False):
         if color is not None and sys.platform != 32:
-            text = "\033[00;{col}m{text}\033[00m".format(col=color, text=text)
+            text = "\033[00;{col}m{text}\033[00m".format(
+                col=color, text=self._add_time(text)
+            )
         print(text, end=end, flush=flush)
 
     def complete(self):

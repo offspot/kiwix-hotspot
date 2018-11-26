@@ -3,8 +3,8 @@
 
 import os
 import sys
-import re
 import time
+import json
 import shutil
 import traceback
 from datetime import datetime
@@ -117,10 +117,49 @@ def run_installation(
             else:
                 previous_loop_mode = None
 
+        base_image = get_content("hotspot_master_image")
+        # harmonize options
+        packages = [] if zim_install is None else zim_install
+        kalite_languages = [] if kalite is None else kalite
+        wikifundi_languages = [] if wikifundi is None else wikifundi
+        aflatoun_languages = ["fr", "en"] if aflatoun else []
+
+        if edupi_resources and not isremote(edupi_resources):
+            logger.step("Copying EduPi resources into cache")
+            shutil.copy(edupi_resources, cache_folder)
+
+        # prepare ansible options
+        ansible_options = {
+            "name": name,
+            "timezone": timezone,
+            "language": language,
+            "language_name": dict(data.ideascube_languages)[language],
+            "edupi": edupi,
+            "edupi_resources": edupi_resources,
+            "wikifundi_languages": wikifundi_languages,
+            "aflatoun_languages": aflatoun_languages,
+            "kalite_languages": kalite_languages,
+            "packages": packages,
+            "wifi_pwd": wifi_pwd,
+            "admin_account": admin_account,
+            "disk_size": size,
+            "root_partition_size": base_image.get("root_partition_size"),
+        }
+        extra_vars, secret_keys = ansiblecube.build_extra_vars(**ansible_options)
+
+        # display config in log
+        logger.step("Dumping Hotspot Configuration")
+        logger.raw_std(
+            json.dumps(
+                {k: "****" if k in secret_keys else v for k, v in extra_vars.items()},
+                indent=4,
+            )
+        )
+
         # Download Base image
         logger.stage("master")
         logger.step("Retrieving base image file")
-        base_image = get_content("hotspot_master_image")
+
         rf = download_content(base_image, logger, build_dir)
         if not rf.successful:
             logger.err("Failed to download base image.\n{e}".format(e=rf.exception))
@@ -146,16 +185,6 @@ def run_installation(
         logger.step("Testing mount procedure")
         if not test_mount_procedure(image_building_path, logger, True):
             raise ValueError("thorough mount procedure failed")
-
-        # harmonize options
-        packages = [] if zim_install is None else zim_install
-        kalite_languages = [] if kalite is None else kalite
-        wikifundi_languages = [] if wikifundi is None else wikifundi
-        aflatoun_languages = ["fr", "en"] if aflatoun else []
-
-        if edupi_resources and not isremote(edupi_resources):
-            logger.step("Copying EduPi resources into cache")
-            shutil.copy(edupi_resources, cache_folder)
 
         # collection contains both downloads and processing callbacks
         # for all requested contents
@@ -245,25 +274,6 @@ def run_installation(
             raise ValueError("cannot decrease image size")
 
         emulator.resize_image(size)
-
-        # prepare ansible options
-        ansible_options = {
-            "name": name,
-            "timezone": timezone,
-            "language": language,
-            "language_name": dict(data.ideascube_languages)[language],
-            "edupi": edupi,
-            "edupi_resources": edupi_resources,
-            "wikifundi_languages": wikifundi_languages,
-            "aflatoun_languages": aflatoun_languages,
-            "kalite_languages": kalite_languages,
-            "packages": packages,
-            "wifi_pwd": wifi_pwd,
-            "admin_account": admin_account,
-            "disk_size": emulator.get_image_size(),
-            "root_partition_size": base_image.get("root_partition_size"),
-        }
-        extra_vars, secret_keys = ansiblecube.build_extra_vars(**ansible_options)
 
         # Run emulation
         logger.step("Starting-up VM")
