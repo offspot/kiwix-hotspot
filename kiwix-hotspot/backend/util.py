@@ -384,7 +384,7 @@ def get_etcher_command(image_fpath, device_fpath, logger, from_cli):
     return cmd, log_to_file, log_file
 
 
-def flash_image_with_etcher(image_fpath, device_fpath, retcode):
+def flash_image_with_etcher(image_fpath, device_fpath, retcode, from_cli=False):
     """ flash an image onto SD-card
 
         use only with small image as there is no output capture on OSX
@@ -392,7 +392,7 @@ def flash_image_with_etcher(image_fpath, device_fpath, retcode):
         retcode is a multiprocessing.Value """
     logger = CLILogger()
     cmd, log_to_file, log_file = get_etcher_command(
-        image_fpath, device_fpath, logger, False
+        image_fpath, device_fpath, logger, from_cli
     )
     returncode, _ = subprocess_pretty_call(cmd, check=False, logger=logger)
     retcode.value = returncode
