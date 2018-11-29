@@ -1,3 +1,6 @@
+2.0.2
+* Better etcher-cli calling and on-error logging on macOS via GUI
+
 2.0.1
 * Changed cache directory name from `cache` to `kiwix-hotspot.cache`
 * Better etcher log output on macOS

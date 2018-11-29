@@ -5,6 +5,7 @@ import os
 import re
 import sys
 import time
+import shlex
 import signal
 import ctypes
 import tempfile
@@ -152,14 +153,25 @@ def get_admin_command(command, from_gui, log_to=None):
         return ["sudo"] + command
 
     if sys.platform == "darwin":
-        return [
-            "/usr/bin/osascript",
-            "-e",
-            'do shell script "{command} 2>&1 {redir}" '
-            "with administrator privileges".format(
-                command=" ".join(command), redir=">{}".format(log_to) if log_to else ""
-            ),
-        ]
+        # write command to a separate temp bash script
+        script = (
+            "#!/bin/bash\n\n{command} 2>&1 {redir}\n\n"
+            'if [ $? -eq 1 ]; then\n    echo "!!! echer returned 1" {redir}\n'
+            "    exit 11\nfi\n".format(
+                command=" ".join([shlex.quote(cmd) for cmd in command]),
+                redir=">>{}".format(log_to) if log_to else "",
+            )
+        )
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".sh", delete=False) as fd:
+            fd.write(script)
+            fd.seek(0)
+
+            return [
+                "/usr/bin/osascript",
+                "-e",
+                'do shell script "/bin/bash {command}" '
+                "with administrator privileges".format(command=fd.name),
+            ]
     if sys.platform == "linux":
         return ["pkexec"] + command
 
@@ -172,6 +184,29 @@ class EtcherWriterThread(threading.Thread):
 
     def stop(self):
         self._should_stop = True
+
+    @classmethod
+    def show_log(cls, logger, log_to_file, log_file, process, eof=False):
+        if log_to_file:
+            try:
+                with open(log_file.name, "r") as f:
+                    lines = f.readlines()
+                    if len(lines) >= 2:
+                        lines.pop()
+                    # working
+                    if "Validating" in lines[-1] or "Flashing" in lines[-1]:
+                        logger.std(lines[-1].replace("\x1b[1A", "").strip())
+                    elif "[1A" in lines[-1]:  # still working but between progress
+                        logger.std(lines[-2].replace("\x1b[1A", "").strip())
+                    else:  # probably at end of file
+                        for line in lines[-5:]:
+                            logger.std(line.replace("\x1b[1A", "").strip())
+            except Exception as exp:
+                logger.err("Failed to read etcher log output: {}".format(exp))
+
+        if not log_to_file or eof:
+            for line in process.stdout:
+                logger.raw_std(line.decode("utf-8", "ignore"))
 
     def run(self,):
         image_fpath, device_fpath, logger = self._args
@@ -207,31 +242,7 @@ class EtcherWriterThread(threading.Thread):
 
             # reset counter and display log
             counter = 0
-            if log_to_file:
-                try:
-                    with open(log_file.name, "r") as f:
-                        lines = f.readlines()
-                        lines.pop()
-                        # working
-                        if "Validating" in lines[-1] or "Flashing" in lines[-1]:
-                            logger.std(lines[-1].replace("\x1b[1A", "").strip())
-                        elif "[1A" in lines[-1]:  # still working but between progress
-                            logger.std(lines[-2].replace("\x1b[1A", "").strip())
-                        else:  # probably at end of file
-                            for line in lines[-5:]:
-                                logger.std(line.replace("\x1b[1A", "").strip())
-                except Exception as exp:
-                    logger.err("Failed to read etcher log output: {}".format(exp))
-            else:
-                for line in process.stdout:
-                    logger.raw_std(line.decode("utf-8", "ignore"))
-
-        if log_to_file:
-            log_file.close()
-            try:
-                os.unlink(log_file.name)
-            except Exception as exp:
-                logger.err(str(exp))
+            self.show_log(logger, log_to_file, log_file, process)
 
         try:
             logger.std(". has process exited?")
@@ -258,6 +269,17 @@ class EtcherWriterThread(threading.Thread):
                 self.exp = CheckCallException(
                     "Process returned {}".format(process.returncode)
                 )
+
+        # capture last output
+        self.show_log(logger, log_to_file, log_file, process, eof=True)
+
+        if log_to_file:
+            log_file.close()
+            try:
+                os.unlink(log_file.name)
+            except Exception as exp:
+                logger.err(str(exp))
+
         logger.std(". process done")
         logger.progress(1)
 
@@ -352,10 +374,6 @@ def get_etcher_command(image_fpath, device_fpath, logger, from_cli):
         device_fpath,
         image_fpath,
     ]
-    # escape etcher-cli and image paths on OSX (to accomodate oascript)
-    if sys.platform == "darwin":
-        cmd[0] = '"{}"'.format(cmd[0])
-        cmd[-1] = '"{}"'.format(cmd[-1])
 
     # handle sudo or GUI alternative for linux and macOS
     if sys.platform in ("linux", "darwin"):
