@@ -2,6 +2,7 @@
 # vim: ai ts=4 sts=4 et sw=4 nu
 
 import os
+import random
 import tempfile
 
 import yaml
@@ -34,6 +35,24 @@ def fetch_catalogs(logger):
                 os.unlink(tmpfile.name)
             else:
                 raise ValueError("Unable to download {}".format(catalog.get("url")))
+
+            # ensure the content is readable (prevent incorrect encoding)
+            entry = catalogs[-1]["all"][random.choice(list(catalogs[-1]["all"].keys()))]
+            for key in (
+                "name",
+                "description",
+                "version",
+                "language",
+                "id",
+                "url",
+                "sha256sum",
+                "type",
+                "langid",
+            ):
+                if not entry.get(key) or not isinstance(entry[key], str):
+                    logger.err("Catalog format is not valid")
+                    catalogs.pop()  # remove catalog from list
+                    break
     except Exception as exp:
         logger.err("Exception while downloading/parsing catalogs: {}".format(exp))
         return None
