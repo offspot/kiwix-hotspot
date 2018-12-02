@@ -71,7 +71,7 @@ def subprocess_pretty_call(
             return run_as_win_admin(cmd, logger)
 
         from_cli = logger is None or type(logger) == CLILogger
-        cmd = get_admin_command(cmd, from_gui=not from_cli)
+        cmd = get_admin_command(cmd, from_gui=not from_cli, logger=logger)
 
     # We should use subprocess.run but it is not available in python3.4
     process = subprocess.Popen(
@@ -144,7 +144,7 @@ def run_as_win_admin(command, logger):
     return rc
 
 
-def get_admin_command(command, from_gui, log_to=None):
+def get_admin_command(command, from_gui, logger, log_to=None):
     """ updated command to run it as root on macos or linux
 
         from_gui: whether called via GUI. Using cli sudo if not """
@@ -157,11 +157,15 @@ def get_admin_command(command, from_gui, log_to=None):
         script = (
             "#!/bin/bash\n\n{command} 2>&1 {redir}\n\n"
             'if [ $? -eq 1 ]; then\n    echo "!!! echer returned 1" {redir}\n'
-            "    exit 11\nfi\n".format(
+            "    exit 11\nfi\n\n".format(
                 command=" ".join([shlex.quote(cmd) for cmd in command]),
                 redir=">>{}".format(log_to) if log_to else "",
             )
         )
+
+        # add script content to logger
+        logger.raw_std(script)
+
         with tempfile.NamedTemporaryFile(mode="w", suffix=".sh", delete=False) as fd:
             fd.write(script)
             fd.seek(0)
@@ -378,7 +382,10 @@ def get_etcher_command(image_fpath, device_fpath, logger, from_cli):
     # handle sudo or GUI alternative for linux and macOS
     if sys.platform in ("linux", "darwin"):
         cmd = get_admin_command(
-            cmd, from_gui=not from_cli, log_to=log_file.name if log_to_file else None
+            cmd,
+            from_gui=not from_cli,
+            logger=logger,
+            log_to=log_file.name if log_to_file else None,
         )
 
     return cmd, log_to_file, log_file
