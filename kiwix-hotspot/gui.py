@@ -1817,7 +1817,7 @@ class Application:
                 self.component.space_error_window.show()
                 all_valid = False
 
-        all_valid = all_valid and self.ensure_connection()
+        all_valid = all_valid and self.ensure_connection() and self.ensure_catalogs()
 
         if all_valid:
 
