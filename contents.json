@@ -8,7 +8,7 @@
         "expanded_size": 1862270976
     },
     "hotspot_master_image": {
-        "url": "{mirror}/plug/base/hotspot-master_2018-10-22.img.zip",
+        "url": "{mirror}/hotspots/base/hotspot-master_2018-10-22.img.zip",
         "name": "hotspot-master_2018-10-22.img.zip",
         "root_partition_size": 7000000000,
         "checksum": "332d64773799a13f144390bca0d62fac2beadd6ebbda28a12b7d2b552609efc5",
