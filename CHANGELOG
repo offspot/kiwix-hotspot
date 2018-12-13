@@ -1,3 +1,6 @@
+2.0.3
+* Added --root for CLI on linux to use losetup instead of udisks (for docker)
+
 2.0.2
 * Better etcher-cli calling and on-error logging on macOS via GUI
 * Added `wipe --sdcard /dev/xxx` CLI command

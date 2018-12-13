@@ -7,7 +7,7 @@ import sys
 from backend.mount import system_has_exfat
 
 if sys.platform == "linux":
-    from backend.mount import udisksctl_exe
+    from backend.mount import udisksctl_exe, losetup_exe
 
 requirements_url = "https://github.com/kiwix/kiwix-hotspot/wiki/System-Requirements"
 
@@ -27,8 +27,16 @@ def host_matches_requirements(build_dir):
 
     if sys.platform == "linux":
         # udisks2
-        if not os.path.exists(udisksctl_exe) or not os.access(udisksctl_exe, os.X_OK):
-            missing_reqs.append("udisks2 (udisksctl) is required.")
+        if bool(os.getenv("NO_UDISKS", False)):
+            if not os.path.exists(losetup_exe) or not os.access(losetup_exe, os.X_OK):
+                missing_reqs.append(
+                    "losetup (mount) is required when excluding udisks2."
+                )
+        else:
+            if not os.path.exists(udisksctl_exe) or not os.access(
+                udisksctl_exe, os.X_OK
+            ):
+                missing_reqs.append("udisks2 (udisksctl) is required.")
 
         # exfat
         mount_exfat = "/sbin/mount.exfat"

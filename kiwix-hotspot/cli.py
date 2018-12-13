@@ -27,7 +27,7 @@ from util import get_adjusted_image_size
 from backend.catalog import get_catalogs
 from run_installation import run_installation
 from util import human_readable_size, get_cache
-from backend.util import sd_has_single_partition
+from backend.util import sd_has_single_partition, is_admin
 
 import tzlocal
 import humanfriendly
@@ -200,8 +200,21 @@ parser.add_argument(
 parser.add_argument("--filename", help="Output file name (without suffix)")
 parser.add_argument("--ram", help="Max RAM for QEMU", default="2G")
 parser.add_argument("--sdcard", help="Device to copy image to")
+parser.add_argument(
+    "--root",
+    action="store_true",
+    help="Don't use udisks2 (linux-only, must be ran as root)",
+)
 
 args = parser.parse_args()
+
+# handle root option (disable udisks use)
+if args.root:
+    if not is_admin():
+        print("You must be root/elevated to use --root option")
+        sys.exit(1)
+    else:
+        os.environ["NO_UDISKS"] = "yes"
 
 # apply options from config file if requested
 if args.config:

@@ -42,6 +42,9 @@ elif sys.platform == "linux":
     udisksctl_exe = "/usr/bin/udisksctl"
     udisks_nou = "--no-user-interaction"
     mkfs_exe = "/sbin/mkfs.exfat"
+    umount_exe = "/bin/umount"
+    mount_exe = "/bin/mount"
+    losetup_exe = "/sbin/losetup"
 elif sys.platform == "darwin":
     hdiutil_exe = "/usr/bin/hdiutil"
     diskutil_exe = "/usr/sbin/diskutil"
@@ -190,6 +193,21 @@ def restore_mode(fpath, mode, logger):
 
 
 def guess_next_loop_device(logger):
+    def _no_udisks(logger):
+        """ guess loop device w/o udisks (using losetup/root) """
+        try:
+            lines = subprocess_pretty_call(
+                [losetup_exe, "--find"], logger, check=True, decode=True
+            )
+        except Exception as exp:
+            logger.err(exp)
+            return None
+
+        return re.search(r"(\/dev\/loop[0-9]+)$", lines[-1].strip()).groups()[0]
+
+    if bool(os.getenv("NO_UDISKS", False)):
+        return _no_udisks(logger)
+
     try:
         lines = subprocess_pretty_call(
             [udisksctl_exe, "dump"], logger, check=True, decode=True
@@ -286,26 +304,41 @@ def get_virtual_device(image_fpath, logger):
         )
 
         # prepare loop device
-        udisks_loop = subprocess_pretty_call(
-            [
-                udisksctl_exe,
-                "loop-setup",
-                "--offset",
-                str(offset),
-                "--size",
-                str(size),
-                "--file",
-                image_fpath,
-                udisks_nou,
-            ],
-            logger,
-            check=True,
-            decode=True,
-        )[0].strip()
+        if bool(os.getenv("NO_UDISKS", False)):
+            loop_maker = subprocess_pretty_call(
+                [
+                    "/sbin/losetup",
+                    "--offset",
+                    str(offset),
+                    "--sizelimit",
+                    str(size),
+                    "--find",
+                    "--show",
+                    image_fpath,
+                ],
+                logger,
+                check=True,
+                decode=True,
+            )[0].strip()
+        else:
+            loop_maker = subprocess_pretty_call(
+                [
+                    udisksctl_exe,
+                    "loop-setup",
+                    "--offset",
+                    str(offset),
+                    "--size",
+                    str(size),
+                    "--file",
+                    image_fpath,
+                    udisks_nou,
+                ],
+                logger,
+                check=True,
+                decode=True,
+            )[0].strip()
 
-        target_dev = re.search(r"(\/dev\/loop[0-9]+)\.$", udisks_loop).groups()[0]
-
-        return target_dev
+        target_dev = re.search(r"(\/dev\/loop[0-9]+)\.?$", loop_maker).groups()[0]
 
     elif sys.platform == "darwin":
         # attach image to create loop devices
@@ -317,8 +350,6 @@ def get_virtual_device(image_fpath, logger):
         )[0].strip()
         target_dev = str(hdiutil_out.splitlines()[0].split()[0])
 
-        return target_dev
-
     elif sys.platform == "win32":
         # make sure we have imdisk installed
         install_imdisk(logger)
@@ -326,7 +357,16 @@ def get_virtual_device(image_fpath, logger):
         # get an available letter
         target_dev = get_avail_drive_letter(logger)
 
-        return target_dev
+    return target_dev
+
+
+def release_virtual_device(device, logger):
+    if bool(os.getenv("NO_UDISKS", False)):
+        subprocess_pretty_call([losetup_exe, "--detach", device], logger)
+    else:
+        subprocess_pretty_call(
+            [udisksctl_exe, "loop-delete", "--block-device", device, udisks_nou], logger
+        )
 
 
 def format_data_partition(image_fpath, logger):
@@ -335,10 +375,15 @@ def format_data_partition(image_fpath, logger):
     target_dev = get_virtual_device(image_fpath, logger)
 
     if sys.platform == "linux":
-        # make sure it's not mounted (gnoe automounts)
-        subprocess_pretty_call(
-            [udisksctl_exe, "unmount", "--block-device", target_dev, udisks_nou], logger
-        )
+
+        # make sure it's not mounted (gnome automounts)
+        if bool(os.getenv("NO_UDISKS", False)):
+            subprocess_pretty_call([umount_exe, target_dev], logger)
+        else:
+            subprocess_pretty_call(
+                [udisksctl_exe, "unmount", "--block-device", target_dev, udisks_nou],
+                logger,
+            )
 
         # change mode via elevation if we can't format it
         previous_mode = None
@@ -399,7 +444,21 @@ def mount_data_partition(image_fpath, logger):
 
     target_dev = get_virtual_device(image_fpath, logger)
 
-    if sys.platform == "linux":
+    if sys.platform == "linux" and bool(os.getenv("NO_UDISKS", False)):
+        # create a mount point in /tmp
+        mount_point = tempfile.mkdtemp()
+
+        try:
+            subprocess_pretty_check_call(
+                [mount_exe, "-t", "exfat", target_dev, mount_point], logger
+            )
+        except Exception:
+            # ensure we release the loop device on mount failure
+            unmount_data_partition(mount_point, target_dev, logger)
+            raise
+        return mount_point, target_dev
+
+    elif sys.platform == "linux":
         # mount the loop-device (udisksctl sets the mount point)
         udisks_mount_ret, udisks_mount = subprocess_pretty_call(
             [udisksctl_exe, "mount", "--block-device", target_dev, udisks_nou],
@@ -416,6 +475,7 @@ def mount_data_partition(image_fpath, logger):
             # udisksctl always mounts under /media/
             mount_point = re.search(r"at (\/media\/.+)\.$", udisks_mount).groups()[0]
         else:
+            release_virtual_device(target_dev, logger)  # release loop if attached
             raise OSError("failed to mount {}".format(target_dev))
 
         return mount_point, target_dev
@@ -469,17 +529,20 @@ def unmount_data_partition(mount_point, device, logger):
 
         if mount_point:
             # unmount using device path
-            subprocess_pretty_call(
-                [udisksctl_exe, "unmount", "--block-device", device, udisks_nou], logger
-            )
+            if bool(os.getenv("NO_UDISKS", False)):
+                subprocess_pretty_call([umount_exe, device], logger)
+            else:
+                subprocess_pretty_call(
+                    [udisksctl_exe, "unmount", "--block-device", device, udisks_nou],
+                    logger,
+                )
             try:
                 os.rmdir(mount_point)
             except (FileNotFoundError, PermissionError):
                 pass
-        # delete the loop device (might have already been deletec)
-        subprocess_pretty_call(
-            [udisksctl_exe, "loop-delete", "--block-device", device, udisks_nou], logger
-        )
+
+        # delete the loop device (might have already been deleted)
+        release_virtual_device(device, logger)
 
     elif sys.platform == "darwin":
 
