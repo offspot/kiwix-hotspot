@@ -44,7 +44,7 @@ build-pibox-image:
     - eval "export OUT_IMG=hotspot-master_$(date +"%Y-%m-%d").img"
     - dist/kiwix-hotspot image --ram 8G --root 7 --size 8 --out ${OUT_IMG}
     - zip -9 ${OUT_IMG}.zip ${OUT_IMG}
-    - scp ${OUT_IMG}.zip upload@download.kiwix.org:/var/www/download.kiwix.org/plug/base/
+    - scp ${OUT_IMG}.zip ci@download.kiwix.org:/data/download/hotspots/base/
   only:
     - schedules
     - web
