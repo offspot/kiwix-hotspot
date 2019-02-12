@@ -1,5 +1,6 @@
 2.0.4
 * Speed up improvements for Wikifundi
+* Updated kiwix-serve to 0.9.0
 
 2.0.3
 * Added --root for CLI on linux to use losetup instead of udisks (for docker)
