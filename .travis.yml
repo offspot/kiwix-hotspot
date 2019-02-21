@@ -20,9 +20,16 @@ matrix:
     - py.test
 
   - os: osx
-    osx_image: xcode8.3
+    osx_image: xcode10.1
     language: generic
-    python: 3.6.5  # just a label
+    python: 3.7.1  # just a label
+    addons:
+      homebrew:
+        packages:
+        - pygobject3
+        - gtk+3
+        - adwaita-icon-theme
+        update: false
     install:
     - PIBOX_RELEASE=$(echo $TRAVIS_TAG | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*\(-rc[[:digit:]]\+\)\?') || true
     - BRANCH=${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}
@@ -30,15 +37,16 @@ matrix:
     - if [ $PIBOX_RELEASE ]; then PIBOX_VERSION=${PIBOX_RELEASE:1}; elif [ "$TRAVIS_EVENT_TYPE" = "cron" ]; then PIBOX_VERSION="nightly ($SCOMMIT)"; else PIBOX_VERSION="CI ($SCOMMIT)"; fi
     - sed -i.bak "s/VERSION = \"devel\"/VERSION = \"${PIBOX_VERSION}\"/g" kiwix-hotspot/data.py
 
-    # Package kiwix-hotspot
-    - brew update
-    # checking our formulas out to how they were when python 3.6.5 was around
-    - cd /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core
-    - git checkout e128fa1bce3377de32cbf11bd8e46f7334dfd7a6 Formula/python.rb Formula/pygobject.rb Formula/pygobject3.rb Formula/py2cairo.rb Formula/py3cairo.rb Formula/cairo.rb Formula/gtk+3.rb Formula/glib.rb Formula/adwaita-icon-theme.rb Formula/gobject-introspection.rb Formula/gdk-pixbuf.rb Formula/harfbuzz.rb Formula/pango.rb Formula/atk.rb
-    - cd -
-    - brew install pygobject3 --with-python3 gtk+3 adwaita-icon-theme
+    # following needed for create-dmg
+    - brew switch icu4c 62.1
+    - python3 -m pip install -U pip
     - python3 -m pip install -r requirements-macos.txt
-    - python3 -m pip install https://github.com/pyinstaller/pyinstaller/archive/93eec04eb2fbfc714d2c3453e04fd126e6a86f52.zip
+    - python3 -m pip install -U pyinstaller
+    # following line needed locally (venv)
+    #- ln -s /usr/local/lib/python3.7/site-packages/gi $(python3 -c "import sys; print(sys.path[-1])")/
+    # fix gdk-pixbuf for codesign (https://github.com/pyinstaller/pyinstaller/pull/2596 and https://gist.github.com/rgaudin/5f027d0621e5a7639cb42f8ba753a259)
+    - wget https://gist.githubusercontent.com/rgaudin/5f027d0621e5a7639cb42f8ba753a259/raw/2211905a8366ffa5cfae5c795330fbdefdfb95d1/pyinstaller-pixbuf-sign.patch
+    - patch -p2 -d $(python3 -c "import os; import PyInstaller; print(os.path.dirname(PyInstaller.__file__))") < pyinstaller-pixbuf-sign.patch
 
     # Download vexpress-boot
     - wget http://mirror.download.kiwix.org/dev/vexpress-boot.zip
@@ -63,12 +71,12 @@ matrix:
     - security import pibox-installer.p12 -k build.keychain -P $MACOS_CERTIFICATE_PASSWORD -A
     - "security set-key-partition-list -S apple-tool:,apple: -s -k mysecretpassword build.keychain"
     - security find-identity -v
-    - "codesign -s \"Developer ID Application: Wikimedia CH (L7HWM3SP3L)\" \"dist/Kiwix Hotspot.app\" --deep"
+    - "codesign --force --sign \"Developer ID Application: Wikimedia CH (L7HWM3SP3L)\" \"dist/Kiwix Hotspot.app\" --deep"
 
     # Install and run create-dmg
-    - npm install --global create-dmg@2.0.0 --python=python2.7
-    - create-dmg dist/Kiwix\ Hotspot.app || true
-    - mv Kiwix-Hotspot-*.dmg kiwix-hotspot-macos.dmg
+    - npm install --global create-dmg
+    - create-dmg dist/Kiwix\ Hotspot.app
+    - mv Kiwix*.dmg kiwix-hotspot-macos.dmg
 
     # CI build
     - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ "a$PIBOX_RELEASE" = "a" ]; then scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa kiwix-hotspot-macos.dmg ci@tmp.kiwix.org:/data/tmp/ci/kiwix-hotspot-macos-$BRANCH.dmg; fi
