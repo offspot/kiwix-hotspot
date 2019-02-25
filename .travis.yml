@@ -89,27 +89,25 @@ matrix:
     - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ $PIBOX_RELEASE ]; then mkdir -p releases/$PIBOX_RELEASE; cp kiwix-hotspot-macos.dmg releases/$PIBOX_RELEASE/; scp -r -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases/$PIBOX_RELEASE ci@download.kiwix.org:/data/download/release/kiwix-hotspot/; fi
 
   - os: linux
-    language: python
-    python: 3.4
-    dist: trusty
+    language: generic
+    python: 3.7.1  # just a label
+    dist: xenial
     sudo: required
-    virtualenv:
-      system_site_packages: true
     addons:
       apt:
         packages:
           # Some package may not be required
-          python3-gi
-          python3-gi-cairo
-          python3-cairo
+          libgirepository1.0-dev
+          gcc
+          libcairo2-dev
+          pkg-config
+          python3-dev
           gir1.2-gtk-3.0
           libdbus-1-dev
           libdbus-glib-1-dev
           libffi-dev
           build-essential
           libssl-dev
-          python-dev
-          python3-dev
           libgdk-pixbuf2.0-dev
     script:
     - PIBOX_RELEASE=$(echo $TRAVIS_TAG | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*\(-rc[[:digit:]]\+\)\?') || true
@@ -117,6 +115,17 @@ matrix:
     - SCOMMIT=$(git rev-parse --short ${TRAVIS_COMMIT})
     - if [ $PIBOX_RELEASE ]; then PIBOX_VERSION=${PIBOX_RELEASE:1}; elif [ "$TRAVIS_EVENT_TYPE" = "cron" ]; then PIBOX_VERSION="nightly ($SCOMMIT)"; else PIBOX_VERSION="CI ($SCOMMIT)"; fi
     - sed -i.bak "s/VERSION = \"devel\"/VERSION = \"${PIBOX_VERSION}\"/g" kiwix-hotspot/data.py
+
+    # python preps
+    - sudo add-apt-repository -y ppa:deadsnakes/ppa
+    - sudo apt-get update -y
+    - sudo apt-get install -y python3.7 python3.7-dev
+    - virtualenv -p /usr/bin/python3.7 hotspot-env
+    - source hotspot-env/bin/activate
+
+    # pygobjects
+    - pip3 install pycairo
+    - pip3 install PyGObject
 
     # update XZ (trusty version -5.0.5 is too old)
     - wget http://mirror.download.kiwix.org/dev/xz-5.2.4.tar.gz
@@ -145,10 +154,9 @@ matrix:
     - pip3 install -r requirements-linux.txt
 
     # Install and run pyinstaller
-    # note: we temporary use a fork that resolves pygobject issues
-    - pip3 install https://github.com/thiolliere/pyinstaller/archive/develop.zip
+    - pip3 install -U pyinstaller
     - pyinstaller --log-level=DEBUG kiwix-hotspot-linux.spec
-    - cat build/kiwix-hotspot-linux/warnkiwix-hotspot-linux.txt
+    - cat build/kiwix-hotspot-linux/warnkiwix-hotspot-linux.txt || true
 
     # Archive
     - cd dist
