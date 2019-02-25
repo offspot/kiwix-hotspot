@@ -64,6 +64,9 @@ matrix:
     # Run PyInstaller
     - pyinstaller --log-level=DEBUG kiwix-hotspot-macos.spec
 
+    # update/resync time (as an offset might prevent codesign from working)
+    - sudo sntp -sS time.apple.com
+
     # Sign application
     - security create-keychain -p mysecretpassword build.keychain
     - security default-keychain -s build.keychain
