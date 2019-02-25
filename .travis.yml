@@ -29,7 +29,7 @@ matrix:
         - pygobject3
         - gtk+3
         - adwaita-icon-theme
-        update: false
+        update: true
     install:
     - PIBOX_RELEASE=$(echo $TRAVIS_TAG | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*\(-rc[[:digit:]]\+\)\?') || true
     - BRANCH=${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}
@@ -63,6 +63,9 @@ matrix:
 
     # Run PyInstaller
     - pyinstaller --log-level=DEBUG kiwix-hotspot-macos.spec
+
+    # update/resync time (as an offset might prevent codesign from working)
+    - sudo sntp -sS time.apple.com
 
     # Sign application
     - security create-keychain -p mysecretpassword build.keychain
