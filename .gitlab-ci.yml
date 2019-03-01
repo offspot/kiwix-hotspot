@@ -1,4 +1,4 @@
-image: "python:3.4"
+image: "python:3.7"
 
 before_script:
   - apt-get update
@@ -27,18 +27,17 @@ build-pibox-image:
     - tar xf qemu-2.12.0-linux-x86_64.tar.gz
 
     # download etcher-cli (not used but packaged)
-    - wget http://mirror.download.kiwix.org/dev/etcher-cli-1.4.5-darwin-x64.tar.gz
+    - wget http://download.kiwix.org/dev/balena-etcher-cli-1.4.8-linux-x64.tar.gz
     - mkdir -p etcher-cli
-    - tar xf etcher-cli-1.4.5-darwin-x64.tar.gz -C etcher-cli --strip-components=1
+    - tar xf balena-etcher-cli-1.4.8-linux-x64.tar.gz -C etcher-cli --strip-components=1
 
     # Install python dependancies
     - pip3 install -U pip
     - pip3 install -r requirements-linux.txt
 
     # Install and run pyinstaller
-    - pip3 install https://github.com/thiolliere/pyinstaller/archive/develop.zip
+    - pip3 install -U pyinstaller
     - pyinstaller --log-level=DEBUG kiwix-hotspot-linux.spec
-    - cat build/kiwix-hotspot-linux/warnkiwix-hotspot-linux.txt
 
     # start image builder
     - eval "export OUT_IMG=hotspot-master_$(date +"%Y-%m-%d").img"
