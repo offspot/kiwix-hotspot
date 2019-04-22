@@ -331,7 +331,7 @@ class Application:
         )
 
         # ideascube language
-        for code, language in data.ideascube_languages:
+        for code, language in data.hotspot_languages:
             self.component.language_tree_store.append([code, language])
 
         renderer = Gtk.CellRendererText()
@@ -651,7 +651,7 @@ class Application:
 
         # language
         index = -1
-        for i, (code, language) in enumerate(data.ideascube_languages):
+        for i, (code, language) in enumerate(data.hotspot_languages):
             if code == "en":
                 index = i
         self.component.language_combobox.set_active(index)
@@ -1403,9 +1403,9 @@ class Application:
 
         # language
         try:
-            value = dict(data.ideascube_languages)[config["language"]]
+            value = dict(data.hotspot_languages)[config["language"]]
             item_tuple = (config["language"], value)
-            item_id = data.ideascube_languages.index(item_tuple)
+            item_id = data.hotspot_languages.index(item_tuple)
         except KeyError:
             pass
         else:
@@ -1547,7 +1547,7 @@ class Application:
     def get_config(self):
         try:
             language_id = self.component.language_combobox.get_active()
-            language = data.ideascube_languages[language_id][0]
+            language = data.hotspot_languages[language_id][0]
         except Exception:
             language = None
 
@@ -1674,7 +1674,7 @@ class Application:
 
         # capture input
         project_name = self.component.project_name_entry.get_text()
-        language = data.ideascube_languages[
+        language = data.hotspot_languages[
             self.component.language_combobox.get_active()
         ][0]
         timezone = self.component.timezone_tree_store[
@@ -1692,7 +1692,7 @@ class Application:
         # validate inputs
         valid_project_name, valid_language, valid_timezone, valid_wifi_pwd, valid_admin_login, valid_admin_pwd = check_user_inputs(
             project_name=self.component.project_name_entry.get_text(),
-            language=data.ideascube_languages[
+            language=data.hotspot_languages[
                 self.component.language_combobox.get_active()
             ][0],
             timezone=self.component.timezone_tree_store[

@@ -42,6 +42,7 @@ from backend.util import EtcherWriterThread
 from backend.util import prevent_sleep, restore_sleep_policy
 from backend.mount import can_write_on, allow_write_on, restore_mode
 from backend.sysreq import host_matches_requirements, requirements_url
+from backend.homepage import generate_homepage, save_homepage
 
 
 def run_installation(
@@ -137,7 +138,7 @@ def run_installation(
             "name": name,
             "timezone": timezone,
             "language": language,
-            "language_name": dict(data.ideascube_languages)[language],
+            "language_name": dict(data.hotspot_languages)[language],
             "edupi": edupi,
             "edupi_resources": edupi_resources,
             "wikifundi_languages": wikifundi_languages,
@@ -159,6 +160,10 @@ def run_installation(
                 indent=4,
             )
         )
+
+        # gen homepage HTML
+        homepage_path = save_homepage(generate_homepage(logger, ansible_options))
+        logger.std("homepage saved to: {}".format(homepage_path))
 
         # Download Base image
         logger.stage("master")
@@ -293,7 +298,13 @@ def run_installation(
 
             logger.step("Run ansiblecube")
             ansiblecube.run_phase_one(
-                emulation, extra_vars, secret_keys, logo=logo, favicon=favicon, css=css
+                emulation,
+                extra_vars,
+                secret_keys,
+                homepage=homepage_path,
+                logo=logo,
+                favicon=favicon,
+                css=css,
             )
 
         # wait for QEMU to release file (windows mostly)

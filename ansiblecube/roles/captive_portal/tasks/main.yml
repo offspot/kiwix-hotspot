@@ -22,8 +22,8 @@
 - name: Create /var/www/captiveportal folder
   file:
     path: /var/www/captiveportal
-    owner: ideascube
-    group: ideascube
+    owner: "{{ username }}"
+    group: "{{ username }}"
     mode: 0755
     state: directory
   tags: master
@@ -32,27 +32,19 @@
   template:
     src: cap.py.j2
     dest: /var/www/captiveportal/cap.py
-    owner: ideascube
-    group: ideascube
+    owner: "{{ username }}"
+    group: "{{ username }}"
     mode: 0755
   notify: restart uwsgi
   tags: ['master', 'rename']
 
 - name: Add nginx specific configuration file
-  copy:
-    src: nginx-captiveportal
+  template:
+    src: nginx.vhost.j2
     dest: /etc/nginx/sites-available/captiveportal
     owner: root
     group: root
     mode: 0644
-  tags: master
-
-- name: Make sure ideascube is not default_server
-  lineinfile:
-    dest: /etc/nginx/sites-available/ideascube
-    regexp: '^(.*)listen(.*)default_server(.*)'
-    line: "    listen      80 ;"
-    backrefs: yes
   tags: master
 
 - name: Enable captive portal vhost
@@ -80,21 +72,19 @@
     state: directory
   tags: master
 
-- name: Generate a Private key
-  command: openssl genrsa -out /etc/nginx/ssl/ideascube.key 2048
-  tags: master
-
-- name: Create Certificate Signing Request
-  command: openssl req -new -sha256 -key /etc/nginx/ssl/ideascube.key -out /etc/nginx/ssl/ideascube.csr -subj "/C=CH/ST=Vaud/L=Lausanne/O=Kiwix/OU=Kiwix Hotspot/CN={{ fqdn }}"
+- name: prepare CSR
+  template:
+    src: csr.conf
+    dest: /tmp/csr.conf
   tags: ['master', 'rename']
 
-- name: Sign the certificate
-  command: openssl x509 -req -sha256 -days 3650 -in /etc/nginx/ssl/ideascube.csr -signkey /etc/nginx/ssl/ideascube.key -out /etc/nginx/ssl/ideascube.crt
-  tags: ['master', 'rename']  
+- name: Create Certificate Signing Request
+  command: openssl req -config /tmp/csr.conf -new -x509 -newkey rsa:2048 -nodes -keyout /etc/nginx/ssl/hotspot.key -days 3650 -out /etc/nginx/ssl/hotspot.crt -batch
+  tags: ['master', 'rename']
 
 - name: Add UWSGI specific configuration file
-  copy:
-    src: captive.ini
+  template:
+    src: captive.ini.j2
     dest: /etc/uwsgi/apps-available/captive.ini
     owner: root
     group: root

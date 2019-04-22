@@ -23,16 +23,21 @@
       # master, resize
     - role: resize
 
+      # master, rename
     - role: nginx
-      tags: master
+
+    - role: home
 
     - role: uwsgi
       tags: master
 
       # master, rename, setup, reconfigure
-    - role: ideascube
+    - role: dnsmasq
+    - role: hostapd
+    - role: iptables
+    - role: network-manager
 
-      # master, rename
+      # master, resize, rename
     - role: kiwix
 
     # master, rename (nginx hostname), reconfigure (password)

@@ -496,7 +496,7 @@ def check_user_inputs(
         and set(project_name) <= allowed_chars
     )
 
-    valid_language = language in dict(data.ideascube_languages).keys()
+    valid_language = language in dict(data.hotspot_languages).keys()
 
     valid_timezone = timezone in pytz.common_timezones
 

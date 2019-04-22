@@ -1,0 +1,76 @@
+---
+- name: Ensure home directory exists
+  file:
+    path: /var/www/home
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  tags: master
+
+- name: install nginx vhost
+  template:
+    src: nginx.vhost.j2
+    dest: /etc/nginx/sites-available/home
+    mode: 0644
+  tags: ['master', 'rename']
+
+- name: enable home vhost
+  file:
+    src: /etc/nginx/sites-available/home
+    dest: /etc/nginx/sites-enabled/home
+    state: link
+    force: yes
+  notify: restart nginx
+  tags: master
+
+- name: Copy static files (general branding)
+  copy:
+    src: static
+    dest: /var/www/
+  tags: master
+
+- name: copy blank homepage
+  template:
+    src: master.html.j2
+    dest: /var/www/home/index.html
+    mode: 0644
+  tags: master
+
+- name: Copy homepage
+  copy:
+    src: "{{ custom_branding_path }}/home.html"
+    dest: /var/www/home/index.html
+    mode: 0644
+  tags: reconfigure
+
+- block:
+  - debug: msg="Customize branding"
+
+  - name: Ensure the branding directory exists
+    file:
+      path: "{{common_static_path}}/branding"
+      state: directory
+      owner: root
+      group: root
+      mode: 0755
+
+  - stat: 
+      path: "{{ custom_branding_path }}/{{ item }}"
+    with_items:
+     - favicon.png
+     - logo.png
+     - style.css
+    register: branding_files_stat
+
+  - copy:
+      src: "{{ custom_branding_path }}/{{ item.item }}"
+      dest: "{{common_static_path}}/branding/{{ item.item }}"
+      owner: "{{ username }}"
+      group: "{{ group }}"
+      mode: 0644
+    when: item.stat.exists
+    with_items: "{{ branding_files_stat.results }}"
+
+  when: has_custom_branding | bool
+  tags: reconfigure

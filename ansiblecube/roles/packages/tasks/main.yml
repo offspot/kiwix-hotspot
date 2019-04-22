@@ -1,69 +1,15 @@
 ---
-# we need to disable dnsmasq for internet connectivity to work
-# will be enabled on seal tag later
-- include_tasks: disable_service.yml service=dnsmasq
-  tags: move-content
-
-- name: Install catalogs
-  become: yes
-  become_user: "{{ username }}"
-  command: ideascube catalog remotes add "{{ item.name }}" "{{ item.description }}" "{{ item.local_url }}"
-  with_items: "{{ ansible_local.config.catalogs }}"
-  tags: move-content
-
-- name: Update ideascube catalog cache before downloading
-  become: yes
-  become_user: "{{ username }}"
-  shell: ideascube catalog cache update
-  tags: move-content
-
-- name: Install, upgrade or remove packages
-  become: yes
-  become_user: "{{ username }}"
-  shell: ideascube catalog install --package-cache {{ packages_cache }} --skip-sha256 {{ item }}
-  with_items: '{{ ansible_local.config.packages | default(omit) }}'
-  when: ansible_local.config.packages | length
-  register: ideascube_catalog_cmd
+- name: restart Kiwix
+  shell: echo "packages moved, requesting kiwix restart"
   notify: restart kiwix
   tags: move-content
 
 - name: Add CSS for package icon
   lineinfile:
-    dest: /opt/venvs/ideascube/lib/python{{ python3_version }}/site-packages/ideascube/static/ideascube/cards.css
+    dest: /var/www/static/cards.css
     line: '.card.{{ item|splitext|first|replace(".", "\.") }} { background-image: url("http://{{ kiwix_fqdn }}/{{ item }}/-/favicon"); }'
     insertafter: EOF
     state: present
   with_items: '{{ ansible_local.config.packages | default(omit) }}'
   when: ansible_local.config.packages | length
   tags: ['move-content', 'rename']
-
-- name: Fix khanacademy icon size in CSS
-  lineinfile:
-    dest: /opt/venvs/ideascube/lib/python{{ python3_version }}/site-packages/ideascube/static/ideascube/cards.css
-    line: '.card.khanacademy { background-size: 48px; }'
-    insertafter: EOF
-    state: present
-  tags: move-content
-
-- name: Fix edupi category CSS
-  lineinfile:
-    dest: /opt/venvs/ideascube/lib/python{{ python3_version }}/site-packages/ideascube/static/ideascube/cards.css
-    line: '.acces, .access { background-color: #FCE94F; }'
-    insertafter: EOF
-    state: present
-  tags: move-content
-
-- name: collect static for ideascube
-  become: yes
-  become_user: "{{ username }}"
-  command: ideascube collectstatic --noinput
-  notify: restart uwsgi
-  tags: move-content
-
-- set_fact:
-    pkg_list: "{{ ideascube_catalog_cmd.results | map(attribute='stdout') | list }}"
-  tags: move-content
-
-- debug:
-    var: pkg_list
-  tags: move-content

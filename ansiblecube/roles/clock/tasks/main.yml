@@ -31,7 +31,7 @@
   file:
     path: /var/www/clock
     owner: "{{ username }}"
-    group: ideascube
+    group: "{{ group }}"
     mode: 0755
     state: directory
   tags: master
@@ -41,14 +41,14 @@
     src: clock.py
     dest: /var/www/clock/clock.py
     owner: "{{ username }}"
-    group: ideascube
+    group: "{{ group }}"
     mode: 0755
   notify: restart uwsgi
   tags: master
 
 - name: Add UWSGI specific configuration file
-  copy:
-    src: uwsgi.ini
+  template:
+    src: clock.ini.j2
     dest: /etc/uwsgi/apps-available/clock.ini
     owner: root
     group: root

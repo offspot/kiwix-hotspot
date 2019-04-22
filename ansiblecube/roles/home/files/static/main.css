@@ -1,0 +1,941 @@
+/* ************************************************* */
+/* *********************** FONT ******************** */
+/* ************************************************* */
+@font-face {
+    font-family: 'fira_sansbold';
+    src: url('./font/FiraSans-Bold.eot');
+    src: url('./font/FiraSans-Bold.eot?#iefix') format('embedded-opentype'),
+         url('./font/FiraSans-Bold.woff') format('woff'),
+         url('./font/FiraSans-Bold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'fira_sansmedium';
+    src: url('./font/FiraSans-Medium.eot');
+    src: url('./font/FiraSans-Medium.eot?#iefix') format('embedded-opentype'),
+         url('./font/FiraSans-Medium.woff') format('woff'),
+         url('./font/FiraSans-Medium.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'fira_sansregular';
+    src: url('./font/FiraSans-Regular.eot');
+    src: url('./font/FiraSans-Regular.eot?#iefix') format('embedded-opentype'),
+         url('./font/FiraSans-Regular.woff') format('woff'),
+         url('./font/FiraSans-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'fira_sansbook';
+    src: url('./font/FiraSans-Book.eot');
+    src: url('./font/FiraSans-Book.eot?#iefix') format('embedded-opentype'),
+         url('./font/FiraSans-Book.woff') format('woff'),
+         url('./font/FiraSans-Book.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'fira_sanslight';
+    src: url('./font/FiraSans-Light.eot');
+    src: url('./font/FiraSans-Light.eot?#iefix') format('embedded-opentype'),
+         url('./font/FiraSans-Light.woff') format('woff'),
+         url('./font/FiraSans-Light.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'fira_sanslight_italic';
+    src: url('./font/FiraSans-LightItalic.eot');
+    src: url('./font/FiraSans-LightItalic.eot?#iefix') format('embedded-opentype'),
+         url('./font/FiraSans-LightItalic.woff') format('woff'),
+         url('./font/FiraSans-LightItalic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* ************************************************* */
+/* ******************** GENERIC RULES ************** */
+/* ************************************************* */
+body {
+    margin: 0;
+    padding: 0;
+}
+body,
+input,
+textarea {
+  color:#404040;
+  color:rgba(0,0,0,0.75);
+  font:15px/20px 'fira_sansregular', sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+/* pure-g force the use of a font that works correctly in all browser for the
+ * em unit (https://github.com/yahoo/pure/issues/41/).
+ * The font is then reset to the default one (sans-serif) in pure-u elements.
+ * As we use 'fira_sansregular' by default, we need to overide the default
+ * value from pure.
+ */
+.pure-g [class*="pure-u"] {
+  font-family: 'fira_sansregular', sans-serif !important;
+}
+div, ul, li, a, section, nav,
+h1, h2, h3, h4, h5, h6,
+hr, input, textarea, footer, header {
+    -moz-box-sizing:border-box;
+    -webkit-box-sizing:border-box;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+hr {
+    clear: both;
+    width: 100%;
+    height: 0;
+    max-width: 980px;
+    margin: 28px auto;
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    border-color: #ddd;
+    border-image: none;
+    border-style: solid;
+    border-width: 1px 0 0;
+}
+ol, ul {
+    list-style: none;
+}
+h2, h3 {
+    margin-bottom: 15px;
+    line-height: 1.2em;
+}
+h4, h5 {
+    margin-bottom: 5px;
+}
+h1 {
+    line-height: 1em;
+}
+h1, h2, h3, h4, h5 {
+    font-family: 'fira_sansbold';
+    font-weight: normal;
+}
+strong {
+    font-family: "fira_sansbold";
+    font-weight: normal;
+}
+a {
+    color: #333;
+}
+img {
+    max-width: 100%;
+}
+table {
+    width: 100%;
+    border: 1px solid #eee;
+}
+table td, table th {
+    text-align: center;
+}
+table tr:nth-child(odd) {
+    background-color: #eee;
+}
+table tr th {
+    background-color: #ccc;
+}
+
+.float-clear {
+    clear: both;
+}
+
+
+/* ************************************************* */
+/* *********************** GRID ******************** */
+/* ************************************************* */
+.row {
+    width: 100%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    display: -webkit-flex;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+}
+.row + .row {
+    margin-top: 40px;
+}
+.row + .row.no-margin {
+    margin-top: 0px;
+}
+.col {
+    flex: 0 1 auto;
+    -webkit-flex: 0 1 auto;
+}
+.col + .col {
+    padding-left: 40px;
+}
+html[dir='rtl'] .col + .col {
+    padding-left: 0;
+    padding-right: 40px;
+}
+.spaced + .spaced {
+    margin-left: 40px;
+}
+html[dir='rtl'] .spaced + .spaced {
+    margin-left: 0;
+    margin-right: 40px;
+}
+.half {
+    width: 50%;
+}
+.third {
+    width: 33.33%;
+}
+.two-third {
+    width: 66.66%
+}
+.quarter {
+    width: 25%;
+}
+.wide {
+    width: 100%;
+    padding-right: inherit;
+}
+.mshow, .tshow {
+    display: none;
+}
+.flow {
+    display: -webkit-flex;
+    display: flex;
+}
+.flow * + * {
+    margin-left: 5px;
+}
+html[dir='rtl'] .flow * + * {
+    margin-right: 5px;
+}
+.layout-container {
+    margin: 0 -10px;
+}
+.layout-element {
+    padding: 0 10px;
+}
+.right-align {
+   justify-content: flex-end;
+}
+
+
+/* ************************************************* */
+/* ********************** FORMS ******************** */
+/* ************************************************* */
+input[type="text"], input[type="password"], input[type="date"],
+input[type="datetime"], input[type="email"], input[type="number"],
+input[type="search"], input[type="tel"], input[type="time"],
+input[type="url"], input[type="file"], textarea,
+[contenteditable="true"] {
+    background-color: white;
+    border: 1px solid #CCCCCC;
+    border-radius: 2px 2px 2px 2px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+    color: rgba(0, 0, 0, 0.75);
+    display: block;
+    font-family: inherit;
+    font-size: 14px;
+    min-height: 50px;
+    margin: 0 0 14px;
+    padding: 7px;
+    width: 100%;
+}
+input[type="submit"],
+.button {
+    border: none;
+    border-radius: 2px;
+    padding: 0 10px;
+    text-decoration: none;
+    color: #fff;
+    font-size: 1.1em;
+    background-color: #6C7A89;
+    display: inline-block;
+    margin-top: 10px;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    cursor: pointer;
+}
+input[type="submit"].action,
+.button.action {
+    background-color: #C75C5C;
+}
+input[type="submit"].warning,
+.button.warning {
+    background-color: #D91E18;
+}
+input[type="submit"].neutral,
+.button.neutral {
+    background-color: #E0E0D1;
+    color: #666;
+}
+input[type="submit"]:hover,
+.button:hover {
+    background-color: #95A5A6;
+    color: #fff;
+}
+input[type="submit"].warning:hover,
+.button.warning:hover {
+    background-color: #EF4836;
+}
+textarea {
+    height: 200px;
+}
+select {
+    width: 100%;
+    background-color: #fff;
+    height: 28px;
+    line-height: 28px;
+    color: rgba(0, 0, 0, 0.75);
+    border: 1px solid #ddd;
+    margin-bottom: 15px;
+}
+select[multiple="multiple"] {
+    height: auto;
+}
+label.strip {
+    display: block;
+    background-color: #D2D7D3;
+    border-top-right-radius: 2px;
+    border-top-left-radius: 2px;
+    padding: 5px;
+    font-family: 'fira_sanslight';
+    margin-top: 14px;
+}
+label.strip + input[type="text"] {
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+}
+[contenteditable=true]:empty:before {
+    content: attr(placeholder);
+    display: block; /* For Firefox */
+    font-family: 'fira_sanslight_italic';
+}
+.editor-dialog input[type="text"] {
+    width: auto;
+    height: auto;
+    margin: 0;
+    display: inline;
+}
+label.required:after {
+    content: ' *';
+    color: #D35400;
+    font-size: 1.2em;
+    line-height: 1em;
+    float: right;
+}
+html[dir="rtl"] label.required:after {
+    float: left;
+}
+.help-text, .helptext {
+    display: block;
+    padding: 7px 7px;
+    margin-top: -14px;
+    margin-bottom: 14px;
+    background: #ddd;
+    color: #6f6f6f;
+    font-size: 11px;
+    border-radius: 0 2px;
+}
+input[type="text"].showable-password,
+input[type="password"].showable-password {
+    display: inline-block;
+    margin: 0;
+    padding-right: 30px;
+}
+.show-password {
+    display: inline-block;
+    width: 25px;
+    line-height: 50px;
+    vertical-align: middle;
+    margin-left: -25px;
+    cursor: pointer;
+}
+html[dir='rtl'] .show-password {
+    margin-left: auto;
+    margin-right: -25px;
+}
+
+.content {
+    padding: 0 30px;
+}
+
+.tinymce-editor {
+    min-height: 150px;
+    max-height: 450px;
+    overflow: auto;
+}
+
+/* ************************************************* */
+/* *************** HEADER & FOOTER ***************** */
+/* ************************************************* */
+header {
+    display: -webkit-flex;
+    display: flex;
+    padding: 0 30px;
+    background-color: #fefefe;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 40px;
+}
+header section {
+    align-self: center;
+    display: -webkit-flex;
+    display: flex;
+}
+header h1 {
+    width: 300px;
+}
+header h1 img {
+    width: 250px;
+}
+html[dir='rtl'] header h1 {
+    background-position: right center;
+    padding-right: 90px;
+}
+header .menu {
+    -webkit-justify-content: flex-end;
+    justify-content: flex-end;
+    -webkit-flex-grow: 3;
+    flex-grow: 3;
+}
+header .menu a {
+    color: #333;
+    line-height: 100px;
+    text-transform: uppercase;
+    font-family: 'fira_sansbold';
+    font-weight: normal;
+}
+header .menu a:hover {
+    text-decoration: underline;
+}
+html[dir='rtl'] header .menu a + a {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+.dropdown-menu {
+    display: flex;
+    flex-direction : column;
+    margin-left: 20px;
+    position: relative;
+}
+header .menu .dropdown-menu:hover > a {
+    text-decoration: underline;
+}
+header .menu .dropdown-menu:hover ul {
+    display: block;
+}
+.menu-subtitle {
+    font-family: 'fira_sansbold';
+}
+header .menu .dropdown-menu ul {
+    display: none;
+    position: absolute;
+    margin-top: -30px;
+    z-index: 999;
+    width: 200px;
+    background-color: white;
+    text-align: left;
+    left: -155px;
+    padding: 20%;
+    border: 1px solid #CCCCCC;
+}
+html[dir='rtl'] header .menu .dropdown-menu ul {
+    margin-left: 150px;
+    text-align: right;
+}
+.dropdown-menu ul a {
+    font-family: 'fira_sansregular';
+    text-transform: capitalize;
+    line-height: 30px;
+}
+#logout {
+    font-family: 'fira_sansbold';
+    text-transform : uppercase;
+}
+footer {
+    padding: 20px;
+    color: #fefefe;
+    background-color: #95A5A6;
+    margin-top: 100px;
+}
+footer a,
+header a {
+    text-decoration: none;
+    color: #fefefe;
+    font-family: 'fira_sanslight';
+}
+header h1 a {
+    color: #333;
+}
+.boxid {
+    font-family: 'fira_sansbold';
+    font-weight: normal;
+    color: #F89406;
+    font-size: 15px;
+    padding: 3px 5px;
+    position: relative;
+    text-align: center;
+    text-transform: uppercase;
+    top: 25px;
+    left: -50px;
+    float: right;
+}
+html[dir='rtl'] .boxid {
+    float: left;
+    right: -81px;
+}
+footer .half {
+    margin-left: 50%;
+}
+.i18n_switch {
+    padding-top: 32px;
+}
+.i18n_switch select {
+    display: inline;
+    width: calc(100% - 100px);
+    min-width: 100px;
+    margin: 0;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    vertical-align: top;
+    height: 40px;
+}
+.i18n_switch input[type='submit'] {
+    display: inline;
+    width: 100px;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    margin: 0;
+    vertical-align: top;
+    height: 40px;
+    line-height: 40px;
+}
+html[dir='rtl'] .i18n_switch select {
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+}
+html[dir='rtl'] .i18n_switch input[type='submit'] {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+}
+/* ************************************************* */
+/* ******************** TOOLS ********************** */
+/* ************************************************* */
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-container {
+    margin: 0 -10px;
+}
+
+.card {
+    margin: 10px;
+    display: block;
+    width:100%;
+    position: relative;
+    overflow: hidden;
+}
+.card.admin {
+    margin: 0;
+}
+.card + .card {
+    margin-top: 20px;
+}
+.card h4 {
+    margin-bottom: 10px;
+    line-height: 1.6em;
+    display: inherit;
+}
+.card h4 span:not(.theme)::before {
+  content: " ";
+}
+.card h4 a,
+.card > a,
+a.card {
+    text-decoration: none;
+}
+.card i.fa {
+    position: absolute;
+    right: 10px;
+    top: calc(50% - 23px);
+}
+html[dir='rtl'] .card i.fa {
+    right: auto;
+    left: 10px;
+}
+.card .flatlist.active {
+    font-family: 'fira_sansmedium';
+}
+.card a.flatlist + a.flatlist:before {
+    content: ' • ';
+}
+.tinted {
+    background-color: #fefefe;
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 2px;
+    background-repeat: no-repeat;
+    background-position: center right 5px;
+}
+html[dir='rtl'] .tinted {
+    background-position: center left 5px;
+}
+
+html[dir='rtl'] .card.book img {
+    float: left;
+    margin-left: 0;
+    margin-right: 10px;
+}
+.card h3 em {
+    font-family: 'fira_sanslight';
+    font-style: normal;
+}
+.card p {
+    margin: 5px 0;
+}
+.card h3, .card h4 {
+    margin-bottom: 10px;
+}
+.theme {
+    font-family: 'fira_sansbook';
+    text-transform: uppercase;
+    color: #fff;
+    padding: 0 5px;
+    text-decoration: none;
+}
+.info {
+    background-color: #E26A6A;
+}
+.learn {
+    background-color: #19B5FE;
+}
+.read {
+    background-color: #F89406;
+}
+.discover {
+    background-color: #87D37C;
+}
+.create {
+    background-color: #D2527F;
+}
+.manage {
+    background-color: #FCE94F;
+}
+
+.access { background-color: #FCE94F; }
+
+.errorlist,
+small.error,
+div.error,
+span.error {
+    background-color: #C0392B;
+    color: #eee;
+    padding: 5px;
+    display: block;
+    margin-top: -14px;
+    margin-bottom: 14px;
+}
+.messages li {
+    margin-bottom: 40px;
+    margin-top: -40px;
+    padding: 20px;
+    text-align: center;
+    font-family: 'fira_sansbook';
+}
+.messages li.success {
+    background-color: #66cc99;
+}
+.messages li.success:before {
+    content: '⍟ ';
+}
+.messages li.success:after {
+    content: ' ⍟';
+}
+.messages li.error {
+    background-color: #CF000F;
+}
+.messages li.error:before {
+    content: '⚠ ';
+}
+.messages li.error:after {
+    content: ' ⚠';
+}
+.messages li.info {
+    background-color: #F5AB35;
+}
+.messages li.info:before {
+    content: '♬ ';
+}
+.messages li.info:after {
+    content: ' ♬';
+}
+
+.right {
+    float: right;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  transition: opacity 500ms;
+  visibility: hidden;
+  opacity: 0;
+}
+.overlay:target {
+  visibility: visible;
+  opacity: 1;
+}
+.popup {
+  margin: 250px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 5px;
+  width: 35%;
+  position: relative;
+  transition: all 5s ease-in-out;
+}
+.popup h2 {
+  margin-top: 0;
+  color: #333;
+}
+.popup .close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  transition: all 200ms;
+  font-size: 30px;
+  font-weight: bold;
+  text-decoration: none;
+  color: #333;
+}
+.popup .close:hover {
+  color: #06D85F;
+}
+
+blockquote {
+  background-color: #f9f9f9;
+  border-left: 10px solid #cccccc;
+  margin: 1.5em 1.5em;
+  padding: 0.6em 10px;
+}
+blockquote:before {
+  color: #cccccc;
+  content: open-quote;
+  font-size: 3.7em;
+  line-height: 0.1em;
+  margin-right: 0.25em;
+  vertical-align: -0.37em;
+}
+blockquote p {
+  display: inline;
+}
+
+/* ************************************************* */
+/* ******************** BLOG *********************** */
+/* ************************************************* */
+
+span.draft {
+    background-color: #ffe1aa;
+    border-radius: 4px;
+    border: solid 1px #ffe9b3;
+    padding: 0.2em 0.5em 0 0.5em;
+}
+
+/* ************************************************* */
+/* ******************* SEARCH ********************** */
+/* ************************************************* */
+div.search input[name='q'] {
+    display: inline;
+    width: calc(100% - 100px);
+    margin: 0;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    vertical-align: top;
+}
+div.search input[type='submit'] {
+    display: inline;
+    width: 100px;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    margin: 0;
+    vertical-align: top;
+}
+html[dir='rtl'] .search input[name='q'] {
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+}
+html[dir='rtl'] .search input[type='submit'] {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+}
+.search .results {
+    margin-top: 40px;
+}
+.search .results li {
+    margin-bottom: 5px;
+}
+.search .results li span {
+    min-width: 50px;
+    display: inline-block;
+    text-align: center;
+}
+.search .main {
+    justify-content: center;
+}
+.filters.card li {
+    display: inline-block;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    background: #eee;
+    padding: 2px 3px;
+    margin: 2px;
+}
+.filters.card li a {
+    text-decoration: none;
+}
+.filters.card li i.fa {
+    position: initial;
+}
+
+#cards td label {
+  display: block;
+  cursor: pointer;
+}
+
+/* ************************************************* */
+/* ******************** MEDIA QUERIES ************** */
+/* ************************************************* */
+@media screen and (max-width: 1279px) {
+    header .menu {
+        margin-right: 0px;
+    }
+    .col + .col {
+        padding-left: 5px;
+    }
+    html[dir='rtl'] .col + .col {
+        padding-right: 5px;
+    }
+    .row {
+        max-width: 95%;
+    }
+    footer .half {
+        margin-left: 10%;
+    }
+    footer .third {
+        width: 60%;
+    }
+}
+@media screen and (max-width: 1023px) {
+    .twide {
+        width: 100%;
+    }
+    .thalf {
+        width: 50%;
+    }
+}
+@media screen and (max-width: 767px) {
+    .mwide {
+        width: 100%;
+    }
+    .mhalf {
+        width: 50%;
+    }
+    header {
+        margin-top: 20px;
+        flex-direction : column;
+        -webkit-flex-direction: column;
+        -webkit-align-items: center;
+    }
+}
+@media screen and (max-width: 600px) {
+    .boxid {
+        display: none;
+    }
+}
+
+.pure-g {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.pure-u {
+    display: flex !important;
+}
+
+@media screen and (min-width: 48em) {
+    .u-md-order-2 {
+        order: 2;
+    }
+
+/* On wide screen, we want the side-part to be on the side of the screen.
+ * We use the float attribute for that.
+ * (The side-part has to be the first element to allow elements after
+ * to be "pushed" on the right. */
+    .side-part-form {
+        width: 33%;
+        float: left;
+    }
+
+/* We reduce the size of the main-part only if there is a side-part. */
+    .side-part-form + .main-part-form {
+        width: 66%;
+
+/* This is needed to create a new block formatting context and avoid
+ * elements of the main part to move around the side-part.
+ * https://www.alsacreations.com/astuce/lire/1543-le-contexte-de-formatage-block-en-css.html (fr)
+ */
+        display: inline-block;
+    }
+
+/* Ideally we should also reduce the size of the button block only if
+ * there is a side-part but it is complicated with css selector.
+ * Always reduce the size is not a problem as we are mouving the
+ * block on the right with the margin-left. */
+    .button-part-form {
+        width: 66%;
+        margin-left: 33%;
+    }
+}
+
+@media screen and (max-width: 48em) {
+/* On small screen, we want to have all part in the same column.
+ * But we want the change the order to have the side-part between the
+ * main-part and the buttons.
+ * Only a flex box allow this, so we have to use it
+ */
+    .two-part-form-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .main-part-form {
+        order: 0;
+    }
+    .side-part-form {
+        order: 1;
+    }
+    .button-part-form {
+        order: 2;
+    }
+}

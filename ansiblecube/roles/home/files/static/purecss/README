@@ -1,0 +1,6 @@
+Those files come from the PureCSS framework (http://purecss.io) versions 0.6.0
+
+- pure-css-grids-min.css is the concatenation of base-min.css, grids-min.css and grids-responsive-min.css
+- pure-css-grids-old-ie-min.css is the concatenation of base-min.css, grids-min.css and grids-responsive-old-ie-min.css
+
+PureCSS is free to use under the Yahoo! Inc. BSD license.

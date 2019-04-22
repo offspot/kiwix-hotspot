@@ -65,3 +65,9 @@ def get_catalogs(logger):
     if YAML_CATALOGS is None:
         YAML_CATALOGS = fetch_catalogs(logger)
     return YAML_CATALOGS
+
+
+def get_package(logger, package_id):
+    for catalog in get_catalogs(logger):
+        if package_id in catalog["all"].keys():
+            return catalog["all"][package_id]

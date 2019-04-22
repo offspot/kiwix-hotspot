@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html{% if LANGUAGE_CODE|language_bidi %} dir="rtl"{% endif %}>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <title>{{ name }}</title>
+        <link rel="icon" href="/hotspot-static/branding/favicon.png">
+        <link rel="stylesheet" href="/hotspot-static/font-awesome/css/font-awesome.min.css" />
+        <!--[if lte IE 8]>
+            <link rel="stylesheet" type="text/css" href="/hotspot-static/purecss/pure-css-grids-old-ie-min.css">
+        <![endif]-->
+        <!--[if gt IE 8]><!-->
+            <link rel="stylesheet" type="text/css" href="/hotspot-static/purecss/pure-css-grids-min.css">
+        <!--<![endif]-->
+        <link rel="stylesheet" type="text/css" href="/hotspot-static/main.css" />
+        <link rel="stylesheet" type="text/css" href="/hotspot-static/cards.css">
+        <link rel="stylesheet" type="text/css" href="/hotspot-static/branding/style.css" />
+    </head>
+    <body class="home">
+        <header>
+		    <section>
+		      <a href="/"><h1><img src="/hotspot-static/branding/logo.png" /></h1></a>
+		      <span class="boxid">{{ name }}</span>
+		    </section>
+		</header>
+		{% if messages %}
+		<ul class="messages">
+		    {% for message in messages %}
+		    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+		    {% endfor %}
+		</ul>
+		{% endif %}
+
+        <div class="content">
+        	<div class="pure-g card-container">
+		        {% for card in cards %}
+	                <div class="pure-u-1 pure-u-md-1-2 pure-u-lg-1-3 pure-u-xl-1-4 pure-u">
+		                <a href="{{ card.url }}" class="card tinted {{ card.css_class }}">
+						  {% if card.fa %}<i class="fa fa-{{ card.fa }} fa-3x"></i>{% endif %}
+						  <h4><span class="theme {{card.category_class}}">{{ card.category }}</span> <span>{{ card.title }}</span></h4>
+						  <p>{{ card.description }}</p>
+						</a>
+	                </div>
+		        {% endfor %}
+		    </div>
+        </div>
+        <footer>
+		    <div class="row">
+		        <div class="col third i18n_switch"></div>
+		        <div class="col half"></div>
+		    </div>
+		</footer>
+    </body>
+</html>

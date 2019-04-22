@@ -538,9 +538,7 @@ and digits '0' to '9', space and hyphen '-'</property>
                   <object class="GtkLabel" id="css_chooser_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="tooltip_text" translatable="yes">CSS style
-It can be modified after installation using the file:
-/usr/share/ideascube/static/branding/style.css</property>
+                    <property name="tooltip_text" translatable="yes">To alter default style</property>
                     <property name="label" translatable="yes">CSS style :</property>
                   </object>
                   <packing>

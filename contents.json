@@ -8,11 +8,11 @@
         "expanded_size": 1862270976
     },
     "hotspot_master_image": {
-        "url": "{mirror}/hotspots/base/hotspot-master_2018-10-22.img.zip",
-        "name": "hotspot-master_2018-10-22.img.zip",
+        "url": "{mirror}/hotspots/base/hotspot-master_2019-05-04.img.zip",
+        "name": "hotspot-master_2019-05-04.img.zip",
         "root_partition_size": 7000000000,
-        "checksum": "332d64773799a13f144390bca0d62fac2beadd6ebbda28a12b7d2b552609efc5",
-        "archive_size": 3057563356,
+        "checksum": "8abc6d18db1564e3d57d3f555ef1e38a18acfac497ffdeee1c26c26c1f3ea8e0",
+        "archive_size": 3360858098,
         "expanded_size": 7760000000
     },
     "aflatoun_content": {

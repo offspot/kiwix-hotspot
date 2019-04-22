@@ -40,7 +40,6 @@
       hostname: "{{ project_name_safe }}"
       fqdn: "{{ project_name_safe }}.{{ tld }}"
       hotspot_name: "{{ project_name }}"
-      cert_domain: ideascube.{{ tld }}
     name: Set hostname and hostpot_name
 
   - set_fact:
@@ -56,7 +55,6 @@
       aflatoun_fqdn: aflatoun.{{ fqdn }}
       edupi_fqdn: edupi.{{ fqdn }}
       wikifundi_fqdn: wikifundi.{{ fqdn }}
-      sites_fqdn: sites.{{ fqdn }}
       time_fqdn: time.{{ fqdn }}
       welcome_fqdn: "goto.kiwix.{{ tld }}"
       version_fqdn: "version.{{ fqdn }}"

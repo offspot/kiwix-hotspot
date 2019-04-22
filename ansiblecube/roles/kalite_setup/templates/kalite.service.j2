@@ -2,8 +2,8 @@
 Description=Kalite server
 
 [Service]
-User=ideascube
-Group=ideascube
+User={{ username }}
+Group={{ group }}
 Environment="KALITE_PYTHON={{ kalite_env }}/bin/python"
 Environment="KALITE_HOME={{ kalite_root }}"
 ExecStart={{ kalite_env }}/bin/kalite start --foreground

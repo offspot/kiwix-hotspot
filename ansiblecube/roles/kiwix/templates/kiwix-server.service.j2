@@ -2,8 +2,8 @@
 Description=Kiwix server
 
 [Service]
-User=ideascube
-Group=ideascube
+User={{ username }}
+Group={{ group }}
 ExecStart=/bin/sh -c "ls {{ zim_path }}/*.zim && /usr/local/bin/kiwix-serve --port=8002 $(ls {{ zim_path }}/*.zim) || /usr/local/bin/kiwix-serve --port=8002 --library {{ zim_path }}/library.xml"
 Restart=always
 KillSignal=SIGQUIT

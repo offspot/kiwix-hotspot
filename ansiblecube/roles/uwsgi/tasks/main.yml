@@ -11,6 +11,31 @@
     state: absent
   tags: master
 
+- name: Install uwsgi packages
+  apt:
+    name: "{{ item }}"
+    state: latest
+    autoremove: yes
+    autoclean: yes
+  with_items:
+   - python3
+   - uwsgi
+   - uwsgi-plugin-python3
+   - avahi-utils
+  tags: master
+
+- name: create apps-available folder
+  file:
+    path: /etc/uwsgi/apps-available
+    state: directory
+  tags: master
+
+- name: create apps-enabled folder
+  file:
+    path: /etc/uwsgi/apps-enabled
+    state: directory
+  tags: master
+
 - name: just force systemd to reread its services
   command: systemctl daemon-reload
   tags: master

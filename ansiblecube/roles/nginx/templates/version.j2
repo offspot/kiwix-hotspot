@@ -4,7 +4,7 @@ server {
 	root /var/www;
 	index version.html;
 
-    location /ideascube-static/ { alias /var/ideascube/static/; expires 1y; }
+    location /hotspot-static/ { alias {{ common_static_path }}/; expires 1y; }
     location /404.html { internal; root /var/www; }
     error_page 404 /404.html;
 }

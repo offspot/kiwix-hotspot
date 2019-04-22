@@ -14,7 +14,7 @@ This is achieved by using a three steps scenario:
 
 ## Tags
 
-* `master`: installs all non-content-specific softwares (system, `ideascube`, `kiwix-serve`).
+* `master`: installs all non-content-specific softwares (system, `kiwix-serve`).
 * `resize`: resize the `/` and `/data` partitions (image should have been already resized qemu-wise).
 * `rename`: reconfigure all software according to `project_name`.
 * `setup`: install and prepare all softwares without enabling them.
@@ -32,7 +32,6 @@ This is achieved by using a three steps scenario:
 * DNS Masquerade (`dnsmasq`)
 * Captive Portal
 * Web & Application servers (`nginx`, `uswgi`)
-* Content & Box Manager (`ideascube`)
 * ZIM files (all of [kiwix](https://kiwix.org)'s library) with indexes.
 * Khan-Accademy Videos (`ka-lite`)
 * Aflatoun
@@ -44,10 +43,6 @@ This is achieved by using a three steps scenario:
 This playbook is not meant to be run standalone on any system.
 
 Please check [make-base-image](https://github.com/kiwix/kiwix-hotspot/tree/master/make-vexpress-boot) and more generally [kiwix-hotspot](https://github.com/kiwix/kiwix-hotspot) to see it in action.
-
-## Tests
-
-The repo is plugged in [Travis CI](https://travis-ci.org/ideascube/ansiblecube).
 
 ### Testing locally
 

@@ -202,7 +202,7 @@ def get_package_content(package_id):
             package.update({"langid": package.get("langid") or package_id})
             return {
                 "url": package["url"],
-                "name": "package_{langid}-{version}.{ext}".format(**package),
+                "name": "{langid}.{ext}".format(**package),
                 "checksum": package["sha256sum"],
                 "archive_size": package["size"],
                 # add a 10% margin for non-zim (zip file mostly)
@@ -349,10 +349,10 @@ def run_aflatoun_actions(cache_folder, mount_point, logger, languages=[]):
 
 
 def run_packages_actions(cache_folder, mount_point, logger, packages=[]):
-    """ ideascube: move ZIM/ZIP files to an package cache """
+    """ ZIM files are used directly by kiwix-serve """
 
-    # ensure packages folder exists
-    packages_folder = os.path.join(mount_point, "packages_cache")
+    # ensure packages folder exists: must macth `zim_path` in ansiblecube
+    packages_folder = os.path.join(mount_point, "packages")
     os.makedirs(packages_folder, exist_ok=True)
 
     for package in packages:
@@ -363,11 +363,7 @@ def run_packages_actions(cache_folder, mount_point, logger, packages=[]):
         package_fpath = get_content_cache(content, cache_folder, True)
 
         # copy to the packages folder
-        final_path = os.path.join(
-            packages_folder,
-            re.match(r"^package_(.+)\.[a-z]{3}$", content["name"]).groups()[0],
-        )
-        shutil.copy(package_fpath, final_path)
+        shutil.copy(package_fpath, os.path.join(packages_folder, content["name"]))
 
 
 def content_is_cached(content, cache_folder, check_sum=False):

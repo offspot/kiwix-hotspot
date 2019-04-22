@@ -35,13 +35,18 @@
     warn: no
   tags: master
 
-- name: Create a kiwix directory in ideascube folder
+- name: Create the ZIM destination folder
   file:
     path: "{{zim_path}}/"
-    owner: "{{username}}"
-    group: "{{username}}"
     state: directory
-  tags: master
+  tags: ['master', 'resize']
+
+- name: Create library.xml (placeholder if no ZIM)
+  copy:
+    src: library.xml
+    dest: "{{ zim_path }}/library.xml"
+  tags: ['master', 'move-content']
+
 
 - name: Setup startup file
   template:
@@ -61,15 +66,6 @@
     dest: /etc/nginx/sites-available/kiwix
   notify: restart nginx
   tags: ['master', 'rename']
-
-- name: Ensure that Ideascube cache folder belong to ideascube user 
-  file:
-    path: /var/cache/ideascube/catalog/ 
-    owner: "{{ username }}"
-    group: "{{ username }}"
-    state: directory
-    recurse: yes
-  tags: master
 
 - name: Nginx enable Virtual host
   file:

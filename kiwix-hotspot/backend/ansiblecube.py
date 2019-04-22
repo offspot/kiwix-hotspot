@@ -172,13 +172,18 @@ def build_extra_vars(
     return extra_vars, secret_keys
 
 
-def run_phase_one(machine, extra_vars, secret_keys, logo=None, favicon=None, css=None):
+def run_phase_one(
+    machine, extra_vars, secret_keys, homepage, logo=None, favicon=None, css=None
+):
     """ run ansiblecube in machine to configure requested softwares """
 
     tags = ["resize", "rename", "reconfigure"]
 
+    # copy homepage
+    machine.put_file(homepage, "/tmp/home.html")
+
     # copy branding files if set
-    branding = {"favicon.png": favicon, "header-logo.png": logo, "style.css": css}
+    branding = {"favicon.png": favicon, "logo.png": logo, "style.css": css}
 
     has_custom_branding = False
     for fname, item in [(k, v) for k, v in branding.items() if v is not None]:

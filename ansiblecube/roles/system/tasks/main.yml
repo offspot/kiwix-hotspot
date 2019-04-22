@@ -133,7 +133,7 @@
 
 - name: Install or upgrade all required package
   apt:
-    name: python-dev,git,sudo,lsb-release,vim,locate,git,unzip,bash-completion,aptitude,ntpdate,fake-hwclock,hdparm,ncurses-term,libffi-dev,libssl-dev,tree,screen,iftop,tmux,mtr-tiny,libwww-perl,httpie,lshw,hwinfo,sqlite3,elinks,mosh,curl,apt-transport-https,tar,exfat-utils,gzip,hostname,liblzma5,pkg-config,systemd,systemd-sysv,tzdata,wget,xz-utils
+    name: python-dev,git,sudo,lsb-release,vim,locate,git,unzip,bash-completion,aptitude,ntpdate,fake-hwclock,hdparm,ncurses-term,libffi-dev,libssl-dev,tree,screen,iftop,tmux,mtr-tiny,libwww-perl,httpie,lshw,hwinfo,sqlite3,elinks,mosh,curl,apt-transport-https,tar,exfat-utils,gzip,hostname,liblzma5,pkg-config,systemd,systemd-sysv,tzdata,wget,xz-utils,adduser,libpam-systemd,policykit-1
     state: latest
     autoremove: yes
     autoclean: yes
@@ -184,10 +184,17 @@
     dest: /etc/hosts
   tags: ['master', 'rename']
 
-- name: Create an ideascube user on the system
+- name: Create a {{ group }} group on the system
+  group:
+    name: "{{ group }}"
+    state: present
+  tags: master
+
+- name: Create an {{ username }} user on the system
   user:
     name: "{{ username }}"
     shell: /bin/bash
+    group: "{{ group }}"
     groups: "sudo,www-data,adm,staff"
     home: "/home/{{ username }}"
     generate_ssh_key: yes
@@ -238,7 +245,7 @@
     owner: "{{ username }}"
   tags: master
 
-- name: Copy visudo file for ideascube user
+- name: Copy visudo file for {{username}} user
   template:
     src: visudo.j2
     dest: /etc/sudoers.d/shutdown

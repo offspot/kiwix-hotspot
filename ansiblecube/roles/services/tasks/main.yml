@@ -1,5 +1,4 @@
 ---
-- include_tasks: enable_service.yml service=remove_staticfiles_json
 - include_tasks: enable_service.yml service=kiwix-server
 
 - include_tasks: enable_service.yml service=edupi

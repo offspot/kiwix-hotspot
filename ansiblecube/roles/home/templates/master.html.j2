@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <title>{{ hostname }}</title>
+        <link rel="icon" href="/hotspot-static/branding/favicon.png">
+        <link rel="stylesheet" href="/hotspot-static/font-awesome/css/font-awesome.min.css" />
+        <!--[if lte IE 8]>
+            <link rel="stylesheet" type="text/css" href="/hotspot-static/purecss/pure-css-grids-old-ie-min.css">
+        <![endif]-->
+        <!--[if gt IE 8]><!-->
+            <link rel="stylesheet" type="text/css" href="/hotspot-static/purecss/pure-css-grids-min.css">
+        <!--<![endif]-->
+        <link rel="stylesheet" type="text/css" href="/hotspot-static/main.css" />
+        <link rel="stylesheet" type="text/css" href="/hotspot-static/branding/style.css" />
+    </head>
+    <body class="">
+        <header>
+            <section>
+              <a href="/">
+                <h1>
+                  <img src="/hotspot-static/branding/logo.png"></img>
+                </h1>
+              </a>
+              <span class="boxid">{{ hostname }}</span>
+            </section>
+        </header>
+        <ul class="messages">
+            <li class="error">Unconfigured master</li>
+        </ul>
+        <div class="content">
+            <h2>This is the default, master image, home page.</h2>
+            <p>You should never see this. Please reinstall kiwix-hotspot on this card.</p>
+        </div>
+        <footer>
+		    <div class="row">
+		        <div class="col third i18n_switch"></div>
+		        <div class="col half"></div>
+		    </div>
+		</footer>
+    </body>
+</html>

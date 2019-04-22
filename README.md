@@ -1,20 +1,20 @@
 # Kiwix Hotspot
 
-This installer install [Ideascube](https://framagit.org/ideascube/ideascube) on an SD card for raspberrypi 2 or raspberrypi 3.
+This installer installs an hotspot system on an SD card for raspberrypi 2 or raspberrypi 3.
 
-Ideascube is a solution to serve offline content from the web such as Wikipedia, the Gutenberg library, TED talks.
+This solution serves offline content from the web such as Wikipedia, the Gutenberg library, TED talks.
 
-Kiwix Hotspot configure the RaspberryPi into a hotspot WiFi with Ideascube server and offline contents.
+Kiwix Hotspot configure the RaspberryPi into a hotspot WiFi with offline contents.
 
 ## Issues
 
 Please report issues [on framagit](https://framagit.org/ideascube/pibox-installer/issues).
 
-## Principle
+## History
 
 The installer emulate the rasbperrypi architecture armhf in QEMU.
 
-Inside the emulator it builds [ideascube](https://framagit.org/ideascube/ideascube) with [ansiblecube](https://github.com/kiwix/kiwix-hotspot/tree/master/ansiblecube).
+Inside the emulator it built [ideascube](https://framagit.org/ideascube/ideascube) with [ansiblecube](https://github.com/kiwix/kiwix-hotspot/tree/master/ansiblecube).
 
 presentation of the projet at Potsdam [Slides](http://wiki.kiwix.org/w/images/4/43/Pibox_installer_potsdam_2017_presentation.pdf)
 
@@ -66,7 +66,7 @@ kiwix-hotspot uses a custom base image based off raspbian-lite with the followin
 * SSH enabled
 * 7GB `/` partition (ext4)
 * 1GB `/data` partition (extfat)
-* ansiblecube deployed: `nginx`, `ideascube`, `kiwix-serve`, etc.
+* ansiblecube deployed: `nginx`, `kiwix-serve`, etc.
 
 Should you want to build the base image:
 

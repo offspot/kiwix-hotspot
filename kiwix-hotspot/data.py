@@ -29,18 +29,7 @@ sdcard_sizes = (8, 16, 32, 64, 128, 200, 256)
 http_proxy_test_url = "http://download.kiwix.org/library/ideascube.yml"
 https_proxy_test_url = "https://download.kiwix.org/library/ideascube.yml"
 
-ideascube_languages = [
-    ("am", u"አማርኛ"),
-    ("ar", u"\u0627\u0644\u0639\u0631\u0628\u064a\u0651\u0629"),
-    ("bm", "Bambara"),
-    ("en", u"English"),
-    ("es", u"Espa\xf1ol"),
-    ("fa-ir", "فارسی"),
-    ("fr", u"Fran\xe7ais"),
-    ("ku", "Kurdî"),
-    ("so", u"Af-soomaali"),
-    ("sw", u"Kiswahili"),
-]
+hotspot_languages = [("en", u"English"), ("fr", u"Fran\xe7ais")]
 
 help_url = "https://github.com/kiwix/kiwix-hotspot/wiki/FAQ"
 etcher_url = "https://etcher.io/"

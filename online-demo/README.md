@@ -45,7 +45,7 @@ mv qemu-{system-arm,img} /usr/local/bin/
 useradd -g www-data -l -m -N -s /bin/bash qdemo
 
 # add fake domains to hosts to be able to test outside nginx
-echo "192.168.1.3        ideascube.hotspot demo.hotspot.kiwix.org kiwix.demo.hotspot.kiwix.org khanacademy.demo.hotspot.kiwix.org aflatoun.demo.hotspot.kiwix.org edupi.demo.hotspot.kiwix.org wikifundi.demo.hotspot.kiwix.org sites.demo.hotspot.kiwix.org" >> /etc/hosts
+echo "192.168.1.3        kiwix.hotspot demo.hotspot.kiwix.org kiwix.demo.hotspot.kiwix.org khanacademy.demo.hotspot.kiwix.org aflatoun.demo.hotspot.kiwix.org edupi.demo.hotspot.kiwix.org wikifundi.demo.hotspot.kiwix.org sites.demo.hotspot.kiwix.org" >> /etc/hosts
 
 # download and execute at-boot script
 wget https://raw.githubusercontent.com/kiwix/kiwix-hotspot/master/online-demo/host-setup.sh -O /root/host-setup.sh && chmod +x /root/host-setup.sh && /root/host-setup.sh
@@ -112,10 +112,4 @@ ip link set tap0 nomaster
 
 # delete the bridge
 ip link delete br0 type bridge
-```
-
-If you host is not powerful enough and the VM is particularly slow, you might want to (in the VM):
-
-``` sh
-sudo sh -c 'echo "uwsgi_read_timeout 120s;\nuwsgi_send_timeout 120s;" >> /var/ideascube/uwsgi_params && nginx -s reload'
 ```

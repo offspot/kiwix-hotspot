@@ -20,7 +20,7 @@ server {
         proxy_pass http://localhost:8010;
     }
 
-    location /ideascube-static/ { alias /var/ideascube/static/; expires 1y; }
+    location /hotspot-static/ { alias {{ common_static_path }}/; expires 1y; }
     location /502.html { internal; root /var/www; }
     error_page 502 /502.html;
 

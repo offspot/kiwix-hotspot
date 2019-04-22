@@ -80,7 +80,7 @@
 
 - name: Add wikifundi CSS hack
   lineinfile:
-    dest: /opt/venvs/ideascube/lib/python{{ python3_version }}/site-packages/ideascube/static/ideascube/cards.css
+    dest: "{{common_static_path}}/cards.css"
     line: '.card.tinted[href*="http://{{ item }}.{{ wikifundi_fqdn }}"], { background-image: url("http://{{ item }}.{{ wikifundi_fqdn }}/logo-sq.png"); background-size: 48px; }'
     insertafter: EOF
     state: present

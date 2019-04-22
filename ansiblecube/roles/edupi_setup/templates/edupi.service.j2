@@ -2,8 +2,8 @@
 Description=Edupi server
 
 [Service]
-User=ideascube
-Group=ideascube
+User={{ username }}
+Group={{ group }}
 WorkingDirectory={{ edupi_root }}
 ExecStart={{ edupi_env }}/bin/gunicorn \
   --bind localhost:8010 edupi.wsgi:application \

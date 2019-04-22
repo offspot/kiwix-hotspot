@@ -145,7 +145,7 @@ for catalog in get_catalogs(logger):
     for (key, value) in catalog["all"].items():
         zim_choices.append(key)
 
-languages = [code for code, language in data.ideascube_languages]
+languages = [code for code, language in data.hotspot_languages]
 
 defaults = {
     "name": "Kiwix",
@@ -162,9 +162,7 @@ defaults = {
     "shrink": "yes",
 }
 
-parser = argparse.ArgumentParser(
-    description="ideascube/kiwix installer for raspberrypi."
-)
+parser = argparse.ArgumentParser(description="kiwix-hotspot installer for raspberrypi.")
 parser.add_argument("--name", help="name of the box ({})".format(defaults["name"]))
 parser.add_argument("--timezone", help="timezone ({})".format(defaults["timezone"]))
 parser.add_argument(

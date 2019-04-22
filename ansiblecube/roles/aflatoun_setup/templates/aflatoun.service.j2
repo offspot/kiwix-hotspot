@@ -2,8 +2,8 @@
 Description=Aflatoun server
 
 [Service]
-User=ideascube
-Group=ideascube
+User={{ username }}
+Group={{ group }}
 Environment="KALITE_HOME={{ aflatoun_root }}"
 Environment="KALITE_PYTHON={{ aflatoun_env }}/bin/python"
 ExecStart={{ aflatoun_env }}/bin/kalite start --port=8009 --foreground
