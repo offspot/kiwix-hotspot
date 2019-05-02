@@ -1845,6 +1845,7 @@ class Application:
                     done_callback=lambda error: GLib.idle_add(
                         self.installation_done, error
                     ),
+                    shrink=True,
                 )
 
             self.component.window.hide()

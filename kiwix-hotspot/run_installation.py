@@ -5,6 +5,7 @@ import os
 import sys
 import time
 import json
+import math
 import shutil
 import traceback
 from datetime import datetime
@@ -12,6 +13,7 @@ from datetime import datetime
 import data
 from backend import qemu
 from util import (
+    ONE_GB,
     human_readable_size,
     get_cache,
     ensure_zip_exfat_compatible,
@@ -26,6 +28,7 @@ from backend.content import (
     isremote,
     get_content_cache,
     get_alien_content,
+    get_required_image_size,
 )
 from backend.download import download_content, unzip_file
 from backend.mount import (
@@ -64,6 +67,7 @@ def run_installation(
     build_dir=".",
     filename=None,
     qemu_ram="2G",
+    shrink=False,
 ):
 
     logger.start(bool(sd_card))
@@ -265,8 +269,9 @@ def run_installation(
 
         # Resize image
         logger.step(
-            "Resizing image file to {s}".format(
-                s=human_readable_size(emulator.get_image_size())
+            "Resizing image file from {s1} to {s2}".format(
+                s1=human_readable_size(emulator.get_image_size()),
+                s2=human_readable_size(size),
             )
         )
         if size < emulator.get_image_size():
@@ -339,6 +344,18 @@ def run_installation(
         with emulator.run(cancel_event) as emulation:
             logger.step("Re-run ansiblecube for move-content")
             ansiblecube.run_phase_two(emulation, extra_vars, secret_keys)
+
+        if shrink:
+            logger.step("Shrink size of physical image file")
+            # calculate physical size of image
+            required_image_size = get_required_image_size(collection)
+            if required_image_size + ONE_GB >= size:
+                # less than 1GB difference, don't bother
+                pass
+            else:
+                # set physical size to required + margin
+                physical_size = math.ceil(required_image_size / ONE_GB) * ONE_GB
+                emulator.resize_image(physical_size, shrink=True)
 
         # wait for QEMU to release file (windows mostly)
         logger.succ("Image creation successful.")

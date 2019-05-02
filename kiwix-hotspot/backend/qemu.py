@@ -131,9 +131,11 @@ class Emulator:
     def get_image_size(self):
         return get_qemu_image_size(self._image, self._logger)
 
-    def resize_image(self, size):
+    def resize_image(self, size, shrink=False):
         subprocess_pretty_check_call(
-            [qemu_img_exe_path, "resize", "-f", "raw", self._image, "{}".format(size)],
+            [qemu_img_exe_path, "resize"]
+            + (["--shrink"] if shrink else [])
+            + ["-f", "raw", self._image, "{}".format(size)],
             self._logger,
         )
 

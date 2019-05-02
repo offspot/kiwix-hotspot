@@ -159,6 +159,7 @@ defaults = {
     "kalite": [],
     "wikifundi": [],
     "zim_install": [],
+    "shrink": "yes",
 }
 
 parser = argparse.ArgumentParser(
@@ -198,6 +199,7 @@ parser.add_argument(
     help="use a JSON config file to set parameters (superseeds cli parameters)",
 )
 parser.add_argument("--filename", help="Output file name (without suffix)")
+parser.add_argument("--shrink", help="Shrink image file", choices=["yes", "no"])
 parser.add_argument("--ram", help="Max RAM for QEMU", default="2G")
 parser.add_argument("--sdcard", help="Device to copy image to")
 parser.add_argument(
@@ -385,6 +387,7 @@ try:
         admin_account=admin_account,
         build_dir=args.build_dir,
         filename=args.filename,
+        shrink=args.shrink == "yes",
         qemu_ram=args.ram,
     )
 except Exception:
