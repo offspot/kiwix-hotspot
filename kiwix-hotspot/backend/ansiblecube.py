@@ -177,7 +177,7 @@ def run_phase_one(
 ):
     """ run ansiblecube in machine to configure requested softwares """
 
-    tags = ["resize", "rename", "reconfigure"]
+    tags = ["rename", "reconfigure"]
 
     # copy homepage
     machine.put_file(homepage, "/tmp/home.html")

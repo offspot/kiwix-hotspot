@@ -1,5 +1,6 @@
 2.0.5
 * Added raspberryPi version to version.<fqdn> page
+* Fixed KAlite installation not working (regression)
 
 2.0.4
 * Speed up improvements for Wikifundi

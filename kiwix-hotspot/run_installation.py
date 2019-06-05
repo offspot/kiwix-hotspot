@@ -286,7 +286,7 @@ def run_installation(
         emulator.resize_image(size)
 
         # Run emulation
-        logger.step("Starting-up VM")
+        logger.step("Starting-up VM (first-time)")
         with emulator.run(cancel_event) as emulation:
             # copying ansiblecube again into the VM
             # should the master-version been updated
@@ -296,7 +296,13 @@ def run_installation(
             )
             emulation.put_dir(data.ansiblecube_path, ansiblecube.ansiblecube_path)
 
-            logger.step("Run ansiblecube")
+            logger.step("Run ansiblecube for `resize`")
+            ansiblecube.run(emulation, ["resize"], extra_vars, secret_keys)
+
+        logger.step("Starting-up VM (second-time)")
+        with emulator.run(cancel_event) as emulation:
+
+            logger.step("Run ansiblecube phase I")
             ansiblecube.run_phase_one(
                 emulation,
                 extra_vars,
@@ -351,9 +357,9 @@ def run_installation(
 
         # rerun emulation for discovery
         logger.stage("move")
-        logger.step("Starting-up VM again for content-discovery")
+        logger.step("Starting-up VM (third-time)")
         with emulator.run(cancel_event) as emulation:
-            logger.step("Re-run ansiblecube for move-content")
+            logger.step("Re-run ansiblecube phase II")
             ansiblecube.run_phase_two(emulation, extra_vars, secret_keys)
 
         if shrink:
