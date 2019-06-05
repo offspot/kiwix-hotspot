@@ -26,6 +26,21 @@
     dest: /var/www/version.html
   tags: ['master', 'rename']
 
+- name: install version rewriter script
+  copy:
+    src: rewrite_version_html.py
+    dest: /usr/local/bin/rewrite_version_html.py
+    mode: 0755
+  tags: master
+
+- name: add version rewriter script to startup
+  cron:
+    name: "Check raspberryPi version on boot"
+    special_time: reboot
+    job: "/usr/local/bin/rewrite_version_html.py"
+    state: present
+  tags: master
+
 - name: Remove default nginx vhost config file (if configured).
   file:
     path: /etc/nginx/sites-enabled/default
