@@ -39,7 +39,7 @@
   file:
     path: "{{zim_path}}/"
     state: directory
-  tags: ['master', 'resize']
+  tags: ['master', 'resize', 'reconfigure', 'move-content']
 
 - name: Create library.xml (placeholder if no ZIM)
   copy:

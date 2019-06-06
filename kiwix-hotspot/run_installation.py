@@ -359,7 +359,7 @@ def run_installation(
         logger.stage("move")
         logger.step("Starting-up VM (third-time)")
         with emulator.run(cancel_event) as emulation:
-            logger.step("Re-run ansiblecube phase II")
+            logger.step("Run ansiblecube phase II")
             ansiblecube.run_phase_two(emulation, extra_vars, secret_keys)
 
         if shrink:
