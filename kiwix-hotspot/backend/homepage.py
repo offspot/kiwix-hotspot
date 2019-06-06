@@ -124,7 +124,7 @@ def generate_homepage(logger, options):
         if "fr" in options["kalite_languages"]:
             cards.append(
                 {
-                    "url": "http://fr.{}".format(kalite_fqdn),
+                    "url": "http://{}/go/fr".format(kalite_fqdn),
                     "css_class": "khanacademy",
                     "category_class": "learn",
                     "category": "Appendre",
@@ -135,7 +135,7 @@ def generate_homepage(logger, options):
         if "en" in options["kalite_languages"]:
             cards.append(
                 {
-                    "url": "http://en.{}".format(kalite_fqdn),
+                    "url": "http://{}/go/en".format(kalite_fqdn),
                     "css_class": "khanacademy",
                     "category_class": "learn",
                     "category": "Learn",

@@ -1,6 +1,7 @@
 2.0.5
 * Added raspberryPi version to version.<fqdn> page
 * Fixed KAlite installation not working (regression)
+* KA lite doesn't require manual language selection
 
 2.0.4
 * Speed up improvements for Wikifundi
