@@ -104,12 +104,14 @@ def generate_homepage(logger, options):
         if options["language"] == "fr":
             description = "Appentissage social/finance pour les enfants et les jeunes"
             category = "Apprendre"
+            url = "http://{}/go/fr".format(aflatoun_fqdn)
         else:
             description = "Social and Financial Education for Children and Young People"
             category = "Learn"
+            url = "http://{}".format(aflatoun_fqdn)
         cards.append(
             {
-                "url": "http://{}/go/{}".format(aflatoun_fqdn, options["language"]),
+                "url": url,
                 "css_class": "",
                 "category_class": "learn",
                 "category": category,
@@ -130,6 +132,17 @@ def generate_homepage(logger, options):
                     "category": "Appendre",
                     "title": "Khan Academy",
                     "description": "Apprendre via des vidéos et des exercices.",
+                }
+            )
+        if "es" in options["kalite_languages"]:
+            cards.append(
+                {
+                    "url": "http://{}/go/es".format(kalite_fqdn),
+                    "css_class": "khanacademy",
+                    "category_class": "learn",
+                    "category": "Aprender",
+                    "title": "Khan Academy",
+                    "description": "Aprende con videos y ejercicios.",
                 }
             )
         if "en" in options["kalite_languages"]:
