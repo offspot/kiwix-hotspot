@@ -3,6 +3,7 @@
 * Fixed KAlite installation not working (regression)
 * KA lite doesn't require manual language selection anymore
 * Aflatoun lite doesn't require manual language selection anymore
+* Updated master (06/06/2019)
 
 2.0.4
 * Speed up improvements for Wikifundi
