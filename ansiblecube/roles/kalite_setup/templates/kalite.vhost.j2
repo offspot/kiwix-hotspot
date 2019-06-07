@@ -37,12 +37,12 @@ server {
 
     location /go/fr {
         add_header Content-Type "text/html; charset=UTF-8";
-        return 200 "<html><head><title>KA Lite en français</title></head><body><p>Veuillez patienter…</p><iframe style='display: none;' src='http://{{ kalite_fqdn }}/api/i18n/set_default_language/?lang=fr' onload=\"window.location = 'http://{{ kalite_fqdn }}/';\"><p><a href='http://{{ kalite_fqdn }}/'>Cliquez ici</a> pour accèder à Khan Academy</p></iframe></body></html>";
+        return 200 "<html><head><title>KA Lite en français</title></head><body><p>Veuillez patienter…</p><iframe style='display: none;' src='/api/i18n/set_default_language/?lang=fr' onload=\"window.location = '/';\"><p><a href='/'>Cliquez ici</a> pour accèder à Khan Academy</p></iframe></body></html>";
     }
 
     location /go/en {
         add_header Content-Type "text/html; charset=UTF-8";
-        return 200 "<html><head><title>KA Lite in english</title></head><body><p>please wait…</p><iframe style='display: none;' src='http://{{ kalite_fqdn }}/api/i18n/set_default_language/?lang=fr' onload=\"window.location = 'http://{{ kalite_fqdn }}/';\"><p><a href='http://{{ kalite_fqdn }}/'>Click here</a> to access Khan Academy</p></iframe></body></html>";
+        return 200 "<html><head><title>KA Lite in english</title></head><body><p>please wait…</p><iframe style='display: none;' src='/api/i18n/set_default_language/?lang=fr' onload=\"window.location = '/';\"><p><a href='/'>Click here</a> to access Khan Academy</p></iframe></body></html>";
     }
 
 

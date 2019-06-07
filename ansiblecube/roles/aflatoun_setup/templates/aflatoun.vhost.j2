@@ -36,6 +36,16 @@ server {
         empty_gif;
     }
 
+    location /go/fr {
+        add_header Content-Type "text/html; charset=UTF-8";
+        return 200 "<html><head><title>Aflatoun en français</title></head><body><p>Veuillez patienter…</p><script>var xhr = new XMLHttpRequest(); xhr.onload = function () { window.location = '/'; }; xhr.open('POST', '/api/i18n/set_default_language/', true); xhr.setRequestHeader('Content-Type', 'application/json'); xhr.send('{\"lang\": \"fr\"}');</script><noscript><p><a href='/'>Cliquez ici</a> pour accèder à Aflatoun</p></noscript></body></html>";
+    }
+
+    location /go/en {
+        add_header Content-Type "text/html; charset=UTF-8";
+        return 200 "<html><head><title>Aflatoun in english</title></head><body><p>please wait…</p><script>var xhr = new XMLHttpRequest(); xhr.onload = function () { window.location = '/'; }; xhr.open('POST', '/api/i18n/set_default_language/', true); xhr.setRequestHeader('Content-Type', 'application/json'); xhr.send('{\"lang\": \"en\"}');</script><noscript><p><a href='/'>Click here</a> to access Aflatoun</p></noscript></body></html>";
+    }
+
     location / {
         proxy_set_header Host $http_host;
         proxy_set_header X-Scheme $scheme;

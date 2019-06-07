@@ -109,7 +109,7 @@ def generate_homepage(logger, options):
             category = "Learn"
         cards.append(
             {
-                "url": "http://{}".format(aflatoun_fqdn),
+                "url": "http://{}/go/{}".format(aflatoun_fqdn, options["language"]),
                 "css_class": "",
                 "category_class": "learn",
                 "category": category,
