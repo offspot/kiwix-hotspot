@@ -1,3 +1,6 @@
+2.0.6
+* fixed regression (not launching) by reverting to previous pygobjects version
+
 2.0.5
 * Added raspberryPi version to version.<fqdn> page
 * Fixed KAlite installation not working (regression)
