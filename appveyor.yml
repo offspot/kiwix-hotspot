@@ -52,7 +52,7 @@ install:
   # pygi-aio provides a way to install from cmd even if it is not documented
   # the only package to install is GTK with GIR
   # note: we don't use msys2 because pyinstaller fails to install on msys2
-  - appveyor DownloadFile "http://mirror.download.kiwix.org/dev/pygi-aio-3.24.1_rev1-setup_049a323fe25432b10f7e9f543b74598d4be74a39.exe" -FileName "pygi-aio-setup.exe"
+  - appveyor DownloadFile "http://mirror.download.kiwix.org/dev/pygi-aio-3.18.2_rev12-setup_549872deadabb77a91efbc56c50fe15f969e5681.exe" -FileName "pygi-aio-setup.exe"
   - mkdir pygi-aio-setup
   - cd pygi-aio-setup
   - set SOURCEPATH=%cd%
@@ -79,8 +79,8 @@ install:
 
   # Install pyinstaller and requirements
   - cd C:\projects\kiwix-hotspot
-  - if %platform%==x86 C:\Python34\python.exe -m pip install pypiwin32==219 pyinstaller -r requirements-windows.txt
-  - if %platform%==x64 C:\Python34-x64\python.exe -m pip install pypiwin32==219 pyinstaller -r requirements-windows.txt
+  - if %platform%==x86 C:\Python34\python.exe -m pip install pypiwin32==219 pyinstaller==3.2.1 -r requirements-windows.txt
+  - if %platform%==x64 C:\Python34-x64\python.exe -m pip install pypiwin32==219 pyinstaller==3.2.1 -r requirements-windows.txt
 
   # Install qemu
   - mkdir "C:\Program Files\qemu"
