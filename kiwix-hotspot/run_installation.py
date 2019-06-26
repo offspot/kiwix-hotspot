@@ -351,9 +351,13 @@ def run_installation(
                 pass  # if mount_point or device are not defined
             raise exp
 
+        time.sleep(10)
+
         # unmount partition
         logger.step("Unmounting data partition")
         unmount_data_partition(mount_point, device, logger)
+
+        time.sleep(10)
 
         # rerun emulation for discovery
         logger.stage("move")
