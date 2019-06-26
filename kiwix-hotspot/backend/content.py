@@ -406,8 +406,9 @@ def get_expanded_size(collection):
             for item in get_all_contents_for(collection)
         ]
     )
-    # add a 5% margin ; make sure it's at least 2GB
-    margin = min([2 * ONE_GiB, total_size * 0.05])
+
+    # add a 2% margin ; make sure it's at least 2GB
+    margin = max([2 * ONE_GiB, total_size * 0.02])
     return total_size + margin
 
 
