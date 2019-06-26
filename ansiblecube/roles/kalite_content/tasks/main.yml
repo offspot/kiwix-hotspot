@@ -10,9 +10,23 @@
   with_items: "{{ ansible_local.config.kalite_languages | default(omit) }}"
   tags: move-content
 
+- name: delete language packs
+  file:
+    path: "{{ kalite_langpack_prefix }}{{ item }}.zip"
+    state: absent
+  with_items: "{{ ansible_local.config.kalite_languages | default(omit) }}"
+  tags: move-content
+
 # downloaded videos were placed in a different location on data part
 - name: move downloaded videos to kalite folder
   shell: mv {{ kalite_videos_prefix }}{{ item }}/* {{ data_path }}/kalite/content/
+  with_items: "{{ ansible_local.config.kalite_languages | default(omit) }}"
+  tags: move-content
+
+- name: delete empty videos folders
+  file:
+    path: "{{ kalite_videos_prefix }}{{ item }}"
+    state: absent
   with_items: "{{ ansible_local.config.kalite_languages | default(omit) }}"
   tags: move-content
 

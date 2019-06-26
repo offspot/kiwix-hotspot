@@ -28,3 +28,10 @@
   command: "{{ aflatoun_env }}/bin/kalite manage retrievecontentpack local {{ item }} {{ aflatoun_langpack_prefix }}{{ item }}.zip"
   with_items: "{{ ansible_local.config.aflatoun_languages }}"
   tags: move-content
+
+- name: delete language packs
+  file:
+    path: "{{ aflatoun_langpack_prefix }}{{ item }}.zip"
+    state: absent
+  with_items: "{{ ansible_local.config.aflatoun_languages }}"
+  tags: move-content
