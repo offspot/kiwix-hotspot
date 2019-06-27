@@ -1,3 +1,7 @@
+2.0.7
+* fixed size evaluation for KA-lite
+* removed leftovers files on cards after use (kalite, aflatoun lang packs)
+
 2.0.6
 * fixed regression (not launching) by reverting to previous pygobjects version
 
