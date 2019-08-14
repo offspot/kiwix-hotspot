@@ -83,7 +83,7 @@ def run_for_image(machine, root_partition_size, disk_size):
     # install latest ansible and important python dependencies
     machine.exec_cmd(
         "sudo sudo python -m pip install -U "
-        "pip virtualenv jinja2 paramiko pyyaml httplib2 ansible==2.6.6"
+        "pip virtualenv jinja2 paramiko pyyaml httplib2 ansible==2.6.18"
     )
 
     # prepare ansible files

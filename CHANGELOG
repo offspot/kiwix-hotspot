@@ -1,3 +1,7 @@
+2.0.9
+
+* updated ansible version (security)
+
 2.0.8
 * fixed ZIM icon display on homepage
 
