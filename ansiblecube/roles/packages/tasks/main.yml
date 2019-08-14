@@ -7,7 +7,7 @@
 - name: Add CSS for package icon
   lineinfile:
     dest: /var/www/static/cards.css
-    line: '.card.{{ item|splitext|first|replace(".", "\.") }} { background-image: url("http://{{ kiwix_fqdn }}/{{ item }}/-/favicon"); }'
+    line: '.card.zim_{{ item|splitext|first|replace(".", "\.") }} { background-image: url("http://{{ kiwix_fqdn }}/meta?content={{ item }}&name=favicon"); }'
     insertafter: EOF
     state: present
   with_items: '{{ ansible_local.config.packages | default(omit) }}'
