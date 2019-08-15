@@ -7,33 +7,48 @@ def get_pi_version():
     """ return a dict with raspi version info """
 
     names = {
-        "0002": "(Model B Rev 1, 256MB)",
-        "0003": "(Model B Rev 1, ECN0001 (no fuses, D14 removed), 256MB)",
-        "0004": "(Model B Rev 2, 256MB)",
-        "0005": "(Model B Rev 2, 256MB)",
-        "0006": "(Model B Rev 2, 256MB)",
-        "0007": "(Model A, 256MB)",
-        "0008": "(Model A, 256MB)",
-        "0009": "(Model A, 256MB)",
-        "000d": "(Model B Rev 2, 512MB)",
-        "000e": "(Model B Rev 2, 512MB)",
-        "000f": "(Model B Rev 2, 512MB)",
-        "0010": "(Model B+, 512MB)",
-        "0013": "(Model B+, 512MB)",
-        "900032": "(Model B+, 512MB)",
-        "0011": "(Compute Module, 512MB)",
-        "0014": "(Compute Module, (Embest, China), 512MB)",
-        "0012": "(Model A+, 256MB)",
-        "0015": "(Model A+, (Embest, China), 256MB/512MB)",
-        "a01041": "(Pi 2 Model B v1.1, (Sony, UK), 1GB)",
-        "a21041": "(Pi 2 Model B v1.1, (Embest, China), 1GB)",
-        "a22042": "(Pi 2 Model B v1.2, (Sony, UK), 1GB)",
-        "900092": "(Pi Zero v1.2, 512MB)",
-        "900093": "(Pi Zero v1.3, 512MB)",
-        "9000C1": "(Pi Zero W, 512MB)",
-        "a02082": "(Pi 3 Model B, (Sony, UK), 1GB)",
-        "a22082": "(Pi 3 Model B, (Embest, China), 1GB)",
-        "a020d3": "(Pi 3 Model B+, (Sony, UK), 1GB)",
+        "0002": ("B", "1.0", "256MB", "Egoman"),
+        "0003": ("B", "1.0", "256MB", "Egoman"),
+        "0004": ("B", "2.0", "256MB", "Sony UK"),
+        "0005": ("B", "2.0", "256MB", "Qisda"),
+        "0006": ("B", "2.0", "256MB", "Egoman"),
+        "0007": ("A", "2.0", "256MB", "Egoman"),
+        "0008": ("A", "2.0", "256MB", "Sony UK"),
+        "0009": ("A", "2.0", "256MB", "Qisda"),
+        "000d": ("B", "2.0", "512MB", "Egoman"),
+        "000e": ("B", "2.0", "512MB", "Sony UK"),
+        "000f": ("B", "2.0", "512MB", "Egoman"),
+        "0010": ("B+", "1.2", "512MB", "Sony UK"),
+        "0011": ("CM1", "1.0", "512MB", "Sony UK"),
+        "0012": ("A+", "1.1", "256MB", "Sony UK"),
+        "0013": ("B+", "1.2", "512MB", "Embest"),
+        "0014": ("CM1", "1.0", "512MB", "Embest"),
+        "0015": ("A+", "1.1", "256MB/512MB", "Embest"),
+        "900021": ("A+", "1.1", "512MB", "Sony UK"),
+        "900032": ("B+", "1.2", "512MB", "Sony UK"),
+        "900092": ("Zero", "1.2", "512MB", "Sony UK"),
+        "900093": ("Zero", "1.3", "512MB", "Sony UK"),
+        "9000c1": ("Zero W", "1.1", "512MB", "Sony UK"),
+        "9020e0": ("3A+", "1.0", "512MB", "Sony UK"),
+        "920092": ("Zero", "1.2", "512MB", "Embest"),
+        "920093": ("Zero", "1.3", "512MB", "Embest"),
+        "900061": ("CM", "1.1", "512MB", "Sony UK"),
+        "a01040": ("2B", "1.0", "1GB", "Sony UK"),
+        "a01041": ("2B", "1.1", "1GB", "Sony UK"),
+        "a02082": ("3B", "1.2", "1GB", "Sony UK"),
+        "a020a0": ("CM3", "1.0", "1GB", "Sony UK"),
+        "a020d3": ("3B+", "1.3", "1GB", "Sony UK"),
+        "a21041": ("2B", "1.1", "1GB", "Embest"),
+        "a22042": ("2B (with BCM2837)", "1.2", "1GB", "Embest"),
+        "a22082": ("3B", "1.2", "1GB", "Embest"),
+        "a220a0": ("CM3", "1.0", "1GB", "Embest"),
+        "a32082": ("3B", "1.2", "1GB", "Sony Japan"),
+        "a52082": ("3B", "1.2", "1GB", "Stadium"),
+        "a22083": ("3B", "1.3", "1GB", "Embest"),
+        "a02100": ("CM3+", "1.0", "1GB", "Sony UK"),
+        "a03111": ("4B", "1.1", "1GB", "Sony UK"),
+        "b03111": ("4B", "1.1", "2GB", "Sony UK"),
+        "c03111": ("4B", "1.1", "4GB", "Sony UK"),
     }
 
     def _get_revision():
@@ -55,8 +70,11 @@ def get_pi_version():
             return None
 
     revision = _get_revision()
-
-    return {"revision": revision, "name": names.get(revision), "model": _get_model()}
+    try:
+        name = "Pi {0} v{1} {2} ({3})".format(*names.get(revision))
+    except Exception:
+        name = None
+    return {"revision": revision, "name": name, "model": _get_model()}
 
 
 def get_string(revision, name, model, as_html=False):

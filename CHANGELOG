@@ -1,9 +1,7 @@
-2.0.9
-
-* updated ansible version (security)
-
 2.0.8
 * fixed ZIM icon display on homepage
+* updated ansible version (security)
+* add rpi4 detection in version.<> (no Pi4 support though)
 
 2.0.7
 * fixed size evaluation for KA-lite
