@@ -1,4 +1,8 @@
 2.0.8
+
+* Updated kiwix-serve to 2.1.0
+
+2.0.8
 * fixed ZIM icon display on homepage
 * updated ansible version (security)
 * add rpi4 detection in version.<> (no Pi4 support though)
