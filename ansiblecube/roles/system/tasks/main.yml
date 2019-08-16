@@ -28,7 +28,7 @@
 
 - name: download exfat kernel module
   unarchive:
-    src: "{{ mirror }}/dev/exfat_{{ kernel_version }}.tar"
+    src: "{{ mirror }}/dev/exfat_{{ kernel_version }}_buster.tar"
     dest: /tmp/
     remote_src: True
   tags: master
@@ -38,6 +38,7 @@
   with_items:
     - "{{ kernel_version }}"
     - "{{ kernel_version }}-v7"
+    - "{{ kernel_version }}-v7l"
   tags: master
 
 - name: make temp directories to fool depmod
@@ -47,9 +48,10 @@
   with_items:
     - "{{ kernel_version }}"
     - "{{ kernel_version }}-v7"
+    - "{{ kernel_version }}-v7l"
   tags: master
 
-- name: create symlinks to fool depmod
+- name: create symlinks to fool depmod (qemu)
   file:
     src: /lib/modules/{{ item }}+
     dest: /tmp/{{ item }}/lib/modules/{{ qemu_kernel_version }}
@@ -57,6 +59,52 @@
   with_items:
     - "{{ kernel_version }}"
     - "{{ kernel_version }}-v7"
+    - "{{ kernel_version }}-v7l"
+  when: running_kernel_version.stdout[:7] == qemu_kernel_version
+  tags: master
+
+- name: create symlinks to fool depmod on Pi 1
+  file:
+    src: /lib/modules/{{ item }}+
+    dest: /tmp/{{ item }}/lib/modules/{{ item }}
+    state: link
+  with_items:
+    - "{{ kernel_version }}"
+    - "{{ kernel_version }}-v7"
+    - "{{ kernel_version }}-v7l"
+  when: running_kernel_version.stdout[:7] == kernel_version
+  tags: master
+
+- name: create symlinks to fool depmod on Pi 2
+  file:
+    src: /lib/modules/{{ item }}+
+    dest: /tmp/{{ kernel_version }}/lib/modules/{{ item }}+
+    state: link
+  with_items:
+    - "{{ kernel_version }}"
+    - "{{ kernel_version }}-v7"
+    - "{{ kernel_version }}-v7l"
+  when: running_kernel_version.stdout[:7] == kernel_version
+  tags: master
+
+- name: create symlinks to fool depmod on Pi 3
+  file:
+    src: /lib/modules/{{ item }}+
+    dest: /tmp/{{ item }}/lib/modules/{{ item }}+
+    state: link
+  with_items:
+    - "{{ kernel_version }}"
+    - "{{ kernel_version }}-v7"
+    - "{{ kernel_version }}-v7l"
+  when: running_kernel_version.stdout[:7] == kernel_version
+  tags: master
+
+- name: create symlinks to fool depmod on Pi 4
+  file:
+    src: /lib/modules/{{ kernel_version }}-v7l+
+    dest: /tmp/{{ kernel_version }}-v7/lib/modules/{{ kernel_version }}-v7l+
+    state: link
+  when: running_kernel_version.stdout[:7] == kernel_version
   tags: master
 
 - name: regenerate modules list
@@ -64,6 +112,7 @@
   with_items:
     - "{{ kernel_version }}"
     - "{{ kernel_version }}-v7"
+    - "{{ kernel_version }}-v7l"
   tags: master
 
 - name: add exfat module to startup list
@@ -83,35 +132,45 @@
   when: has_exfat.stdout.strip()|int == 0
   tags: master
 
-- name: remove raspi sources
-  file:
-    path: /etc/apt/sources.list.d/raspi.list
-    state: absent
-  tags: master
-
-- name: Run apt update
-  apt:
-    update_cache: yes
-  tags: master
-
-- name: install stretch debian keyring
-  apt:
-    deb: http://ftp.fr.debian.org/debian/pool/main/d/debian-archive-keyring/debian-archive-keyring_2017.5_all.deb
-  when: ansible_distribution_release == "stretch"
-  tags: master
-
-- name: install jessie debian keyring
-  apt:
-    deb: http://ftp.fr.debian.org/debian/pool/main/d/debian-archive-keyring/debian-archive-keyring_2017.5~deb8u1_all.deb
-  when: ansible_distribution_release == "jessie"
-  tags: master
-
-- name: Drop a complete sources.list
+- name: create systemd-service to ublock RF on start
   copy:
-    src: sources_{{ ansible_distribution_release }}.list
-    dest: /etc/apt/sources.list
-  when: ansible_distribution == "Debian"
+    src: unblock-rf.service
+    dest: /etc/systemd/system/unblock-rf.service
   tags: master
+
+- name: reload systemd
+  command: systemctl daemon-reload
+  tags: master
+
+# - name: remove raspi sources
+#   file:
+#     path: /etc/apt/sources.list.d/raspi.list
+#     state: absent
+#   tags: master
+
+# - name: Run apt update
+#   apt:
+#     update_cache: yes
+#   tags: master
+
+# - name: install buster debian keyring
+#   apt:
+#     deb: http://ftp.fr.debian.org/debian/pool/main/d/debian-archive-keyring/debian-archive-keyring_2019.1_all.deb
+#   when: ansible_distribution_release == "buster"
+#   tags: master
+
+# - name: install stretch debian keyring
+#   apt:
+#     deb: http://ftp.fr.debian.org/debian/pool/main/d/debian-archive-keyring/debian-archive-keyring_2017.5_all.deb
+#   when: ansible_distribution_release == "stretch"
+#   tags: master
+
+# - name: Drop a complete sources.list
+#   copy:
+#     src: sources_{{ ansible_distribution_release }}.list
+#     dest: /etc/apt/sources.list
+#   when: ansible_distribution == "Debian"
+#   tags: master
 
 - name: Run apt update
   apt:
@@ -133,18 +192,13 @@
 
 - name: Install or upgrade all required package
   apt:
-    name: python-dev,git,sudo,lsb-release,vim,locate,git,unzip,bash-completion,aptitude,ntpdate,fake-hwclock,hdparm,ncurses-term,libffi-dev,libssl-dev,tree,screen,iftop,tmux,mtr-tiny,libwww-perl,httpie,lshw,hwinfo,sqlite3,elinks,mosh,curl,apt-transport-https,tar,exfat-utils,gzip,hostname,liblzma5,pkg-config,systemd,systemd-sysv,tzdata,wget,xz-utils,adduser,libpam-systemd,policykit-1
+    name: python-dev,git,sudo,lsb-release,vim,locate,git,unzip,bash-completion,aptitude,ntpdate,fake-hwclock,hdparm,ncurses-term,libffi-dev,libssl-dev,tree,screen,iftop,tmux,mtr-tiny,libwww-perl,httpie,lshw,hwinfo,sqlite3,elinks,mosh,curl,apt-transport-https,tar,exfat-fuse,exfat-utils,gzip,hostname,liblzma5,pkg-config,systemd,systemd-sysv,tzdata,wget,xz-utils,adduser,libpam-systemd,policykit-1,python3-setuptools
     state: latest
     autoremove: yes
     autoclean: yes
   tags: master
 
 - import_tasks: clean_apt.yml
-  tags: master
-
-- name: install newer exfat-utils from bower
-  apt:
-    deb: "{{ mirror }}/dev/exfat-utils_1.2.8-1_armhf.deb"
   tags: master
 
 - name: Install avahi packages
@@ -211,6 +265,13 @@
   with_items:
     - fr_FR.UTF-8
     - en_US.UTF-8
+  tags: master
+
+- name: set default locale to en_US
+  copy:
+    src: locale
+    dest: /etc/default/locale
+    mode: 0644
   tags: master
 
 - name: Copy a blank rc.local
@@ -306,6 +367,14 @@
     backup: yes
   notify: update timezone
   tags: ['master', 'setup', 'reconfigure']
+
+- name: add rfkill unblock to startup
+  cron:
+    name: "Unblock RF devices"
+    special_time: reboot
+    job: "/usr/sbin/rfkill unblock all"
+    state: present
+  tags: master
 
 - name: Checking if grub conf file is there
   stat:

@@ -1,6 +1,7 @@
 2.0.8
 
 * Updated kiwix-serve to 2.1.0
+* Updated to raspbian 2019-07-10 (buster)
 
 2.0.8
 * fixed ZIM icon display on homepage

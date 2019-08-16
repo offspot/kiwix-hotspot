@@ -1,10 +1,20 @@
 ---
 - name: Install iptables
   apt:
-    name: iptables
+    name: iptables,arptables,ebtables
     state: latest
     autoremove: yes
     autoclean: yes
+  tags: master
+
+- name: use iptables instead of the default nftables
+  command: update-alternatives --set {{ item }} /usr/sbin/{{ item }}-legacy
+  with_items:
+    - iptables
+    - ip6tables
+    - arptables
+    - ebtables
+  when: ansible_distribution_release == "buster"
   tags: master
 
 - name: Authorize routing

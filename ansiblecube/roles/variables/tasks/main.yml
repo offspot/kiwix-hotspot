@@ -2,6 +2,15 @@
 - debug: msg="Start playbook {{ ansible_date_time["date"] }} - {{ ansible_date_time["time"] }}"
   tags: always
 
+- name: Check running kernel version
+  command: uname -r
+  register: running_kernel_version
+  tags: always
+
+- debug:
+    msg: "Running Kernel: {{ running_kernel_version.stdout }} / {{ running_kernel_version.stdout[:7] }}"
+  tags: always
+
 - name: DEBUG list {{ data_path }} content
   command: ls -lh {{ data_path }}
   ignore_errors: yes
@@ -16,15 +25,25 @@
 
 - block:
   
-  - name: set python3.4 for jessie
-    set_fact:
-      python3_version: "3.4"
-    when: ansible_distribution_release == "jessie"
-
   - name: set python3.5 for stretch
     set_fact:
       python3_version: "3.5"
     when: ansible_distribution_release == "stretch"
+
+  - name: set python3.7 for buster
+    set_fact:
+      python3_version: "3.7"
+    when: ansible_distribution_release == "buster"
+
+  - name: set php7.0 for stretch
+    set_fact:
+      php_version: "7.0"
+    when: ansible_distribution_release == "stretch"
+
+  - name: set php7.3 for buster
+    set_fact:
+      php_version: "7.3"
+    when: ansible_distribution_release == "buster"
 
   tags: always
 

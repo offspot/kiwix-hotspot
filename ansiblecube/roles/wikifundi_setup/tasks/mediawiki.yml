@@ -38,19 +38,19 @@
   environment:
     RUNLEVEL: 1
   apt:
-    name: php7.0-fpm,php7.0-sqlite3,php7.0-intl,php7.0-mbstring,php7.0-xml,php7.0-curl
+    name: php{{ php_version }}-fpm,php{{ php_version }}-sqlite3,php{{ php_version }}-intl,php{{ php_version }}-mbstring,php{{ php_version }}-xml,php{{ php_version }}-curl
     state: latest
     autoremove: yes
     autoclean: yes
   tags: setup
 
-- include_tasks: disable_service.yml service=php7.0-fpm
+- include_tasks: disable_service.yml service=php{{ php_version }}-fpm
   tags: setup
 
 - name: change PHP7 settings to allow file uploads up to 5MiB
   copy:
     src: 90-wikifundi.ini
-    dest: /etc/php/7.0/fpm/conf.d/90-wikifundi.ini
+    dest: /etc/php/{{ php_version }}/fpm/conf.d/90-wikifundi.ini
   tags: setup
 
 - import_tasks: clean_apt.yml
@@ -60,7 +60,7 @@
   environment:
     RUNLEVEL: 1
   apt:
-    name: git,vim,unzip,imagemagick,libicu-dev,libav-tools,librsvg2-bin,poppler-utils,memcached,redis-server,lua5.1,python3,locales
+    name: git,vim,unzip,imagemagick,libicu-dev,ffmpeg,librsvg2-bin,poppler-utils,memcached,redis-server,lua5.1,python3,locales
     state: latest
     autoremove: yes
     autoclean: yes
@@ -214,8 +214,8 @@
   tags: setup
 
 - name: copy php conf for nginx
-  copy:
-    src: php.conf
+  template:
+    src: php.conf.j2
     dest: /etc/nginx/conf.d/php.conf
   tags: setup
 

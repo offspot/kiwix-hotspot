@@ -1,7 +1,6 @@
 ---
-- name: Unblock wlan
-  command: rfkill unblock wlan
-  when: (ansible_architecture == 'x86_64' or ansible_architecture == 'i386')
+- name: Unblock RF
+  command: rfkill unblock all
   ignore_errors: yes
   tags: master
 
@@ -41,6 +40,18 @@
 - name: reload systemd
   systemd:
     daemon-reload: yes
+
+- name: unmask hostapd
+  become: true
+  command: systemctl unmask hostapd
+  tags: master
+
+- name: unmask hostapd
+  become: true
+  systemd:
+    masked: no
+    name: hostapd
+  tags: master
 
 - include_tasks: enable_service.yml service=hostapd
   tags: master

@@ -1,0 +1,12 @@
+deb http://raspbian.raspberrypi.org/raspbian/ buster main contrib non-free rpi
+#deb-src http://raspbian.raspberrypi.org/raspbian/ buster main contrib non-free rpi
+
+deb http://deb.debian.org/debian/ buster main contrib non-free
+
+deb http://security.debian.org/debian-security buster/updates main contrib non-free
+
+# buster-updates, previously known as 'volatile'
+deb http://deb.debian.org/debian/ buster-updates main contrib non-free
+
+# buster-backports, previously on backports.debian.org
+deb http://deb.debian.org/debian/ buster-backports main contrib non-free
