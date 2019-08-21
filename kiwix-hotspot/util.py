@@ -501,7 +501,8 @@ def check_user_inputs(
     valid_timezone = timezone in pytz.common_timezones
 
     valid_wifi_pwd = (
-        len(wifi_pwd) <= 31
+        len(wifi_pwd) >= 8
+        and len(wifi_pwd) <= 31
         and set(wifi_pwd)
         <= set(
             string.ascii_uppercase + string.ascii_lowercase + string.digits + "-" + "_"
