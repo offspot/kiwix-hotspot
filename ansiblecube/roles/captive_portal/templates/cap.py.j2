@@ -1,8 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import re
 import subprocess
+
 
 def has_internet():
     try:
@@ -14,46 +15,46 @@ def has_internet():
 
 TRANSLATIONS = {
     "fr": {
-        "banner": u"Bienvenue sur «<em>{{ hotspot_name }}</em>» "
-        u"(<a href=\"http://{{ fqdn }}/\">{{ fqdn }}</a>)",
-        "title": u"<em>{{ project_name }}</em> est une ressource de "
-        u"contenus libres d'accès.",
-        "reminder": u"Merci de vous rappeler des points suivants :",
-        "access": u"L'accès à ces contenus ne se fait "
-        u"<strong>qu'à travers <em>http://{{ fqdn }}/</em></strong>. "
-        u"<u>Souvenez-vous en !</u>",
-        "internet": u"Cette ressource peut fournir un accès à Internet. "
-        u"Dans ce cas, il faudra vous <em>identifier</em> pour y accèder.",
-        "prompt": u"Cette page vous sera alors présenté <strong>après 15mn</strong> "
-        u"d'inactivité.",
-        "https": u"Surfant sur un site sécurisé, le navigateur pourrait vous afficher "
-        u"un <em>avertissement de sécurité</em> au lieu d'afficher cette page. "
-        u"Ouvrez-en simplement une nouvelle "
-        u"sur un site non-sécurisé et identifiez-vous à nouveau.",
-        "go_button": u"Aller à {{ fqdn }}",
-        "internet_button": u"M'identifier et accèder à Internet",
+        "banner": "Bienvenue sur «<em>{{ hotspot_name }}</em>» "
+        '(<a href="http://{{ fqdn }}/">{{ fqdn }}</a>)',
+        "title": "<em>{{ project_name }}</em> est une ressource de "
+        "contenus libres d'accès.",
+        "reminder": "Merci de vous rappeler des points suivants :",
+        "access": "L'accès à ces contenus ne se fait "
+        "<strong>qu'à travers <em>http://{{ fqdn }}/</em></strong>. "
+        "<u>Souvenez-vous en !</u>",
+        "internet": "Cette ressource peut fournir un accès à Internet. "
+        "Dans ce cas, il faudra vous <em>identifier</em> pour y accèder.",
+        "prompt": "Cette page vous sera alors présenté <strong>après 15mn</strong> "
+        "d'inactivité.",
+        "https": "Surfant sur un site sécurisé, le navigateur pourrait vous afficher "
+        "un <em>avertissement de sécurité</em> au lieu d'afficher cette page. "
+        "Ouvrez-en simplement une nouvelle "
+        "sur un site non-sécurisé et identifiez-vous à nouveau.",
+        "go_button": "Aller à {{ fqdn }}",
+        "internet_button": "M'identifier et accèder à Internet",
     },
     "en": {
-        "banner": u"Entering “<em>{{ hotspot_name }}</em>” "
-        u"(<a href=\"http://{{ fqdn }}/\">{{ fqdn }}</a>)",
-        "title": u"<em>{{ project_name }}</em> is a free-to-use, content-enabled box.",
-        "reminder": u"Please, keep the following in mind:",
-        "access": u"Access to this box's content is done "
-        u"<strong>solely via <em>http://{{ fqdn }}/</em></strong>. "
-        u"<u>Remember-it !</u>",
-        "internet": u"This box may also provide access to Internet. "
-        u"You need to <em>log-in</em> to the network to access it.",
-        "prompt": u"You will then be prompted with this page <strong>after "
-        u"every 15mn</strong> of inactivity.",
-        "https": u"When browsing a secure website, your browser might display "
-        u"a <em>Security Warning</em> instead of displaying this page. "
-        u"Just open a new page onto a non-secure website to log-in again.",
-        "go_button": u"Go to {{ fqdn }}",
-        "internet_button": u"Log me in and access Internet",
+        "banner": "Entering “<em>{{ hotspot_name }}</em>” "
+        '(<a href="http://{{ fqdn }}/">{{ fqdn }}</a>)',
+        "title": "<em>{{ project_name }}</em> is a free-to-use, content-enabled box.",
+        "reminder": "Please, keep the following in mind:",
+        "access": "Access to this box's content is done "
+        "<strong>solely via <em>http://{{ fqdn }}/</em></strong>. "
+        "<u>Remember-it !</u>",
+        "internet": "This box may also provide access to Internet. "
+        "You need to <em>log-in</em> to the network to access it.",
+        "prompt": "You will then be prompted with this page <strong>after "
+        "every 15mn</strong> of inactivity.",
+        "https": "When browsing a secure website, your browser might display "
+        "a <em>Security Warning</em> instead of displaying this page. "
+        "Just open a new page onto a non-secure website to log-in again.",
+        "go_button": "Go to {{ fqdn }}",
+        "internet_button": "Log me in and access Internet",
     },
 }
 
-header = u"""<!DOCTYPE html>
+header = """<!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8">
@@ -71,7 +72,7 @@ header = u"""<!DOCTYPE html>
         <link rel="stylesheet" type="text/css" href="/hotspot-static/branding/style.css" />
     </head>"""
 
-parta = u"""
+parta = """
     <body class="">
         <header>
             <section>
@@ -91,16 +92,16 @@ parta = u"""
             <p style="text-decoration: underline;">{reminder}</p>
             <ul><li>{access}</li>"""
 
-partb = u"""<li>{internet}</li><li>{prompt}</li>"""
+partb = """<li>{internet}</li><li>{prompt}</li>"""
 
-partc = u"""<li>{https}</li></ul>
+partc = """<li>{https}</li></ul>
             <p><a class="button" href="http://{{ fqdn }}">{go_button}</a>"""
 
-partd = u""" <a class="button neutral" href="/register">{internet_button}</a>"""
+partd = """ <a class="button neutral" href="/register">{internet_button}</a>"""
 
-parte = u"""</p></div>"""
+parte = """</p></div>"""
 
-footer = u"""
+footer = """
         <footer>
             <div class="row">
                 <div class="col third i18n_switch"></div>
@@ -113,10 +114,12 @@ footer = u"""
 
 def get_translation_for(accept_lang_header, default="en"):
     chosen_lang = default
-    langs = [lang_item.replace("_", "-").split("-")[0].lower()
-             for lang_code in accept_lang_header.split(",")
-             for lang_item in lang_code.split(";")
-             if "q=" not in lang_item]
+    langs = [
+        lang_item.replace("_", "-").split("-")[0].lower()
+        for lang_code in accept_lang_header.split(",")
+        for lang_item in lang_code.split(";")
+        if "q=" not in lang_item
+    ]
 
     for lang in langs:
         if lang in TRANSLATIONS.keys():
@@ -127,15 +130,33 @@ def get_translation_for(accept_lang_header, default="en"):
 
 
 def allow_host(ipaddress):
-    passlist_output = subprocess.check_output(
-        "sudo iptables -t nat -nL CAPTIVE_PASSLIST", shell=True)
-    passlist = [re.split(r"\s+", line)[3]
-                for line in passlist_output.split("\n") if "--" in line]
+    passlist_ps = subprocess.run(
+        ["/usr/bin/sudo", "/usr/sbin/iptables", "-t", "nat", "-nL", "CAPTIVE_PASSLIST"],
+        capture_output=True,
+        text=True,
+    )
+    passlist = [
+        re.split(r"\s+", line)[3]
+        for line in passlist_ps.stdout.split("\n")
+        if "--" in line
+    ]
     if ipaddress in passlist:
         return
-    subprocess.check_output(
-        "sudo iptables -t nat -I CAPTIVE_PASSLIST 1 -s {ip} -j ACCEPT"
-        .format(ip=ipaddress), shell=True)
+    subprocess.run(
+        [
+            "/usr/bin/sudo",
+            "/usr/sbin/iptables",
+            "-t",
+            "nat",
+            "-I",
+            "CAPTIVE_PASSLIST",
+            "1",
+            "-s",
+            str(ipaddress),
+            "-j",
+            "ACCEPT",
+        ]
+    )
 
 
 def application(env, start_response):
