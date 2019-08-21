@@ -1,7 +1,19 @@
-2.0.8
+2.0.9
 
+* system locale to en_US (was en_GB*)
 * Updated kiwix-serve to 2.1.0
 * Updated to raspbian 2019-07-10 (buster)
+* Added support for Pi4
+* WPA password must be at least 8chars.
+* Changed data partition label to HSPOT_DATA
+* Internal scripts (captive_portal, time) to use python3
+* Tested on the following revisions:
+ * Raspberry Pi 4 Model B Rev 1.1 / b03111 / Pi 4B v1.1 2GB (Sony UK)
+ * Raspberry Pi 3 Model B Plus Rev 1.3 / a020d3 / Pi 3B+ v1.3 1GB (Sony UK)
+ * Raspberry Pi 3 Model B Rev 1.2 / a02082 / Pi 3B v1.2 1GB (Sony UK)
+ * Raspberry Pi Model B Rev 2 / 000e / Pi B v2.0 512MB (Sony UK)
+ * Raspberry Pi Model B Rev 2 / 000f / Pi B v2.0 512MB (Egoman)
+ * Raspberry Pi Zero W Rev 1.1 / 9000c1 / Pi Zero W v1.1 512MB (Sony UK)
 
 2.0.8
 * fixed ZIM icon display on homepage
