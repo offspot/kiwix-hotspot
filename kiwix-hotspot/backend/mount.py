@@ -10,7 +10,7 @@ import random
 import tempfile
 import traceback
 
-from data import data_dir
+from data import data_dir, data_partition_label
 from backend.content import get_content
 from backend.qemu import get_qemu_image_size
 from backend.util import (
@@ -392,7 +392,9 @@ def format_data_partition(image_fpath, logger):
 
         # format the data partition
         try:
-            subprocess_pretty_check_call([mkfs_exe, "-n", "data", target_dev], logger)
+            subprocess_pretty_check_call(
+                [mkfs_exe, "-n", data_partition_label, target_dev], logger
+            )
         finally:
             # remove write rights we just added
             if previous_mode:
@@ -406,7 +408,14 @@ def format_data_partition(image_fpath, logger):
 
         try:
             subprocess_pretty_check_call(
-                [diskutil_exe, "eraseVolume", "exfat", "data", target_part], logger
+                [
+                    diskutil_exe,
+                    "eraseVolume",
+                    "exfat",
+                    data_partition_label,
+                    target_part,
+                ],
+                logger,
             )
         finally:
             # ensure we release the loop device on mount failure
@@ -428,7 +437,7 @@ def format_data_partition(image_fpath, logger):
                     "-v",
                     "3",
                     "-p",
-                    "/fs:exfat /V:data /q /y",
+                    "/fs:exfat /V:{} /q /y".format(data_partition_label),
                     "-m",
                     target_dev,
                 ],

@@ -34,4 +34,6 @@ hotspot_languages = [("en", u"English"), ("fr", u"Fran\xe7ais")]
 help_url = "https://github.com/kiwix/kiwix-hotspot/wiki/FAQ"
 etcher_url = "https://etcher.io/"
 
+data_partition_label = "HSPOT_DATA"
+
 VERSION = "devel"
