@@ -1,7 +1,7 @@
 2.0.9
 
 * system locale to en_US (was en_GB*)
-* Updated kiwix-serve to 2.1.0
+* Updated kiwix-serve to 3.0.1
 * Updated to raspbian 2019-07-10 (buster)
 * Added support for Pi4
 * WPA password must be at least 8chars.
