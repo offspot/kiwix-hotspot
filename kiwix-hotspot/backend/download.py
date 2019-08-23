@@ -2,7 +2,6 @@
 # vim: ai ts=4 sts=4 et sw=4 nu
 
 import os
-import io
 import re
 import sys
 import shutil
@@ -12,12 +11,17 @@ import subprocess
 import requests
 
 from data import data_dir, http_proxy_test_url, https_proxy_test_url
-from util import ReportHook, get_checksum, get_cache, get_prefs
+from util import get_checksum, get_cache, get_prefs
 from backend.util import subprocess_pretty_check_call, startup_info_args
 
+PROXIES = None
 FAILURE_RETRIES = 6
 szip_exe = os.path.join(data_dir, "7za.exe")
-PROXIES = None
+
+if sys.platform == "win32":
+    aria2_exe = os.path.join(data_dir, "aria2c.exe")
+else:
+    aria2_exe = os.path.join(data_dir, "aria2c")
 
 
 def read_proxies(load_env=True):
@@ -112,82 +116,88 @@ class RequestedFile(object):
         )
 
 
-def stream(
-    url,
-    write_to=None,
-    callback=None,
-    block_size=1024,
-    proxies=None,
-    only_first_block=False,
-):
-    """ download an URL without blocking
+def download_file(url, fpath, logger, checksum=None):
 
-        - retries download on failure (with increasing wait delay)
-        - feeds a callback to provide progress indication """
+    """ download an URL into a named path and reports progress to logger
 
-    # prepare adapter so it retries on failure
-    session = requests.Session()
-    # retries up-to FAILURE_RETRIES whichever kind of listed error
-    retries = requests.packages.urllib3.util.retry.Retry(
-        total=FAILURE_RETRIES,  # total number of retries
-        connect=FAILURE_RETRIES,  # connection errors
-        read=FAILURE_RETRIES,  # read errors
-        status=2,  # failure HTTP status (only those bellow)
-        redirect=False,  # don't fail on redirections
-        backoff_factor=30,  # sleep factor between retries
-        status_forcelist=[413, 429, 500, 502, 503, 504],
-    )
-    retry_adapter = requests.adapters.HTTPAdapter(max_retries=retries)
-    session.mount("http", retry_adapter)  # tied to http and https
-    req = session.get(
-        url, stream=True, proxies=proxies if proxies is not None else PROXIES
-    )
+        download is externalized to aria2c binary and progress extracted
+        from periodic summary
 
-    total_size = int(req.headers.get("content-length", 0))
-    # adjust if we are only requesting first block
-    if only_first_block and total_size > block_size:
-        total_size = block_size
+        downloads are resumed if possible
 
-    total_downloaded = 0
-    if write_to is not None:
-        fd = open(write_to, "wb")
-    else:
-        fd = io.BytesIO()
+        supports metalink. if link is metalink, downloads both then replace
+        actual target (aria2 doesn't allow setting target for metalink
+        as it can be multiple files) """
 
-    for data in req.iter_content(block_size):
-        callback(data, block_size, total_size)
-        total_downloaded += len(data)
-        if write_to:
-            fd.write(data)
+    output_dir, fname = os.path.split(fpath)
+    args = [aria2_exe, f"--dir={output_dir}", f"--out={fname}"]
+    args += [
+        "--connect-timeout=60",
+        "--max-file-not-found=5",
+        "--max-tries=5",
+        "--retry-wait=60",
+        "--timeout=60",
+        "--follow-metalink=mem",
+        "--allow-overwrite=true",
+        "--always-resume=false",
+        "--max-resume-failure-tries=1",
+        "--auto-file-renaming=false",
+        "--download-result=full",
+        "--log-level=error",
+        "--console-log-level=error",
+        "--summary-interval=1",  # display a line with progress every X seconds
+        "--human-readable={}".format(str(logger.on_tty).lower()),
+    ]
+    args += ["--http-accept-gzip=true"]  # only for catalog?
+    args += [url]
 
-        # stop downloading/reading if we're just testing first block
-        if only_first_block:
-            break
+    aria2c = subprocess.Popen(args, stdout=subprocess.PIPE, text=True)
+    # logger.std(" ".join(args))
 
-    if write_to:
-        fd.close()
-    else:
-        fd.seek(0)
+    if not logger.on_tty:
+        logger.ascii_progressbar(0, 100)
 
-    if total_size != 0 and total_downloaded != total_size:
-        raise AssertionError(
-            "Downloaded size ({}) is different than expected ({})".format(
-                total_downloaded, total_size
-            )
+    metalink_target = None
+    for line in iter(aria2c.stdout.readline, ""):
+        line = line.strip()
+        # [#915371 5996544B/90241109B(6%) CN:4 DL:1704260B ETA:49s]
+        if line.startswith("[#") and line.endswith("]"):  # quick check, no re
+            if logger.on_tty:
+                logger.flash(line + "          ")
+            else:
+                try:
+                    downloaded_size, total_size = [
+                        int(x)
+                        for x in list(
+                            re.search(r"\s([0-9]+)B\/([0-9]+)B", line).groups()
+                        )
+                    ]
+                except Exception:
+                    downloaded_size, total_size = 1, -1
+                logger.ascii_progressbar(downloaded_size, total_size)
+        if metalink_target is None and line.startswith("FILE:"):
+            metalink_target = line.split(":")[-1].strip()
+
+    if aria2c.poll() is None:
+        try:
+            aria2c.wait(timeout=2)
+        except subprocess.TimeoutError:
+            aria2c.terminate()
+
+    logger.std("")  # clear last \r
+
+    if not aria2c.returncode == 0:
+        return RequestedFile.from_failure(
+            url,
+            fpath,
+            ValueError("aria2c returned {}".format(aria2c.returncode)),
+            checksum,
         )
 
-    return total_downloaded, write_to if write_to else fd
+    if metalink_target is not None:
+        shutil.move(metalink_target, fpath)
 
-
-def download_file(url, fpath, logger, checksum=None):
-    """ downloads expected URL+sum to file while showing progress to logger """
-    hook = ReportHook(logger.raw_std).reporthook
-    try:
-        size, path = stream(url, fpath, callback=hook)
-    except Exception as exp:
-        return RequestedFile.from_failure(url, fpath, exp, checksum)
-
-    return RequestedFile.from_download(url, fpath, size)
+    return RequestedFile.from_download(url, fpath, os.path.getsize(fpath))
 
 
 def download_if_missing(url, fpath, logger, checksum=None):
@@ -207,19 +217,13 @@ def download_if_missing(url, fpath, logger, checksum=None):
 
 
 def test_connection(proxies=None):
-    try:
-        hook = ReportHook(print).reporthook
-        for kind, url in (
-            ("HTTP", http_proxy_test_url),
-            ("HTTPS", https_proxy_test_url),
-        ):
-            size, fd = stream(
-                url, proxies=proxies, callback=hook, only_first_block=True
-            )
-    except Exception:
-        return False, kind
-    else:
-        return size > 0, None
+    for kind, url in (("HTTP", http_proxy_test_url), ("HTTPS", https_proxy_test_url)):
+        try:
+            req = requests.head(url, proxies=proxies or PROXIES, timeout=20)
+            req.raise_for_status()
+        except Exception:
+            return False, kind
+    return True, None
 
 
 def get_content_cache(content, folder, is_cache_folder=False):
@@ -289,7 +293,7 @@ def win_unarchive_compressed_tar_pipe(archive_fpath, dest_folder, logger):
         [szip_exe, "x", "-so", archive_fpath],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        **startup_info_args()
+        **startup_info_args(),
     )
     logger.std("Call: " + str(uncompress.args))
 
@@ -299,7 +303,7 @@ def win_unarchive_compressed_tar_pipe(archive_fpath, dest_folder, logger):
         stdin=uncompress.stdout,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        **startup_info_args()
+        **startup_info_args(),
     )
     logger.std("Call: " + str(untar.args))
 

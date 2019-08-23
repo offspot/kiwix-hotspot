@@ -119,6 +119,13 @@ install:
   - 7z.exe x etcher-cli.zip
   - del etcher-cli.zip
 
+  # Download aria2
+  - cd C:\projects\kiwix-hotspot
+  - if %platform%==x86 appveyor DownloadFile "http://mirror.download.kiwix.org/dev/aria2c-win32.zip" -FileName "aria2c.zip"
+  - if %platform%==x64 appveyor DownloadFile "http://mirror.download.kiwix.org/dev/aria2c-win64.zip" -FileName "aria2c.zip"
+  - 7z.exe x aria2c.zip
+  - del aria2c.zip
+
   # Run pyinstaller and show warning
   - cd C:\projects\kiwix-hotspot
   - if %platform%==x86 C:\Python34\python.exe C:\Python34\Scripts\pyinstaller-script.py --log-level=DEBUG kiwix-hotspot-win32.spec

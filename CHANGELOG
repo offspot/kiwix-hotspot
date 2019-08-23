@@ -1,5 +1,7 @@
 2.0.9
 
+* Using aria2 to download content (metalink and resume)
+* Using mirror.download.kiwix.org for retrieving catalog (gzip'd)
 * system locale to en_US (was en_GB*)
 * Updated kiwix-serve to 3.0.1
 * Updated to raspbian 2019-07-10 (buster)

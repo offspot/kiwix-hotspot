@@ -97,6 +97,37 @@ class Logger(ProgressHelper):
         self.stg_tag = self.text_buffer.create_tag("stg", foreground="purple")
         self.run_pulse()
 
+    @property
+    def on_tty(self):
+        return False
+
+    def flash(self, line):
+        pass
+
+    def ascii_progressbar(self, current, total):
+        width = 60
+        avail_dots = width - 2
+        if total == -1:
+            line = "unknown size"
+        elif current >= total:
+            line = "[" + "." * avail_dots + "] 100%\n"
+        else:
+            ratio = min(float(current) / total, 1.)
+            shaded_dots = min(int(ratio * avail_dots), avail_dots)
+            percent = min(int(ratio * 100), 100)
+            line = (
+                "["
+                + "." * shaded_dots
+                + " " * (avail_dots - shaded_dots)
+                + "] "
+                + str(percent)
+                + "%\r"
+            )
+
+        if getattr(self, "_last_progress_line", None) != line:
+            self.raw_std(line)
+            setattr(self, "_last_progress_line", line)
+
     def step(self, step):
         GLib.idle_add(self.main_thread_step, step)
 

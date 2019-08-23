@@ -13,7 +13,7 @@ CATALOGS = [
     {
         "name": "Kiwix",
         "description": "Kiwix ZIM Content",
-        "url": "http://download.kiwix.org/library/ideascube.yml",
+        "url": "http://mirror.download.kiwix.org/library/ideascube.yml",
     }
 ]
 
@@ -27,11 +27,11 @@ def fetch_catalogs(logger):
     try:
         for catalog in CATALOGS:
             tmpfile = tempfile.NamedTemporaryFile(suffix=".yml", delete=False)
+            tmpfile.close()
             dlf = download_file(catalog.get("url"), tmpfile.name, logger)
-            tmpfile.seek(0)  # reset as we'll read it right away
             if dlf.successful:
-                catalogs.append(yaml.load(tmpfile.read()))
-                tmpfile.close()
+                with open(tmpfile.name, "r") as fp:
+                    catalogs.append(yaml.load(fp.read()))
                 os.unlink(tmpfile.name)
             else:
                 raise ValueError("Unable to download {}".format(catalog.get("url")))
