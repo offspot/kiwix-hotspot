@@ -194,9 +194,7 @@ def run_phase_one(
 
     # save YAML catalogs into local files inside VM for use by ideascube
     for index, catalog in enumerate(CATALOGS):
-        with tempfile.NamedTemporaryFile(
-            suffix=".yml", delete=False, encoding="utf-8"
-        ) as fd:
+        with tempfile.NamedTemporaryFile(suffix=".yml", delete=False) as fd:
             yaml.safe_dump(
                 get_catalogs(machine._logger)[index],
                 fd,
