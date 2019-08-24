@@ -20,3 +20,4 @@ qemu-system-arm
 xz-*.tar.gz
 xz-*
 etcher-cli
+aria2c

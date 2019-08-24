@@ -339,44 +339,16 @@ def human_readable_size(size, binary=True):
     return output
 
 
-class ReportHook:
-    def __init__(self, writter):
-        self._current_size = 0
-        self.width = 60
-        self._last_line = None
-        self._writter = writter
-        self.reporthook(0, 0, 100)  # display empty bar as we start
-
-    def reporthook(self, chunk, chunk_size, total_size):
-        if chunk != 0:
-            self._current_size += chunk_size
-
-        avail_dots = self.width - 2
-        if total_size == -1:
-            line = "unknown size"
-        elif self._current_size >= total_size:
-            line = "[" + "." * avail_dots + "] 100%\n"
-        else:
-            ratio = min(float(self._current_size) / total_size, 1.)
-            shaded_dots = min(int(ratio * avail_dots), avail_dots)
-            percent = min(int(ratio * 100), 100)
-            line = (
-                "["
-                + "." * shaded_dots
-                + " " * (avail_dots - shaded_dots)
-                + "] "
-                + str(percent)
-                + "%\r"
-            )
-
-        if line != self._last_line:
-            self._last_line = line
-            self._writter(line)
-
-
 class CLILogger(ProgressHelper):
     def __init__(self):
         super(CLILogger, self).__init__()
+
+    @property
+    def on_tty(self):
+        return True
+
+    def flash(self, line):
+        self.raw_std(line + "\r")
 
     def step(self, step, end=None):
         self.p("--> {}".format(step), color="34", end=end)
@@ -501,7 +473,8 @@ def check_user_inputs(
     valid_timezone = timezone in pytz.common_timezones
 
     valid_wifi_pwd = (
-        len(wifi_pwd) <= 31
+        len(wifi_pwd) >= 8
+        and len(wifi_pwd) <= 31
         and set(wifi_pwd)
         <= set(
             string.ascii_uppercase + string.ascii_lowercase + string.digits + "-" + "_"
@@ -613,7 +586,7 @@ def save_prefs(prefs, auto_reload=True):
     """ save a passed preferences dict to the preferences file on disk """
     fpath = get_prefs_path()
     try:
-        with open(fpath, "w") as fd:
+        with open(fpath, "w", encoding="utf-8") as fd:
             json.dump(prefs, fd, indent=4)
     except Exception as exp:
         print("Failed to save prefs to {}: {}".format(fpath, exp))

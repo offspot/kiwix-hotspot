@@ -25,7 +25,7 @@
 - include_tasks: enable_service.yml service=memcached
   when: ansible_local.config.wikifundi_languages | length
 
-- include_tasks: enable_service.yml service=php7.0-fpm
+- include_tasks: enable_service.yml service=php{{ php_version }}-fpm
   when: ansible_local.config.wikifundi_languages | length
 
 - include_tasks: enable_vhost.yml name={{ item }}.wikifundi

@@ -1,0 +1,8 @@
+[Unit]
+Description=Ublock RF devices
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin rfkill ublock all

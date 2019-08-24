@@ -33,10 +33,11 @@ language_name: "English"
 # versions
 qemu_kernel_version: "4.10.0"
 kernel_version: "4.14.34"
-kiwix_version: "2.1.0"
+kiwix_version: "3.0.1"
 kalite_version: "0.17.4"
 edupi_version: "1.4.10"
 python3_version: "3.5"
+php_version: "7.3"
 
 # Apps path
 venvs_root: /home/{{ username }}/venvs

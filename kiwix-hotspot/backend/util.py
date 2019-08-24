@@ -361,7 +361,9 @@ def get_etcher_command(image_fpath, device_fpath, logger, from_cli):
     # on macOS, GUI sudo captures stdout so we use a log file
     log_to_file = not from_cli and sys.platform == "darwin"
     if log_to_file:
-        log_file = tempfile.NamedTemporaryFile(suffix=".log", delete=False)
+        log_file = tempfile.NamedTemporaryFile(
+            suffix=".log", delete=False, encoding="utf-8"
+        )
     else:
         log_file = None
 

@@ -37,7 +37,9 @@ jinja_env.filters["language_bidi"] = language_is_bidirectional
 
 
 def save_homepage(html):
-    with tempfile.NamedTemporaryFile("w", delete=False, suffix=".html") as fp:
+    with tempfile.NamedTemporaryFile(
+        "w", delete=False, suffix=".html", encoding="utf-8"
+    ) as fp:
         fp.write(html)
         fp.close()
         return fp.name

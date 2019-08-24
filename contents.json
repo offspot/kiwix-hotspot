@@ -1,18 +1,18 @@
 {
     "raspbian_image": {
-        "url": "http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2018-04-19/2018-04-18-raspbian-stretch-lite.zip",
-        "name": "2018-04-18-raspbian-stretch-lite.zip",
-        "kernel_version": "4.14.34",
+        "url": "http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2019-07-12/2019-07-10-raspbian-buster-lite.zip",
+        "name": "2019-07-10-raspbian-buster-lite.zip",
+        "kernel_version": "4.19.57",
         "checksum": "5a0747b2bfb8c8664192831b7dc5b22847718a1cb77639a1f3db3683b242dc96",
         "archive_size": 366646269,
         "expanded_size": 1862270976
     },
     "hotspot_master_image": {
-        "url": "{mirror}/hotspots/base/hotspot-master_2019-06-06.img.zip",
-        "name": "hotspot-master_2019-06-06.img.zip",
+        "url": "{mirror}/hotspots/base/hotspot-master_2019-08-24.img.zip",
+        "name": "hotspot-master_2019-08-24.img.zip",
         "root_partition_size": 7000000000,
-        "checksum": "52446c52ef5f5e7e8bc7325151293624d9f139200c172d04ccd78c4bea12c519",
-        "archive_size": 3349407423,
+        "checksum": "105c6a49193177dca7d12d148b1f86e5607dcc4457a5bf9e2062e06dfff58203",
+        "archive_size": 2141277652,
         "expanded_size": 7760000000
     },
     "aflatoun_content": {

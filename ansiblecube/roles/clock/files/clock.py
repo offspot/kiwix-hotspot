@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """ hardware clock management UI
@@ -11,13 +11,12 @@
 # https://afterthoughtsoftware.com/products/rasclock
 # https://www.cyberciti.biz/faq/howto-set-date-time-from-linux-command-prompt/
 
-import re
 import urllib
 import subprocess
 
-header = u"""<html><head><meta charset="utf-8"><style type="text/css">th { text-align: left; }</style></head>"""
+header = """<html><head><meta charset="utf-8"><style type="text/css">th { text-align: left; }</style></head>"""
 
-body = u"""<body>
+body = """<body>
 <h1><a href="/">Pi Time</a></h1>
 {output}
 <table>
@@ -48,7 +47,7 @@ body = u"""<body>
 </form>
 """
 
-footer = u"</html>"
+footer = "</html>"
 
 date_bin = "/bin/date"
 hwclock_bin = "/sbin/hwclock"
@@ -56,10 +55,13 @@ tdctl_bin = "/usr/bin/timedatectl"
 
 
 def get_output(command):
-    try:
-        return subprocess.check_output(["sudo"] + command).strip()
-    except Exception as exp:
-        return "ERROR: {}".format(exp)
+    ps = subprocess.run(["sudo"] + command, capture_output=True, text=True)
+    stdout = ps.stdout.strip()
+    if ps.returncode == 0:
+        return stdout
+    if ps.returncode == 1 and "hwclock" in command[0]:
+        return "ERROR: no hardware clock installed?"
+    return "ERROR: {}".format(stdout)
 
 
 def application(env, start_response):

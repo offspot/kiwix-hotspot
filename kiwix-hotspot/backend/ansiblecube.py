@@ -26,7 +26,7 @@ def run(machine, tags, extra_vars={}, secret_keys=[]):
 
     # save extra_vars to a file on guest
     extra_vars_path = posixpath.join(ansiblecube_path, "extra_vars.json")
-    with tempfile.NamedTemporaryFile("w", delete=False) as fp:
+    with tempfile.NamedTemporaryFile("w", delete=False, encoding="utf-8") as fp:
         json.dump(extra_vars, fp, indent=4)
         fp.close()
         machine.put_file(fp.name, extra_vars_path)
@@ -72,13 +72,13 @@ def run_for_image(machine, root_partition_size, disk_size):
     """ initial launch of a bare raspbian to create a base (master) image """
     tags = ["master", "rename", "setup"]
 
-    machine.exec_cmd("sudo apt-get update")
+    machine.exec_cmd("sudo apt-get update -y")
     # install ansible dependencies (packages)
     machine.exec_cmd(
-        "sudo apt-get install -y " "python-dev libffi-dev libssl-dev git lsb-release"
+        "sudo apt-get install -y python-dev libffi-dev libssl-dev git lsb-release"
     )
     # install the latest pip
-    machine.exec_cmd("wget https://bootstrap.pypa.io/get-pip.py " "-O /tmp/get-pip.py")
+    machine.exec_cmd("wget https://bootstrap.pypa.io/get-pip.py -O /tmp/get-pip.py")
     machine.exec_cmd("sudo python /tmp/get-pip.py")
     # install latest ansible and important python dependencies
     machine.exec_cmd(
@@ -194,7 +194,9 @@ def run_phase_one(
 
     # save YAML catalogs into local files inside VM for use by ideascube
     for index, catalog in enumerate(CATALOGS):
-        with tempfile.NamedTemporaryFile(suffix=".yml", delete=False) as fd:
+        with tempfile.NamedTemporaryFile(
+            suffix=".yml", delete=False, encoding="utf-8"
+        ) as fd:
             yaml.safe_dump(
                 get_catalogs(machine._logger)[index],
                 fd,
