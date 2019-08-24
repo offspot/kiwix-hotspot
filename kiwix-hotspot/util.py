@@ -586,7 +586,7 @@ def save_prefs(prefs, auto_reload=True):
     """ save a passed preferences dict to the preferences file on disk """
     fpath = get_prefs_path()
     try:
-        with open(fpath, "w") as fd:
+        with open(fpath, "w", encoding="utf-8") as fd:
             json.dump(prefs, fd, indent=4)
     except Exception as exp:
         print("Failed to save prefs to {}: {}".format(fpath, exp))

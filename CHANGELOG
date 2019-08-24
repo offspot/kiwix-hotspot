@@ -6,8 +6,10 @@
 * system locale to en_US (was en_GB*)
 * Updated kiwix-serve to 3.0.1
 * Updated to raspbian 2019-07-10 (buster)
+* Base image 1GB lighter to download
 * Added support for Pi4
 * WPA password must be at least 8chars.
+* Fixed bug for ZIMs with UTF-8 title/desc on windows
 * Changed data partition label to HSPOT_DATA
 * Internal scripts (captive_portal, time) to use python3
 * Tested on the following revisions:

@@ -688,7 +688,7 @@ and digits '0' to '9', space and hyphen '-'</property>
                           <object class="GtkLabel" id="no_id_23">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Must contains only 0 to 31 ASCII letters 'A' to 'z',
+                            <property name="label" translatable="yes">Must contains only 8 to 31 ASCII letters 'A' to 'z',
 digits '0' to '9', hyphen '-' and underscore '_'</property>
                             <attributes>
                               <attribute name="foreground" value="#efef29292929"/>

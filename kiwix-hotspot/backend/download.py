@@ -130,7 +130,7 @@ def download_file(url, fpath, logger, checksum=None):
         as it can be multiple files) """
 
     output_dir, fname = os.path.split(fpath)
-    args = [aria2_exe, f"--dir={output_dir}", f"--out={fname}"]
+    args = [aria2_exe, "--dir={}".format(output_dir), "--out={}".format(fname)]
     args += [
         "--connect-timeout=60",
         "--max-file-not-found=5",
@@ -151,7 +151,9 @@ def download_file(url, fpath, logger, checksum=None):
     args += ["--http-accept-gzip=true"]  # only for catalog?
     args += [url]
 
-    aria2c = subprocess.Popen(args, stdout=subprocess.PIPE, text=True)
+    aria2c = subprocess.Popen(
+        args, stdout=subprocess.PIPE, universal_newlines=True, **startup_info_args()
+    )
     # logger.std(" ".join(args))
 
     if not logger.on_tty:
@@ -293,7 +295,7 @@ def win_unarchive_compressed_tar_pipe(archive_fpath, dest_folder, logger):
         [szip_exe, "x", "-so", archive_fpath],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        **startup_info_args(),
+        **startup_info_args()
     )
     logger.std("Call: " + str(uncompress.args))
 
@@ -303,7 +305,7 @@ def win_unarchive_compressed_tar_pipe(archive_fpath, dest_folder, logger):
         stdin=uncompress.stdout,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        **startup_info_args(),
+        **startup_info_args()
     )
     logger.std("Call: " + str(untar.args))
 

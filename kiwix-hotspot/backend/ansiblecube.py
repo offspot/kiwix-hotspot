@@ -26,7 +26,7 @@ def run(machine, tags, extra_vars={}, secret_keys=[]):
 
     # save extra_vars to a file on guest
     extra_vars_path = posixpath.join(ansiblecube_path, "extra_vars.json")
-    with tempfile.NamedTemporaryFile("w", delete=False) as fp:
+    with tempfile.NamedTemporaryFile("w", delete=False, encoding="utf-8") as fp:
         json.dump(extra_vars, fp, indent=4)
         fp.close()
         machine.put_file(fp.name, extra_vars_path)
@@ -194,7 +194,9 @@ def run_phase_one(
 
     # save YAML catalogs into local files inside VM for use by ideascube
     for index, catalog in enumerate(CATALOGS):
-        with tempfile.NamedTemporaryFile(suffix=".yml", delete=False) as fd:
+        with tempfile.NamedTemporaryFile(
+            suffix=".yml", delete=False, encoding="utf-8"
+        ) as fd:
             yaml.safe_dump(
                 get_catalogs(machine._logger)[index],
                 fd,

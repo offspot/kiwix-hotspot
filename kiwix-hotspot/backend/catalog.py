@@ -3,6 +3,7 @@
 
 import os
 import random
+import shutil
 import tempfile
 
 import yaml
@@ -25,14 +26,15 @@ def fetch_catalogs(logger):
     catalogs = []
     logger.std("downloading catalogs...")
     try:
+        tmp_dir = tempfile.mkdtemp()
+
         for catalog in CATALOGS:
-            tmpfile = tempfile.NamedTemporaryFile(suffix=".yml", delete=False)
-            tmpfile.close()
-            dlf = download_file(catalog.get("url"), tmpfile.name, logger)
+            tmp_fpath = os.path.join(tmp_dir, "{}.catalog".format(catalog["name"]))
+            dlf = download_file(catalog.get("url"), tmp_fpath, logger)
             if dlf.successful:
-                with open(tmpfile.name, "r") as fp:
+                with open(tmp_fpath, "r") as fp:
                     catalogs.append(yaml.load(fp.read()))
-                os.unlink(tmpfile.name)
+                os.unlink(tmp_fpath)
             else:
                 raise ValueError("Unable to download {}".format(catalog.get("url")))
 
@@ -53,6 +55,8 @@ def fetch_catalogs(logger):
                     logger.err("Catalog format is not valid")
                     catalogs.pop()  # remove catalog from list
                     break
+
+        shutil.rmtree(tmp_dir, ignore_errors=True)
     except Exception as exp:
         logger.err("Exception while downloading/parsing catalogs: {}".format(exp))
         return None

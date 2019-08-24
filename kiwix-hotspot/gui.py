@@ -1355,7 +1355,7 @@ class Application:
                 else "{}.json".format(dialog.get_filename())
             )
             try:
-                with open(filename, "w") as fd:
+                with open(filename, "w", encoding="utf-8") as fd:
                     json.dump(self.get_config(), fd, indent=4)
             except Exception:
                 self.display_error_message(
