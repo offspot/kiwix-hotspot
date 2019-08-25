@@ -30,7 +30,7 @@ def fetch_catalogs(logger):
 
         for catalog in CATALOGS:
             tmp_fpath = os.path.join(tmp_dir, "{}.catalog".format(catalog["name"]))
-            dlf = download_file(catalog.get("url"), tmp_fpath, logger)
+            dlf = download_file(catalog.get("url"), tmp_fpath, logger, debug=False)
             if dlf.successful:
                 with open(tmp_fpath, "r") as fp:
                     catalogs.append(yaml.load(fp.read()))

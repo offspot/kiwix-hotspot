@@ -163,7 +163,6 @@ def generate_homepage(logger, options):
         kiwix_fqdn = "kiwix.{fqdn}".format(fqdn=fqdn)
         for package_id in options["packages"]:
             package = get_package(logger, package_id)
-            print(package)
             cards.append(
                 {
                     "url": "http://{fqdn}/{id}".format(
