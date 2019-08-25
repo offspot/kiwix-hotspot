@@ -125,6 +125,7 @@ install:
   - if %platform%==x64 appveyor DownloadFile "http://mirror.download.kiwix.org/dev/aria2c-win64.zip" -FileName "aria2c.zip"
   - 7z.exe x aria2c.zip
   - del aria2c.zip
+  - appveyor DownloadFile "http://mirror.download.kiwix.org/dev/ca-certificates.crt" -FileName "ca-certificates.crt"
 
   # Run pyinstaller and show warning
   - cd C:\projects\kiwix-hotspot

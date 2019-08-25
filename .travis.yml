@@ -65,6 +65,7 @@ matrix:
     - wget http://download.kiwix.org/dev/aria2c-darwin.zip
     - unzip aria2c-darwin.zip
     - rm aria2c-darwin.zip
+    - wget http://download.kiwix.org/dev/ca-certificates.crt
 
     # Run PyInstaller
     - pyinstaller --log-level=DEBUG kiwix-hotspot-macos.spec
@@ -159,6 +160,7 @@ matrix:
     - wget http://download.kiwix.org/dev/aria2c-linux64.zip
     - unzip aria2c-linux64.zip
     - rm aria2c-linux64.zip
+    - wget http://download.kiwix.org/dev/ca-certificates.crt
 
     # Install python dependancies
     - pip3 install -r requirements-linux.txt
