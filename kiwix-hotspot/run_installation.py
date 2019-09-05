@@ -175,7 +175,7 @@ def run_installation(
             sys.exit(1)
         elif rf.found:
             logger.std("Reusing already downloaded base image ZIP file")
-        logger.progress(.5)
+        logger.progress(0.5)
 
         # extract base image and rename
         logger.step("Extracting base image from ZIP file")
@@ -186,7 +186,7 @@ def run_installation(
             dest_fpath=image_building_path,
         )
         logger.std("Extraction complete: {p}".format(p=image_building_path))
-        logger.progress(.9)
+        logger.progress(0.9)
 
         if not os.path.exists(image_building_path):
             raise IOError("image path does not exists: {}".format(image_building_path))

@@ -509,7 +509,7 @@ def get_adjusted_image_size(size):
     if not size % ONE_GB == 0:
         return size
 
-    rate = .97 if size / ONE_GB <= 16 else .96
+    rate = 0.97 if size / ONE_GB <= 16 else 0.96
     return int(size * rate)
 
 

@@ -50,8 +50,8 @@ from backend.download import get_proxies, test_connection
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk, GLib, GdkPixbuf, GObject
 
-VALID_RGBA = Gdk.RGBA(0., 0., 0., 0.)
-INVALID_RGBA = Gdk.RGBA(1, 0.5, 0.5, 1.)
+VALID_RGBA = Gdk.RGBA(0.0, 0.0, 0.0, 0.0)
+INVALID_RGBA = Gdk.RGBA(1, 0.5, 0.5, 1.0)
 mainloop = None
 
 
@@ -112,7 +112,7 @@ class Logger(ProgressHelper):
         elif current >= total:
             line = "[" + "." * avail_dots + "] 100%\n"
         else:
-            ratio = min(float(current) / total, 1.)
+            ratio = min(float(current) / total, 1.0)
             shaded_dots = min(int(ratio * avail_dots), avail_dots)
             percent = min(int(ratio * 100), 100)
             line = (
@@ -1295,7 +1295,7 @@ class Application:
         end = text_buffer.get_end_iter()
         end.backward_line()
 
-        self.component.run_text_view.scroll_to_iter(end, 0, True, 0, 1.)
+        self.component.run_text_view.scroll_to_iter(end, 0, True, 0, 1.0)
 
     def run_window_delete_event(self, widget, path):
         return True
