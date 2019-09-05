@@ -182,6 +182,7 @@ def download_file(url, fpath, logger, checksum=None, debug=False):
                 except Exception:
                     downloaded_size, total_size = 1, -1
                 logger.ascii_progressbar(downloaded_size, total_size)
+        # parse filename from progress report
         if (
             metalink_target is None
             and line.startswith("FILE:")
@@ -189,6 +190,13 @@ def download_file(url, fpath, logger, checksum=None, debug=False):
         ):
             metalink_target = os.path.join(
                 output_dir, os.path.basename(line.split(":")[-1].strip())
+            )
+
+        # parse metalink filename from results summary (if not caught before)
+        if metalink_target is None and "|OK  |" in line and "[MEMORY]" not in line:
+
+            metalink_target = os.path.join(
+                output_dir, os.path.basename(line.split("|", 4)[-1].strip())
             )
 
     if aria2c.poll() is None:
