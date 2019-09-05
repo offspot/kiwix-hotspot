@@ -1,3 +1,6 @@
+2.1.1
+* Fixed an issue when downloading small files too fast
+
 2.1.0
 
 * Using aria2 to download content (metalink and resume)
