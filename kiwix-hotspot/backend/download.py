@@ -170,7 +170,7 @@ def download_file(url, fpath, logger, checksum=None, debug=False):
         # [#915371 5996544B/90241109B(6%) CN:4 DL:1704260B ETA:49s]
         if line.startswith("[#") and line.endswith("]"):  # quick check, no re
             if logger.on_tty:
-                logger.flash(line + "          ")
+                logger.flash(line + "                    ")
             else:
                 try:
                     downloaded_size, total_size = [
@@ -182,22 +182,13 @@ def download_file(url, fpath, logger, checksum=None, debug=False):
                 except Exception:
                     downloaded_size, total_size = 1, -1
                 logger.ascii_progressbar(downloaded_size, total_size)
-        # parse filename from progress report
-        if (
-            metalink_target is None
-            and line.startswith("FILE:")
-            and "[MEMORY]" not in line
-        ):
-            metalink_target = os.path.join(
-                output_dir, os.path.basename(line.split(":")[-1].strip())
-            )
 
         # parse metalink filename from results summary (if not caught before)
         if metalink_target is None and "|OK  |" in line and "[MEMORY]" not in line:
-
             metalink_target = os.path.join(
                 output_dir, os.path.basename(line.split("|", 4)[-1].strip())
             )
+            logger.std(".. found metalink_target: {mt}".format(mt=metalink_target))
 
     if aria2c.poll() is None:
         try:
@@ -216,9 +207,15 @@ def download_file(url, fpath, logger, checksum=None, debug=False):
         )
 
     if metalink_target is not None and metalink_target != fpath:
-        logger.std("mv {src} {dst}".format(src=metalink_target, dst=fpath))
+        logger.std(".. mv {src} {dst}".format(src=metalink_target, dst=fpath))
         time.sleep(5)
         os.replace(metalink_target, fpath)
+    else:
+        logger.std(
+            ".. not moving metalink_target: {mt} into {fp}".format(
+                mt=metalink_target, fp=fpath
+            )
+        )
 
     return RequestedFile.from_download(url, fpath, os.path.getsize(fpath))
 
