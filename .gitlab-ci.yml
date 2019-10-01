@@ -35,6 +35,7 @@ build-pibox-image:
     - wget http://download.kiwix.org/dev/aria2c-linux64.zip
     - unzip aria2c-linux64.zip
     - rm aria2c-linux64.zip
+    - wget http://download.kiwix.org/dev/ca-certificates.crt
 
     # Install python dependancies
     - pip3 install -U pip
