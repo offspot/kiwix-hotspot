@@ -13,7 +13,7 @@
   tags: setup
 
 - name: install node files
-  command: mv /tmp/node-v10.16.3-linux-armv6l/bin/* /usr/bin/ && mv /tmp/node-v10.16.3-linux-armv6l/include/node /usr/include/ && mv /tmp/node-v10.16.3-linux-armv6l/lib/node_modules /usr/lib/ && ln -s /usr/bin/node /usr/sbin/node
+  shell: mv /tmp/node-v10.16.3-linux-armv6l/bin/* /usr/bin/ && mv /tmp/node-v10.16.3-linux-armv6l/include/node /usr/include/ && mv /tmp/node-v10.16.3-linux-armv6l/lib/node_modules /usr/lib/ && ln -sf /usr/bin/node /usr/sbin/node
   tags: setup
 
 - name: Install dependencies (tex, for MathRenderer)
