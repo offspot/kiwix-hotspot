@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block intro %}<li class="info">{% trans %}Entering “<em>{{ hotspot_name }}</em>”{% endtrans %} (<a href="http://{{ fqdn }}/">{{ fqdn }}</a>)</li>{% endblock %}
+
+{% block content %}
+	<h2>{% trans %}<em>{{ project_name }}</em> is a free-to-use, content-enabled box.{% endtrans %}</h2>
+    <p class="underline">{% trans %}Please, keep the following in mind:{% endtrans %}</p>
+    <ul><li>{% trans %}Access to this box's content is done <strong>solely via <em>http://{{ fqdn }}/</em></strong>.{% endtrans %} <span class="underline">{% trans %}Remember-it !{% endtrans %}</li>
+		<li>{% trans colored_status=internet_status|colored_status|safe %}This box may also provide access to Internet (currently {{ colored_status }}){% endtrans %}</li>
+		<li>{% trans %}You will then be prompted with this page <strong>after every 15mn</strong> of inactivity.{% endtrans %}</li>
+		<li>{% trans %}When browsing a secure website, your browser might display a <em>Security Warning</em> instead of displaying this page. Just open a new page onto a non-secure website to register again.{% endtrans %}</li>
+	</ul>
+	<hr />
+	{% if action_required %}
+	<h2>{% trans %}Action Required!{% endtrans %}</h2>
+	<p>{% trans %}After you click the button bellow, <strong>you need to <u>manually</u> go to</strong>:{% endtrans %}</p>
+	<p><code>http://{{ fqdn }}/</code> <button class="clipboard button neutral" data-clipboard-text="http://{{ fqdn }}/">{% trans %}Copy to clipboard{% endtrans %}</button></p>
+	<p>{% trans %}Open your Web browser copy-paste or type this address there then click bellow.{% endtrans %}</p>
+	{% endif %}
+    <p><a class="button" href="/hotspot-register">{% trans %}Agree to register and close{% endtrans %}</a></p>
+{% endblock %}

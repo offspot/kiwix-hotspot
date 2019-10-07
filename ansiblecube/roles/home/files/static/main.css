@@ -663,28 +663,28 @@ span.error {
     background-color: #66cc99;
 }
 .messages li.success:before {
-    content: '⍟ ';
+    content: '🎉 ';
 }
 .messages li.success:after {
-    content: ' ⍟';
+    content: ' 🎉';
 }
 .messages li.error {
     background-color: #CF000F;
 }
 .messages li.error:before {
-    content: '⚠ ';
+    content: '⚠️ ';
 }
 .messages li.error:after {
-    content: ' ⚠';
-}
-.messages li.info {
-    background-color: #F5AB35;
+    content: ' ⚠️';
 }
 .messages li.info:before {
-    content: '♬ ';
+    content: '📣 ';
 }
 .messages li.info:after {
-    content: ' ♬';
+    content: ' 📣';
+}
+.messages li.info {
+    background-color: #3F7FDD;
 }
 
 .right {
@@ -821,6 +821,23 @@ html[dir='rtl'] .search input[type='submit'] {
 #cards td label {
   display: block;
   cursor: pointer;
+}
+
+.online {
+    color: #87D37C;
+}
+
+.offline {
+    color: #F89406;
+}
+
+.button-sm {
+    height: 30px;
+    line-height: 30px;
+}
+
+.underline {
+    text-decoration: underline;
 }
 
 /* ************************************************* */

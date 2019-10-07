@@ -4,6 +4,13 @@ uid = {{ username }}
 gid = {{ group }}
 
 socket    = :3031
-wsgi-file = /var/www/captiveportal/cap.py
+workdir   = {{ captive_root }}
+wsgi-file = {{ captive_root }}/entrypoint.py
 process   = 3
 plugin    = python3
+virtualenv= {{ captive_env }}
+
+env = HOTSPOT_NAME={{ hotspot_name }}
+env = FQDN={{ fqdn }}
+env = PROJECT_NAME={{ project_name }}
+env = STATIC_DIR={{ common_static_path }}

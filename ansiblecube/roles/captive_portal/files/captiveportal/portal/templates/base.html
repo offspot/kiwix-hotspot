@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <title>{{ hotspot_name }}</title>
+        <link rel="icon" href="/hotspot-static/branding/favicon.png">
+        <link rel="stylesheet" href="/hotspot-static/font-awesome/css/font-awesome.min.css" />
+        <!--[if lte IE 8]>
+            <link rel="stylesheet" type="text/css" href="/hotspot-static/purecss/pure-css-grids-old-ie-min.css">
+        <![endif]-->
+        <!--[if gt IE 8]><!-->
+            <link rel="stylesheet" type="text/css" href="/hotspot-static/purecss/pure-css-grids-min.css">
+        <!--<![endif]-->
+        <link rel="stylesheet" type="text/css" href="/hotspot-static/main.css" />
+        <link rel="stylesheet" type="text/css" href="/hotspot-static/branding/style.css" />
+        <script src="/hotspot-static/clipboard.min.js"></script>
+    </head>
+    <body class="">
+        <header>
+            <section>
+              <a href="/">
+                <h1>
+                  <img src="/hotspot-static/branding/logo.png"></img>
+                </h1>
+              </a>
+              <span class="boxid">{{ project_name }}!</span>
+            </section>
+        </header>
+        <ul class="messages">
+			{% block intro %}{% endblock %}
+        </ul>
+        <div class="content">
+        	{% block content %}{% endblock %}
+		</div>
+		<footer>
+            <div class="row">
+                <div class="col third i18n_switch"></div>
+                <div class="col half"></div>
+            </div>
+        </footer>
+        <script type="text/javascript">
+(function(exports, d) {
+  function domReady(fn, context) {
+
+    function onReady(event) {
+      d.removeEventListener("DOMContentLoaded", onReady);
+      fn.call(context || exports, event);
+    }
+
+    function onReadyIe(event) {
+      if (d.readyState === "complete") {
+        d.detachEvent("onreadystatechange", onReadyIe);
+        fn.call(context || exports, event);
+      }
+    }
+
+    d.addEventListener && d.addEventListener("DOMContentLoaded", onReady) ||
+    d.attachEvent      && d.attachEvent("onreadystatechange", onReadyIe);
+  }
+
+  exports.domReady = domReady;
+})(window, document);
+        </script>
+        <script type="text/javascript">domReady(function(event) {
+        new ClipboardJS('.clipboard');
+        {% block js %}{% endblock %}
+    });</script>
+    </body>
+</html>
