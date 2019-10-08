@@ -61,7 +61,7 @@ class User(peewee.Model):
 
     @property
     def is_apple(self):
-        return self.system in ("macos", "iphone", "ipad")
+        return self.platform in ("macos", "iphone", "ipad")
 
     @property
     def is_recent_android(self):

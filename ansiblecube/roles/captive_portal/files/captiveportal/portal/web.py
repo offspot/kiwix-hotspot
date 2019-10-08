@@ -49,7 +49,9 @@ from portal.utils import (
 )
 from portal.database import User
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.DEBUG if bool(os.getenv("DEBUG", False)) else logging.INFO
+)
 logger = logging.getLogger("hotspot-portal")
 root = pathlib.Path(__file__).parent
 app = Flask("hotspot-portal", template_folder=root.joinpath("templates"))
@@ -93,14 +95,18 @@ def get_hw_addr_for(ip_addr, default="aa:bb:cc:dd:ee:ff"):
 
 
 def system_infos_for(user_agent):
-    logger.info(str(user_agent))
     system = None
+    platform = None
     system_version = None
     user_agent_str = str(user_agent)
     match = re.search(r"(Android)\s([.\d]*)", user_agent_str)
     if match:
         system = match.group(1)
         system_version = match.group(2)
+    match = re.search(r"CaptiveNetworkSupport", user_agent_str)
+    if match:
+        platform = "iphone"
+        system = "iPhone OS"
     match = re.search(r"(OS X)\s([\d_]*)", user_agent_str)
     if match:
         system = match.group(1)
@@ -120,7 +126,7 @@ def system_infos_for(user_agent):
     if system_version is not None:
         system_version = float(".".join(system_version.split(".")[:2]))
     return {
-        "platform": user_agent.platform,
+        "platform": platform or user_agent.platform,
         "system": system,
         "system_version": system_version,
         "browser": user_agent.browser,
@@ -138,13 +144,13 @@ def create_user(request):
 
 def apple_success(request, user):
     """ Fake apple Success page (200 with body containing Success) """
-    logger.info("returning APPLE SUCCESS")
+    logger.debug("returning APPLE SUCCESS")
     return render_template("apple_success.html")
 
 
 def firefox_success(request, user):
     """ `success` 200 response """
-    logger.info("returning FIREFOX SUCCESS")
+    logger.debug("returning FIREFOX SUCCESS")
     resp = flask.make_response("success\n\n", 200)
     resp.headers["Content-Type"] = "text/plain"
     return resp
@@ -152,7 +158,7 @@ def firefox_success(request, user):
 
 def microsoft_success(request, user):
     """ `Microsoft Connect Test` 200 response """
-    logger.info("returning MICROSOFT SUCCESS")
+    logger.debug("returning MICROSOFT SUCCESS")
     resp = flask.make_response("Microsoft Connect Test", 200)
     resp.headers["Content-Type"] = "text/html"
     return resp
@@ -160,7 +166,7 @@ def microsoft_success(request, user):
 
 def microsoft_success_ncsi(request, user):
     """ `Microsoft NCSI` 200 response """
-    logger.info("returning MICROSOFT SUCCESS NCSI")
+    logger.debug("returning MICROSOFT SUCCESS NCSI")
     resp = flask.make_response("Microsoft NCSI", 200)
     resp.headers["Content-Type"] = "text/plain"
     return resp
@@ -168,7 +174,7 @@ def microsoft_success_ncsi(request, user):
 
 def nmcheck_success(request, user):
     """ `NetworkManager is online` 200 response """
-    logger.info("returning nmcheck SUCCESS")
+    logger.debug("returning nmcheck SUCCESS")
     resp = flask.make_response("NetworkManager is online\n", 200)
     resp.headers["Content-Type"] = "text/plain; charset=UTF-8"
     return resp
@@ -176,7 +182,7 @@ def nmcheck_success(request, user):
 
 def ubuntu_success(request, user):
     """ HTTP 1.1/204 No Content with X-NetworkManager-Status header """
-    logger.info("returning Ubuntu SUCCESS")
+    logger.debug("returning Ubuntu SUCCESS")
     resp = flask.make_response("", 204)
     resp.headers["X-NetworkManager-Status"] = "online"
     return resp
@@ -184,7 +190,7 @@ def ubuntu_success(request, user):
 
 def no_content(request, user):
     """ HTTP 1.1/204 No Content """
-    logger.info("returning NO-CONTENT SUCCESS")
+    logger.debug("returning NO-CONTENT SUCCESS")
     resp = flask.make_response("", 204)
     return resp
 
@@ -212,15 +218,15 @@ def success(request, user):
 @app.route("/", defaults={"u_path": ""})
 @app.route("/<path:u_path>")
 def entrypoint(u_path):
-    logger.info(request.accept_languages)
-    logger.info("REQ: {}{}".format(request.host, request.path))
+    logger.debug("REQ: {}{}".format(request.host, request.path))
+    logger.debug("UA: {}".format(request.user_agent))
     user = create_user(request)
 
     if user.is_registered or user.is_active:
-        logger.info(f"user IS registered ({user.registered_on})")
+        logger.debug(f"user IS registered ({user.registered_on})")
         return success(request, user)
     else:
-        logger.info(f"is NOT registered ({user.registered_on})")
+        logger.debug(f"is NOT registered ({user.registered_on})")
         context = {"user": user, "action_required": not user.is_apple}
         context.update(get_branding_context())
         return render_template("portal.html", **context)
