@@ -10,7 +10,12 @@ process   = 3
 plugin    = python3
 virtualenv= {{ captive_env }}
 
+# plugin    = logfile
+# logger    = file:/tmp/captive.log
+# env = DEBUG=1
+
 env = HOTSPOT_NAME={{ hotspot_name }}
 env = FQDN={{ fqdn }}
 env = PROJECT_NAME={{ project_name }}
 env = STATIC_DIR={{ common_static_path }}
+

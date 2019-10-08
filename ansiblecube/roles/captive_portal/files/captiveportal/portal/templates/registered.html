@@ -7,7 +7,7 @@
 {% if action_required %}
 <p>{% trans %}Now open your web browser and go to <button class="clipboard button button-sm neutral" data-clipboard-text="http://{{ fqdn }}/">{{ fqdn }}</button> as instructed earlier.{% endtrans %}</p>
 {% else %}
-
 <p>{% trans %}You're now ready to access <em>{{ project_name }}'s content</em>.{% endtrans %}</p>
 <p><a class="button" href="http://{{ fqdn }}" target="_system">{% trans %}Go to {{ fqdn }}{% endtrans %}</a></p>
-{% endif %}{% endblock %}
+{% endif %}
+{% endblock %}
