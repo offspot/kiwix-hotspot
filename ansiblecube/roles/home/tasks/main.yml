@@ -24,11 +24,12 @@
   notify: restart nginx
   tags: master
 
+# copy branding again in reconfigure to allow out-of-master updates
 - name: Copy static files (general branding)
   copy:
     src: static
     dest: /var/www/
-  tags: master
+  tags: ["master", "reconfigure"]
 
 - name: copy blank homepage
   template:
