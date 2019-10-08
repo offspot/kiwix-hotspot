@@ -1,5 +1,6 @@
 2.1.1
 * Fixed an issue when downloading small files too fast
+* Added new captive portal to improve user's onboarding
 
 2.1.0
 
