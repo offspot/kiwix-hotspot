@@ -862,7 +862,6 @@ html[dir='rtl'] .search input[type='submit'] {
         width: 50%;
     }
     header {
-        margin-top: 20px;
         flex-direction : column;
         -webkit-flex-direction: column;
         -webkit-align-items: center;

@@ -47,6 +47,9 @@
     - role: captive_portal
 
       # content setup (install, dependencies)
+    - role: nomad_setup
+      when: ansible_local.config.nomad|bool
+
     - role: wikifundi_setup
       when: ansible_local.config.wikifundi_languages | length
 
