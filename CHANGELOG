@@ -1,5 +1,7 @@
 2.1.1
 * Fixed an issue when downloading small files too fast
+* Added new content offer: Nomad Education Android APK
+* Updated Kiwix to version 3.0.1-6
 
 2.1.0
 

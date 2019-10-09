@@ -56,6 +56,7 @@ def run_installation(
     wikifundi,
     edupi,
     edupi_resources,
+    nomad,
     zim_install,
     size,
     logger,
@@ -141,6 +142,7 @@ def run_installation(
             "language_name": dict(data.hotspot_languages)[language],
             "edupi": edupi,
             "edupi_resources": edupi_resources,
+            "nomad": nomad,
             "wikifundi_languages": wikifundi_languages,
             "aflatoun_languages": aflatoun_languages,
             "kalite_languages": kalite_languages,
@@ -200,6 +202,7 @@ def run_installation(
         collection = get_collection(
             edupi=edupi,
             edupi_resources=edupi_resources,
+            nomad=nomad,
             packages=packages,
             kalite_languages=kalite_languages,
             wikifundi_languages=wikifundi_languages,

@@ -74,6 +74,27 @@ def generate_homepage(logger, options):
             }
         )
 
+    if options["nomad"]:
+        edupi_fqdn = "nomad.{fqdn}".format(fqdn=fqdn)
+        if options["language"] == "fr":
+            title = "Écoles Numériques Android"
+            category = "Accès"
+            description = "Accès à l'application Android de Nomad Education"
+        else:
+            title = "Android Digital Schools"
+            category = "Access"
+            description = "Access to the Nomad Education Android App"
+        cards.append(
+            {
+                "url": "http://{}".format(edupi_fqdn),
+                "css_class": "nomad",
+                "category_class": "access",
+                "category": category,
+                "title": title,
+                "description": description,
+            }
+        )
+
     if options["wikifundi_languages"]:
         wikifundi_fqdn = "wikifundi.{fqdn}".format(fqdn=fqdn)
         if "fr" in options["wikifundi_languages"]:

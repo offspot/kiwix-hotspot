@@ -2,7 +2,6 @@
 # vim: ai ts=4 sts=4 et sw=4 nu
 
 import os
-import re
 import json
 import shutil
 import itertools
@@ -80,6 +79,7 @@ def get_remote_content(url):
 def get_collection(
     edupi=False,
     edupi_resources=None,
+    nomad=False,
     packages=[],
     kalite_languages=[],
     wikifundi_languages=[],
@@ -114,6 +114,11 @@ def get_collection(
                 run_edupi_actions,
                 {"enable": edupi, "resources_path": edupi_resources},
             )
+        )
+
+    if nomad:
+        collection.append(
+            ("NomadEducation", get_nomad_contents, run_nomad_actions, {"enable": nomad})
         )
 
     if len(packages):
@@ -169,6 +174,11 @@ def get_all_contents_for(collection):
 def get_edupi_contents(enable=False, resources_path=None):
     """ edupi: has no large downloads. might have user-specified one """
     return [get_alien_content(resources_path)] if resources_path else []
+
+
+def get_nomad_contents(enable=False):
+    """ nomad: only contains one APK """
+    return [get_content("nomad_apk")]
 
 
 def get_kalite_contents(languages=[]):
@@ -273,6 +283,22 @@ def run_edupi_actions(
         cache_folder=cache_folder,
         root_path=mount_point,
         final_path=os.path.join(mount_point, "edupi_resources"),
+        logger=logger,
+    )
+
+
+def run_nomad_actions(cache_folder, mount_point, logger, enable=False):
+    """ copy downloaded APK """
+    if not enable:
+        return
+
+    nomad_apk = get_content("nomad_apk")
+    nomad_folder = os.path.join(mount_point, "nomad")
+    os.makedirs(nomad_folder, exist_ok=True)
+    copy(
+        content=nomad_apk,
+        cache_folder=cache_folder,
+        final_path=os.path.join(nomad_folder, nomad_apk["name"]),
         logger=logger,
     )
 
@@ -396,7 +422,7 @@ def get_collection_download_size_using_cache(collection, cache_folder):
     )
 
 
-def get_expanded_size(collection):
+def get_expanded_size(collection, add_margin=True):
     """ sum of extracted sizes of all collection with 10%|2GB margin """
     total_size = sum(
         [
@@ -408,7 +434,7 @@ def get_expanded_size(collection):
     )
 
     # add a 2% margin ; make sure it's at least 2GB
-    margin = max([2 * ONE_GiB, total_size * 0.02])
+    margin = max([2 * ONE_GiB, total_size * 0.02]) if add_margin else 0
     return total_size + margin
 
 

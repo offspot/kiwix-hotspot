@@ -125,7 +125,7 @@ def set_config(config, args):
                     setif(arg_key, value)
 
         # bool contents (switch)
-        for key in ("edupi", "aflatoun"):
+        for key in ("edupi", "aflatoun", "nomad"):
             if config["content"].get(key) is not None:
                 vl = "yes" if config["content"][key] in ("yes", True) else "no"
                 setif(key, vl)
@@ -155,6 +155,7 @@ defaults = {
     "build_dir": ".",
     "catalog": False,
     "edupi": "no",
+    "nomad": "no",
     "aflatoun": "no",
     "kalite": [],
     "wikifundi": [],
@@ -177,6 +178,7 @@ parser.add_argument(
     "--wikifundi", help="install wikifundi", choices=["fr", "en"], nargs="+"
 )
 parser.add_argument("--edupi", help="install edupi", choices=["yes", "no"])
+parser.add_argument("--nomad", help="install Nomad Education", choices=["yes", "no"])
 parser.add_argument(
     "--edupi-resources", help="Zipped folder of resources to init EduPi with"
 )
@@ -303,6 +305,7 @@ for name in keys:
 collection = get_collection(
     edupi=args.edupi == "yes",
     edupi_resources=args.edupi_resources,
+    nomad=args.nomad == "yes",
     packages=args.zim_install,
     kalite_languages=args.kalite,
     wikifundi_languages=args.wikifundi,
@@ -374,6 +377,7 @@ try:
         aflatoun=args.aflatoun == "yes",
         edupi=args.edupi == "yes",
         edupi_resources=args.edupi_resources,
+        nomad=args.nomad == "yes",
         zim_install=args.zim_install,
         size=args.output_size,
         logger=logger,

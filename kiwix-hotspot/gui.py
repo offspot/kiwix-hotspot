@@ -472,7 +472,7 @@ class Application:
         def get_project_size(name, lang):
             langs = ["fr", "en"] if name == "aflatoun" else [lang]
             return get_expanded_size(
-                get_collection(**{"{}_languages".format(name): langs})
+                get_collection(**{"{}_languages".format(name): langs}), add_margin=False
             )
 
         # kalite
@@ -521,6 +521,19 @@ class Application:
         )
         self.component.edupi_resources_chooser.connect(
             "file-set", lambda _: self.update_free_space()
+        )
+
+        # nomad
+        self.component.nomad_switch.connect(
+            "notify::active", lambda switch, state: self.update_free_space()
+        )
+        self.component.nomad_label.set_label(
+            "{} ({})".format(
+                self.component.nomad_label.get_label(),
+                human_readable_size(
+                    get_expanded_size(get_collection(nomad=True), add_margin=False)
+                ),
+            )
         )
 
         self.refresh_disk_list()
@@ -721,7 +734,7 @@ class Application:
             for lang, button in getattr(self, "iter_{}_check_button".format(key))():
                 button.set_active(False)
 
-        for key in ("edupi", "aflatoun"):
+        for key in ("edupi", "aflatoun", "nomad"):
             getattr(self.component, "{}_switch".format(key)).set_active(False)
 
         # edupi resources
@@ -1537,7 +1550,7 @@ class Application:
                         button.set_active(lang in config["content"][key])
 
             # boolean contents (switches)
-            for key in ("edupi", "aflatoun"):
+            for key in ("edupi", "aflatoun", "nomad"):
                 if config["content"].get(key) is not None:
                     getattr(self.component, "{}_switch".format(key)).set_active(
                         config["content"][key]
@@ -1668,6 +1681,7 @@ class Application:
                             ("aflatoun", self.component.aflatoun_switch.get_active()),
                             ("edupi", self.component.edupi_switch.get_active()),
                             ("edupi_resources", edupi_resources),
+                            ("nomad", self.component.nomad_switch.get_active()),
                         ]
                     ),
                 ),
@@ -1816,6 +1830,8 @@ class Application:
 
         edupi = self.component.edupi_switch.get_active()
 
+        nomad = self.component.nomad_switch.get_active()
+
         logo = self.component.logo_chooser.get_filename()
         favicon = self.component.favicon_chooser.get_filename()
         css = self.component.css_chooser.get_filename()
@@ -1863,6 +1879,7 @@ class Application:
                     aflatoun=aflatoun,
                     edupi=edupi,
                     edupi_resources=self.get_edupi_resources(),
+                    nomad=nomad,
                     zim_install=zim_install,
                     size=output_size,
                     logger=self.logger,
@@ -1944,10 +1961,12 @@ class Application:
         aflatoun = self.component.aflatoun_switch.get_active()
         edupi = self.component.edupi_switch.get_active()
         edupi_resources = self.get_edupi_resources()
+        nomad = self.component.nomad_switch.get_active()
 
         collection = get_collection(
             edupi=edupi,
             edupi_resources=edupi_resources,
+            nomad=nomad,
             packages=zim_list,
             kalite_languages=kalite,
             wikifundi_languages=wikifundi,
