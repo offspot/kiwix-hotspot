@@ -109,11 +109,11 @@
         "expanded_size": 26901218918
     },
     "nomad_apk": {
-        "url": "{mirror}/other/nomad/nomadeducation-ecoles.apk",
+        "url": "{mirror}/other/nomad/nomadeducation-ecoles_2.7.0.apk",
         "name": "ecoles_numeriques.apk",
         "folder_name": null,
-        "checksum": "0b12025c5b49adc79547e6946b296e9db638df6900355aba0c910569b73bb893",
-        "archive_size": 37652894,
-        "expanded_size": 37652894
+        "checksum": "2d6c51458ebcddbd4d7f0b28d68203ef0af734940b562fcc4c28910e9e2a8f1d",
+        "archive_size": 51473201,
+        "expanded_size": 51473201
     }
 }
