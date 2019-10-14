@@ -32,6 +32,7 @@ import platform
 import subprocess
 
 import flask
+import werkzeug
 from flask import Flask, request, render_template
 from flask_babel import Babel
 
@@ -45,6 +46,7 @@ from portal.utils import (
     is_ubuntu_request,
     is_firefox_request,
     is_microsoft_request,
+    REGISTRATION_TIMEOUT,
     is_microsoft_ncsi_request,
 )
 from portal.database import User
@@ -64,7 +66,16 @@ app.jinja_env.filters["colored_status"] = colored_status
 
 @babel.localeselector
 def get_locale():
-    return request.accept_languages.best_match(["fr", "en"])
+    """ select locale from HTTP Accept-Languages header value
+
+        Dropping regional specifier as we handle offer bare-language translations """
+    supported_languages = ["fr", "en"]
+    try:
+        return werkzeug.datastructures.LanguageAccept(
+            [(al[0].split("-", 1)[0], al[1]) for al in request.accept_languages]
+        ).best_match(supported_languages)
+    except Exception:
+        return supported_languages[-1]
 
 
 def get_branding_context():
@@ -73,6 +84,7 @@ def get_branding_context():
         "hotspot_name": os.getenv("HOTSPOT_NAME", "default"),
         "fqdn": os.getenv("FQDN", "default.hotspot"),
         "internet_status": "online" if has_internet() else "offline",
+        "interval": REGISTRATION_TIMEOUT / 60,
     }
 
 
@@ -230,6 +242,15 @@ def entrypoint(u_path):
         context = {"user": user, "action_required": not user.is_apple}
         context.update(get_branding_context())
         return render_template("portal.html", **context)
+
+
+@app.route("/fake-register")
+def fake_register():
+    """ just display registered page """
+    user = create_user(request)
+    context = {"user": user, "action_required": not user.is_apple}
+    context.update(get_branding_context())
+    return render_template("registered.html", **context)
 
 
 @app.route("/hotspot-register")

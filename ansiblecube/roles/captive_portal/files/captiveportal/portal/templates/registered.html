@@ -1,7 +1,5 @@
 {% extends "base.html" %}
 
-{% block intro %}<li class="success">{% trans %}Registered to “<em>{{ hotspot_name }}</em>” (<a href="http://{{ fqdn }}/">{{ fqdn }}</a>){% endtrans %}</li>{% endblock %}
-
 {% block content %}
 <h2>{% trans %}You're all set!{% endtrans %}</h2>
 {% if action_required %}

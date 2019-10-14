@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-10-07 10:52+0000\n"
+"POT-Creation-Date: 2019-10-14 10:24+0000\n"
 "PO-Revision-Date: 2019-10-07 09:38+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -26,51 +26,29 @@ msgstr "connecté"
 msgid "Offline"
 msgstr "hors-ligne"
 
-#: portal/templates/portal.html:3
+#: portal/templates/portal.html:4
 #, python-format
-msgid "Entering “<em>%(hotspot_name)s</em>”"
-msgstr "Connection à «<em>%(hotspot_name)s</em>»"
+msgid "Welcome to <em>%(project_name)s</em> Hotspot."
+msgstr "Bienvenue sur le Hotspot <em>%(project_name)s</em>."
 
-#: portal/templates/portal.html:6
-#, python-format
-msgid "<em>%(project_name)s</em> is a free-to-use, content-enabled box."
-msgstr "<em>%(project_name)s</em> est une ressource de contenus libres d'accès"
+#: portal/templates/portal.html:5
+msgid "Access your content via: "
+msgstr "Accèdez aux contenus via :"
 
-#: portal/templates/portal.html:7
-msgid "Please, keep the following in mind:"
-msgstr "Merci de vous rappeler des points suivants :"
+#: portal/templates/portal.html:5
+msgid "Copy to clipboard"
+msgstr "Copier l'adresse"
 
 #: portal/templates/portal.html:8
-#, python-format
 msgid ""
-"Access to this box's content is done <strong>solely via "
-"<em>http://%(fqdn)s/</em></strong>."
+"<strong>You need to <u>manually</u> go to</strong> (use copy-paste) that "
+"address as clicking on the button bellow might close this web page."
 msgstr ""
-"L'accès à ces contenus ne se fait <strong>qu'à travers "
-"<em>http://%(fqdn)s/</em></strong>."
+"<strong>Vous devez <u>manuellement</u> (utilisez le copier-coller) aller "
+"à</strong> cette addresse car après avoir cliqué sur le bouton ci-"
+"dessous, cette page risque de se fermer."
 
-#: portal/templates/portal.html:8
-msgid "Remember-it !"
-msgstr "Souvenez-vous en !"
-
-#: portal/templates/portal.html:9
-#, python-format
-msgid ""
-"This box may also provide access to Internet (currently "
-"%(colored_status)s)"
-msgstr ""
-"Cette ressource pourrait fournir un accès"
-" à Internet (actuellement %(colored_status)s)."
-
-#: portal/templates/portal.html:10
-msgid ""
-"You will then be prompted with this page <strong>after every "
-"15mn</strong> of inactivity."
-msgstr ""
-"Cette page vous sera alors présenté <strong>après 15mn</strong> "
-"d'inactivité."
-
-#: portal/templates/portal.html:11
+#: portal/templates/portal.html:12
 msgid ""
 "When browsing a secure website, your browser might display a <em>Security"
 " Warning</em> instead of displaying this page. Just open a new page onto "
@@ -81,33 +59,19 @@ msgstr ""
 "en simplement une nouvelle sur un site non-sécurisé et enregistrez-vous à"
 " nouveau."
 
-#: portal/templates/portal.html:15
-msgid "Action Required!"
-msgstr "Action requise !"
+#: portal/templates/portal.html:13
+#, python-format
+msgid ""
+"You will be disconnected after %(interval)smn of inactivity: use this "
+"address to reconnect."
+msgstr ""
+"Vous serez déconnecté après %(interval)smn"
+" d'innactivité. Utilisez cette adresse pour"
+" vous reconnecter."
 
 #: portal/templates/portal.html:16
-msgid ""
-"After you click the button bellow, <strong>you need to <u>manually</u> go"
-" to</strong>:"
-msgstr ""
-"Après avoir cliqué sur le bouton ci-dessous, <strong>vous devrez "
-"<u>manuellement</u> aller à</strong> :"
-
-#: portal/templates/portal.html:17
-msgid "Copy to clipboard"
-msgstr "Copier l'adresse"
-
-#: portal/templates/portal.html:18
-msgid ""
-"Open your Web browser copy-paste or type this address there then click "
-"bellow."
-msgstr ""
-"Ouvrez votre navigateur Web et collez ou saisissez cette adresse ; puis "
-"cliquez ci-dessous."
-
-#: portal/templates/portal.html:20
-msgid "Agree to register and close"
-msgstr "OK pour continuer"
+msgid "Agree and register"
+msgstr "S'enregistrer"
 
 #: portal/templates/registered.html:3
 #, python-format
@@ -134,14 +98,14 @@ msgstr ""
 "text=\"http://%(fqdn)s/\">%(fqdn)s</button> en suivant les instructions "
 "précédentes."
 
-#: portal/templates/registered.html:11
+#: portal/templates/registered.html:10
 #, python-format
 msgid "You're now ready to access <em>%(project_name)s's content</em>."
 msgstr ""
 "Vous êtes désormais prêt à accèder aux <em>contenus de "
 "%(project_name)s</em>."
 
-#: portal/templates/registered.html:12
+#: portal/templates/registered.html:11
 #, python-format
 msgid "Go to %(fqdn)s"
 msgstr "Aller à %(fqdn)s"

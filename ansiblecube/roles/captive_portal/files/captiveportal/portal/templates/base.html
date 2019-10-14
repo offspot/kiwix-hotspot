@@ -15,6 +15,7 @@
         <link rel="stylesheet" type="text/css" href="/hotspot-static/main.css" />
         <link rel="stylesheet" type="text/css" href="/hotspot-static/branding/style.css" />
         <script src="/hotspot-static/clipboard.min.js"></script>
+        <style type="text/css">ul { list-style-type: initial; padding-left: 1em; }</style>
     </head>
     <body class="">
         <header>
@@ -27,9 +28,6 @@
               <span class="boxid">{{ project_name }}!</span>
             </section>
         </header>
-        <ul class="messages">
-			{% block intro %}{% endblock %}
-        </ul>
         <div class="content">
         	{% block content %}{% endblock %}
 		</div>
