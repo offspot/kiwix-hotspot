@@ -42,6 +42,8 @@ nomad_version: "2.7.0"
 
 # Apps path
 venvs_root: /home/{{ username }}/venvs
+captive_root: /var/www/captiveportal
+captive_env: "{{ venvs_root }}/captive"
 aflatoun_root: "{{ data_path }}/aflatoun"
 aflatoun_env: "{{ venvs_root }}/aflatoun"
 edupi_root: "/home/{{ username }}/edupi"

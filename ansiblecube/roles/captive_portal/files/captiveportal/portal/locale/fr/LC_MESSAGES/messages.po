@@ -1,0 +1,111 @@
+# French translations for PROJECT.
+# Copyright (C) 2019 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2019-10-14 10:24+0000\n"
+"PO-Revision-Date: 2019-10-07 09:38+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: fr\n"
+"Language-Team: fr <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.7.0\n"
+
+#: portal/utils.py:138
+msgid "Online"
+msgstr "connecté"
+
+#: portal/utils.py:138
+msgid "Offline"
+msgstr "hors-ligne"
+
+#: portal/templates/portal.html:4
+#, python-format
+msgid "Welcome to <em>%(project_name)s</em> Hotspot."
+msgstr "Bienvenue sur le Hotspot <em>%(project_name)s</em>."
+
+#: portal/templates/portal.html:5
+msgid "Access your content via: "
+msgstr "Accèdez aux contenus via :"
+
+#: portal/templates/portal.html:5
+msgid "Copy to clipboard"
+msgstr "Copier l'adresse"
+
+#: portal/templates/portal.html:8
+msgid ""
+"<strong>You need to <u>manually</u> go to</strong> (use copy-paste) that "
+"address as clicking on the button bellow might close this web page."
+msgstr ""
+"<strong>Vous devez <u>manuellement</u> (utilisez le copier-coller) aller "
+"à</strong> cette addresse car après avoir cliqué sur le bouton ci-"
+"dessous, cette page risque de se fermer."
+
+#: portal/templates/portal.html:12
+msgid ""
+"When browsing a secure website, your browser might display a <em>Security"
+" Warning</em> instead of displaying this page. Just open a new page onto "
+"a non-secure website to register again."
+msgstr ""
+"Surfant sur un site sécurisé, le navigateur pourrait vous afficher un "
+"<em>avertissement de sécurité</em> au lieu d'afficher cette page. Ouvrez-"
+"en simplement une nouvelle sur un site non-sécurisé et enregistrez-vous à"
+" nouveau."
+
+#: portal/templates/portal.html:13
+#, python-format
+msgid ""
+"You will be disconnected after %(interval)smn of inactivity: use this "
+"address to reconnect."
+msgstr ""
+"Vous serez déconnecté après %(interval)smn"
+" d'innactivité. Utilisez cette adresse pour"
+" vous reconnecter."
+
+#: portal/templates/portal.html:16
+msgid "Agree and register"
+msgstr "S'enregistrer"
+
+#: portal/templates/registered.html:3
+#, python-format
+msgid ""
+"Registered to “<em>%(hotspot_name)s</em>” (<a "
+"href=\"http://%(fqdn)s/\">%(fqdn)s</a>)"
+msgstr ""
+"Enregistré sur «<em>%(hotspot_name)s</em>» (<a "
+"href=\"http://%(fqdn)s/\">%(fqdn)s</a>)"
+
+#: portal/templates/registered.html:6
+msgid "You're all set!"
+msgstr "C'est tout bon !"
+
+#: portal/templates/registered.html:8
+#, python-format
+msgid ""
+"Now open your web browser and go to <button class=\"clipboard button "
+"button-sm neutral\" data-clipboard-"
+"text=\"http://%(fqdn)s/\">%(fqdn)s</button> as instructed earlier."
+msgstr ""
+"Maintenant, ouvrez votre navigateur et allez à <button class=\"clipboard "
+"button button-sm neutral\" data-clipboard-"
+"text=\"http://%(fqdn)s/\">%(fqdn)s</button> en suivant les instructions "
+"précédentes."
+
+#: portal/templates/registered.html:10
+#, python-format
+msgid "You're now ready to access <em>%(project_name)s's content</em>."
+msgstr ""
+"Vous êtes désormais prêt à accèder aux <em>contenus de "
+"%(project_name)s</em>."
+
+#: portal/templates/registered.html:11
+#, python-format
+msgid "Go to %(fqdn)s"
+msgstr "Aller à %(fqdn)s"

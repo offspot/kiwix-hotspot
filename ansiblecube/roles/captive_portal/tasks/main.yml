@@ -19,24 +19,38 @@
     mode: 0755
   tags: master
 
-- name: Create /var/www/captiveportal folder
+- name: Remove {{ captive_root }}
   file:
-    path: /var/www/captiveportal
-    owner: "{{ username }}"
-    group: "{{ username }}"
-    mode: 0755
-    state: directory
-  tags: master
-  
-- name: Copy captive portal script to /var/www/captiveportal
-  template:
-    src: cap.py.j2
-    dest: /var/www/captiveportal/cap.py
+    dest: "{{ captive_root }}"
+    state: absent
+  tags: ["master", "reconfigure"]
+
+- name: disable dnsmasq temporarily
+  become: yes
+  command: systemctl stop dnsmasq
+  tags: ["master", "reconfigure"]
+
+- name: Copy {{ captive_root }} folder
+  copy:
+    src: captiveportal
+    dest: /var/www/
     owner: "{{ username }}"
     group: "{{ username }}"
     mode: 0755
   notify: restart uwsgi
-  tags: ['master', 'rename']
+  tags: ["master", "reconfigure"]
+
+- name: create venv
+  become: yes
+  become_user: "{{ username }}"
+  command: virtualenv -p python3 {{ captive_env }}
+  tags: ["master", "reconfigure"]
+
+- name: Install captive portal deps
+  pip:
+    requirements: "{{ captive_root }}/requirements.txt"
+    virtualenv: "{{ captive_env }}"
+  tags: ["master", "reconfigure"]
 
 - name: Add nginx specific configuration file
   template:
@@ -89,7 +103,7 @@
     owner: root
     group: root
     mode: 0644
-  tags: master
+  tags: ['master', 'rename']
 
 - name: Enable captive.ini for UWSGI
   file:

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h2>{% trans %}Welcome to <em>{{ project_name }}</em> Hotspot.{% endtrans %}</h2>
+	<p>{% trans %}Access your content via: {% endtrans %} <code>http://{{ fqdn }}/</code> <button class="clipboard button button-sm neutral" data-clipboard-text="http://{{ fqdn }}/">{% trans %}Copy to clipboard{% endtrans %}</button></p>
+
+	{% if action_required %}
+	<p>{% trans %}<strong>You need to <u>manually</u> go to</strong> (use copy-paste) that address as clicking on the button bellow might close this web page.{% endtrans %}</p>
+	<hr />
+	{% endif %}
+	<ul>
+	<li>{% trans %}When browsing a secure website, your browser might display a <em>Security Warning</em> instead of displaying this page. Just open a new page onto a non-secure website to register again.{% endtrans %}</li>
+	<li>{% trans interval=interval|int %}You will be disconnected after {{ interval }}mn of inactivity: use this address to reconnect.{% endtrans %}</li>
+	</ul>
+
+    <p><a class="button" href="/hotspot-register">{% trans %}Agree and register{% endtrans %}</a></p>
+{% endblock %}
