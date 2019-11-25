@@ -4,9 +4,9 @@
 import socket
 
 
-def is_connected(hostname="www.google.com"):
+def is_connected(host="1.1.1.1"):
     try:
-        socket.create_connection((socket.gethostbyname(hostname), 80), timeout=2)
+        socket.create_connection((host, 53), timeout=4)
         return True
     except Exception:
         pass
