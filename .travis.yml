@@ -1,7 +1,9 @@
+# retrieve $APPLE_P12_PASSWORD
+secure: "fbRUJU20aWTMQAfbVNl4JRP90lNCGQTd132jgysUONKDJziuOIhgPv7C/xTHV3UJ6ZZuzfZGpAQo/pGg/9zyHaJkm9i0NTBiqN0K4xX4NE/0gkP5sXkpRmc3YVgsMQITPf5CoZJU+pLbsvxeJ+qBZ8TKLdTT7AnoK3qhmfnDGQeIqP7jO+7ANzGVHNRyswxva8If64+oc335zTBLfAULofvD//3BvYUIPLUp5IH55yiVUOytJXAdv6KXIiMSyatEspEzxklf/60LIQRepTiH0XyuplJPBMqtdCiziqSfBuGTyUzJD+gsK08dEETveQhCTTZwNVbz0i81Q4uWbT6tKRTUGOawVJ0MYl/CmBK5zoREzteBJz+JsRys5TzwtuvWz2gG2yjfyP9KZgGP5qSz7KLvKMez3zwMTVQg6hyblmtpj40EHDQC704v7AVxjnzM6C9zsl12SYbYI0Q2HvlSFMK9SUir1b6kjK+lLZrMWzMUcVoqvR+sCzgWRf0cT95A1SMnKRlU3hBXkcwB1uDUvFKCrtkfQjsxeu85CVGSwlFuz3IcWrTff+HpU0BXR6Iju0TrOINpFrjzfo3F/n4rFqlxOWn4ypUd0v41k52M3onNQg/wzrjfbN/TCrcNsGGj5hFZSOrYaBfBPchqZTQu5fXywYgj0cNdfqPZIkhvcck="
+
+# extract macOS-kiwix.p12
 before_install:
-- openssl aes-256-cbc -K $encrypted_af8ee76d875e_key -iv $encrypted_af8ee76d875e_iv -in travis_secrets.tar.enc -out travis_secrets.tar -d
-- tar xvf travis_secrets.tar
-- chmod 600 pibox_installer_ci_rsa
+- openssl aes-256-cbc -K $encrypted_cee12fde475e_key -iv $encrypted_cee12fde475e_iv -in macOS-kiwix.p12.enc -out macOS-kiwix.p12 -d
 
 addons:
   ssh_known_hosts:
@@ -77,7 +79,7 @@ matrix:
     - security create-keychain -p mysecretpassword build.keychain
     - security default-keychain -s build.keychain
     - security unlock-keychain -p mysecretpassword build.keychain
-    - security import pibox-installer.p12 -k build.keychain -P $MACOS_CERTIFICATE_PASSWORD -A
+    - security import macOS-kiwix.p12 -k build.keychain -P $APPLE_P12_PASSWORD -A
     - "security set-key-partition-list -S apple-tool:,apple: -s -k mysecretpassword build.keychain"
     - security find-identity -v
     - "codesign --force --sign \"Developer ID Application: Wikimedia CH (L7HWM3SP3L)\" \"dist/Kiwix Hotspot.app\" --deep"
@@ -88,11 +90,11 @@ matrix:
     - mv Kiwix*.dmg kiwix-hotspot-macos.dmg
 
     # CI build
-    - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ "a$PIBOX_RELEASE" = "a" ]; then scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa kiwix-hotspot-macos.dmg ci@tmp.kiwix.org:/data/tmp/ci/kiwix-hotspot-macos-$BRANCH.dmg; fi
+    - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ "a$PIBOX_RELEASE" = "a" ]; then scp -v -o StrictHostKeyChecking=no kiwix-hotspot-macos.dmg ci@tmp.kiwix.org:/data/tmp/ci/kiwix-hotspot-macos-$BRANCH.dmg; fi
     # nightly build (cron master)
-    - if [ "$TRAVIS_EVENT_TYPE" = "cron" ] && [ "a$PIBOX_RELEASE" = "a" ]; then SRCDIR=nightly/$(date +'%Y-%m-%d'); mkdir -p $SRCDIR; cp kiwix-hotspot-macos.dmg $SRCDIR/; scp -r -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa $SRCDIR ci@download.kiwix.org:/data/download/nightly/; fi
+    - if [ "$TRAVIS_EVENT_TYPE" = "cron" ] && [ "a$PIBOX_RELEASE" = "a" ]; then SRCDIR=nightly/$(date +'%Y-%m-%d'); mkdir -p $SRCDIR; cp kiwix-hotspot-macos.dmg $SRCDIR/; scp -r -v -o StrictHostKeyChecking=no $SRCDIR ci@download.kiwix.org:/data/download/nightly/; fi
     # release build (tagged)
-    - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ $PIBOX_RELEASE ]; then mkdir -p releases/$PIBOX_RELEASE; cp kiwix-hotspot-macos.dmg releases/$PIBOX_RELEASE/; scp -r -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases/$PIBOX_RELEASE ci@download.kiwix.org:/data/download/release/kiwix-hotspot/; fi
+    - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ $PIBOX_RELEASE ]; then mkdir -p releases/$PIBOX_RELEASE; cp kiwix-hotspot-macos.dmg releases/$PIBOX_RELEASE/; scp -r -v -o StrictHostKeyChecking=no releases/$PIBOX_RELEASE ci@download.kiwix.org:/data/download/release/kiwix-hotspot/; fi
 
   - os: linux
     language: generic
@@ -176,8 +178,8 @@ matrix:
     - cd ..
 
     # CI build
-    - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ "a$PIBOX_RELEASE" = "a" ]; then scp -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa dist/kiwix-hotspot-linux.tar.gz ci@tmp.kiwix.org:/data/tmp/ci/kiwix-hotspot-linux-$BRANCH.tar.gz; fi
+    - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ "a$PIBOX_RELEASE" = "a" ]; then scp -v -o StrictHostKeyChecking=no dist/kiwix-hotspot-linux.tar.gz ci@tmp.kiwix.org:/data/tmp/ci/kiwix-hotspot-linux-$BRANCH.tar.gz; fi
     # nightly build (cron master)
-    - if [ "$TRAVIS_EVENT_TYPE" = "cron" ] && [ "a$PIBOX_RELEASE" = "a" ]; then SRCDIR=nightly/$(date +'%Y-%m-%d'); mkdir -p $SRCDIR; cp dist/kiwix-hotspot-linux.tar.gz $SRCDIR/; scp -r -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa $SRCDIR ci@download.kiwix.org:/data/download/nightly/; fi
+    - if [ "$TRAVIS_EVENT_TYPE" = "cron" ] && [ "a$PIBOX_RELEASE" = "a" ]; then SRCDIR=nightly/$(date +'%Y-%m-%d'); mkdir -p $SRCDIR; cp dist/kiwix-hotspot-linux.tar.gz $SRCDIR/; scp -r -v -o StrictHostKeyChecking=no $SRCDIR ci@download.kiwix.org:/data/download/nightly/; fi
     # release build (tagged)
-    - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ $PIBOX_RELEASE ]; then mkdir -p releases/$PIBOX_RELEASE; cp dist/kiwix-hotspot-linux.tar.gz releases/$PIBOX_RELEASE/; scp -r -v -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases/$PIBOX_RELEASE ci@download.kiwix.org:/data/download/release/kiwix-hotspot/; fi
+    - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ $PIBOX_RELEASE ]; then mkdir -p releases/$PIBOX_RELEASE; cp dist/kiwix-hotspot-linux.tar.gz releases/$PIBOX_RELEASE/; scp -r -v -o StrictHostKeyChecking=no releases/$PIBOX_RELEASE ci@download.kiwix.org:/data/download/release/kiwix-hotspot/; fi
