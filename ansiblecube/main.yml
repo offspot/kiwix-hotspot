@@ -19,7 +19,7 @@
 
     # master, setup (timezone, apt-update)
     - role: system
-    
+
       # master, resize
     - role: resize
 
@@ -49,6 +49,9 @@
       # content setup (install, dependencies)
     - role: nomad_setup
       when: ansible_local.config.nomad|bool
+
+    - role: mathews_setup
+      when: ansible_local.config.mathews|bool
 
     - role: wikifundi_setup
       when: ansible_local.config.wikifundi_languages | length

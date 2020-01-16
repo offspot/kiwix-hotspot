@@ -33,12 +33,13 @@ language_name: "English"
 # versions
 qemu_kernel_version: "4.10.0"
 kernel_version: "4.14.34"
-kiwix_version: "3.0.1-6"
+kiwix_version: "3.0.1-8"
 kalite_version: "0.17.4"
 edupi_version: "1.4.10"
 python3_version: "3.5"
 php_version: "7.3"
 nomad_version: "2.7.0"
+mathews_version: "1.6"
 
 # Apps path
 venvs_root: /home/{{ username }}/venvs
@@ -57,6 +58,7 @@ mediawiki_root: "{{ wikifundi_root }}/w"
 parsoid_root: "{{ mediawiki_root }}/parsoid"
 common_static_path: "/var/www/static"
 nomad_root: "/var/www/nomad"
+mathews_root: "/var/www/mathews"
 
 # Domain names
 kiwix_server_name: kiwix.{{ hostname }}
@@ -65,6 +67,7 @@ aflatoun_server_name: aflatoun.{{ hostname }}
 edupi_server_name: edupi.{{ hostname }}
 wikifundi_server_name: wikifundi.{{ hostname }}
 nomad_server_name: nomad.{{ hostname }}
+mathews_server_name: mathews.{{ hostname }}
 time_server_name: time.{{ hostname }}
 
 kiwix_fqdn: kiwix.{{ fqdn }}
@@ -73,6 +76,7 @@ aflatoun_fqdn: aflatoun.{{ fqdn }}
 edupi_fqdn: edupi.{{ fqdn }}
 wikifundi_fqdn: wikifundi.{{ fqdn }}
 nomad_fqdn: nomad.{{ fqdn }}
+mathews_fqdn: mathews.{{ fqdn }}
 time_fqdn: time.{{ fqdn }}
 
 # content & features
@@ -94,3 +98,4 @@ zim_path: "{{ data_path }}/packages"
 wikifundi_langpack_prefix: "{{ data_path }}/wikifundi_langpack_"
 edupi_resources_path: "{{ data_path }}/edupi_resources"
 nomad_content_path: "{{ data_path }}/nomad"
+mathews_content_path: "{{ data_path }}/mathews"

@@ -1,0 +1,44 @@
+---
+- name: Ensure directory exists
+  file:
+    path: "{{ mathews_root }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  tags: ['master', 'reconfigure']
+
+- name: Ensure APK directory exists
+  file:
+    path: "{{ mathews_content_path }}"
+    state: directory
+  tags: ['master', 'reconfigure', 'content']
+
+- name: install nginx vhost
+  template:
+    src: nginx.vhost.j2
+    dest: /etc/nginx/sites-available/mathews
+    mode: 0644
+  tags: ['master', 'rename', 'reconfigure']
+
+- name: enable mathews vhost
+  file:
+    src: /etc/nginx/sites-available/mathews
+    dest: /etc/nginx/sites-enabled/mathews
+    state: link
+    force: yes
+  notify: restart nginx
+  tags: ['master', 'reconfigure']
+
+- name: Copy static files
+  copy:
+    src: static
+    dest: "{{ mathews_root }}/"
+  tags: ['master', 'reconfigure']
+
+- name: copy page
+  template:
+    src: index.html.j2
+    dest: "{{ mathews_root }}/index.html"
+    mode: 0644
+  tags: ['master', 'reconfigure']
