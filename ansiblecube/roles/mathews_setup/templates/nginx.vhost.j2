@@ -1,0 +1,11 @@
+server {
+    listen  80;
+    server_name {{ mathews_fqdn }} {{ hostname }};
+    root {{ mathews_root }};
+
+    location /download/ { alias {{ mathews_content_path }}/; }
+
+    location /hotspot-static/ { alias {{ common_static_path }}/; expires 1y; }
+    location /502.html { internal; root /var/www; }
+    error_page 502 /502.html;
+}

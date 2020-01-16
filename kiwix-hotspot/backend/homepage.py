@@ -95,6 +95,27 @@ def generate_homepage(logger, options):
             }
         )
 
+    if options["mathews"]:
+        edupi_fqdn = "mathews.{fqdn}".format(fqdn=fqdn)
+        if options["language"] == "fr":
+            title = "Math Mathews Android"
+            category = "Accès"
+            description = "Accès à l'application Android Math Mathews"
+        else:
+            title = "Android Math Mathews"
+            category = "Access"
+            description = "Access to the Math Mathews Android App"
+        cards.append(
+            {
+                "url": "http://{}".format(edupi_fqdn),
+                "css_class": "mathews",
+                "category_class": "access",
+                "category": category,
+                "title": title,
+                "description": description,
+            }
+        )
+
     if options["wikifundi_languages"]:
         wikifundi_fqdn = "wikifundi.{fqdn}".format(fqdn=fqdn)
         if "fr" in options["wikifundi_languages"]:

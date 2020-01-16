@@ -115,5 +115,13 @@
         "checksum": "2d6c51458ebcddbd4d7f0b28d68203ef0af734940b562fcc4c28910e9e2a8f1d",
         "archive_size": 51473201,
         "expanded_size": 51473201
+    },
+    "mathews_apk": {
+        "url": "{mirror}/other/mathews/mathmathews_1.6.apk",
+        "name": "math_mathews.apk",
+        "folder_name": null,
+        "checksum": "a779239f0e948ccff808552bf134723c2315b3fc22765bffb10dca62ac333e3f",
+        "archive_size": 35420045,
+        "expanded_size": 35420045
     }
 }

@@ -125,7 +125,7 @@ def set_config(config, args):
                     setif(arg_key, value)
 
         # bool contents (switch)
-        for key in ("edupi", "aflatoun", "nomad"):
+        for key in ("edupi", "aflatoun", "nomad", "mathews"):
             if config["content"].get(key) is not None:
                 vl = "yes" if config["content"][key] in ("yes", True) else "no"
                 setif(key, vl)
@@ -156,6 +156,7 @@ defaults = {
     "catalog": False,
     "edupi": "no",
     "nomad": "no",
+    "mathews": "no",
     "aflatoun": "no",
     "kalite": [],
     "wikifundi": [],
@@ -179,6 +180,7 @@ parser.add_argument(
 )
 parser.add_argument("--edupi", help="install edupi", choices=["yes", "no"])
 parser.add_argument("--nomad", help="install Nomad Education", choices=["yes", "no"])
+parser.add_argument("--mathews", help="install Math Mathews", choices=["yes", "no"])
 parser.add_argument(
     "--edupi-resources", help="Zipped folder of resources to init EduPi with"
 )
@@ -261,7 +263,14 @@ else:
 
 
 # check arguments
-valid_project_name, valid_language, valid_timezone, valid_wifi_pwd, valid_admin_login, valid_admin_pwd = check_user_inputs(
+(
+    valid_project_name,
+    valid_language,
+    valid_timezone,
+    valid_wifi_pwd,
+    valid_admin_login,
+    valid_admin_pwd,
+) = check_user_inputs(
     project_name=args.name,
     language=args.language,
     timezone=args.timezone,
@@ -306,6 +315,7 @@ collection = get_collection(
     edupi=args.edupi == "yes",
     edupi_resources=args.edupi_resources,
     nomad=args.nomad == "yes",
+    mathews=args.mathews == "yes",
     packages=args.zim_install,
     kalite_languages=args.kalite,
     wikifundi_languages=args.wikifundi,
@@ -378,6 +388,7 @@ try:
         edupi=args.edupi == "yes",
         edupi_resources=args.edupi_resources,
         nomad=args.nomad == "yes",
+        mathews=args.mathews == "yes",
         zim_install=args.zim_install,
         size=args.output_size,
         logger=logger,

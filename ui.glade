@@ -1290,7 +1290,7 @@ In File mode the image is created at build path, you can choose the size
               </packing>
             </child>
             <child>
-              <object class="GtkBox" id="">
+              <object class="GtkBox" id="no_id_89">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
@@ -1308,6 +1308,42 @@ In File mode the image is created at build path, you can choose the size
                 </child>
                 <child>
                   <object class="GtkSwitch" id="nomad_switch">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="pack_type">end</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">17</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox" id="no_id_90">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <child>
+                  <object class="GtkLabel" id="mathews_label">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">Android APK</property>
+                    <property name="label" translatable="yes">Math Mathews :</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkSwitch" id="mathews_switch">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                   </object>

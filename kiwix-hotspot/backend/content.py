@@ -80,6 +80,7 @@ def get_collection(
     edupi=False,
     edupi_resources=None,
     nomad=False,
+    mathews=False,
     packages=[],
     kalite_languages=[],
     wikifundi_languages=[],
@@ -119,6 +120,16 @@ def get_collection(
     if nomad:
         collection.append(
             ("NomadEducation", get_nomad_contents, run_nomad_actions, {"enable": nomad})
+        )
+
+    if mathews:
+        collection.append(
+            (
+                "MathMathews",
+                get_mathews_contents,
+                run_mathews_actions,
+                {"enable": mathews},
+            )
         )
 
     if len(packages):
@@ -179,6 +190,11 @@ def get_edupi_contents(enable=False, resources_path=None):
 def get_nomad_contents(enable=False):
     """ nomad: only contains one APK """
     return [get_content("nomad_apk")]
+
+
+def get_mathews_contents(enable=False):
+    """ mathews: only contains one APK """
+    return [get_content("mathews_apk")]
 
 
 def get_kalite_contents(languages=[]):
@@ -299,6 +315,22 @@ def run_nomad_actions(cache_folder, mount_point, logger, enable=False):
         content=nomad_apk,
         cache_folder=cache_folder,
         final_path=os.path.join(nomad_folder, nomad_apk["name"]),
+        logger=logger,
+    )
+
+
+def run_mathews_actions(cache_folder, mount_point, logger, enable=False):
+    """ copy downloaded APK """
+    if not enable:
+        return
+
+    mathews_apk = get_content("mathews_apk")
+    mathews_folder = os.path.join(mount_point, "mathews")
+    os.makedirs(mathews_folder, exist_ok=True)
+    copy(
+        content=mathews_apk,
+        cache_folder=cache_folder,
+        final_path=os.path.join(mathews_folder, mathews_apk["name"]),
         logger=logger,
     )
 

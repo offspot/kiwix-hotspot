@@ -536,6 +536,19 @@ class Application:
             )
         )
 
+        # mathews
+        self.component.mathews_switch.connect(
+            "notify::active", lambda switch, state: self.update_free_space()
+        )
+        self.component.mathews_label.set_label(
+            "{} ({})".format(
+                self.component.mathews_label.get_label(),
+                human_readable_size(
+                    get_expanded_size(get_collection(mathews=True), add_margin=False)
+                ),
+            )
+        )
+
         self.refresh_disk_list()
 
         self.reset_config()  # will calculate free space
@@ -734,7 +747,7 @@ class Application:
             for lang, button in getattr(self, "iter_{}_check_button".format(key))():
                 button.set_active(False)
 
-        for key in ("edupi", "aflatoun", "nomad"):
+        for key in ("edupi", "aflatoun", "nomad", "mathews"):
             getattr(self.component, "{}_switch".format(key)).set_active(False)
 
         # edupi resources
@@ -1550,7 +1563,7 @@ class Application:
                         button.set_active(lang in config["content"][key])
 
             # boolean contents (switches)
-            for key in ("edupi", "aflatoun", "nomad"):
+            for key in ("edupi", "aflatoun", "nomad", "mathews"):
                 if config["content"].get(key) is not None:
                     getattr(self.component, "{}_switch".format(key)).set_active(
                         config["content"][key]
@@ -1682,6 +1695,7 @@ class Application:
                             ("edupi", self.component.edupi_switch.get_active()),
                             ("edupi_resources", edupi_resources),
                             ("nomad", self.component.nomad_switch.get_active()),
+                            ("mathews", self.component.mathews_switch.get_active()),
                         ]
                     ),
                 ),
@@ -1735,7 +1749,14 @@ class Application:
         zim_install = [zim[0] for zim in self.component.zim_list_store if zim[8]]
 
         # validate inputs
-        valid_project_name, valid_language, valid_timezone, valid_wifi_pwd, valid_admin_login, valid_admin_pwd = check_user_inputs(
+        (
+            valid_project_name,
+            valid_language,
+            valid_timezone,
+            valid_wifi_pwd,
+            valid_admin_login,
+            valid_admin_pwd,
+        ) = check_user_inputs(
             project_name=self.component.project_name_entry.get_text(),
             language=data.hotspot_languages[
                 self.component.language_combobox.get_active()
@@ -1832,6 +1853,8 @@ class Application:
 
         nomad = self.component.nomad_switch.get_active()
 
+        mathews = self.component.mathews_switch.get_active()
+
         logo = self.component.logo_chooser.get_filename()
         favicon = self.component.favicon_chooser.get_filename()
         css = self.component.css_chooser.get_filename()
@@ -1880,6 +1903,7 @@ class Application:
                     edupi=edupi,
                     edupi_resources=self.get_edupi_resources(),
                     nomad=nomad,
+                    mathews=mathews,
                     zim_install=zim_install,
                     size=output_size,
                     logger=self.logger,
@@ -1962,11 +1986,13 @@ class Application:
         edupi = self.component.edupi_switch.get_active()
         edupi_resources = self.get_edupi_resources()
         nomad = self.component.nomad_switch.get_active()
+        mathews = self.component.mathews_switch.get_active()
 
         collection = get_collection(
             edupi=edupi,
             edupi_resources=edupi_resources,
             nomad=nomad,
+            mathews=mathews,
             packages=zim_list,
             kalite_languages=kalite,
             wikifundi_languages=wikifundi,
