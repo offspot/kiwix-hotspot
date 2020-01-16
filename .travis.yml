@@ -4,6 +4,10 @@ secure: "fbRUJU20aWTMQAfbVNl4JRP90lNCGQTd132jgysUONKDJziuOIhgPv7C/xTHV3UJ6ZZuzfZ
 # extract macOS-kiwix.p12
 before_install:
 - openssl aes-256-cbc -K $encrypted_cee12fde475e_key -iv $encrypted_cee12fde475e_iv -in macOS-kiwix.p12.enc -out macOS-kiwix.p12 -d
+- openssl aes-256-cbc -K $encrypted_cee12fde475e_key -iv $encrypted_cee12fde475e_iv -in kiwix-hotspot_ci_rsa.enc -out kiwix-hotspot_ci_rsa -d
+- eval "$(ssh-agent -s)"
+- chmod 600 hotspot_ci_rsa
+- ssh-add hotspot_ci_rsa
 
 addons:
   ssh_known_hosts:
