@@ -87,7 +87,7 @@ matrix:
     - security import macOS-kiwix.p12 -k build.keychain -P $APPLE_P12_PASSWORD -A
     - "security set-key-partition-list -S apple-tool:,apple: -s -k mysecretpassword build.keychain"
     - security find-identity -v
-    - "codesign --force --sign \"Developer ID Application: Wikimedia CH (L7HWM3SP3L)\" \"dist/Kiwix Hotspot.app\" --deep"
+    - "codesign --force --sign \"3rd Party Mac Developer Application: Wikimedia CH (L7HWM3SP3L)\" \"dist/Kiwix Hotspot.app\" --deep"
 
     - create-dmg dist/Kiwix\ Hotspot.app
     - mv Kiwix*.dmg kiwix-hotspot-macos.dmg
