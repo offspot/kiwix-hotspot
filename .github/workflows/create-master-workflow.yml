@@ -20,7 +20,7 @@ jobs:
 
         run: |
           eval $(ssh-agent -s)
-          echo "$ssh_key" | base64 -d | tr -d '\r' | ssh-add - > /dev/null
+          echo "$ssh_key" | base64 -d > ssk_key
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
           ssh-keyscan download.kiwix.org >> ${HOME}/.ssh/known_hosts
@@ -29,7 +29,14 @@ jobs:
       - name: test upload
         run: |
           echo "from workflow" > test-file
-          scp test-file ci@download.kiwix.org:/data/tmp/ci/test-file
+          scp -i ssk_key test-file ci@download.kiwix.org:/data/tmp/ci/test-file
+
+      - name: install system deps
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          apt-get update
+          apt-get install -y locales openssh-client wget zip unzip tar python3-gi python3-gi-cairo python3-cairo gir1.2-gtk-3.0 libdbus-1-dev libdbus-glib-1-dev libffi-dev build-essential libssl-dev python3-dev libgdk-pixbuf2.0-dev
 
       - name: download custom kernel
         run: |
