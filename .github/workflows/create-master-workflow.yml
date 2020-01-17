@@ -19,7 +19,7 @@ jobs:
           ssh_key: ${{ secrets.ssh_key }}
 
         run: |
-          echo "$ssh_key" | base64 -d > ssk_key
+          echo "$ssh_key" | base64 -d > ssh_key
           chmod 600 ssh_key
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
@@ -29,7 +29,7 @@ jobs:
       - name: test upload
         run: |
           echo "from workflow" > test-file
-          scp -i ssk_key test-file ci@download.kiwix.org:/data/tmp/ci/test-file
+          scp -i ssh_key test-file ci@download.kiwix.org:/data/tmp/ci/test-file
 
       - name: install system deps
         env:
