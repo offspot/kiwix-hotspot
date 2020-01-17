@@ -37,7 +37,7 @@ matrix:
         - gtk+3
         - adwaita-icon-theme
         - npm
-        update: true
+        update: false
     install:
     - PIBOX_RELEASE=$(echo $TRAVIS_TAG | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*\(-rc[[:digit:]]\+\)\?') || true
     - BRANCH=${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}
