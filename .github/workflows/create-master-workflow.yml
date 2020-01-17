@@ -17,6 +17,8 @@ jobs:
       - name: decrypt SSH key
         env:
           ssh_key: ${{ secrets.ssh_key }}
+
+        run: |
           eval $(ssh-agent -s)
           echo "$ssh_key" | base64 -d | tr -d '\r' | ssh-add - > /dev/null
           mkdir -p ~/.ssh
