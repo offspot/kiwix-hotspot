@@ -1,23 +1,22 @@
 name: create master image
-# This workflow is triggered on pushes to the repository.
-on: [push]
+on:
+  schedule:
+    # every months on the 1st
+    - cron:  '0 6 1 * *'
 
 jobs:
   build:
     name: master image build
     runs-on: ubuntu-latest
     steps:
-
       - name: set image name
         run: echo ::set-env name=OUT_IMG::hotspot-master_$(echo $(date +%Y-%m-%d)).img
-
       - name: verify image name
         run : echo $OUT_IMG
 
       - name: decrypt SSH key
         env:
           ssh_key: ${{ secrets.ssh_key }}
-
         run: |
           echo "$ssh_key" | base64 -d > ssh_key
           chmod 600 ssh_key
@@ -25,7 +24,6 @@ jobs:
           chmod 700 ~/.ssh
           ssh-keyscan download.kiwix.org >> ${HOME}/.ssh/known_hosts
           chmod 644 ${HOME}/.ssh/known_hosts
-
       - name: test upload
         run: |
           echo "from workflow" > test-file
@@ -42,34 +40,30 @@ jobs:
         uses: actions/checkout@v1
         with:
           fetch-depth: 1
+      - name: setup python version
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.7'
 
       - name: download custom kernel
         run: |
           wget http://mirror.download.kiwix.org/dev/vexpress-boot.zip
           unzip vexpress-boot.zip
-
       - name: download static Qemu
         run: |
           wget http://mirror.download.kiwix.org/dev/qemu-2.12.0-linux-x86_64.tar.gz
           tar xvf qemu-2.12.0-linux-x86_64.tar.gz
-
       - name: download etcher-cli (packaging only)
         run: |
           wget http://download.kiwix.org/dev/balena-etcher-cli-1.4.8-linux-x64.tar.gz
           mkdir -p etcher-cli
           tar xf balena-etcher-cli-1.4.8-linux-x64.tar.gz -C etcher-cli --strip-components=1
-
       - name: download aria2c (packaging only)
         run: |
           wget http://download.kiwix.org/dev/aria2c-linux64.zip
           unzip aria2c-linux64.zip
           rm aria2c-linux64.zip
           wget http://download.kiwix.org/dev/ca-certificates.crt
-
-      - name: setup python version
-        uses: actions/setup-python@v1
-        with:
-          python-version: '3.7'
 
       - name: install python deps
         run: |
