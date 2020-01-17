@@ -36,8 +36,8 @@ matrix:
         - pygobject3
         - gtk+3
         - adwaita-icon-theme
-        - create-dmg
-        update: false
+        - npm
+        update: true
     install:
     - PIBOX_RELEASE=$(echo $TRAVIS_TAG | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*\(-rc[[:digit:]]\+\)\?') || true
     - BRANCH=${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}
@@ -88,8 +88,10 @@ matrix:
     - security find-identity -v
     #- "codesign --force --sign \"Developer ID Application: Wikimedia CH (L7HWM3SP3L)\" \"dist/Kiwix Hotspot.app\" --deep --timestamp"
 
-    - create-dmg dist/Kiwix\ Hotspot.app
-    - mv Kiwix*.dmg kiwix-hotspot-macos.dmg
+    # create dmg
+    - npm install -g appdmg
+    - mv dist/Kiwix\ Hotspot.app .
+    - appdmg dmg.json kiwix-hotspot-macos.dmg
 
     # CI build
     - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ "a$PIBOX_RELEASE" = "a" ]; then scp -v -o StrictHostKeyChecking=no kiwix-hotspot-macos.dmg ci@tmp.kiwix.org:/data/tmp/ci/kiwix-hotspot-macos-$BRANCH.dmg; fi
