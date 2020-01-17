@@ -19,8 +19,8 @@ jobs:
           ssh_key: ${{ secrets.ssh_key }}
 
         run: |
-          eval $(ssh-agent -s)
           echo "$ssh_key" | base64 -d > ssk_key
+          chmod 600 ssh_key
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
           ssh-keyscan download.kiwix.org >> ${HOME}/.ssh/known_hosts
