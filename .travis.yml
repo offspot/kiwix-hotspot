@@ -1,7 +1,8 @@
 # retrieve $APPLE_P12_PASSWORD
 env:
   global:
-    secure: HOwTErqKRasJS9tZYzGULewke9rN91Du6YYbLJ6T1ekQan9ZagLAdKkSnZS6+Bs7/Q3H0QfmWceFnDurtSQsMJrspfmDGJ3e7VCUcB2Xgoz0YaUwUzreRkhr1D5BkJjDE+Ex7Zlz6teBrBctXphDqfjob4VtzD5J2Nt/+8gVuZrKRDHLrKQYAobudEBgYphh8owhNorykVIITaS+RWUY52Qt9wo3RNVVrRL1omgnzDIeagsOpKdIP7stutsP8fklypPzH9lm8+Aunxg4PXG18TpY//5O8UDDS2mDNCY3a+9YbnKCM3fPaysJqsF5WPTeInMg25tph9/lvCxiFMQ0zcnKLp94Ds7FKwEEmJWTkLbC2Bcme9w0mMhtheNnxwYICLAz9fDaFjZtr8hiE4BjV3VzLz+KUDvpvikAAvH4TS7qlq3RivAuyzDnFABTDL6NzygfYGm31eSymqX+LoyRr43I0ndv+qq/PzcU5nOdDIXapA/QOtKsVUlRbFz8ePReKMPPLhlKtxV6hCKLQvr2EA+shdtD+0MEPSAB54vRysS/27E2dcPy8CZqhjFduTOlzROJpAIi391ag0SG9LSmZMTJRvXNcRl8e/XZmi0JHRIvWGnx7rmkhGdyIDgiGHWQu2cBkgS7gl49JvG47c+tql3Hrq34pn3A3P8M5QjEd14=
+    # APPLE_P12_PASSWORD
+    secure: "eZ/bO8w87NvCtgUFRnxCAg06xKMoLFhf9fPe8XzpVFK7K6t5zQlf79By5ESw41c+IbF6I5Y7WSBz4bx+x4VQirJ6tPolz3LBgzjXhcYolhGWYmT6xvJXYwRsJdSms4+1FAhCJfekgp0z7J7CVzyneVLSBBfiicayRX43J7O/6IuxwgQAPGSWQ7oX3vVn+sRlqYE2sEKC1PobXGHf5LsLcBYEEQAiCfw6F7b4HcjY72nZSuds8DQF2o7BhRAyO/yrnmoTyJ6qU4tKk1JXiUYqv9wJACp9jJyZGgGl+89SFRD0UtLQYJhYMRGSkFKP3hoE0bWHEmTBE3htPzfS51HRfdhf7ocLPg6kJtNM11eUSUTORshPcJrlde8DKhBJ/asZz6q8V7+khxCmRLyvolsQWkyinOoY7YnHuEZJBiFA7v0TieuWQA5m1jmaIh8T6lH+SoQX+4Rtp6EsJ1ZhIqzvs99R9VSxVC6E6OS6sng4FT2mnqQWvP+fKh7qfcnn7qmKF9EF3tEdjkB0WVBlDJ88gUX0VQWuaSOUbgpwZKG/9CF5kOLfxCVOC1e9LXx/HkcgAdipei75Ut/PnGIinqs5g5X0AyWCRG9MAL/PtRn0njROYG5cvCWKAYXW4mCxx2uSH6r5Y16X7cYxN+LBoeISNnAXJVXjtSo0O7NkQpfiffI="
 
 before_install:
 - openssl aes-256-cbc -K $encrypted_cee12fde475e_key -iv $encrypted_cee12fde475e_iv -in travis_secrets.tar.enc -out travis_secrets.tar -d
@@ -83,10 +84,10 @@ matrix:
     - security create-keychain -p mysecretpassword build.keychain
     - security default-keychain -s build.keychain
     - security unlock-keychain -p mysecretpassword build.keychain
-    - security import macOS-kiwix2020.p12 -k build.keychain -P $APPLE_P12_PASSWORD -A
+    - security import wmch-devid.p12 -k build.keychain -P $APPLE_P12_PASSWORD -A
     - "security set-key-partition-list -S apple-tool:,apple: -s -k mysecretpassword build.keychain"
     - security find-identity -v
-    #- "codesign --force --sign \"Developer ID Application: Wikimedia CH (L7HWM3SP3L)\" \"dist/Kiwix Hotspot.app\" --deep --timestamp"
+    - "codesign --force --sign \"Developer ID Application: Wikimedia CH (L7HWM3SP3L)\" \"dist/Kiwix Hotspot.app\" --deep --timestamp"
 
     # create dmg
     - npm install -g appdmg
