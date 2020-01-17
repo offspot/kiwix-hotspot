@@ -7,8 +7,16 @@ image: Visual Studio 2017
 build: off
 
 environment:
-  kiwix_certificate_secret:
-    secure: 5NoKiSa8D/4H1mZDpW/QvQ==
+  win_certificate_password:
+    secure: x2Lld8/U8CYBdps4+IBXk3ZGSW3aXY1fm0ql4Z8wjnQ=
+  rsa_secret:
+    secure: xTDdno6QY6dZ+ljQk0hSLQ==
+  rsa_salt:
+    secure: R8E5BN9zQalPVrEQbs0qFgeKOl5q1cKat+qMaUHM8V3tLa2McvKyleT3kZYVo+i2gZR3oP3jHts17cFyrWwmNw==
+  win_certificate_secret:
+    secure: upt5BmdOfMNZpA7Gq2gDWg==
+  win_certificate_salt:
+    secure: UtTHZoEm326x/YH25Wuh4hiqnPwc/WzJK0X0nmENakhh8BHW2WJBjJrWMStKK4iyk0W8qf06Ic6wcmcdDXWXGg==
 
 platform:
   - x64
@@ -39,10 +47,10 @@ install:
       (Get-Content kiwix-hotspot\data.py).replace('devel', $version) | Set-Content kiwix-hotspot\data.py
 
   # decrypt certificates
-  - C:\OpenSSL-v111-Win32\bin\openssl.exe enc -d -aes-256-cbc -md sha256 -pass pass:%win_certificate_secret% -in kiwix.p12.enc -out kiwix.pfx
   - nuget install secure-file -ExcludeVersion
   - choco install reshack.portable -y
-  - secure-file\tools\secure-file -decrypt pibox_installer_ci_rsa.appveyor_enc -secret %certificate_secret% -out pibox_installer_ci_rsa
+  - secure-file\tools\secure-file -decrypt kiwix.p12.appveyor_enc -secret %win_certificate_secret% -salt %win_certificate_salt% -out kiwix.pfx
+  - secure-file\tools\secure-file -decrypt kiwix-hotspot_ci_rsa.appveyor_enc -secret %rsa_secret% -salt %rsa_salt% -out kiwix-hotspot_ci_rsa
 
   # Download vexpress-boot
   - appveyor DownloadFile "http://mirror.download.kiwix.org/dev/vexpress-boot.zip"
@@ -154,9 +162,9 @@ install:
 
   - if %platform%==x86 move C:\projects\kiwix-hotspot\windows_bundle\kiwix-hotspot.exe C:\msys64\home\appveyor\kiwix-hotspot-win32.exe
   - if %platform%==x64 move C:\projects\kiwix-hotspot\windows_bundle\kiwix-hotspot.exe C:\msys64\home\appveyor\kiwix-hotspot-win64.exe
-  - move C:\projects\kiwix-hotspot\pibox_installer_ci_rsa C:\msys64\home\appveyor\
+  - move C:\projects\kiwix-hotspot\kiwix-hotspot_ci_rsa C:\msys64\home\appveyor\
 
-  - if %platform%==x86 C:\msys64\usr\bin\bash --login -c "DESTINATION=$(cat /c/destination-ps.txt | tr -d '\r' | tr -d '\n') ; USER=$(cat /c/user-ps.txt | tr -d '\r' | tr -d '\n') ; HOST=$(cat /c/host-ps.txt | tr -d '\r' | tr -d '\n') ; scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa kiwix-hotspot-win32.exe $USER@$HOST:$DESTINATION/kiwix-hotspot-win32-$(cat branch.txt | sed 's/ //g').exe"
-  - if %platform%==x64 C:\msys64\usr\bin\bash --login -c "DESTINATION=$(cat /c/destination-ps.txt | tr -d '\r' | tr -d '\n') ; USER=$(cat /c/user-ps.txt | tr -d '\r' | tr -d '\n') ; HOST=$(cat /c/host-ps.txt | tr -d '\r' | tr -d '\n') ; scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa kiwix-hotspot-win64.exe $USER@$HOST:$DESTINATION/kiwix-hotspot-win64-$(cat branch.txt | sed 's/ //g').exe"
+  - if %platform%==x86 C:\msys64\usr\bin\bash --login -c "DESTINATION=$(cat /c/destination-ps.txt | tr -d '\r' | tr -d '\n') ; USER=$(cat /c/user-ps.txt | tr -d '\r' | tr -d '\n') ; HOST=$(cat /c/host-ps.txt | tr -d '\r' | tr -d '\n') ; scp -r -o StrictHostKeyChecking=no -i kiwix-hotspot_ci_rsa kiwix-hotspot-win32.exe $USER@$HOST:$DESTINATION/kiwix-hotspot-win32-$(cat branch.txt | sed 's/ //g').exe"
+  - if %platform%==x64 C:\msys64\usr\bin\bash --login -c "DESTINATION=$(cat /c/destination-ps.txt | tr -d '\r' | tr -d '\n') ; USER=$(cat /c/user-ps.txt | tr -d '\r' | tr -d '\n') ; HOST=$(cat /c/host-ps.txt | tr -d '\r' | tr -d '\n') ; scp -r -o StrictHostKeyChecking=no -i kiwix-hotspot_ci_rsa kiwix-hotspot-win64.exe $USER@$HOST:$DESTINATION/kiwix-hotspot-win64-$(cat branch.txt | sed 's/ //g').exe"
 
-  - C:\msys64\usr\bin\bash --login -c "PIBOX_RELEASE=$(cat tag.txt | sed 's/ //g' | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*\(-rc[[:digit:]]\+\)\?') || true; if [ $PIBOX_RELEASE ]; then mkdir -p releases/$PIBOX_RELEASE/; cp kiwix-hotspot-win*.exe releases/$PIBOX_RELEASE/; scp -r -o StrictHostKeyChecking=no -i pibox_installer_ci_rsa releases/$PIBOX_RELEASE ci@download.kiwix.org:/data/download/release/kiwix-hotspot/; fi"
+  - C:\msys64\usr\bin\bash --login -c "PIBOX_RELEASE=$(cat tag.txt | sed 's/ //g' | grep -x 'v[[:digit:]]\+.[[:digit:]]\+\(.[[:digit:]]\+\)*\(-rc[[:digit:]]\+\)\?') || true; if [ $PIBOX_RELEASE ]; then mkdir -p releases/$PIBOX_RELEASE/; cp kiwix-hotspot-win*.exe releases/$PIBOX_RELEASE/; scp -r -o StrictHostKeyChecking=no -i kiwix-hotspot_ci_rsa releases/$PIBOX_RELEASE ci@download.kiwix.org:/data/download/release/kiwix-hotspot/; fi"
