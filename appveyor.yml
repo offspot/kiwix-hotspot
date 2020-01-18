@@ -46,11 +46,11 @@ install:
       }
       (Get-Content kiwix-hotspot\data.py).replace('devel', $version) | Set-Content kiwix-hotspot\data.py
 
-  # decrypt certificates
-  - nuget install secure-file -ExcludeVersion
   - choco install reshack.portable -y
-  - secure-file\tools\secure-file -decrypt kiwix.p12.appveyor_enc -secret %win_certificate_secret% -salt %win_certificate_salt% -out kiwix.pfx
-  - secure-file\tools\secure-file -decrypt kiwix-hotspot_ci_rsa.appveyor_enc -secret %rsa_secret% -salt %rsa_salt% -out kiwix-hotspot_ci_rsa
+  # decrypt certificates
+  - ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/secure-file/master/install.ps1'))
+  - cmd: appveyor-tools\secure-file -decrypt kiwix.p12.appveyor_enc -secret %win_certificate_secret% -salt %win_certificate_salt% -out kiwix.pfx
+  - cmd: appveyor-tools\secure-file -decrypt hotspot_ci_rsa.appveyor_enc -secret %rsa_secret% -salt %rsa_salt% -out kiwix-hotspot_ci_rsa
 
   # Download vexpress-boot
   - appveyor DownloadFile "http://mirror.download.kiwix.org/dev/vexpress-boot.zip"
