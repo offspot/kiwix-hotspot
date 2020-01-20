@@ -1,5 +1,7 @@
 name: create master
 on:
+  repository_dispatch:
+    types: create-master
   schedule:
     # every months on the 1st
     - cron:  '0 6 1 * *'
@@ -38,8 +40,6 @@ jobs:
 
       - name: checkout code
         uses: actions/checkout@v1
-        with:
-          fetch-depth: 1
       - name: setup python version
         uses: actions/setup-python@v1
         with:
@@ -75,7 +75,9 @@ jobs:
         run: pyinstaller --log-level=DEBUG kiwix-hotspot-linux.spec
 
       - name: build master image
-        run: dist/kiwix-hotspot image --ram 8G --root 7 --size 8 --out ${OUT_IMG}
+        env:
+            QEMU_CPU: 2
+        run: dist/kiwix-hotspot image --ram 6G --root 7 --size 8 --out ${OUT_IMG}
 
       - name: ZIP master image
         run: zip -9 ${OUT_IMG}.zip ${OUT_IMG}
