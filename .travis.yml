@@ -104,7 +104,7 @@ matrix:
   - os: linux
     language: generic
     python: 3.7.1  # just a label
-    dist: xenial
+    dist: bionic
     sudo: required
     addons:
       apt:
@@ -176,6 +176,7 @@ matrix:
     - pip3 install -U pyinstaller
     - pyinstaller --log-level=DEBUG kiwix-hotspot-linux.spec
     - cat build/kiwix-hotspot-linux/warnkiwix-hotspot-linux.txt || true
+    - ./dist/kiwix-hotspot --version
 
     # Archive
     - cd dist
