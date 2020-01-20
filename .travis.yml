@@ -48,7 +48,7 @@ matrix:
 
     - python3 -m pip install -U pip
     - python3 -m pip install -r requirements-macos.txt
-    - python3 -m pip install -U pyinstaller
+    - python3 -m pip install https://github.com/pyinstaller/pyinstaller/archive/develop.zip
     # following line needed locally (venv)
     #- ln -s /usr/local/lib/python3.7/site-packages/gi $(python3 -c "import sys; print(sys.path[-1])")/
     # fix gdk-pixbuf for codesign (https://github.com/pyinstaller/pyinstaller/pull/2596 and https://gist.github.com/rgaudin/5f027d0621e5a7639cb42f8ba753a259)
@@ -133,8 +133,10 @@ matrix:
     - sudo add-apt-repository -y ppa:deadsnakes/ppa
     - sudo apt-get update -y
     - sudo apt-get install -y python3.7 python3.7-dev
+    - sudo apt-get install --reinstall python3-pkg-resources
     - virtualenv -p /usr/bin/python3.7 hotspot-env
     - source hotspot-env/bin/activate
+    - pip3 install -U setuptools
 
     # pygobjects
     - pip3 install pycairo
