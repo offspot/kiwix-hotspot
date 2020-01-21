@@ -1,5 +1,8 @@
 name: create master
 on:
+  push:
+    branches:
+      - master-image-test
   repository_dispatch:
     types: create-master
   schedule:
