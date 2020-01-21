@@ -21,4 +21,4 @@ sudo ln -s /usr/local/bin/hotspot-demo /etc/network/if-up.d/hotspot-demo
 sudo sh -c 'echo "@reboot /usr/local/bin/hotspot-demo" >> /etc/crontab'
 
 echo "rename image for demo"
-cd /var/lib/ansible/local && sudo /usr/local/bin/ansible-playbook --inventory hosts --tags rename,seal  --extra-vars "tld=kiwix.org project_name=demo.hotspot" main.yml
+cd /var/lib/ansible/local && sudo /usr/bin/ansible-playbook --inventory hosts --tags rename,seal  --extra-vars "tld=kiwix.org project_name=demo.hotspot" main.yml

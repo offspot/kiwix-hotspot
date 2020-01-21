@@ -34,7 +34,7 @@ def run(machine, tags, extra_vars={}, secret_keys=[]):
 
     # prepare ansible command
     ansible_cmd = [
-        "/usr/local/bin/ansible-playbook",
+        "/usr/bin/ansible-playbook",
         "--inventory hosts",
         "--tags {}".format(",".join(tags)),
         '--extra-vars="@{}"'.format(extra_vars_path),
