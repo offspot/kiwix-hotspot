@@ -3,6 +3,7 @@
   pip:
     name: uwsgi
     state: absent
+  ignore_errors: True
   tags: master
 
 - name: Remove the old service file
