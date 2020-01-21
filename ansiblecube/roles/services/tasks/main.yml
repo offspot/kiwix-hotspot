@@ -8,7 +8,9 @@
     service: edupi
   when: ansible_local.config.edupi|bool
 
-- import_tasks: enable_vhost.yml name=edupi
+- import_tasks: enable_vhost.yml
+  vars:
+    name: edupi
   when: ansible_local.config.edupi|bool
 
 - import_tasks: enable_service.yml
@@ -16,7 +18,9 @@
     service: kalite
   when: ansible_local.config.kalite_languages | length
 
-- import_tasks: enable_vhost.yml name=kalite
+- import_tasks: enable_vhost.yml
+  vars:
+    name: kalite
   when: ansible_local.config.kalite_languages | length
 
 - import_tasks: enable_service.yml
@@ -24,7 +28,9 @@
     service: aflatoun
   when: ansible_local.config.aflatoun_languages | length
 
-- import_tasks: enable_vhost.yml name=aflatoun
+- import_tasks: enable_vhost.yml
+  vars:
+    name: aflatoun
   when: ansible_local.config.aflatoun_languages | length
 
 - import_tasks: enable_service.yml
