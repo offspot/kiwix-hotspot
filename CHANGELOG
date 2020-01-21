@@ -1,3 +1,7 @@
+2.3.1
+* fixed startup issue on Windows and Linux
+* dmg signed as well
+
 2.3
 * Added new content: Math Mathews APK (1.6)
 * Updated Kiwix to version 3.0.1-8
