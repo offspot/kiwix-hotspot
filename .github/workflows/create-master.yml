@@ -70,7 +70,6 @@ jobs:
 
       - name: install python deps
         run: |
-          python -m pip install --upgrade pip
           pip install -r requirements-linux.txt
           pip install -U pyinstaller
 
