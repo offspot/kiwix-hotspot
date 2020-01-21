@@ -37,7 +37,9 @@
     autoclean: yes
   tags: setup
 
-- include_tasks: disable_service.yml service=php{{ php_version }}-fpm
+- import_tasks: disable_service.yml
+  vars:
+    service: php{{ php_version }}-fpm
   tags: setup
 
 - name: change PHP7 settings to allow file uploads up to 5MiB
@@ -59,10 +61,14 @@
     autoclean: yes
   tags: setup
 
-- include_tasks: disable_service.yml service=memcached
+- import_tasks: disable_service.yml
+  vars:
+    service: memcached
   tags: setup
 
-- include_tasks: disable_service.yml service=redis-server
+- import_tasks: disable_service.yml
+  vars:
+    service: redis-server
   tags: setup
 
 - import_tasks: clean_apt.yml

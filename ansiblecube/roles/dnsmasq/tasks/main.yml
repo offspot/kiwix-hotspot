@@ -9,7 +9,9 @@
     autoclean: yes
   tags: master
 
-- include_tasks: disable_service.yml service=dnsmasq
+- import_tasks: disable_service.yml
+  vars:
+    service: dnsmasq
   tags: master
 
 - name: Copy dnsmasq.conf file
@@ -20,7 +22,7 @@
   tags: ['master', 'rename']
 
 - name: Copy dnsmasq-spoof.conf file
-  template: 
+  template:
     src: dnsmasq-spoof.conf.j2
     dest: /etc/dnsmasq-spoof.conf
   tags: master

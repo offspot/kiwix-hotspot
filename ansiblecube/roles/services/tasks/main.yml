@@ -1,40 +1,60 @@
 ---
-- include_tasks: enable_service.yml service=kiwix-server
+- import_tasks: enable_service.yml
+  vars:
+    service: kiwix-server
 
-- include_tasks: enable_service.yml service=edupi
+- import_tasks: enable_service.yml
+  vars:
+    service: edupi
   when: ansible_local.config.edupi|bool
 
-- include_tasks: enable_vhost.yml name=edupi
+- import_tasks: enable_vhost.yml name=edupi
   when: ansible_local.config.edupi|bool
 
-- include_tasks: enable_service.yml service=kalite
+- import_tasks: enable_service.yml
+  vars:
+    service: kalite
   when: ansible_local.config.kalite_languages | length
 
-- include_tasks: enable_vhost.yml name=kalite
+- import_tasks: enable_vhost.yml name=kalite
   when: ansible_local.config.kalite_languages | length
 
-- include_tasks: enable_service.yml service=aflatoun
+- import_tasks: enable_service.yml
+  vars:
+    service: aflatoun
   when: ansible_local.config.aflatoun_languages | length
 
-- include_tasks: enable_vhost.yml name=aflatoun
+- import_tasks: enable_vhost.yml name=aflatoun
   when: ansible_local.config.aflatoun_languages | length
 
-- include_tasks: enable_service.yml service=parsoid
+- import_tasks: enable_service.yml
+  vars:
+    service: parsoid
   when: ansible_local.config.wikifundi_languages | length
 
-- include_tasks: enable_service.yml service=memcached
+- import_tasks: enable_service.yml
+  vars:
+    service: memcached
   when: ansible_local.config.wikifundi_languages | length
 
-- include_tasks: enable_service.yml service=php{{ php_version }}-fpm
+- import_tasks: enable_service.yml
+  vars:
+    service: php{{ php_version }}-fpm
   when: ansible_local.config.wikifundi_languages | length
 
-- include_tasks: enable_vhost.yml name={{ item }}.wikifundi
+- include_tasks: enable_vhost.yml
+  vars:
+    name: "{{ item }}.wikifundi"
   with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
   when: ansible_local.config.wikifundi_languages | length
 
-- include_tasks: enable_service.yml service=dnsmasq
+- import_tasks: enable_service.yml
+  vars:
+    service: dnsmasq
 
-- include_tasks: disable_service.yml service=rsyslog
+- import_tasks: disable_service.yml
+  vars:
+    service: rsyslog
 
 - name: Disable SSH
   systemd:

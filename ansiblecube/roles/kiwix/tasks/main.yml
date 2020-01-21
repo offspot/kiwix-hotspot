@@ -75,5 +75,7 @@
   notify: restart nginx
   tags: ['master', 'rename']
 
-- include_tasks: enable_service.yml service=kiwix-server
+- import_tasks: enable_service.yml
+  vars:
+    service: kiwix-server
   tags: master
