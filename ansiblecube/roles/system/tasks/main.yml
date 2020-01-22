@@ -183,7 +183,7 @@
 
 - name: Remove unwanted packages before upgrading
   apt:
-    name: apache2,apache2-mpm-worker,apache2-utils,apache2.2-bin,apache2.2-common,btrfs-tools,figlet,toilet,bluez,fping,stress,iperf,iotop,lirc,apt-listchanges,clipit,sslh,python-pip,python-setuptools,python-virtualenv,virtualenv
+    name: apache2,apache2-mpm-worker,apache2-utils,apache2.2-bin,apache2.2-common,btrfs-tools,figlet,toilet,bluez,fping,stress,iperf,iotop,lirc,apt-listchanges,clipit,sslh,python-virtualenv,virtualenv
     state: absent
     purge: yes
     autoremove: yes
@@ -192,7 +192,7 @@
 
 - name: Install or upgrade all required package
   apt:
-    name: python-dev,git,sudo,lsb-release,vim,locate,git,unzip,bash-completion,aptitude,ntpdate,fake-hwclock,hdparm,ncurses-term,libffi-dev,libssl-dev,tree,screen,iftop,tmux,mtr-tiny,libwww-perl,httpie,lshw,hwinfo,sqlite3,elinks,mosh,curl,apt-transport-https,tar,exfat-fuse,exfat-utils,gzip,hostname,liblzma5,pkg-config,systemd,systemd-sysv,tzdata,wget,xz-utils,adduser,libpam-systemd,policykit-1,python3-pip,python3-setuptools
+    name: python-dev,git,sudo,lsb-release,vim,locate,git,unzip,bash-completion,aptitude,ntpdate,fake-hwclock,hdparm,ncurses-term,libffi-dev,libssl-dev,tree,screen,iftop,tmux,mtr-tiny,libwww-perl,httpie,lshw,hwinfo,sqlite3,elinks,mosh,curl,apt-transport-https,tar,exfat-fuse,exfat-utils,gzip,hostname,liblzma5,pkg-config,systemd,systemd-sysv,tzdata,wget,xz-utils,adduser,libpam-systemd,policykit-1,python3-pip,python3-setuptools,python-pip,python-setuptools
     state: latest
     autoremove: yes
     autoclean: yes
