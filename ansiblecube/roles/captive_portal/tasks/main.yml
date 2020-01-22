@@ -1,13 +1,10 @@
 ---
 - name: Install conntrack
   apt:
-    name: "{{item}}"
+    name: conntrack,uwsgi-plugin-python
     state: latest
     autoremove: yes
     autoclean: yes
-  with_items:
-    - conntrack
-    - uwsgi-plugin-python
   tags: master
 
 - name: Copy connectivity check script
@@ -70,13 +67,13 @@
   tags: master
 
 - name: Start dnsmasq-spoof.conf file by default - forcing short TTL
-  lineinfile: 
+  lineinfile:
     dest: /etc/default/dnsmasq
     regexp: 'DNSMASQ_OPTS='
     line: 'DNSMASQ_OPTS="--conf-file=/etc/dnsmasq-spoof.conf --local-ttl=300"'
     state: present
   tags: master
-              
+
 - name: Create /etc/nginx/ssl folder
   file:
     path: /etc/nginx/ssl

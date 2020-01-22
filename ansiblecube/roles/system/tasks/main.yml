@@ -192,7 +192,7 @@
 
 - name: Install or upgrade all required package
   apt:
-    name: python-dev,git,sudo,lsb-release,vim,locate,git,unzip,bash-completion,aptitude,ntpdate,fake-hwclock,hdparm,ncurses-term,libffi-dev,libssl-dev,tree,screen,iftop,tmux,mtr-tiny,libwww-perl,httpie,lshw,hwinfo,sqlite3,elinks,mosh,curl,apt-transport-https,tar,exfat-fuse,exfat-utils,gzip,hostname,liblzma5,pkg-config,systemd,systemd-sysv,tzdata,wget,xz-utils,adduser,libpam-systemd,policykit-1,python3-pip
+    name: python-dev,git,sudo,lsb-release,vim,locate,git,unzip,bash-completion,aptitude,ntpdate,fake-hwclock,hdparm,ncurses-term,libffi-dev,libssl-dev,tree,screen,iftop,tmux,mtr-tiny,libwww-perl,httpie,lshw,hwinfo,sqlite3,elinks,mosh,curl,apt-transport-https,tar,exfat-fuse,exfat-utils,gzip,hostname,liblzma5,pkg-config,systemd,systemd-sysv,tzdata,wget,xz-utils,adduser,libpam-systemd,policykit-1,python3-pip,python3-setuptools
     state: latest
     autoremove: yes
     autoclean: yes
@@ -203,14 +203,10 @@
 
 - name: Install avahi packages
   apt:
-    name: "{{ item }}"
+    name: avahi-daemon,libnss-mdns,avahi-utils
     state: latest
     autoremove: yes
     autoclean: yes
-  with_items:
-   - avahi-daemon
-   - libnss-mdns
-   - avahi-utils
   tags: master
 
 - import_tasks: clean_apt.yml
