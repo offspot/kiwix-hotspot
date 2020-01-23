@@ -1,4 +1,6 @@
 name: create master
+runs-on: self-hosted
+
 on:
   push:
     branches:
@@ -81,8 +83,8 @@ jobs:
             QEMU_CPU: 2
         run: dist/kiwix-hotspot image --ram 6G --root 7 --size 8 --out ${OUT_IMG}
 
-      - name: ZIP master image
-        run: zip -9 ${OUT_IMG}.zip ${OUT_IMG}
+      # - name: ZIP master image
+      #   run: zip -9 ${OUT_IMG}.zip ${OUT_IMG}
 
       - name: upload master image to kiwix server
-        run: scp ${OUT_IMG}.zip ci@download.kiwix.org:/data/download/hotspots/base/
+        run: scp -c aes128-ctr ${OUT_IMG} ci@download.kiwix.org:/data/download/hotspots/base/
