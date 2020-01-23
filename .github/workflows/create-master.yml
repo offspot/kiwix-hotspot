@@ -1,5 +1,4 @@
 name: create master
-runs-on: self-hosted
 
 on:
   push:
