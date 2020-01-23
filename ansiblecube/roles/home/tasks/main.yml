@@ -26,7 +26,7 @@
 
 # copy branding again in reconfigure to allow out-of-master updates
 - name: Copy static files (general branding)
-  command: cp -r static /var/www/
+  command: cp -r {{ playbook_dir }}/roles/home/files/static /var/www/
   tags: ["master", "reconfigure"]
 
 - name: copy blank homepage
