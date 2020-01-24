@@ -24,16 +24,17 @@ jobs:
         env:
           ssh_key: ${{ secrets.ssh_key }}
         run: |
-          echo "$ssh_key" | base64 -d > ssh_key
-          chmod 600 ssh_key
+          echo "$ssh_key" | base64 -d > ${HOME}/ssh_key
+          chmod 600 ${HOME}/ssh_key
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
           ssh-keyscan download.kiwix.org >> ${HOME}/.ssh/known_hosts
           chmod 644 ${HOME}/.ssh/known_hosts
+
       - name: test upload
         run: |
           echo "from workflow" > test-file
-          scp -i ssh_key test-file ci@download.kiwix.org:/data/tmp/ci/test-file
+          scp -i ${HOME}/ssh_key test-file ci@download.kiwix.org:/data/tmp/ci/test-file
 
       - name: install system deps
         env:
@@ -86,4 +87,4 @@ jobs:
       #   run: zip -9 ${OUT_IMG}.zip ${OUT_IMG}
 
       - name: upload master image to kiwix server
-        run: scp -i ssh_key -c aes128-ctr ${OUT_IMG} ci@download.kiwix.org:/data/download/hotspots/base/
+        run: scp -i ${HOME}/ssh_key -c aes128-ctr ${OUT_IMG} ci@download.kiwix.org:/data/download/hotspots/base/
