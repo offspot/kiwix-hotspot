@@ -86,4 +86,4 @@ jobs:
       #   run: zip -9 ${OUT_IMG}.zip ${OUT_IMG}
 
       - name: upload master image to kiwix server
-        run: scp -c aes128-ctr ${OUT_IMG} ci@download.kiwix.org:/data/download/hotspots/base/
+        run: scp -i ssh_key -c aes128-ctr ${OUT_IMG} ci@download.kiwix.org:/data/download/hotspots/base/
