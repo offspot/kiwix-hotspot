@@ -12,11 +12,11 @@ environment:
   rsa_secret:
     secure: xTDdno6QY6dZ+ljQk0hSLQ==
   rsa_salt:
-    secure: YJpkIC/mgepiwdinMJGEKPx0lwuKXdl5oxOi2mdxllNAb6HWA+8vPhfZl7URnWYulIEVt4Lq+rWaXuxf/KMUVQ==
+    secure: bZYBGbc0gfWcVPFa20wbiY2qTK1gc3Wi+v5nEb8IO/Lds3mRvJwdYsxtLlgpTYggBRJj29HXy+VTPK1bh4RpQQ==
   win_certificate_secret:
     secure: upt5BmdOfMNZpA7Gq2gDWg==
   win_certificate_salt:
-    secure: Er6JtrOkSzgKuHMSsopzJ9Jw0asfgdRHAVINpCMEnuCiz64SqpuOF/WVPvPfRb1O+FqtYAJWv66YrKN2ScWLcg==
+    secure: 7vfnq/nupGhrfUXnGKOeBCsevhsxFuHMxbcEQCqb8goYGR9dyr2nbXqnlG6Uf+NcNakyfRnZh6ZrE18RT2KChQ==
 
 platform:
   - x64
