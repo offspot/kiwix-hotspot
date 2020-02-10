@@ -24,6 +24,7 @@ platform:
 
 install:
   - set PATH=C:\Program Files (x86)\Windows Kits\10\bin\%platform%\;%PATH%
+  - set VS100COMNTOOLS=%VS140COMNTOOLS%"
 
   # send all non-release build to tmp.kiwix.org except cron to nightly folder
   - ps: if ($env:APPVEYOR_SCHEDULED_BUILD -eq "true") { "/data/download/nightly/" | Out-File C:\destination-ps.txt -NoNewline -Encoding ASCII; Get-Date -UFormat "%Y-%m-%d" | Out-File C:\destination-ps.txt -Append -NoNewline -Encoding ASCII; "ci" | Out-File C:\user-ps.txt -NoNewline -Encoding ASCII; "download.kiwix.org" | Out-File C:\host-ps.txt -NoNewline -Encoding ASCII } else  { "/data/tmp/ci" | Out-File C:\destination-ps.txt -NoNewline -Encoding ASCII; "ci" | Out-File C:\user-ps.txt -NoNewline -Encoding ASCII; "tmp.kiwix.org" | Out-File C:\host-ps.txt -NoNewline -Encoding ASCII; }
