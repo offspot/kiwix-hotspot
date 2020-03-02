@@ -8,7 +8,7 @@ Kiwix Hotspot configure the RaspberryPi into a hotspot WiFi with offline content
 
 ## Issues
 
-Please report issues [on framagit](https://framagit.org/ideascube/pibox-installer/issues).
+Please report issues [on GitHub](https://github.com/kiwix/kiwix-hotspot/issues).
 
 ## History
 
