@@ -58,7 +58,7 @@ requirements: `gcc-arm-linux-gnueabihf`, `bc` and `zip`
 
 run: `python3 make-vexpress-boot`
 
-## Build pibox base image
+## Build base image
 
 kiwix-hotspot uses a custom base image based off raspbian-lite with the following modifications (not exhaustive):
 
@@ -73,7 +73,6 @@ Should you want to build the base image:
 ``` sh
 kiwix-hotspot image --root 7 --size 8 --out my-base.img
 ```
-
 
 ## Package kiwix-hotspot
 
