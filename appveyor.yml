@@ -46,7 +46,7 @@ install:
       }
       (Get-Content kiwix-hotspot\data.py).replace('devel', $version) | Set-Content kiwix-hotspot\data.py
 
-  - choco install reshack.portable -y
+  - choco install reshack -y
   # decrypt certificates
   - ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/secure-file/master/install.ps1'))
   - cmd: appveyor-tools\secure-file -decrypt kiwix.p12.appveyor_enc -secret %win_certificate_secret% -salt %win_certificate_salt% -out kiwix.pfx
