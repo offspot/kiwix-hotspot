@@ -1,3 +1,8 @@
+2.3.2
+* fixed captive portal (Flask-Babel bug)
+* change title/desc of mathews and nomad in homepage
+* fixed typo and wording in nomad description
+
 2.3.1
 * fixed startup issue on Windows and Linux
 * dmg signed as well

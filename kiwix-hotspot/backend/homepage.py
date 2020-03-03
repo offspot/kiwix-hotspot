@@ -76,14 +76,12 @@ def generate_homepage(logger, options):
 
     if options["nomad"]:
         edupi_fqdn = "nomad.{fqdn}".format(fqdn=fqdn)
+        title = "Nomad exercices du CP au CM2"
+        description = "Téléchargez l'application pour android"
         if options["language"] == "fr":
-            title = "Écoles Numériques Android"
             category = "Accès"
-            description = "Accès à l'application Android de Nomad Education"
         else:
-            title = "Android Digital Schools"
             category = "Access"
-            description = "Access to the Nomad Education Android App"
         cards.append(
             {
                 "url": "http://{}".format(edupi_fqdn),
@@ -98,13 +96,13 @@ def generate_homepage(logger, options):
     if options["mathews"]:
         edupi_fqdn = "mathews.{fqdn}".format(fqdn=fqdn)
         if options["language"] == "fr":
-            title = "Math Mathews Android"
+            title = "Math Mathews Treasure Hunt"
             category = "Accès"
-            description = "Accès à l'application Android Math Mathews"
+            description = "Téléchargez l'application"
         else:
-            title = "Android Math Mathews"
+            title = "Math Mathews Treasure Hunt"
             category = "Access"
-            description = "Access to the Math Mathews Android App"
+            description = "Download the App"
         cards.append(
             {
                 "url": "http://{}".format(edupi_fqdn),
