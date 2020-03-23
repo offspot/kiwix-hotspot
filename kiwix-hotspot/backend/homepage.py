@@ -171,7 +171,7 @@ def generate_homepage(logger, options):
                     "url": "http://{}/go/fr".format(kalite_fqdn),
                     "css_class": "khanacademy",
                     "category_class": "learn",
-                    "category": "Appendre",
+                    "category": "Apprendre",
                     "title": "Khan Academy",
                     "description": "Apprendre via des vidéos et des exercices.",
                 }

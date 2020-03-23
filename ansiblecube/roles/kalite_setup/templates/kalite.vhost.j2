@@ -13,7 +13,6 @@ server {
 
     # Default value, overwritten in nginx.d
     set $kalite_home {{ kalite_root }}/;
-    include /etc/ka-lite/nginx.d/*.conf;
 
     location /static {
         alias   $kalite_home/httpsrv/static/;
@@ -27,27 +26,23 @@ server {
         alias   $kalite_home/content/;
     }
 
-    location /content/khan {
-        alias   /usr/share/kalite/assessment/khan/;
-    }
-
     location /favicon.ico {
         empty_gif;
     }
 
     location /go/fr {
-        add_header Content-Type "text/html; charset=UTF-8";
-        return 200 "<html><head><title>KA Lite en français</title></head><body><p>Veuillez patienter…</p><iframe style='display: none;' src='/api/i18n/set_default_language/?lang=fr' onload=\"window.location = '/';\"><p><a href='/'>Cliquez ici</a> pour accèder à Khan Academy</p></iframe></body></html>";
+        default_type "text/html; charset=UTF-8";
+        return 200 "<html><head><title>KA Lite en français</title></head><body><p>Veuillez patienter…</p><iframe style='display: none;' src='/api/i18n/set_default_language/?lang=fr' onload=\"window.location = '/learn/';\"><p><a href='/learn/'>Cliquez ici</a> pour accèder à Khan Academy</p></iframe></body></html>";
     }
 
     location /go/es {
-        add_header Content-Type "text/html; charset=UTF-8";
-        return 200 "<html><head><title>KA Lite en español</title></head><body><p>Por favor espera…</p><iframe style='display: none;' src='/api/i18n/set_default_language/?lang=es' onload=\"window.location = '/';\"><p><a href='/'>Haga clic aquí</a> para acceder a la Khan Academy</p></iframe></body></html>";
+        default_type "text/html; charset=UTF-8";
+        return 200 "<html><head><title>KA Lite en español</title></head><body><p>Por favor espera…</p><iframe style='display: none;' src='/api/i18n/set_default_language/?lang=es' onload=\"window.location = '/learn/';\"><p><a href='/learn/'>Haga clic aquí</a> para acceder a la Khan Academy</p></iframe></body></html>";
     }
 
     location /go/en {
-        add_header Content-Type "text/html; charset=UTF-8";
-        return 200 "<html><head><title>KA Lite in english</title></head><body><p>please wait…</p><iframe style='display: none;' src='/api/i18n/set_default_language/?lang=fr' onload=\"window.location = '/';\"><p><a href='/'>Click here</a> to access Khan Academy</p></iframe></body></html>";
+        default_type "text/html; charset=UTF-8";
+        return 200 "<html><head><title>KA Lite in english</title></head><body><p>please wait…</p><iframe style='display: none;' src='/api/i18n/set_default_language/?lang=fr' onload=\"window.location = '/learn/';\"><p><a href='/learn/'>Click here</a> to access Khan Academy</p></iframe></body></html>";
     }
 
 
