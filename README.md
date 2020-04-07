@@ -6,6 +6,9 @@ This solution serves offline content from the web such as Wikipedia, the Gutenbe
 
 Kiwix Hotspot configure the RaspberryPi into a hotspot WiFi with offline contents.
 
+[![CodeFactor](https://www.codefactor.io/repository/github/kiwix/kiwix-hotspot/badge)](https://www.codefactor.io/repository/github/kiwix/kiwix-hotspot)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
 ## Issues
 
 Please report issues [on GitHub](https://github.com/kiwix/kiwix-hotspot/issues).
@@ -125,4 +128,5 @@ we use a self extracting archive 7zS.sfx because pyinstaller in onefile on windo
 
 ## License
 
-GPLv3 or (at your option) any later version, see [LICENSE](https://github.com/kiwix/kiwix-hotspot/blob/master/LICENSE) for more details.
+[GPLv3](https://www.gnu.org/licenses/gpl-3.0) or later, see
+[LICENSE](LICENSE) for more details.
