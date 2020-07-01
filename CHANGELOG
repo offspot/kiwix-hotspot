@@ -1,6 +1,7 @@
 2.3.3
 * fixed typo in khan label
 * khan link from homepage goes directly to learn page
+* updated kiwix-serve to 3.1.1-6 (support for new ZIM files)
 
 2.3.2
 * fixed captive portal (Flask-Babel bug)

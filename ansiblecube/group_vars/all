@@ -33,7 +33,7 @@ language_name: "English"
 # versions
 qemu_kernel_version: "4.10.0"
 kernel_version: "4.14.34"
-kiwix_version: "3.0.1-8"
+kiwix_version: "3.1.1-6"
 kalite_version: "0.17.4"
 edupi_version: "1.4.10"
 python3_version: "3.5"
