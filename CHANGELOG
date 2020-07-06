@@ -1,3 +1,7 @@
+2.3.4
+* fixed windows build
+* updated kiwix-serve to 3.1.2
+
 2.3.3
 * fixed typo in khan label
 * khan link from homepage goes directly to learn page
