@@ -1,3 +1,6 @@
+2.3.5
+* Now updating kiwix-serve on reconfigure if version mismatches with master
+
 2.3.4
 * fixed windows build
 * updated kiwix-serve to 3.1.2
