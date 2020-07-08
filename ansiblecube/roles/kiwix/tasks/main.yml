@@ -1,39 +1,13 @@
 ---
-- debug: msg="kiwix_version {{ kiwix_version }}"
-  tags: master
+- name: Check installed kiwix-serve version
+  shell: /usr/local/bin/kiwix-serve --version
+  register: installed_kiwix_version
+  ignore_errors: True
+  tags: ['master', 'reconfigure']
 
-- name: Downloading kiwix binaries {{ kiwix_version }}
-  get_url:
-    url: "{{ mirror }}/release/kiwix-tools/kiwix-tools_linux-{{ ansible_architecture }}-{{ kiwix_version }}.tar.gz"
-    dest: /tmp/kiwix-tools.tar.gz
-    timeout: 30
-    force: yes
-  when: ansible_architecture in ("x86_64", "i586")
-  tags: master
-
-- name: Downloading kiwix binaries {{ kiwix_version }}
-  get_url:
-    url: "{{ mirror }}/release/kiwix-tools/kiwix-tools_linux-i586-{{ kiwix_version }}.tar.gz"
-    dest: /tmp/kiwix-tools.tar.gz
-    timeout: 30
-    force: yes
-  when: ansible_architecture not in ("x86_64", "i586", "armhf", "armv7l")
-  tags: master
-
-- name: Downloading kiwix binaries {{ kiwix_version }}
-  get_url:
-    url: "{{ mirror }}/release/kiwix-tools/kiwix-tools_linux-armhf-{{ kiwix_version }}.tar.gz"
-    dest: /tmp/kiwix-tools.tar.gz
-    timeout: 30
-    force: yes
-  when: ansible_architecture in ("armhf", "armv7l")
-  tags: master
-
-- name: Copying downloaded kiwix-tools
-  shell: tar -x --strip-components 1 -f /tmp/kiwix-tools.tar.gz && mv /tmp/kiwix-serve /usr/local/bin/kiwix-serve && chmod 755 /usr/local/bin/kiwix-serve chdir=/tmp
-  args:
-    warn: no
-  tags: master
+- import_tasks: install.yml
+  when: kiwix_version != installed_kiwix_version.stdout
+  tags: ['master', 'reconfigure']
 
 - name: Create the ZIM destination folder
   file:
@@ -46,7 +20,6 @@
     src: library.xml
     dest: "{{ zim_path }}/library.xml"
   tags: ['master', 'move-content']
-
 
 - name: Setup startup file
   template:
@@ -79,3 +52,4 @@
   vars:
     service: kiwix-server
   tags: master
+

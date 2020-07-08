@@ -1,0 +1,31 @@
+---
+- debug: msg="Installing kiwix_version ({{ installed_kiwix_version.stdout }} -> {{ kiwix_version }})"
+
+- name: Downloading kiwix binaries {{ kiwix_version }} for x86
+  get_url:
+    url: "{{ mirror }}/release/kiwix-tools/kiwix-tools_linux-{{ ansible_architecture }}-{{ kiwix_version }}.tar.gz"
+    dest: /tmp/kiwix-tools.tar.gz
+    timeout: 30
+    force: yes
+  when: ansible_architecture in ("x86_64", "i586")
+
+- name: Downloading kiwix binaries {{ kiwix_version }} for i586
+  get_url:
+    url: "{{ mirror }}/release/kiwix-tools/kiwix-tools_linux-i586-{{ kiwix_version }}.tar.gz"
+    dest: /tmp/kiwix-tools.tar.gz
+    timeout: 30
+    force: yes
+  when: ansible_architecture not in ("x86_64", "i586", "armhf", "armv7l")
+
+- name: Downloading kiwix binaries {{ kiwix_version }} for arm
+  get_url:
+    url: "{{ mirror }}/release/kiwix-tools/kiwix-tools_linux-armhf-{{ kiwix_version }}.tar.gz"
+    dest: /tmp/kiwix-tools.tar.gz
+    timeout: 30
+    force: yes
+  when: ansible_architecture in ("armhf", "armv7l")
+
+- name: Copying downloaded kiwix-tools
+  shell: tar -x --strip-components 1 -f /tmp/kiwix-tools.tar.gz && mv /tmp/kiwix-serve /usr/local/bin/kiwix-serve && chmod 755 /usr/local/bin/kiwix-serve chdir=/tmp
+  args:
+    warn: no
