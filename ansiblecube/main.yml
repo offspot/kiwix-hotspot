@@ -10,6 +10,8 @@
       when: ansible_architecture == 'armv7l' and ansible_lsb.id == 'Debian'
       ignore_errors: yes
       tags: ['always']
+    - include_tasks: disable_service.yml service=dnsmasq
+      tags: always
 
   roles:
     - role: variables

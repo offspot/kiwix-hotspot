@@ -1,3 +1,6 @@
+2.3.6
+* Fixed network operations in qemu
+
 2.3.5
 * Now updating kiwix-serve on reconfigure if version mismatches with master
 
