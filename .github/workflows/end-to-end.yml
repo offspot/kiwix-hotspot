@@ -1,0 +1,65 @@
+name: end-to-end test
+on:
+  repository_dispatch:
+    types: end-to-end
+
+jobs:
+  build:
+    name: end-to-end test
+    runs-on: ubuntu-latest
+    steps:
+      - name: install system deps
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y locales openssh-client wget zip unzip tar python3-gi python3-gi-cairo python3-cairo gir1.2-gtk-3.0 libdbus-1-dev libdbus-glib-1-dev libffi-dev build-essential libssl-dev python3-dev libgdk-pixbuf2.0-dev exfat-fuse exfat-utils
+          sudo usermod -a -G disk runner
+
+      - name: checkout code
+        uses: actions/checkout@v1
+      - name: setup python version
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.7'
+
+      - name: download custom kernel
+        run: |
+          wget http://mirror.download.kiwix.org/dev/vexpress-boot.zip
+          unzip vexpress-boot.zip
+      - name: download static Qemu
+        run: |
+          wget http://mirror.download.kiwix.org/dev/qemu-2.12.0-linux-x86_64.tar.gz
+          tar xvf qemu-2.12.0-linux-x86_64.tar.gz
+      - name: download etcher-cli (packaging only)
+        run: |
+          wget http://download.kiwix.org/dev/balena-etcher-cli-1.4.8-linux-x64.tar.gz
+          mkdir -p etcher-cli
+          tar xf balena-etcher-cli-1.4.8-linux-x64.tar.gz -C etcher-cli --strip-components=1
+      - name: download aria2c (packaging only)
+        run: |
+          wget http://download.kiwix.org/dev/aria2c-linux64.zip
+          unzip aria2c-linux64.zip
+          rm aria2c-linux64.zip
+          wget http://download.kiwix.org/dev/ca-certificates.crt
+
+      - name: install python deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-linux.txt
+          pip install -U pyinstaller
+
+      - name: compile app
+        run: pyinstaller --log-level=DEBUG kiwix-hotspot-linux.spec
+
+      - name: build test image with small projects
+        run: |
+          sudo dist/kiwix-hotspot cli --root --timezone UTC --aflatoun yes --edupi yes --nomad yes --mathews yes --edupi-resources https://download.openzim.org/wikifundi/2.0/resources_en_fr_2018-08.zip --zim-install wikipedia_fr_test.fr --size 16G
+          ls -lh ./hotspot-*.img || true
+          sudo rm -rf ./hotspot-*.img || true
+          sudo dist/kiwix-hotspot cache --build . reset --keep-master || true
+
+      - name: build test image with wikifundi
+        run: |
+          sudo dist/kiwix-hotspot cli --root --timezone UTC --wikifundi fr --zim-install wikipedia_fr_test.fr --size 16G
+          ls -lh ./hotspot-*.img || true
