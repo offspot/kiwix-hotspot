@@ -125,6 +125,7 @@ def reset_cache(logger, build_folder, cache_folder, **kwargs):
     logger.std("-------------")
 
     if kwargs.get("keep_master"):
+        tmp_master_fpath = None
 
         master = get_content("hotspot_master_image")
         master_fpath = os.path.join(cache_folder, master["name"])
@@ -160,7 +161,8 @@ def reset_cache(logger, build_folder, cache_folder, **kwargs):
             shutil.move(tmp_master_fpath, master_fpath)
         except Exception as exp:
             logger.err("Unable to move back your master file into fresh cache.")
-            logger.err("Please find your master at: {}".format(tmp_master_fpath))
+            if tmp_master_fpath is not None:
+                logger.err("Please find your master at: {}".format(tmp_master_fpath))
             return 1
 
     logger.std("-------------")
