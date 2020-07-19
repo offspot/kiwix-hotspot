@@ -8,6 +8,13 @@
     autoclean: yes
   tags: master
 
+- name: add APK mime-type for nginx
+  lineinfile:
+    path: /etc/nginx/mime.types
+    line: '    application/vnd.android.package-archive apk;'
+    state: present
+  tags: master
+
 - name: install 502.html
   template:
     src: 502.html.j2
