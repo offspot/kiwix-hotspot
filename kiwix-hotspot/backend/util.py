@@ -52,9 +52,7 @@ def startup_info_args():
     return {"startupinfo": si, "creationflags": cf}
 
 
-def subprocess_pretty_call(
-    cmd, logger, stdin=None, check=False, decode=False, as_admin=False
-):
+def subprocess_pretty_call(cmd, logger, check=False, as_admin=False):
     """ flexible subprocess helper running separately and using the logger
 
         cmd: the command to be run
@@ -76,26 +74,23 @@ def subprocess_pretty_call(
     # We should use subprocess.run but it is not available in python3.4
     process = subprocess.Popen(
         cmd,
-        stdin=stdin,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
+        universal_newlines=True,
         **startup_info_args()
     )
 
     if logger is not None:
         logger.std("Call: " + str(process.args))
 
-    process.wait()
-
-    lines = (
-        [l.decode("utf-8", "ignore") for l in process.stdout.readlines()]
-        if decode
-        else process.stdout.readlines()
-    )
+    stdout, stderr = process.communicate()
+    lines = stdout.splitlines()
+    if stderr:
+        lines += ["--- STDERR ---"] + stderr.splitlines()
 
     if logger is not None:
         for line in lines:
-            logger.raw_std(line if decode else line.decode("utf-8", "ignore"))
+            logger.raw_std(line)
 
     if check:
         if process.returncode != 0:
@@ -105,10 +100,8 @@ def subprocess_pretty_call(
     return process.returncode, lines
 
 
-def subprocess_pretty_check_call(cmd, logger, stdin=None, as_admin=False):
-    return subprocess_pretty_call(
-        cmd=cmd, logger=logger, stdin=stdin, check=True, as_admin=as_admin
-    )
+def subprocess_pretty_check_call(cmd, logger, as_admin=False):
+    return subprocess_pretty_call(cmd=cmd, logger=logger, check=True, as_admin=as_admin)
 
 
 def subprocess_timed_output(cmd, logger, timeout=10):
@@ -407,7 +400,7 @@ def flash_image_with_etcher(image_fpath, device_fpath, retcode, from_cli=False):
     retcode.value = returncode
     if log_to_file:
         try:
-            subprocess_pretty_call(["/bin/cat", log_file.name], logger, decode=True)
+            subprocess_pretty_call(["/bin/cat", log_file.name], logger)
             log_file.close()
             os.unlink(log_file.name)
         except Exception as exp:
@@ -429,7 +422,7 @@ def sd_has_single_partition(sd_card, logger):
                 ]
             )
             return nb_partitions == 1
-        elif sys.platform == "win32":
+        if sys.platform == "win32":
             disk_prefix = re.sub(
                 r".+PHYSICALDRIVE([0-9+])", r"Disk #\1, Partition #", sd_card
             )
@@ -442,7 +435,7 @@ def sd_has_single_partition(sd_card, logger):
                 ]
             )
             return nb_partitions == 1
-        elif sys.platform == "linux":
+        if sys.platform == "linux":
             disk_prefix = re.sub(r"\/dev\/([a-z0-9]+)", r"─\1", sd_card)
             lines = subprocess_timed_output(["/bin/lsblk", sd_card], logger)
             nb_partitions = len(
