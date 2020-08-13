@@ -458,7 +458,7 @@ def mount_data_partition(image_fpath, logger):
             raise
         return mount_point, target_dev
 
-    elif sys.platform == "linux":
+    if sys.platform == "linux":
         # mount the loop-device (udisksctl sets the mount point)
         udisks_mount_ret, udisks_mount = subprocess_pretty_call(
             [udisksctl_exe, "mount", "--block-device", target_dev, udisks_nou],
@@ -479,7 +479,7 @@ def mount_data_partition(image_fpath, logger):
 
         return mount_point, target_dev
 
-    elif sys.platform == "darwin":
+    if sys.platform == "darwin":
         target_part = "{dev}s3".format(dev=target_dev)
 
         # create a mount point in /tmp
@@ -494,7 +494,7 @@ def mount_data_partition(image_fpath, logger):
             raise
         return mount_point, target_dev
 
-    elif sys.platform == "win32":
+    if sys.platform == "win32":
         mount_point = "{}\\".format(target_dev)
 
         # mount into the specified drive

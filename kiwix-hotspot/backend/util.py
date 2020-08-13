@@ -422,7 +422,7 @@ def sd_has_single_partition(sd_card, logger):
                 ]
             )
             return nb_partitions == 1
-        elif sys.platform == "win32":
+        if sys.platform == "win32":
             disk_prefix = re.sub(
                 r".+PHYSICALDRIVE([0-9+])", r"Disk #\1, Partition #", sd_card
             )
@@ -435,7 +435,7 @@ def sd_has_single_partition(sd_card, logger):
                 ]
             )
             return nb_partitions == 1
-        elif sys.platform == "linux":
+        if sys.platform == "linux":
             disk_prefix = re.sub(r"\/dev\/([a-z0-9]+)", r"─\1", sd_card)
             lines = subprocess_timed_output(["/bin/lsblk", sd_card], logger)
             nb_partitions = len(
