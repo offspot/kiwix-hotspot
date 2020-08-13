@@ -149,12 +149,12 @@ def get_avail_drive_letter(logger):
 
     # get volumes from wmic
     wmic_out = subprocess_pretty_call(
-        ["wmic", "logicaldisk", "get", "caption"], logger, check=True, decode=True
+        ["wmic", "logicaldisk", "get", "caption"], logger, check=True
     )
     volumes = [line.strip()[:-1] for line in wmic_out[1:-1]]
 
     # get list of network mappings
-    net_out = subprocess_pretty_call(["net", "use"], logger, check=True, decode=True)
+    net_out = subprocess_pretty_call(["net", "use"], logger, check=True)
     reg = r"\s+([A-Z])\:\s+\\"
     net_maps = [
         re.match(reg, line).groups()[0] for line in net_out if re.match(reg, line)
@@ -196,9 +196,7 @@ def guess_next_loop_device(logger):
     def _no_udisks(logger):
         """ guess loop device w/o udisks (using losetup/root) """
         try:
-            lines = subprocess_pretty_call(
-                [losetup_exe, "--find"], logger, check=True, decode=True
-            )
+            lines = subprocess_pretty_call([losetup_exe, "--find"], logger, check=True)
         except Exception as exp:
             logger.err(exp)
             return None
@@ -209,9 +207,7 @@ def guess_next_loop_device(logger):
         return _no_udisks(logger)
 
     try:
-        lines = subprocess_pretty_call(
-            [udisksctl_exe, "dump"], logger, check=True, decode=True
-        )
+        lines = subprocess_pretty_call([udisksctl_exe, "dump"], logger, check=True)
     except Exception as exp:
         logger.err(exp)
         return None
@@ -318,7 +314,6 @@ def get_virtual_device(image_fpath, logger):
                 ],
                 logger,
                 check=True,
-                decode=True,
             )[0].strip()
         else:
             loop_maker = subprocess_pretty_call(
@@ -335,7 +330,6 @@ def get_virtual_device(image_fpath, logger):
                 ],
                 logger,
                 check=True,
-                decode=True,
             )[0].strip()
 
         target_dev = re.search(r"(\/dev\/loop[0-9]+)\.?$", loop_maker).groups()[0]
@@ -343,10 +337,7 @@ def get_virtual_device(image_fpath, logger):
     elif sys.platform == "darwin":
         # attach image to create loop devices
         hdiutil_out = subprocess_pretty_call(
-            [hdiutil_exe, "attach", "-nomount", image_fpath],
-            logger,
-            check=True,
-            decode=True,
+            [hdiutil_exe, "attach", "-nomount", image_fpath], logger, check=True,
         )[0].strip()
         target_dev = str(hdiutil_out.splitlines()[0].split()[0])
 
@@ -467,13 +458,12 @@ def mount_data_partition(image_fpath, logger):
             raise
         return mount_point, target_dev
 
-    elif sys.platform == "linux":
+    if sys.platform == "linux":
         # mount the loop-device (udisksctl sets the mount point)
         udisks_mount_ret, udisks_mount = subprocess_pretty_call(
             [udisksctl_exe, "mount", "--block-device", target_dev, udisks_nou],
             logger,
             check=False,
-            decode=True,
         )
         udisks_mount = udisks_mount[0].strip()
 
@@ -489,7 +479,7 @@ def mount_data_partition(image_fpath, logger):
 
         return mount_point, target_dev
 
-    elif sys.platform == "darwin":
+    if sys.platform == "darwin":
         target_part = "{dev}s3".format(dev=target_dev)
 
         # create a mount point in /tmp
@@ -504,7 +494,7 @@ def mount_data_partition(image_fpath, logger):
             raise
         return mount_point, target_dev
 
-    elif sys.platform == "win32":
+    if sys.platform == "win32":
         mount_point = "{}\\".format(target_dev)
 
         # mount into the specified drive
