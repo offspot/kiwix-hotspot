@@ -52,7 +52,7 @@ matrix:
     # following line needed locally (venv)
     #- ln -s /usr/local/lib/python3.7/site-packages/gi $(python3 -c "import sys; print(sys.path[-1])")/
     # fix gdk-pixbuf for codesign (https://github.com/pyinstaller/pyinstaller/pull/2596 and https://gist.github.com/rgaudin/5f027d0621e5a7639cb42f8ba753a259)
-    - wget https://gist.githubusercontent.com/rgaudin/5f027d0621e5a7639cb42f8ba753a259/raw/2211905a8366ffa5cfae5c795330fbdefdfb95d1/pyinstaller-pixbuf-sign.patch
+    - wget https://gist.githubusercontent.com/rgaudin/5f027d0621e5a7639cb42f8ba753a259/raw/c03134d2c1fbceb1886ee51ba41a64798725e26d/pyinstaller-pixbuf-sign.patch
     - patch -p2 -d $(python3 -c "import os; import PyInstaller; print(os.path.dirname(PyInstaller.__file__))") < pyinstaller-pixbuf-sign.patch
 
     # Download vexpress-boot
