@@ -158,7 +158,7 @@ install:
   - cd C:\projects\kiwix-hotspot\dist\kiwix-hotspot
 
   # sign the build
-  - signtool.exe sign /f C:\projects\kiwix-hotspot\kiwix.pfx /p %win_certificate_password% /t http://timestamp.verisign.com/scripts/timstamp.dll /d "Kiwix Hotspot" C:\projects\kiwix-hotspot\windows_bundle\kiwix-hotspot.exe
+  - signtool.exe sign /f C:\projects\kiwix-hotspot\kiwix.pfx /p %win_certificate_password% /t http://timestamp.comodoca.com/?td=sha256 /d "Kiwix Hotspot" C:\projects\kiwix-hotspot\windows_bundle\kiwix-hotspot.exe
 
   - if %platform%==x86 move C:\projects\kiwix-hotspot\windows_bundle\kiwix-hotspot.exe C:\msys64\home\appveyor\kiwix-hotspot-win32.exe
   - if %platform%==x64 move C:\projects\kiwix-hotspot\windows_bundle\kiwix-hotspot.exe C:\msys64\home\appveyor\kiwix-hotspot-win64.exe
