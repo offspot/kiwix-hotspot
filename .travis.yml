@@ -137,8 +137,15 @@ matrix:
     - source hotspot-env/bin/activate
 
     # pygobjects
-    - pip3 install pycairo
-    - pip3 install PyGObject
+    - pip3 install pycairo==1.19.1
+    - wget https://files.pythonhosted.org/packages/93/41/bf9ab8929f51dac2979ae81bb094728bacee3ceb049def72d3fc1bcb4241/PyGObject-3.36.1.tar.gz
+    - tar xf PyGObject-3.36.1.tar.gz
+    - cd PyGObject-3.36.1
+    - wget https://gist.githubusercontent.com/rgaudin/eeaab830d847889dbd859443e66c09fd/raw/9a6513a81a2bb737a802bbf8849c3c525fd6d204/pygobject.patch
+    - patch setup.py < pygobject.patch
+    - python3 setup.py build_ext
+    - python3 setup.py install
+    - cd -
 
     # update XZ (trusty version -5.0.5 is too old)
     - wget http://mirror.download.kiwix.org/dev/xz-5.2.4.tar.gz
