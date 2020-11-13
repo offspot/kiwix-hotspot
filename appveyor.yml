@@ -82,9 +82,9 @@ install:
   # fix msys trustdb
   - curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz
   - curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig
-  - pacman-key --verify msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig
-  - pacman -U msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz
-  
+  - C:\msys64\usr\bin\bash -lc "pacman-key --verify msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
+  - C:\msys64\usr\bin\bash -lc "pacman -U msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
+
   - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Syuu"  # Core update (in case any core packages are outdated)
   - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Syuu"  # Normal update
   - $env:CHERE_INVOKING = 'yes'  # Preserve the current working directory
