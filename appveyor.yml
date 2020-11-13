@@ -80,7 +80,7 @@ install:
   - if %platform%==x64 dir C:\Python34-x64\Lib\site-packages\gi
 
   # Install gdk-pixbuf and add it to PATH because it is needed by pyinstaller
-  - C:\msys64\usr\bin\bash --login -c "pacman --sync --noconfirm --clean --refresh"
+  - C:\msys64\usr\bin\bash --login -c "pacman --sync --noconfirm --refresh"
   - if %platform%==x86 C:\msys64\usr\bin\bash --login -c "pacman -S mingw-w64-i686-gdk-pixbuf2 --noconfirm"
   - if %platform%==x86 set PATH=%PATH%;C:\msys64\mingw32\bin
   - if %platform%==x64 C:\msys64\usr\bin\bash --login -c "pacman -S mingw-w64-x86_64-gdk-pixbuf2 --noconfirm"
