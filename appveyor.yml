@@ -54,6 +54,7 @@ install:
 
   # - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Syuu"  # Core update (in case any core packages are outdated)
   # - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Syuu"  # Normal update
+  - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy"  # Normal update
   # Preserve the current working directory
   - set CHERE_INVOKING=yes
   # Start a 64 bit Mingw environment
