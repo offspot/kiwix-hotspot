@@ -79,12 +79,18 @@ install:
   - if %platform%==x86 dir C:\Python34\Lib\site-packages\gi
   - if %platform%==x64 dir C:\Python34-x64\Lib\site-packages\gi
 
-  # Install gdk-pixbuf and add it to PATH because it is needed by pyinstaller
+  # fix msys trustdb
+  - curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz
+  - curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig
+  - pacman-key --verify msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig
+  - pacman -U msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz
+  
   - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Syuu"  # Core update (in case any core packages are outdated)
   - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Syuu"  # Normal update
   - $env:CHERE_INVOKING = 'yes'  # Preserve the current working directory
   - $env:MSYSTEM = 'MINGW64'  # Start a 64 bit Mingw environment
 
+  # Install gdk-pixbuf and add it to PATH because it is needed by pyinstaller
   - if %platform%==x86 C:\msys64\usr\bin\bash --login -c "pacman -S mingw-w64-i686-gdk-pixbuf2 --noconfirm"
   - if %platform%==x86 set PATH=%PATH%;C:\msys64\mingw32\bin
   - if %platform%==x64 C:\msys64\usr\bin\bash --login -c "pacman -S mingw-w64-x86_64-gdk-pixbuf2 --noconfirm"
