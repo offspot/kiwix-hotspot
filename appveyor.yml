@@ -46,7 +46,6 @@ install:
       }
       (Get-Content kiwix-hotspot\data.py).replace('devel', $version) | Set-Content kiwix-hotspot\data.py
 
-  - choco install reshack.portable -y
   # decrypt certificates
   - ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/secure-file/master/install.ps1'))
   - cmd: appveyor-tools\secure-file -decrypt kiwix.p12.appveyor_enc -secret %win_certificate_secret% -salt %win_certificate_salt% -out kiwix.pfx
@@ -144,16 +143,23 @@ install:
   - cd C:\projects\kiwix-hotspot\dist\kiwix-hotspot
   - 7z.exe a -m0=Copy C:\projects\kiwix-hotspot\windows_bundle\kiwix-hotspot.7z *
 
+  # download resource hacker portable
+  - mkdir C:\resource_hacker
+  - cd C:\resource_hacker
+  - appveyor DownloadFile "http://www.angusj.com/resourcehacker/resource_hacker.zip"
+  - 7z.exe x resource_hacker.zip
+  - del resource_hacker.zip
+
   # download tools
   - cd C:\projects\kiwix-hotspot\windows_bundle\
   # create SFX exe from 7z archive
   - copy /b "C:\Program Files\7zextra\7zS.sfx" + sfxconfig.txt + kiwix-hotspot.7z kiwix-hotspot.exe
   # change icon and add version info to exe
   - copy ..\kiwix-hotspot-logo.ico icon.ico
-  - C:\ProgramData\chocolatey\lib\reshack.portable\tools\ResourceHacker.exe -open resources.rc -save resources.res -action compile -log CONSOLE
-  # not changing version info due to a bug in Appveyor/ResourceHacker
-  #- C:\ProgramData\chocolatey\lib\reshack.portable\tools\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res resources.res -mask VERSIONINFO,1, -log CONSOLE
-  - C:\ProgramData\chocolatey\lib\reshack.portable\tools\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res icon.ico -mask ICONGROUP,MAINICON, -log CONSOLE
+  - C:\resource_hacker\ResourceHacker.exe -open resources.rc -save resources.res -action compile -log CONSOLE
+  # not changing version info due to a bug in ResourceHacker now removing elevation request when doing this
+  # - C:\resource_hacker\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res resources.res -mask VERSIONINFO,1, -log CONSOLE
+  - C:\resource_hacker\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res icon.ico -mask ICONGROUP,MAINICON, -log CONSOLE
   - timeout 10
   - cd C:\projects\kiwix-hotspot\dist\kiwix-hotspot
 
