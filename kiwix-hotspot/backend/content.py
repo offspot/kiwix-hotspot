@@ -81,6 +81,7 @@ def get_collection(
     edupi_resources=None,
     nomad=False,
     mathews=False,
+    africatik=False,
     packages=[],
     kalite_languages=[],
     wikifundi_languages=[],
@@ -129,6 +130,16 @@ def get_collection(
                 get_mathews_contents,
                 run_mathews_actions,
                 {"enable": mathews},
+            )
+        )
+
+    if africatik:
+        collection.append(
+            (
+                "Africatik",
+                get_africatik_contents,
+                run_africatik_actions,
+                {"enable": africatik},
             )
         )
 
@@ -195,6 +206,11 @@ def get_nomad_contents(enable=False):
 def get_mathews_contents(enable=False):
     """ mathews: only contains one APK """
     return [get_content("mathews_apk")]
+
+
+def get_africatik_contents(enable=False):
+    """ africatik: a ZIP to extract """
+    return [get_content("africatik_all")]
 
 
 def get_kalite_contents(languages=[]):
@@ -331,6 +347,23 @@ def run_mathews_actions(cache_folder, mount_point, logger, enable=False):
         content=mathews_apk,
         cache_folder=cache_folder,
         final_path=os.path.join(mathews_folder, mathews_apk["name"]),
+        logger=logger,
+    )
+
+
+def run_africatik_actions(cache_folder, mount_point, logger, enable=False):
+    """ extract ZIP to folder """
+    if not enable:
+        return
+
+    africatik_ark = get_content("africatik_all")
+    africatik_folder = os.path.join(mount_point, africatik_ark["folder_name"])
+    os.makedirs(africatik_folder, exist_ok=True)
+    extract_and_move(
+        content=africatik_ark,
+        cache_folder=cache_folder,
+        root_path=mount_point,
+        final_path=africatik_folder,
         logger=logger,
     )
 

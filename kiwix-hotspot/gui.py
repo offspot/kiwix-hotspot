@@ -549,6 +549,19 @@ class Application:
             )
         )
 
+        # africatik
+        self.component.africatik_switch.connect(
+            "notify::active", lambda switch, state: self.update_free_space()
+        )
+        self.component.africatik_label.set_label(
+            "{} ({})".format(
+                self.component.africatik_label.get_label(),
+                human_readable_size(
+                    get_expanded_size(get_collection(africatik=True), add_margin=False)
+                ),
+            )
+        )
+
         self.refresh_disk_list()
 
         self.reset_config()  # will calculate free space
@@ -747,7 +760,7 @@ class Application:
             for lang, button in getattr(self, "iter_{}_check_button".format(key))():
                 button.set_active(False)
 
-        for key in ("edupi", "aflatoun", "nomad", "mathews"):
+        for key in ("edupi", "aflatoun", "nomad", "mathews", "africatik"):
             getattr(self.component, "{}_switch".format(key)).set_active(False)
 
         # edupi resources
@@ -1563,7 +1576,7 @@ class Application:
                         button.set_active(lang in config["content"][key])
 
             # boolean contents (switches)
-            for key in ("edupi", "aflatoun", "nomad", "mathews"):
+            for key in ("edupi", "aflatoun", "nomad", "mathews", "africatik"):
                 if config["content"].get(key) is not None:
                     getattr(self.component, "{}_switch".format(key)).set_active(
                         config["content"][key]
@@ -1696,6 +1709,7 @@ class Application:
                             ("edupi_resources", edupi_resources),
                             ("nomad", self.component.nomad_switch.get_active()),
                             ("mathews", self.component.mathews_switch.get_active()),
+                            ("africatik", self.component.africatik_switch.get_active()),
                         ]
                     ),
                 ),
@@ -1855,6 +1869,8 @@ class Application:
 
         mathews = self.component.mathews_switch.get_active()
 
+        africatik = self.component.africatik_switch.get_active()
+
         logo = self.component.logo_chooser.get_filename()
         favicon = self.component.favicon_chooser.get_filename()
         css = self.component.css_chooser.get_filename()
@@ -1904,6 +1920,7 @@ class Application:
                     edupi_resources=self.get_edupi_resources(),
                     nomad=nomad,
                     mathews=mathews,
+                    africatik=africatik,
                     zim_install=zim_install,
                     size=output_size,
                     logger=self.logger,
@@ -1987,12 +2004,14 @@ class Application:
         edupi_resources = self.get_edupi_resources()
         nomad = self.component.nomad_switch.get_active()
         mathews = self.component.mathews_switch.get_active()
+        africatik = self.component.africatik_switch.get_active()
 
         collection = get_collection(
             edupi=edupi,
             edupi_resources=edupi_resources,
             nomad=nomad,
             mathews=mathews,
+            africatik=africatik,
             packages=zim_list,
             kalite_languages=kalite,
             wikifundi_languages=wikifundi,

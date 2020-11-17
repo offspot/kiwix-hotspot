@@ -1,6 +1,7 @@
 2.3.7
 
 * APK now properly recognized on Android 9+
+* Added new Africatik content pack
 
 2.3.6
 * Fixed network operations in qemu

@@ -55,6 +55,9 @@
     - role: mathews_setup
       when: ansible_local.config.mathews|bool
 
+    - role: africatik_setup
+      when: ansible_local.config.africatik|bool
+
     - role: wikifundi_setup
       when: ansible_local.config.wikifundi_languages | length
 
