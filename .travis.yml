@@ -81,7 +81,7 @@ matrix:
     - cd dist/Kiwix\ Hotspot.app/Contents/Resources/share/
     - KEEPS=(fontconfig glib-2.0 icons locale themes)
     - for folder in "${KEEPS[@]}" ; do mv "$folder" "$folder.KEEP" | true ; done
-    - find . -type d ! -name "*.KEEP" ! -name "." -exec rm -rf {} \; | true
+    - find . -type d ! -name "*.KEEP" ! -name "." -depth 1 -exec rm -rf {} \; | true
     - for folder in "${KEEPS[@]}" ; do mv "$folder.KEEP" "$folder" | true ; done
     - ls -l
     - cd -
