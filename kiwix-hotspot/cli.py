@@ -125,7 +125,7 @@ def set_config(config, args):
                     setif(arg_key, value)
 
         # bool contents (switch)
-        for key in ("edupi", "aflatoun", "nomad", "mathews"):
+        for key in ("edupi", "aflatoun", "nomad", "mathews", "africatik"):
             if config["content"].get(key) is not None:
                 vl = "yes" if config["content"][key] in ("yes", True) else "no"
                 setif(key, vl)
@@ -142,7 +142,7 @@ if get_catalogs(logger) is None:
 
 zim_choices = []
 for catalog in get_catalogs(logger):
-    for (key, value) in catalog["all"].items():
+    for (key, _) in catalog["all"].items():
         zim_choices.append(key)
 
 languages = [code for code, language in data.hotspot_languages]
@@ -157,6 +157,7 @@ defaults = {
     "edupi": "no",
     "nomad": "no",
     "mathews": "no",
+    "africatik": "no",
     "aflatoun": "no",
     "kalite": [],
     "wikifundi": [],
@@ -181,6 +182,7 @@ parser.add_argument(
 parser.add_argument("--edupi", help="install edupi", choices=["yes", "no"])
 parser.add_argument("--nomad", help="install Nomad Education", choices=["yes", "no"])
 parser.add_argument("--mathews", help="install Math Mathews", choices=["yes", "no"])
+parser.add_argument("--africatik", help="install Africatik", choices=["yes", "no"])
 parser.add_argument(
     "--edupi-resources", help="Zipped folder of resources to init EduPi with"
 )
@@ -316,6 +318,7 @@ collection = get_collection(
     edupi_resources=args.edupi_resources,
     nomad=args.nomad == "yes",
     mathews=args.mathews == "yes",
+    africatik=args.africatik == "yes",
     packages=args.zim_install,
     kalite_languages=args.kalite,
     wikifundi_languages=args.wikifundi,
@@ -389,6 +392,7 @@ try:
         edupi_resources=args.edupi_resources,
         nomad=args.nomad == "yes",
         mathews=args.mathews == "yes",
+        africatik=args.africatik == "yes",
         zim_install=args.zim_install,
         size=args.output_size,
         logger=logger,

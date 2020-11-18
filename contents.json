@@ -123,5 +123,13 @@
         "checksum": "a779239f0e948ccff808552bf134723c2315b3fc22765bffb10dca62ac333e3f",
         "archive_size": 35420045,
         "expanded_size": 35420045
+    },
+    "africatik_all": {
+        "url": "{mirror}/other/africatik/africatik-1.0.zip",
+        "name": "africatik-1.0.zip",
+        "folder_name": "africatik",
+        "checksum": "4a34f8ef7c06f30e43e2081396bef1c85e2b58747fac7933a197c820fb5662b1",
+        "archive_size": 2743580745,
+        "expanded_size": 2743697408
     }
 }

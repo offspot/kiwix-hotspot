@@ -350,7 +350,7 @@ class _RunningInstance:
             remotedirpath = ""
             remotedirpath_unformatted = localdirpath
 
-            while remotedirpath_unformatted is not "":
+            while remotedirpath_unformatted != "":
                 remotedirpath_unformatted, tail = os.path.split(
                     remotedirpath_unformatted
                 )

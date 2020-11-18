@@ -1,6 +1,6 @@
 server {
     listen  80;
-    server_name {{ mathews_fqdn }} {{ hostname }};
+    server_name {{ mathews_fqdn }} {{ mathews_server_name }};
     root {{ mathews_root }};
 
     location /download/ { alias {{ mathews_content_path }}/; }
