@@ -33,7 +33,7 @@ language_name: "English"
 # versions
 qemu_kernel_version: "4.10.0"
 kernel_version: "4.14.34"
-kiwix_version: "3.1.2"
+kiwix_version: "3.1.2-4"
 kalite_version: "0.17.4"
 edupi_version: "1.4.10"
 python3_version: "3.5"
@@ -80,7 +80,7 @@ edupi_fqdn: edupi.{{ fqdn }}
 wikifundi_fqdn: wikifundi.{{ fqdn }}
 nomad_fqdn: nomad.{{ fqdn }}
 mathews_fqdn: mathews.{{ fqdn }}
-africatik_fqdn: africtik.{{ fqdn }}
+africatik_fqdn: africatik.{{ fqdn }}
 time_fqdn: time.{{ fqdn }}
 
 # content & features

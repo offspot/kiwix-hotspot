@@ -2,6 +2,7 @@
 
 * APK now properly recognized on Android 9+
 * Added new Africatik content pack
+* Updated kiwix-serve to 3.1.2-4
 
 2.3.6
 * Fixed network operations in qemu

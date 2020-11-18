@@ -125,8 +125,8 @@
         "expanded_size": 35420045
     },
     "africatik_all": {
-        "url": "{mirror}/other/africatik/africatik-2020.zip",
-        "name": "africatik-2020.zip",
+        "url": "{mirror}/other/africatik/africatik-1.0.zip",
+        "name": "africatik-1.0.zip",
         "folder_name": "africatik",
         "checksum": "4a34f8ef7c06f30e43e2081396bef1c85e2b58747fac7933a197c820fb5662b1",
         "archive_size": 2743580745,
