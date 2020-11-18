@@ -33,13 +33,14 @@ language_name: "English"
 # versions
 qemu_kernel_version: "4.10.0"
 kernel_version: "4.14.34"
-kiwix_version: "3.1.2"
+kiwix_version: "3.1.2-4"
 kalite_version: "0.17.4"
 edupi_version: "1.4.10"
 python3_version: "3.5"
 php_version: "7.3"
 nomad_version: "2.7.0"
 mathews_version: "1.6"
+africatik: "1.0"
 
 # Apps path
 venvs_root: /home/{{ username }}/venvs
@@ -59,6 +60,7 @@ parsoid_root: "{{ mediawiki_root }}/parsoid"
 common_static_path: "/var/www/static"
 nomad_root: "/var/www/nomad"
 mathews_root: "/var/www/mathews"
+africatik_root: "/var/www/africatik"
 
 # Domain names
 kiwix_server_name: kiwix.{{ hostname }}
@@ -68,6 +70,7 @@ edupi_server_name: edupi.{{ hostname }}
 wikifundi_server_name: wikifundi.{{ hostname }}
 nomad_server_name: nomad.{{ hostname }}
 mathews_server_name: mathews.{{ hostname }}
+africatik_server_name: africatik.{{ hostname }}
 time_server_name: time.{{ hostname }}
 
 kiwix_fqdn: kiwix.{{ fqdn }}
@@ -77,6 +80,7 @@ edupi_fqdn: edupi.{{ fqdn }}
 wikifundi_fqdn: wikifundi.{{ fqdn }}
 nomad_fqdn: nomad.{{ fqdn }}
 mathews_fqdn: mathews.{{ fqdn }}
+africatik_fqdn: africatik.{{ fqdn }}
 time_fqdn: time.{{ fqdn }}
 
 # content & features
@@ -99,3 +103,4 @@ wikifundi_langpack_prefix: "{{ data_path }}/wikifundi_langpack_"
 edupi_resources_path: "{{ data_path }}/edupi_resources"
 nomad_content_path: "{{ data_path }}/nomad"
 mathews_content_path: "{{ data_path }}/mathews"
+africatik_content_path: "{{ data_path }}/africatik"

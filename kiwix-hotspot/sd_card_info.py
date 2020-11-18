@@ -157,7 +157,7 @@ elif sys.platform == "win32":
 
         devices = []
         lines.pop(0)
-        for line in filter(lambda l: len(l) is not 0, lines):
+        for line in filter(lambda l: len(l) != 0, lines):
             size = extract_field(column["Size"], line)
             formatted_size = human_readable_size(size, binary=False)
             devices.append(
@@ -175,7 +175,7 @@ elif sys.platform == "win32":
 
         return filter(
             lambda d: d["media_type"] != "Fixed hard disk media"
-            and d["size"] is not "",
+            and d["size"] != "",
             devices,
         )
 

@@ -75,7 +75,7 @@ def generate_homepage(logger, options):
         )
 
     if options["nomad"]:
-        edupi_fqdn = "nomad.{fqdn}".format(fqdn=fqdn)
+        noamad_fqdn = "nomad.{fqdn}".format(fqdn=fqdn)
         title = "Nomad exercices du CP au CM2"
         description = "Téléchargez l'application pour android"
         if options["language"] == "fr":
@@ -84,7 +84,7 @@ def generate_homepage(logger, options):
             category = "Access"
         cards.append(
             {
-                "url": "http://{}".format(edupi_fqdn),
+                "url": "http://{}".format(noamad_fqdn),
                 "css_class": "nomad",
                 "category_class": "access",
                 "category": category,
@@ -94,7 +94,7 @@ def generate_homepage(logger, options):
         )
 
     if options["mathews"]:
-        edupi_fqdn = "mathews.{fqdn}".format(fqdn=fqdn)
+        mathews_fqdn = "mathews.{fqdn}".format(fqdn=fqdn)
         if options["language"] == "fr":
             title = "Math Mathews Treasure Hunt"
             category = "Accès"
@@ -105,8 +105,29 @@ def generate_homepage(logger, options):
             description = "Download the App"
         cards.append(
             {
-                "url": "http://{}".format(edupi_fqdn),
+                "url": "http://{}".format(mathews_fqdn),
                 "css_class": "mathews",
+                "category_class": "access",
+                "category": category,
+                "title": title,
+                "description": description,
+            }
+        )
+
+    if options["africatik"]:
+        africatik_fqdn = "africatik.{fqdn}".format(fqdn=fqdn)
+        if options["language"] == "fr":
+            title = "Apps Africatik"
+            category = "Accès"
+            description = "Téléchargez les apps"
+        else:
+            title = "Africatik apps"
+            category = "Access"
+            description = "Download the Apps"
+        cards.append(
+            {
+                "url": "http://{}".format(africatik_fqdn),
+                "css_class": "africatik",
                 "category_class": "access",
                 "category": category,
                 "title": title,
