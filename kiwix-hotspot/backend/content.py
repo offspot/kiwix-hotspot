@@ -282,7 +282,7 @@ def extract_and_move(content, cache_folder, root_path, final_path, logger):
     # move useful content to final path
     useful_path = (
         os.path.join(extract_folder, content["folder_name"])
-        if "folder_name" in content.keys()
+        if content.get("folder_name")
         else extract_folder
     )
     shutil.move(useful_path, final_path)
@@ -358,7 +358,6 @@ def run_africatik_actions(cache_folder, mount_point, logger, enable=False):
 
     africatik_ark = get_content("africatik_all")
     africatik_folder = os.path.join(mount_point, africatik_ark["folder_name"])
-    os.makedirs(africatik_folder, exist_ok=True)
     extract_and_move(
         content=africatik_ark,
         cache_folder=cache_folder,
