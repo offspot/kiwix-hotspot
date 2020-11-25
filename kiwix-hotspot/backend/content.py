@@ -357,7 +357,7 @@ def run_africatik_actions(cache_folder, mount_point, logger, enable=False):
         return
 
     africatik_ark = get_content("africatik_all")
-    africatik_folder = os.path.join(mount_point, africatik_ark["folder_name"])
+    africatik_folder = os.path.join(mount_point, "africatik")
     extract_and_move(
         content=africatik_ark,
         cache_folder=cache_folder,
