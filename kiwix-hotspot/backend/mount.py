@@ -469,10 +469,14 @@ def mount_data_partition(image_fpath, logger):
 
         if udisks_mount_ret != 0 and "AlreadyMounted" in udisks_mount:
             # was automatically mounted (gnome default)
-            mount_point = re.search(r"at `(\/media\/.*)'\.$", udisks_mount).groups()[0]
+            mount_point = re.search(
+                r"at `(\/(run\/)?media\/.*)'\.$", udisks_mount
+            ).groups()[0]
         elif udisks_mount_ret == 0:
-            # udisksctl always mounts under /media/
-            mount_point = re.search(r"at (\/media\/.+)\.$", udisks_mount).groups()[0]
+            # udisksctl mounts under /media/ or /run/media/ (depending on disribution)
+            mount_point = re.search(
+                r"at (\/(run\/)?media\/.+)\.$", udisks_mount
+            ).groups()[0]
         else:
             release_virtual_device(target_dev, logger)  # release loop if attached
             raise OSError("failed to mount {}".format(target_dev))
