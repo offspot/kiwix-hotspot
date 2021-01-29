@@ -71,7 +71,7 @@ def get_qemu_image_size(image_fpath, logger):
     matches = []
     for line_number, line in enumerate(output):
         if line_number == 2:
-            matches = re.findall(r"virtual size: \S*G \((\d*) bytes\)", line)
+            matches = re.findall(r"virtual size: \S*(?:G| GiB) \((\d*) bytes\)", line)
 
     if len(matches) != 1:
         raise QemuException("cannot get image %s size from qemu-img info" % image_fpath)
