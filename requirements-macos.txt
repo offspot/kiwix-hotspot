@@ -1,7 +1,7 @@
 tzlocal==1.5.1
 paramiko==2.4.2
 pytz==2018.7
-PyYAML==4.2b4
+PyYAML==5.4
 iso-639==0.4.5
 path.py==11.5.0
 psutil==5.4.8
