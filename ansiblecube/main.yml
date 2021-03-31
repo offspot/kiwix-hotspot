@@ -9,8 +9,19 @@
       shell: echo default-on >/sys/class/leds/a20-olinuxino-lime2:green:usr/trigger
       when: ansible_architecture == 'armv7l' and ansible_lsb.id == 'Debian'
       ignore_errors: yes
-      tags: ['always']
-    - include_tasks: disable_service.yml service=dnsmasq
+      tags: always
+    - name: Populate service facts
+      service_facts:
+
+    - name: Print service facts
+      debug:
+        var: ansible_facts.services
+
+    - include_tasks: disable_service.yml
+      vars:
+        service: dnsmasq
+      when: "'dnsmasq' in ansible_facts.services"
+      ignore_errors: yes
       tags: always
 
   roles:
