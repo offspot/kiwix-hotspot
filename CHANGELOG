@@ -1,3 +1,7 @@
+2.4
+
+* image size now rounded to next power of two (qemu expects it)
+
 2.3.8
 
 * Fixed Africatik ZIP extraction

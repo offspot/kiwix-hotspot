@@ -6,6 +6,7 @@ import re
 import sys
 import json
 import data
+import math
 import signal
 import base64
 import string
@@ -500,6 +501,11 @@ def check_user_inputs(
     )
 
 
+def as_power_of_2(size):
+    """ round to the next nearest power of 2 """
+    return 2 ** int(math.ceil(math.log(size) / math.log(2)))
+
+
 def get_adjusted_image_size(size):
     """ save some space to accomodate real SD card sizes
 
@@ -507,10 +513,10 @@ def get_adjusted_image_size(size):
 
     # if size is not a rounded GB multiple, assume it's OK
     if not size % ONE_GB == 0:
-        return size
+        return as_power_of_2(size)
 
     rate = 0.97 if size / ONE_GB <= 16 else 0.96
-    return int(size * rate)
+    return as_power_of_2(int(size * rate))
 
 
 def get_folder_size(path):
