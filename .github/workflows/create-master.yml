@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - master-image-test
-  repository_dispatch:
+      - raspios-master
+  workflow_dispatch:
     types: create-master
   schedule:
     # every months on the 1st
@@ -16,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: set image name
-        run: echo ::set-env name=OUT_IMG::hotspot-master_$(echo $(date +%Y-%m-%d)).img
+        run: echo "OUT_IMG=hotspot-master_$(echo $(date +%Y-%m-%d)).img" >> $GITHUB_ENV
       - name: verify image name
         run : echo $OUT_IMG
 
@@ -28,7 +29,7 @@ jobs:
           chmod 600 ${HOME}/ssh_key
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          ssh-keyscan download.kiwix.org >> ${HOME}/.ssh/known_hosts
+          ssh-keyscan mirror.download.kiwix.org >> ${HOME}/.ssh/known_hosts
           chmod 644 ${HOME}/.ssh/known_hosts
 
       - name: test upload
@@ -56,8 +57,8 @@ jobs:
           unzip vexpress-boot.zip
       - name: download static Qemu
         run: |
-          wget http://mirror.download.kiwix.org/dev/qemu-2.12.0-linux-x86_64.tar.gz
-          tar xvf qemu-2.12.0-linux-x86_64.tar.gz
+          wget http://mirror.download.kiwix.org/dev/qemu-5.2.0-linux-x86_64.tar.gz
+          tar xvf qemu-5.2.0-linux-x86_64.tar.gz
       - name: download etcher-cli (packaging only)
         run: |
           wget http://download.kiwix.org/dev/balena-etcher-cli-1.4.8-linux-x64.tar.gz
@@ -83,8 +84,14 @@ jobs:
             QEMU_CPU: 2
         run: dist/kiwix-hotspot image --ram 6G --root 7 --size 8 --out ${OUT_IMG}
 
-      # - name: ZIP master image
-      #   run: zip -9 ${OUT_IMG}.zip ${OUT_IMG}
+      - name: ZIP master image
+        run: zip -9 ${OUT_IMG}.zip ${OUT_IMG}
+
+      - name: Display ZIP details
+        run: |
+          ls -l *
+          openssl dgst -sha256 ${OUT_IMG}.zip
 
       - name: upload master image to kiwix server
-        run: scp -i ${HOME}/ssh_key -c aes128-ctr ${OUT_IMG} ci@download.kiwix.org:/data/download/hotspots/base/
+        run: scp -i ${HOME}/ssh_key -c aes128-ctr ${OUT_IMG}.zip ci@mirror.download.kiwix.org:/data/download/hotspots/base/
+

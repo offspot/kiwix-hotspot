@@ -10,6 +10,7 @@
       when: ansible_architecture == 'armv7l' and ansible_lsb.id == 'Debian'
       ignore_errors: yes
       tags: always
+
     - name: Populate service facts
       service_facts:
 

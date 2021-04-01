@@ -22,3 +22,9 @@ xz-*
 etcher-cli
 aria2c
 *.pyc
+/*.dylib
+/*.tar.gz
+kiwix-hotspot.cache
+ca-certificates.crt
+*.img
+*.zip

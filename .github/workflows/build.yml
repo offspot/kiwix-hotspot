@@ -1,0 +1,105 @@
+on:
+  push:
+    branches: "*"
+    tags: "v*"
+  workflow_dispatch:
+  schedule:
+    # every night at 1am
+    - cron:  '0 1 * * *'
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-18.04
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v1
+      - name: setup python version
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.7'
+
+      - name: setup environ vars
+        run: python ./.github/setup_build_env.py
+
+      - name: decrypt SSH key
+        env:
+          ssh_key: ${{ secrets.ssh_key }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          echo "$ssh_key" | base64 -d > ${HOME}/.ssh/id_rsa
+          chmod 600 ${HOME}/.ssh/id_rsa
+          ssh-keyscan tmp.kiwix.org >> ${HOME}/.ssh/known_hosts
+          ssh-keyscan mirror.download.kiwix.org >> ${HOME}/.ssh/known_hosts
+          chmod 644 ${HOME}/.ssh/known_hosts
+
+      - name: install system deps
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y locales openssh-client wget zip unzip tar python3-gi python3-gi-cairo python3-cairo gir1.2-gtk-3.0 libdbus-1-dev libdbus-glib-1-dev libffi-dev build-essential libssl-dev python3-dev libgdk-pixbuf2.0-dev exfat-fuse exfat-utils
+          sudo usermod -a -G disk runner
+
+      - name: update version in source code
+        run: sed -i.bak "s/VERSION = \"devel\"/VERSION = \"${VERSION}\"/g" kiwix-hotspot/data.py
+
+      - name: download custom kernel
+        run: |
+          wget http://mirror.download.kiwix.org/dev/vexpress-boot.zip
+          unzip vexpress-boot.zip
+      - name: download static Qemu
+        run: |
+          wget http://mirror.download.kiwix.org/dev/qemu-5.2.0-linux-x86_64.tar.gz
+          tar xvf qemu-5.2.0-linux-x86_64.tar.gz
+      - name: download etcher-cli (packaging only)
+        run: |
+          wget http://download.kiwix.org/dev/balena-etcher-cli-1.4.8-linux-x64.tar.gz
+          mkdir -p etcher-cli
+          tar xf balena-etcher-cli-1.4.8-linux-x64.tar.gz -C etcher-cli --strip-components=1
+      - name: download aria2c (packaging only)
+        run: |
+          wget http://download.kiwix.org/dev/aria2c-linux64.zip
+          unzip aria2c-linux64.zip
+          rm aria2c-linux64.zip
+          wget http://download.kiwix.org/dev/ca-certificates.crt
+
+      - name: install python deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-linux.txt
+          pip install -U pyinstaller
+
+      - name: compile app
+        run: pyinstaller --log-level=DEBUG kiwix-hotspot-linux.spec
+
+      - name: show binary version
+        run: dist/kiwix-hotspot --version
+
+      - name: package archive
+        run: |
+          cd dist
+          tar czvf kiwix-hotspot-linux.tar.gz kiwix-hotspot
+          cd ..
+
+      - name: upload CI build
+        run: scp -v -o StrictHostKeyChecking=no dist/kiwix-hotspot-linux.tar.gz ci@tmp.kiwix.org:/data/tmp/ci/kiwix-hotspot-linux-$BRANCH.tar.gz
+        if: env.BUILDTYPE == 'CI'
+
+      - name: upload nightly build (cron on master)
+        run: |
+          SRCDIR=nightly/$DATE
+          mkdir -p $SRCDIR
+          cp dist/kiwix-hotspot-linux.tar.gz $SRCDIR/
+          scp -r -v -o StrictHostKeyChecking=no $SRCDIR ci@mirror.download.kiwix.org:/data/download/nightly/
+        if: env.BUILDTYPE == 'nightly'
+
+      - name: upload release build (tagged)
+        run: |
+          mkdir -p releases/$RELEASE
+          cp dist/kiwix-hotspot-linux.tar.gz releases/$RELEASE/
+          scp -r -v -o StrictHostKeyChecking=no releases/$RELEASE ci@mirror.download.kiwix.org:/data/download/release/kiwix-hotspot/
+        if: env.BUILDTYPE == 'release'
+
+

@@ -26,95 +26,6 @@
   shell: udevadm control --reload-rules && udevadm trigger
   tags: master
 
-- name: download exfat kernel module
-  unarchive:
-    src: "{{ mirror }}/dev/exfat_{{ kernel_version }}_buster.tar"
-    dest: /tmp/
-    remote_src: True
-  tags: master
-
-- name: install module files
-  command: install -m644 -b -D /tmp/exfat_{{ item }}.ko /lib/modules/{{ item }}+/kernel/fs/exfat/exfat.ko
-  with_items:
-    - "{{ kernel_version }}"
-    - "{{ kernel_version }}-v7"
-    - "{{ kernel_version }}-v7l"
-  tags: master
-
-- name: make temp directories to fool depmod
-  file:
-    dest: /tmp/{{ item }}/lib/modules
-    state: directory
-  with_items:
-    - "{{ kernel_version }}"
-    - "{{ kernel_version }}-v7"
-    - "{{ kernel_version }}-v7l"
-  tags: master
-
-- name: create symlinks to fool depmod (qemu)
-  file:
-    src: /lib/modules/{{ item }}+
-    dest: /tmp/{{ item }}/lib/modules/{{ qemu_kernel_version }}
-    state: link
-  with_items:
-    - "{{ kernel_version }}"
-    - "{{ kernel_version }}-v7"
-    - "{{ kernel_version }}-v7l"
-  when: running_kernel_version.stdout[:7] == qemu_kernel_version
-  tags: master
-
-- name: create symlinks to fool depmod on Pi 1
-  file:
-    src: /lib/modules/{{ item }}+
-    dest: /tmp/{{ item }}/lib/modules/{{ item }}
-    state: link
-  with_items:
-    - "{{ kernel_version }}"
-    - "{{ kernel_version }}-v7"
-    - "{{ kernel_version }}-v7l"
-  when: running_kernel_version.stdout[:7] == kernel_version
-  tags: master
-
-- name: create symlinks to fool depmod on Pi 2
-  file:
-    src: /lib/modules/{{ item }}+
-    dest: /tmp/{{ kernel_version }}/lib/modules/{{ item }}+
-    state: link
-  with_items:
-    - "{{ kernel_version }}"
-    - "{{ kernel_version }}-v7"
-    - "{{ kernel_version }}-v7l"
-  when: running_kernel_version.stdout[:7] == kernel_version
-  tags: master
-
-- name: create symlinks to fool depmod on Pi 3
-  file:
-    src: /lib/modules/{{ item }}+
-    dest: /tmp/{{ item }}/lib/modules/{{ item }}+
-    state: link
-  with_items:
-    - "{{ kernel_version }}"
-    - "{{ kernel_version }}-v7"
-    - "{{ kernel_version }}-v7l"
-  when: running_kernel_version.stdout[:7] == kernel_version
-  tags: master
-
-- name: create symlinks to fool depmod on Pi 4
-  file:
-    src: /lib/modules/{{ kernel_version }}-v7l+
-    dest: /tmp/{{ kernel_version }}-v7/lib/modules/{{ kernel_version }}-v7l+
-    state: link
-  when: running_kernel_version.stdout[:7] == kernel_version
-  tags: master
-
-- name: regenerate modules list
-  command: depmod -a -b /tmp/{{ item }}
-  with_items:
-    - "{{ kernel_version }}"
-    - "{{ kernel_version }}-v7"
-    - "{{ kernel_version }}-v7l"
-  tags: master
-
 - name: add exfat module to startup list
   lineinfile:
     dest: /etc/modules-load.d/modules.conf
@@ -142,36 +53,6 @@
   command: systemctl daemon-reload
   tags: master
 
-# - name: remove raspi sources
-#   file:
-#     path: /etc/apt/sources.list.d/raspi.list
-#     state: absent
-#   tags: master
-
-# - name: Run apt update
-#   apt:
-#     update_cache: yes
-#   tags: master
-
-# - name: install buster debian keyring
-#   apt:
-#     deb: http://ftp.fr.debian.org/debian/pool/main/d/debian-archive-keyring/debian-archive-keyring_2019.1_all.deb
-#   when: ansible_distribution_release == "buster"
-#   tags: master
-
-# - name: install stretch debian keyring
-#   apt:
-#     deb: http://ftp.fr.debian.org/debian/pool/main/d/debian-archive-keyring/debian-archive-keyring_2017.5_all.deb
-#   when: ansible_distribution_release == "stretch"
-#   tags: master
-
-# - name: Drop a complete sources.list
-#   copy:
-#     src: sources_{{ ansible_distribution_release }}.list
-#     dest: /etc/apt/sources.list
-#   when: ansible_distribution == "Debian"
-#   tags: master
-
 - name: Run apt update
   apt:
     update_cache: yes
@@ -181,30 +62,18 @@
   shell: dpkg --configure -a
   tags: master
 
-- name: Remove unwanted packages before upgrading
-  apt:
-    name: apache2,apache2-mpm-worker,apache2-utils,apache2.2-bin,apache2.2-common,btrfs-tools,figlet,toilet,bluez,fping,stress,iperf,iotop,lirc,apt-listchanges,clipit,sslh,python-virtualenv,virtualenv
-    state: absent
-    purge: yes
-    autoremove: yes
-    autoclean: yes
-  tags: master
-
 - name: Install or upgrade all required package
   apt:
-    name: python-dev,git,sudo,lsb-release,vim,locate,git,unzip,bash-completion,aptitude,ntpdate,fake-hwclock,hdparm,ncurses-term,libffi-dev,libssl-dev,tree,screen,iftop,tmux,mtr-tiny,libwww-perl,httpie,lshw,hwinfo,sqlite3,elinks,mosh,curl,apt-transport-https,tar,exfat-fuse,exfat-utils,gzip,hostname,liblzma5,pkg-config,systemd,systemd-sysv,tzdata,wget,xz-utils,adduser,libpam-systemd,policykit-1,python3-pip,python3-setuptools,python-pip,python-setuptools
+    name: python-dev,git,locate,ntpdate,fake-hwclock,ncurses-term,libffi-dev,libssl-dev,screen,iftop,libwww-perl,sqlite3,apt-transport-https,exfat-utils,python3-pip,python3-setuptools,python-pip,python-setuptools
     state: latest
     autoremove: yes
     autoclean: yes
   tags: master
 
-- import_tasks: clean_apt.yml
-  tags: master
-
-- name: Install avahi packages
+- name: remove exfat-fuse
   apt:
-    name: avahi-daemon,libnss-mdns,avahi-utils
-    state: latest
+    name: exfat-fuse
+    state: absent
     autoremove: yes
     autoclean: yes
   tags: master

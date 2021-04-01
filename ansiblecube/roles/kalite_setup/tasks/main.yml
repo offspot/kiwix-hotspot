@@ -12,9 +12,9 @@
 - name: Setup kalite virtualenv
   become: yes
   become_user: "{{ username }}"
-  command: virtualenv -p python2.7 --no-site-packages {{ kalite_env }}
+  command: virtualenv -p python2.7 {{ kalite_env }}
   tags: setup
-  
+
 - name: Install Ka-lite
   become: yes
   become_user: "{{ username }}"
@@ -22,7 +22,7 @@
     name: ka-lite
     version: "{{ kalite_version }}"
     virtualenv: "{{ kalite_env }}"
-  register: kalite_installation 
+  register: kalite_installation
   tags: setup
 
 - name: Install cherrypy 6.1.0 to fix an issue

@@ -14,7 +14,7 @@
 
 - name: Install uwsgi packages
   apt:
-    name: python3,uwsgi,uwsgi-plugin-python3,avahi-utils
+    name: python3,uwsgi,uwsgi-plugin-python3
     state: latest
     autoremove: yes
     autoclean: yes

@@ -9,10 +9,10 @@
   tags: master
 
 - name: add APK mime-type for nginx
-  lineinfile:
+  replace:
     path: /etc/nginx/mime.types
-    line: '    application/vnd.android.package-archive apk;'
-    state: present
+    regexp: '^}$'
+    replace: '    application/vnd.android.package-archive apk; }'
   tags: master
 
 - name: install 502.html

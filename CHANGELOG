@@ -1,6 +1,16 @@
 2.4
 
 * image size now rounded to next power of two (qemu expects it)
+* [master] master based off raspiOS 2021-03-04
+* [master] root partition resized first as raspi's image is tight
+* [master] reboot after resize
+* [master] removed download/install of custom exfat modules (now in system)
+* [master] using secure protocol for composer update to prevent qemu network issues
+* vexpress-boot:
+  * updated to build 5.10 version (exfat is in tree now)
+  * using git to preserve file modes
+  * dropped the netfilter conf
+* using new 2021-04-09 master image
 
 2.3.8
 

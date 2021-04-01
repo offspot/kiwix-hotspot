@@ -164,6 +164,18 @@
     dest: "{{ mediawiki_root }}/composer.json"
   tags: setup
 
+- name: update composer config to prevent network header mismatch
+  command: php composer.phar config -g repo.packagist composer https://packagist.org
+  args:
+    chdir: "{{ mediawiki_root }}"
+  tags: setup
+
+- name: update composer config to prevent network header mismatch (2)
+  command: php composer.phar config -g github-protocols https ssh
+  args:
+    chdir: "{{ mediawiki_root }}"
+  tags: setup
+
 - name: install composer
   command: php composer.phar update --no-dev
   args:

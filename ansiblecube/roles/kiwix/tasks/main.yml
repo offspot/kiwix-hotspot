@@ -23,8 +23,8 @@
 
 - name: Setup startup file
   template:
-    src: kiwix-server.service.j2
-    dest: /etc/systemd/system/kiwix-server.service
+    src: kiwix.service.j2
+    dest: /etc/systemd/system/kiwix.service
   tags: master
 
 - name: Remove nginx configuration otherwise, if hostname var change it won't be overrided
@@ -50,6 +50,6 @@
 
 - import_tasks: enable_service.yml
   vars:
-    service: kiwix-server
+    service: kiwix
   tags: master
 

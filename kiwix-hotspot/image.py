@@ -46,8 +46,24 @@ def run_in_qemu(image_fpath, disk_size, root_size, logger, cancel_event, qemu_ra
         )
         emulator.resize_image(disk_size)
 
-        # Run emulation
+        # expand root system size early so we can update packages
         with emulator.run(cancel_event) as emulation:
+            emulation.put_file(
+                os.path.join(data.ansiblecube_path, "partition_boundaries.py"),
+                "/tmp/partition_boundaries.py",
+            )
+            emulation.put_file(
+                os.path.join(data.ansiblecube_path, "expand-rootfs.sh"),
+                "/tmp/expand-rootfs.sh",
+            )
+            emulation.exec_cmd("sudo chmod +x /tmp/expand-rootfs.sh")
+            emulation.exec_cmd(
+                "sudo /tmp/expand-rootfs.sh {} {}".format(root_size, disk_size)
+            )
+
+        # now run emulation
+        with emulator.run(cancel_event) as emulation:
+
             # enable SSH for good
             logger.step("Enable SSH")
             emulation.exec_cmd("sudo /bin/systemctl enable ssh")

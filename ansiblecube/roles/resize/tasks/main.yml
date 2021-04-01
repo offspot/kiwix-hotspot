@@ -1,15 +1,48 @@
 ---
-- name: disable exfat-fuse as handler for exfat fs
-  file:
-    dest: /sbin/mount.exfat
-    state: absent
-  tags: master
+
+- name: Populate service facts
+  service_facts:
+
+- import_tasks: disable_service.yml
+  vars:
+    service: kiwix
+  when: "'kiwix' in ansible_facts.services"
+  ignore_errors: yes
+  tags: ['master', 'resize']
+
+- import_tasks: disable_service.yml
+  vars:
+    service: edupi
+  when: "'edupi' in ansible_facts.services"
+  ignore_errors: yes
+  tags: ['master', 'resize']
+
+- import_tasks: disable_service.yml
+  vars:
+    service: kalite
+  when: "'edupi' in ansible_facts.services"
+  ignore_errors: yes
+  tags: ['master', 'resize']
+
+- import_tasks: disable_service.yml
+  vars:
+    service: aflatoun
+  when: "'edupi' in ansible_facts.services"
+  ignore_errors: yes
+  tags: ['master', 'resize']
+
+- name: create tar of {{ data_path }}
+  become: yes
+  become_user: "{{ username }}"
+  args:
+    chdir: "{{ data_path }}"
+  shell: tar --dereference --hard-dereference -cf /home/{{ username }}/data_part.tar *
+  tags: resize
 
 - name: Unmount {{ data_path }} partition
   become: yes
   command: umount {{ data_path }}
-  ignore_errors: True
-  tags: ['master', 'resize']
+  tags: resize
 
 - name: make sure data partition is removed from fstab
   lineinfile:
@@ -22,6 +55,7 @@
   file:
     dest: "{{ data_path }}"
     state: absent
+  ignore_errors: True
   tags: resize
 
 - name: Copy partition table analysis script
@@ -37,7 +71,7 @@
 - name: Analyze disk partition table
   become: yes
   shell: fdisk -l {{ disk }} | python /tmp/partition_boundaries.py {{ root_partition_size }} {{ disk_size }}
-  register: disk_partition_infos  
+  register: disk_partition_infos
   tags: ['master', 'resize']
 
 - name: Delete partition table analysis script
@@ -62,22 +96,6 @@
   become: yes
   command: partprobe -s
   when: nb_partitions.stdout.strip()|int >= 3
-  tags: ['master', 'resize']
-
-- name: recreating root partition
-  become: yes
-  shell: /bin/echo -e "d\n2\nn\np\n2\n{{ disk_partition_infos.stdout.split()[0] }}\n{{ disk_partition_infos.stdout.split()[1] }}\nt\n2\n83\nw" | fdisk {{ disk }}
-  ignore_errors: True
-  tags: ['master', 'resize']
-
-- name: informing kernel about root partition's new boundaries
-  become: yes
-  command: partprobe -s
-  tags: ['master', 'resize']
-
-- name: resize filesystem on root partition
-  become: yes
-  command: resize2fs {{ root_partition }}
   tags: ['master', 'resize']
 
 # should raise an error because acting on mounted partitions
@@ -161,4 +179,17 @@
   with_items:
     - "{{ data_path }}/test"
   tags: always
+
+- name: restore {{ data_path }} archive
+  become: yes
+  become_user: "{{ username }}"
+  shell: tar -m --no-same-permissions --no-same-owner --no-overwrite-dir -C {{ data_path }} -xf /home/{{ username }}/data_part.tar
+  ignore_errors: yes
+  tags: resize
+
+- name: remove backup archive
+  file:
+    path: /home/{{ username }}/data_part.tar
+    state: absent
+  tags: resize
 

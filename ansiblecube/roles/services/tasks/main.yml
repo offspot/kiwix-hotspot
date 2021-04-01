@@ -1,7 +1,7 @@
 ---
 - import_tasks: enable_service.yml
   vars:
-    service: kiwix-server
+    service: kiwix
 
 - import_tasks: enable_service.yml
   vars:
