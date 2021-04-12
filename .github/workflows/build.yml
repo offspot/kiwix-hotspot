@@ -1,3 +1,5 @@
+name: CI build
+
 on:
   push:
     branches: "*"
@@ -8,8 +10,8 @@ on:
     - cron:  '0 1 * * *'
 
 jobs:
-  build:
-    name: build
+  build_linux:
+    name: build linux
     runs-on: ubuntu-18.04
     steps:
       - name: checkout code
@@ -21,6 +23,9 @@ jobs:
 
       - name: setup environ vars
         run: python ./.github/setup_build_env.py
+
+      - name: update version in source code
+        run: sed -i.bak "s/VERSION = \"devel\"/VERSION = \"${VERSION}\"/g" kiwix-hotspot/data.py
 
       - name: decrypt SSH key
         env:
@@ -41,9 +46,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y locales openssh-client wget zip unzip tar python3-gi python3-gi-cairo python3-cairo gir1.2-gtk-3.0 libdbus-1-dev libdbus-glib-1-dev libffi-dev build-essential libssl-dev python3-dev libgdk-pixbuf2.0-dev exfat-fuse exfat-utils
           sudo usermod -a -G disk runner
-
-      - name: update version in source code
-        run: sed -i.bak "s/VERSION = \"devel\"/VERSION = \"${VERSION}\"/g" kiwix-hotspot/data.py
 
       - name: download custom kernel
         run: |
@@ -99,6 +101,131 @@ jobs:
         run: |
           mkdir -p releases/$RELEASE
           cp dist/kiwix-hotspot-linux.tar.gz releases/$RELEASE/
+          scp -r -v -o StrictHostKeyChecking=no releases/$RELEASE ci@mirror.download.kiwix.org:/data/download/release/kiwix-hotspot/
+        if: env.BUILDTYPE == 'release'
+
+  build_macos:
+    name: build macOS
+    runs-on: macos-latest
+    env:
+      CERTIFICATE: /tmp/wmch-devid.p12
+      SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+      ALTOOL_USERNAME: ${{ secrets.APPLE_SIGNING_ALTOOL_USERNAME }}
+      ASC_PROVIDER: ${{ secrets.APPLE_SIGNING_TEAM }}
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v1
+      - name: setup python version
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.6'
+
+      - name: setup environ vars
+        run: python ./.github/setup_build_env.py
+
+      - name: update version in source code
+        run: sed -i.bak "s/VERSION = \"devel\"/VERSION = \"${VERSION}\"/g" kiwix-hotspot/data.py
+
+      - name: decrypt SSH key
+        env:
+          ssh_key: ${{ secrets.ssh_key }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          echo "$ssh_key" | base64 -d > ${HOME}/.ssh/id_rsa
+          chmod 600 ${HOME}/.ssh/id_rsa
+          ssh-keyscan tmp.kiwix.org >> ${HOME}/.ssh/known_hosts
+          ssh-keyscan mirror.download.kiwix.org >> ${HOME}/.ssh/known_hosts
+          chmod 644 ${HOME}/.ssh/known_hosts
+
+      - name: install system deps
+        run: |
+          brew update
+          brew install pygobject3 gtk+3 adwaita-icon-theme npm
+
+      - name: install python deps
+        run: |
+          python3 -m pip install -U pip
+          python3 -m pip install -r requirements-macos.txt
+          python3 -c "import gi ; print(gi.__file__)"
+          python3 -m pip install -U pyinstaller
+
+      - name: Download vexpress-boot
+        run: |
+          wget http://mirror.download.kiwix.org/dev/vexpress-boot.zip
+          unzip vexpress-boot.zip
+
+      - name: Bundle QEMU
+        run: |
+          wget http://mirror.download.kiwix.org/dev/qemu-5.2.0_macOS.tar
+          tar xf qemu-5.2.0_macOS.tar
+
+      - name: Bundle Etcher-cli
+        run: |
+          wget http://download.kiwix.org/dev/balena-etcher-cli-1.4.8-darwin-x64.tar.gz
+          mkdir -p etcher-cli
+          tar xf balena-etcher-cli-1.4.8-darwin-x64.tar.gz -C etcher-cli --strip-components=1
+
+      - name: Bundle aria2c
+        run: |
+          wget http://download.kiwix.org/dev/aria2c-darwin.zip
+          unzip aria2c-darwin.zip
+          rm aria2c-darwin.zip
+          wget http://download.kiwix.org/dev/ca-certificates.crt
+
+      - name: Run PyInstaller
+        run: pyinstaller --log-level=DEBUG kiwix-hotspot-macos.spec
+
+      - name: remove extra folders in share
+        run: |
+          cd dist/Kiwix\ Hotspot.app/Contents/Resources/share/
+          KEEPS=(fontconfig glib-2.0 icons locale themes)
+          for folder in "${KEEPS[@]}" ; do mv "$folder" "$folder.KEEP" | true ; done
+          find . -type d ! -name "*.KEEP" ! -name "." -depth 1 -exec rm -rf {} \; | true
+          for folder in "${KEEPS[@]}" ; do mv "$folder.KEEP" "$folder" | true ; done
+          ls -l
+          cd -
+
+      - name: install Apple certificate
+        shell: bash
+        run: |
+          echo "${{ secrets.APPLE_SIGNING_CERTIFICATE }}" | base64 --decode -o $CERTIFICATE
+          security create-keychain -p mysecretpassword build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p mysecretpassword build.keychain
+          security import $CERTIFICATE -k build.keychain -P "${{ secrets.APPLE_SIGNING_P12_PASSWORD }}" -A
+          rm $CERTIFICATE
+          security set-key-partition-list -S "apple-tool:,apple:" -s -k mysecretpassword build.keychain
+          security find-identity -v
+          sudo sntp -sS -t 60 time4.google.com || true
+          xcrun altool --store-password-in-keychain-item "ALTOOL_PASSWORD" -u "$ALTOOL_USERNAME" -p "${{ secrets.APPLE_SIGNING_ALTOOL_PASSWORD }}"
+
+      - name: Sign application
+        run: |
+          codesign --force --sign "$SIGNING_IDENTITY" "dist/Kiwix Hotspot.app" --deep --timestamp
+
+      - name: create dmg
+        run: |
+          npm install -g appdmg
+          mv dist/Kiwix\ Hotspot.app .
+          appdmg dmg.json kiwix-hotspot-macos.dmg
+
+      - name: upload CI build
+        run: scp -v -o StrictHostKeyChecking=no kiwix-hotspot-macos.dmg ci@tmp.kiwix.org:/data/tmp/ci/kiwix-hotspot-macos-$BRANCH.dmg
+        if: env.BUILDTYPE == 'CI'
+
+      - name: upload nightly build (cron on master)
+        run: |
+          SRCDIR=nightly/$DATE
+          mkdir -p $SRCDIR
+          cp kiwix-hotspot-macos.dmg $SRCDIR/
+          scp -r -v -o StrictHostKeyChecking=no $SRCDIR ci@mirror.download.kiwix.org:/data/download/nightly/
+        if: env.BUILDTYPE == 'nightly'
+
+      - name: upload release build (tagged)
+        run: |
+          mkdir -p releases/$RELEASE
+          cp kiwix-hotspot-macos.dmg releases/$RELEASE/
           scp -r -v -o StrictHostKeyChecking=no releases/$RELEASE ci@mirror.download.kiwix.org:/data/download/release/kiwix-hotspot/
         if: env.BUILDTYPE == 'release'
 

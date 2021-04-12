@@ -30,7 +30,6 @@
   file:
     dest: "{{ data_path }}"
     state: absent
-  ignore_errors: True
   tags: resize
 
 - name: Copy partition table analysis script
@@ -142,7 +141,6 @@
   command: mount "{{ data_path }}"
   args:
     warn: no
-  ignore_errors: True
   tags: ['master', 'resize']
 
 - name: Create test directory

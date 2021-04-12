@@ -30,12 +30,13 @@ jobs:
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
           ssh-keyscan mirror.download.kiwix.org >> ${HOME}/.ssh/known_hosts
+          ssh-keyscan tmp.kiwix.org >> ${HOME}/.ssh/known_hosts
           chmod 644 ${HOME}/.ssh/known_hosts
 
       - name: test upload
         run: |
           echo "from workflow" > test-file
-          scp -i ${HOME}/ssh_key test-file ci@download.kiwix.org:/data/tmp/ci/test-file
+          scp -i ${HOME}/ssh_key test-file ci@tmp.kiwix.org:/data/tmp/ci/test-file
 
       - name: install system deps
         env:
