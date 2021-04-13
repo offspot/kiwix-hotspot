@@ -33,9 +33,6 @@ import humanfriendly
 
 from data import cache_folder_name
 
-if sys.platform == "win32":
-    from win32com.shell import shellcon, shell
-
 ONE_MiB = 2 ** 20
 ONE_GiB = 2 ** 30
 ONE_GB = int(1e9)
@@ -553,10 +550,7 @@ def get_prefs_path():
     fname = "kiwix-hotspot.prefs"
     homedir = os.path.expanduser("~")
     if sys.platform == "win32":
-        try:
-            prefsdir = shell.SHGetFolderPath(0, shellcon.CSIDL_LOCAL_APPDATA, 0, 0)
-        except Exception:
-            prefsdir = homedir
+        prefsdir = os.getenv("LOCALAPPDATA") or homedir
     elif sys.platform == "linux":
         prefsdir = os.path.join(homedir, ".config")
     elif sys.platform == "darwin":

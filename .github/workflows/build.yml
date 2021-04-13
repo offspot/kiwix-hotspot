@@ -24,9 +24,6 @@ jobs:
       - name: setup environ vars
         run: python ./.github/setup_build_env.py
 
-      - name: update version in source code
-        run: sed -i.bak "s/VERSION = \"devel\"/VERSION = \"${VERSION}\"/g" kiwix-hotspot/data.py
-
       - name: decrypt SSH key
         env:
           ssh_key: ${{ secrets.ssh_key }}
@@ -106,7 +103,7 @@ jobs:
 
   build_macos:
     name: build macOS
-    runs-on: macos-latest
+    runs-on: macos-10.15
     env:
       CERTIFICATE: /tmp/wmch-devid.p12
       SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
@@ -122,9 +119,6 @@ jobs:
 
       - name: setup environ vars
         run: python ./.github/setup_build_env.py
-
-      - name: update version in source code
-        run: sed -i.bak "s/VERSION = \"devel\"/VERSION = \"${VERSION}\"/g" kiwix-hotspot/data.py
 
       - name: decrypt SSH key
         env:
@@ -227,6 +221,188 @@ jobs:
           mkdir -p releases/$RELEASE
           cp kiwix-hotspot-macos.dmg releases/$RELEASE/
           scp -r -v -o StrictHostKeyChecking=no releases/$RELEASE ci@mirror.download.kiwix.org:/data/download/release/kiwix-hotspot/
+        if: env.BUILDTYPE == 'release'
+
+  build_windows:
+    name: build Windows
+    runs-on: windows-2019
+    steps:
+      - uses: Vampire/setup-wsl@v1
+      - name: checkout code
+        uses: actions/checkout@v1
+
+      - name: setup environ vars
+        run: python ./.github/setup_build_env.py
+
+      - name: update PATH
+        run: $Env:Path += ";C:\Program Files (x86)\Windows Kits\10\bin\x64\"
+
+      - name: Decode SSH key
+        id: base64dec
+        uses: timheuer/base64-to-file@v1
+        with:
+          fileName: 'id_rsa'
+          encodedString: ${{ secrets.ssh_key }}
+
+      - name: Prepare SSH env
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          mv ${{ steps.base64dec.outputs.filePath }} ${HOME}/.ssh/id_rsa
+          chmod 600 ${HOME}/.ssh/id_rsa
+          ssh-keyscan tmp.kiwix.org >> ${HOME}/.ssh/known_hosts
+          ssh-keyscan mirror.download.kiwix.org >> ${HOME}/.ssh/known_hosts
+          chmod 644 ${HOME}/.ssh/known_hosts
+          echo ${HOME}/.ssh/id_rsa
+          ls -l ${HOME}/.ssh/id_rsa
+
+      - name: Download vexpress-boot
+        run: |
+          curl.exe -L -O http://mirror.download.kiwix.org/dev/vexpress-boot.zip
+          7z x vexpress-boot.zip
+
+      - name: Install python deps
+        run: |
+          # update packages
+          C:\msys64\usr\bin\bash --login -c "pacman -Syy --noconfirm"
+          C:\msys64\usr\bin\bash --login -c "pacman -Syu --noconfirm"
+          C:\msys64\usr\bin\bash --login -c "pacman -S --needed --noconfirm git"
+          # install pygobjects
+          C:\msys64\usr\bin\bash --login -c "pacman -S --noconfirm mingw-w64-x86_64-gtk3 mingw-w64-x86_64-python3 mingw-w64-x86_64-python3-gobject"
+          # install pip
+          curl.exe -L -O https://bootstrap.pypa.io/get-pip.py
+          C:\msys64\mingw64\bin\python.exe get-pip.py
+          # install python deps
+          C:\msys64\usr\bin\bash --login -c "pacman -S --noconfirm mingw-w64-x86_64-python-pynacl mingw-w64-x86_64-python-yaml mingw-w64-x86_64-python-psutil mingw-w64-x86_64-python-jinja mingw-w64-x86_64-python-paramiko mingw-w64-x86_64-python-scandir mingw-w64-x86_64-python-cryptography mingw-w64-x86_64-python-bcrypt"
+          # install harmless deps
+          C:\msys64\mingw64\bin\python.exe -m pip install -r requirements-windows.txt
+          C:\msys64\usr\bin\bash --login -c "pacman -S --noconfirm mingw-w64-x86_64-libsodium"
+          # install pyinstaller
+          C:\msys64\mingw64\bin\python.exe -m pip install pyinstaller
+          echo "Verifying gi"
+          C:\msys64\mingw64\bin\python.exe -c "import gi ; print(gi.__file__)"
+          echo "Verifying win32"
+          C:\msys64\mingw64\bin\python.exe -c 'from win32ctypes.pywin32 import pywintypes'
+          C:\msys64\mingw64\bin\python.exe -c 'from win32ctypes.pywin32 import win32api'
+          C:\msys64\mingw64\bin\pyinstaller.exe
+
+      - name: install QEMU
+        run: |
+          mkdir "C:\qemu"
+          cd "C:\qemu"
+          curl.exe -L -O https://qemu.weilnetz.de/w64/2021/qemu-w64-setup-20210203.exe
+          7z.exe x qemu-w64-setup-20210203.exe
+          del qemu-w64-setup-20210203.exe
+          move qemu-system-arm.exe qemu-arm.exe
+          # remove .fd files
+          Remove-Item keymaps -Recurse -Force
+          Remove-Item share -Recurse -Force
+          Remove-Item 'C:\qemu\$PLUGINSDIR\' -Recurse -Force
+          del qemu-system-*
+          move qemu-arm.exe qemu-system-arm.exe
+          dir "C:\qemu"
+
+      - name: bundle 7zip
+        run: |
+          mkdir "C:\7zextra"
+          cd "C:\7zextra"
+          curl.exe -L -O http://mirror.download.kiwix.org/dev/7z920_extra.7z
+          7z.exe x 7z920_extra.7z
+          curl.exe -L -O http://mirror.download.kiwix.org/dev/7z1805-extra.7z
+          7z.exe -y x 7z1805-extra.7z
+
+      - name: Copy Imdisk Installer
+        run: |
+          mkdir "C:\imdiskinst"
+          cd "C:\imdiskinst"
+          curl.exe -L -o imdiskinst.exe http://mirror.download.kiwix.org/dev/imdiskinst.exe
+          7z.exe x imdiskinst.exe
+          del imdiskinst.exe
+          dir "C:\imdiskinst"
+
+      - name: Download Etcher-cli
+        run: |
+          mkdir "C:\etcher-cli"
+          cd "C:\etcher-cli"
+          curl.exe -L -o etcher-cli.zip http://mirror.download.kiwix.org/dev/Etcher-cli-1.1.2-win32-x64.zip
+          7z.exe x etcher-cli.zip
+          del etcher-cli.zip
+
+      - name: Download aria2
+        run: |
+          cd $Env:GITHUB_WORKSPACE
+          curl.exe -L -o aria2c.zip http://mirror.download.kiwix.org/dev/aria2c-win64.zip
+          7z.exe x aria2c.zip
+          del aria2c.zip
+          curl.exe -L -o ca-certificates.crt http://mirror.download.kiwix.org/dev/ca-certificates.crt
+
+      - name: run pyinstaller
+        run: |
+          C:\msys64\mingw64\bin\pyinstaller.exe --log-level=DEBUG kiwix-hotspot-win64.spec
+          cat build\kiwix-hotspot-win64\warn-kiwix-hotspot-win64.txt
+
+      - name: deploy
+        run: |
+          cd dist\kiwix-hotspot
+          7z.exe a -m0=Copy $Env:GITHUB_WORKSPACE\windows_bundle\kiwix-hotspot.7z *
+
+      - name: download resource hacker portable
+        run: |
+          mkdir C:\resource_hacker
+          cd C:\resource_hacker
+          curl.exe -L -O http://www.angusj.com/resourcehacker/resource_hacker.zip
+          7z.exe x resource_hacker.zip
+          del resource_hacker.zip
+
+      - name: update binary
+        run: |
+          # download tools
+          cd $Env:GITHUB_WORKSPACE\windows_bundle\
+          # create SFX exe from 7z archive
+          C:\Windows\System32\cmd.exe /c copy /b "C:\7zextra\7zS.sfx" + sfxconfig.txt + kiwix-hotspot.7z kiwix-hotspot.exe
+          # change icon and add version info to exe
+          C:\Windows\System32\cmd.exe /c copy ..\kiwix-hotspot-logo.ico icon.ico
+          C:\resource_hacker\ResourceHacker.exe -open resources.rc -save resources.res -action compile -log CONSOLE
+          # not changing version info due to a bug in ResourceHacker now removing elevation request when doing this
+          C:\resource_hacker\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res icon.ico -mask ICONGROUP,MAINICON, -log CONSOLE
+          ping -n 10 127.0.0.1
+          cd $Env:GITHUB_WORKSPACE
+          mkdir signed
+          C:\Windows\System32\cmd.exe /c move $Env:GITHUB_WORKSPACE\windows_bundle\kiwix-hotspot.exe $Env:GITHUB_WORKSPACE\signed\kiwix-hotspot-win64.exe
+
+      - name: sign the build
+        uses: GabrielAcostaEngler/signtool-code-sign@main
+        with:
+          certificate: '${{ secrets.WINDOWS_SIGNING_CERTIFICATE }}'
+          cert-password: '${{ secrets.WINDOWS_SIGNING_CERTIFICATE_PASSWORD }}'
+          cert-sha1: '${{ secrets.WINDOWS_SIGNING_CERTIFICATE_SHA1 }}'
+          cert-description: 'Kiwix Hotspot'
+          folder: 'signed'
+          recursive: true
+          timestamp-server: 'http://timestamp.digicert.com'
+
+      - name: move the build
+        run: |
+          C:\Windows\System32\cmd.exe /c move $Env:GITHUB_WORKSPACE\signed\kiwix-hotspot-win64.exe $Env:GITHUB_WORKSPACE\kiwix-hotspot-win64.exe
+          cd $Env:GITHUB_WORKSPACE\
+
+      - name: upload CI build
+        run: scp -i ${HOME}/.ssh/id_rsa -v -o StrictHostKeyChecking=no kiwix-hotspot-win64.exe ci@tmp.kiwix.org:/data/tmp/ci/kiwix-hotspot-win64-$Env:BRANCH.exe
+        if: env.BUILDTYPE == 'CI'
+
+      - name: upload nightly build (cron on master)
+        run: |
+          SRCDIR=nightly/$Env:DATE
+          mkdir -p $SRCDIR
+          cp kiwix-hotspot-win64.exe $SRCDIR/
+          scp -i ${HOME}/.ssh/id_rsa -r -v -o StrictHostKeyChecking=no $SRCDIR ci@mirror.download.kiwix.org:/data/download/nightly/
+        if: env.BUILDTYPE == 'nightly'
+
+      - name: upload release build (tagged)
+        run: |
+          mkdir -p releases/$Env:RELEASE
+          cp kiwix-hotspot-win64.exe releases/$Env:RELEASE/
+          scp -i ${HOME}/.ssh/id_rsa -r -v -o StrictHostKeyChecking=no releases/$Env:RELEASE ci@mirror.download.kiwix.org:/data/download/release/kiwix-hotspot/
         if: env.BUILDTYPE == 'release'
 
 

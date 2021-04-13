@@ -4,12 +4,14 @@
 
 import os
 import sys
+import pathlib
 import datetime
 
 GITHUB_ENV = os.getenv("GITHUB_ENV")
 GITHUB_EVENT_NAME = os.getenv("GITHUB_EVENT_NAME", "")
 GITHUB_REF = os.getenv("GITHUB_REF")
 GITHUB_SHA = os.getenv("GITHUB_SHA")
+GITHUB_WORKSPACE = os.getenv("GITHUB_WORKSPACE")
 SCHEDULED = GITHUB_EVENT_NAME == "schedule"
 
 if GITHUB_ENV is None or GITHUB_REF is None or GITHUB_SHA is None:
@@ -53,5 +55,17 @@ lines = "\n".join([f"{k}={v}" for k, v in UPDATES.items()])
 print(f"Updating GITHUB_ENV:\n-----\n{lines}\n-----")
 with open(GITHUB_ENV, "a") as fh:
     fh.write(lines)
+
+# updating version in source code
+if GITHUB_WORKSPACE:
+    fpath = pathlib.Path(GITHUB_WORKSPACE) / "kiwix-hotspot" / "data.py"
+    with open(fpath, "r") as fh:
+        content = fh.read()
+    with open(fpath, "w") as fh:
+        fh.write(
+            content.replace(
+                'VERSION = "devel"', 'VERSION = "{}"'.format(UPDATES["VERSION"])
+            )
+        )
 
 print(f"Running {UPDATES['BUILDTYPE']} build for {UPDATES['VERSION']}")

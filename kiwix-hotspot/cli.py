@@ -245,7 +245,14 @@ for key, value in defaults.items():
 
 if args.catalog:
     for catalog in get_catalogs(logger):
-        print(yaml.dump(catalog, default_flow_style=False, default_style=""))
+        print(
+            yaml.safe_dump(
+                catalog,
+                default_flow_style=False,
+                allow_unicode=True,
+                encoding="utf-8",
+            ).decode("UTF-8")
+        )
     sys.exit(0)
 
 if args.admin_account:

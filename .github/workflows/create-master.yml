@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master-image-test
-      - raspios-master
+      # - raspios-master
   workflow_dispatch:
     types: create-master
   schedule:
