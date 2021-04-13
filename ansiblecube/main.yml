@@ -11,17 +11,9 @@
       ignore_errors: yes
       tags: always
 
-    - name: Populate service facts
-      service_facts:
-
-    - name: Print service facts
-      debug:
-        var: ansible_facts.services
-
-    - include_tasks: disable_service.yml
-      vars:
-        service: dnsmasq
-      when: "'dnsmasq' in ansible_facts.services"
+    - name: disable dnsmasq to enable network operations
+      shell: systemctl stop dnsmasq
+      become: yes
       ignore_errors: yes
       tags: always
 

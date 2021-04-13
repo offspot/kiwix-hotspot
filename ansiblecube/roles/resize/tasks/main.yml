@@ -1,33 +1,8 @@
 ---
 
-- name: Populate service facts
-  service_facts:
-
-- import_tasks: disable_service.yml
-  vars:
-    service: kiwix
-  when: "'kiwix' in ansible_facts.services"
-  ignore_errors: yes
-  tags: ['master', 'resize']
-
-- import_tasks: disable_service.yml
-  vars:
-    service: edupi
-  when: "'edupi' in ansible_facts.services"
-  ignore_errors: yes
-  tags: ['master', 'resize']
-
-- import_tasks: disable_service.yml
-  vars:
-    service: kalite
-  when: "'edupi' in ansible_facts.services"
-  ignore_errors: yes
-  tags: ['master', 'resize']
-
-- import_tasks: disable_service.yml
-  vars:
-    service: aflatoun
-  when: "'edupi' in ansible_facts.services"
+- name: disable services using {{ data_path }}
+  shell: systemctl stop kiwix edupi kalite aflatoun
+  become: yes
   ignore_errors: yes
   tags: ['master', 'resize']
 
