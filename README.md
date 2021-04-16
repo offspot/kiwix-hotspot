@@ -57,7 +57,7 @@ run CLI application: `python3 kiwix-hotspot cli`
 kiwix-hotspot use a linux kernel for the QEMU emulation of vexpress machine.
 This vexpress boot can be compiled on linux using make-vexpress-boot python3 script.
 
-requirements: `git bc bison flex libssl-dev make libc6-dev libncurses5-dev crossbuild-essential-armhf`
+requirements: `zip git bc bison flex libssl-dev make libc6-dev libncurses5-dev crossbuild-essential-armhf`
 
 run: `python3 make-vexpress-boot`
 

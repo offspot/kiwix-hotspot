@@ -234,8 +234,8 @@ jobs:
       - name: setup environ vars
         run: python ./.github/setup_build_env.py
 
-      - name: update PATH
-        run: $Env:Path += ";C:\Program Files (x86)\Windows Kits\10\bin\x64\"
+      # - name: update PATH
+      #   run: $Env:Path += ";C:\Program Files (x86)\Windows Kits\10\bin\x64\"
 
       - name: Decode SSH key
         id: base64dec
@@ -261,35 +261,10 @@ jobs:
           curl.exe -L -O http://mirror.download.kiwix.org/dev/vexpress-boot.zip
           7z x vexpress-boot.zip
 
-      - name: Install python deps
-        run: |
-          # update packages
-          C:\msys64\usr\bin\bash --login -c "pacman -Syy --noconfirm"
-          C:\msys64\usr\bin\bash --login -c "pacman -Syu --noconfirm"
-          C:\msys64\usr\bin\bash --login -c "pacman -S --needed --noconfirm git"
-          # install pygobjects
-          C:\msys64\usr\bin\bash --login -c "pacman -S --noconfirm mingw-w64-x86_64-gtk3 mingw-w64-x86_64-python3 mingw-w64-x86_64-python3-gobject"
-          # install pip
-          curl.exe -L -O https://bootstrap.pypa.io/get-pip.py
-          C:\msys64\mingw64\bin\python.exe get-pip.py
-          # install python deps
-          C:\msys64\usr\bin\bash --login -c "pacman -S --noconfirm mingw-w64-x86_64-python-pynacl mingw-w64-x86_64-python-yaml mingw-w64-x86_64-python-psutil mingw-w64-x86_64-python-jinja mingw-w64-x86_64-python-paramiko mingw-w64-x86_64-python-scandir mingw-w64-x86_64-python-cryptography mingw-w64-x86_64-python-bcrypt"
-          # install harmless deps
-          C:\msys64\mingw64\bin\python.exe -m pip install -r requirements-windows.txt
-          C:\msys64\usr\bin\bash --login -c "pacman -S --noconfirm mingw-w64-x86_64-libsodium"
-          # install pyinstaller
-          C:\msys64\mingw64\bin\python.exe -m pip install pyinstaller
-          echo "Verifying gi"
-          C:\msys64\mingw64\bin\python.exe -c "import gi ; print(gi.__file__)"
-          echo "Verifying win32"
-          C:\msys64\mingw64\bin\python.exe -c 'from win32ctypes.pywin32 import pywintypes'
-          C:\msys64\mingw64\bin\python.exe -c 'from win32ctypes.pywin32 import win32api'
-          C:\msys64\mingw64\bin\pyinstaller.exe
-
       - name: install QEMU
         run: |
-          mkdir "C:\qemu"
-          cd "C:\qemu"
+          mkdir "assets\qemu"
+          cd "assets\qemu"
           curl.exe -L -O https://qemu.weilnetz.de/w64/2021/qemu-w64-setup-20210203.exe
           7z.exe x qemu-w64-setup-20210203.exe
           del qemu-w64-setup-20210203.exe
@@ -297,36 +272,38 @@ jobs:
           # remove .fd files
           Remove-Item keymaps -Recurse -Force
           Remove-Item share -Recurse -Force
-          Remove-Item 'C:\qemu\$PLUGINSDIR\' -Recurse -Force
+          Remove-Item '$PLUGINSDIR' -Recurse -Force
           del qemu-system-*
           move qemu-arm.exe qemu-system-arm.exe
-          dir "C:\qemu"
+          cd ..\..
 
       - name: bundle 7zip
         run: |
-          mkdir "C:\7zextra"
-          cd "C:\7zextra"
+          mkdir "assets\7zextra"
+          cd "assets\7zextra"
           curl.exe -L -O http://mirror.download.kiwix.org/dev/7z920_extra.7z
           7z.exe x 7z920_extra.7z
           curl.exe -L -O http://mirror.download.kiwix.org/dev/7z1805-extra.7z
           7z.exe -y x 7z1805-extra.7z
+          cd ..\..
 
       - name: Copy Imdisk Installer
         run: |
-          mkdir "C:\imdiskinst"
-          cd "C:\imdiskinst"
+          mkdir "assets\imdiskinst"
+          cd "assets\imdiskinst"
           curl.exe -L -o imdiskinst.exe http://mirror.download.kiwix.org/dev/imdiskinst.exe
           7z.exe x imdiskinst.exe
           del imdiskinst.exe
-          dir "C:\imdiskinst"
+          cd ..\..
 
       - name: Download Etcher-cli
         run: |
-          mkdir "C:\etcher-cli"
-          cd "C:\etcher-cli"
+          mkdir "assets\etcher-cli"
+          cd "assets\etcher-cli"
           curl.exe -L -o etcher-cli.zip http://mirror.download.kiwix.org/dev/Etcher-cli-1.1.2-win32-x64.zip
           7z.exe x etcher-cli.zip
           del etcher-cli.zip
+          cd ..\..
 
       - name: Download aria2
         run: |
@@ -336,12 +313,10 @@ jobs:
           del aria2c.zip
           curl.exe -L -o ca-certificates.crt http://mirror.download.kiwix.org/dev/ca-certificates.crt
 
-      - name: run pyinstaller
-        run: |
-          C:\msys64\mingw64\bin\pyinstaller.exe --log-level=DEBUG kiwix-hotspot-win64.spec
-          cat build\kiwix-hotspot-win64\warn-kiwix-hotspot-win64.txt
+      - name: build pyinstaller in docker
+        run: docker.exe run -v ${Env:GITHUB_WORKSPACE}:'c:\code' mcr.microsoft.com/windows/servercore:ltsc2019 powershell.exe -File C:\code\build-hotspot.ps1
 
-      - name: deploy
+      - name: archive it
         run: |
           cd dist\kiwix-hotspot
           7z.exe a -m0=Copy $Env:GITHUB_WORKSPACE\windows_bundle\kiwix-hotspot.7z *
@@ -359,7 +334,7 @@ jobs:
           # download tools
           cd $Env:GITHUB_WORKSPACE\windows_bundle\
           # create SFX exe from 7z archive
-          C:\Windows\System32\cmd.exe /c copy /b "C:\7zextra\7zS.sfx" + sfxconfig.txt + kiwix-hotspot.7z kiwix-hotspot.exe
+          C:\Windows\System32\cmd.exe /c copy /b "..\assets\7zextra\7zS.sfx" + sfxconfig.txt + kiwix-hotspot.7z kiwix-hotspot.exe
           # change icon and add version info to exe
           C:\Windows\System32\cmd.exe /c copy ..\kiwix-hotspot-logo.ico icon.ico
           C:\resource_hacker\ResourceHacker.exe -open resources.rc -save resources.res -action compile -log CONSOLE

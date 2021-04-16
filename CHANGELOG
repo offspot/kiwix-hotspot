@@ -9,6 +9,7 @@
 * [master] using secure protocol for composer update to prevent qemu network issues
 * using new 2021-04-13 master image
 * Updated Africatik contents
+* removed dep to pypiwin32
 
 2.3.8
 
