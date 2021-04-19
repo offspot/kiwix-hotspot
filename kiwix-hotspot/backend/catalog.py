@@ -33,7 +33,7 @@ def fetch_catalogs(logger):
             dlf = download_file(catalog.get("url"), tmp_fpath, logger, debug=False)
             if dlf.successful:
                 with open(tmp_fpath, "r") as fp:
-                    catalogs.append(yaml.load(fp.read()))
+                    catalogs.append(yaml.safe_load(fp.read()))
                 os.unlink(tmp_fpath)
             else:
                 raise ValueError("Unable to download {}".format(catalog.get("url")))

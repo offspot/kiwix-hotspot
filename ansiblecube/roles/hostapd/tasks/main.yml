@@ -53,5 +53,7 @@
     name: hostapd
   tags: master
 
-- include_tasks: enable_service.yml service=hostapd
+- import_tasks: enable_service.yml
+  vars:
+    service: hostapd
   tags: master

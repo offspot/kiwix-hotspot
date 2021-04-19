@@ -3,6 +3,7 @@
   pip:
     name: uwsgi
     state: absent
+  ignore_errors: True
   tags: master
 
 - name: Remove the old service file
@@ -13,15 +14,10 @@
 
 - name: Install uwsgi packages
   apt:
-    name: "{{ item }}"
+    name: python3,uwsgi,uwsgi-plugin-python3
     state: latest
     autoremove: yes
     autoclean: yes
-  with_items:
-   - python3
-   - uwsgi
-   - uwsgi-plugin-python3
-   - avahi-utils
   tags: master
 
 - name: create apps-available folder

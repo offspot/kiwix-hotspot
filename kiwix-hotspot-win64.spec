@@ -15,11 +15,11 @@ with open(rsc, 'w') as f:
 	f.write(content)
 
 block_cipher = None
-typelib_path = os.path.join(site.getsitepackages()[1], 'gnome', 'lib', 'girepository-1.0')
+#typelib_path = os.path.join(site.getsitepackages()[1], 'gnome', 'lib', 'girepository-1.0')
 
 a = Analysis(['kiwix-hotspot/__main__.py'],
              pathex=['.'],
-             binaries=[(os.path.join(typelib_path, tl), 'gi_typelibs') for tl in os.listdir(typelib_path)],
+             # binaries=[(os.path.join(typelib_path, tl), 'gi_typelibs') for tl in os.listdir(typelib_path)],
              datas=[('ui.glade', '.'),
                     ('contents.json', '.'),
                     ('imdisk.png', '.'),
@@ -30,13 +30,13 @@ a = Analysis(['kiwix-hotspot/__main__.py'],
                     ('ca-certificates.crt', '.'),
                     ('ansiblecube', 'ansiblecube'),
                     ('vexpress-boot', 'vexpress-boot'),
-                    ('C:\Program Files\qemu', 'qemu'),
-                    ('C:\Program Files\imdiskinst', 'imdiskinst'),
-                    ('C:\Program Files\etcher-cli', 'etcher-cli'),
-                    ('C:\Program Files\\7zextra\\x64\\7za.dll', '.'),
-                    ('C:\Program Files\\7zextra\\x64\\7za.exe', '.'),
-                    ('C:\Program Files\\7zextra\\x64\\7zxa.dll', '.')],
-             hiddenimports=['gui', 'cli', 'image', 'cache', 'wipe', 'pkg_resources.py2_warn'],
+                    ('assets\\qemu', 'qemu'),
+                    ('assets\\imdiskinst', 'imdiskinst'),
+                    ('assets\\etcher-cli', 'etcher-cli'),
+                    ('assets\\7zextra\\x64\\7za.dll', '.'),
+                    ('assets\\7zextra\\x64\\7za.exe', '.'),
+                    ('assets\\7zextra\\x64\\7zxa.dll', '.')],
+             hiddenimports=['gui', 'cli', 'image', 'cache', 'wipe', 'pkg_resources', 'pkg_resources.py2_warn'],
              hookspath=['additional-hooks'],
              runtime_hooks=[],
              excludes=[],

@@ -1,19 +1,19 @@
 {
     "raspbian_image": {
-        "url": "http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2019-07-12/2019-07-10-raspbian-buster-lite.zip",
-        "name": "2019-07-10-raspbian-buster-lite.zip",
-        "kernel_version": "4.19.57",
-        "checksum": "5a0747b2bfb8c8664192831b7dc5b22847718a1cb77639a1f3db3683b242dc96",
-        "archive_size": 366646269,
-        "expanded_size": 1862270976
+        "url": "https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2021-03-25/2021-03-04-raspios-buster-armhf-lite.zip",
+        "name": "2021-03-04-raspios-buster-armhf-lite.zip",
+        "kernel_version": "5.10.17",
+        "checksum": "ea92412af99ec145438ddec3c955aa65e72ef88d84f3307cea474da005669d39",
+        "archive_size": 463405209,
+        "expanded_size": 1866465280
     },
     "hotspot_master_image": {
-        "url": "{mirror}/hotspots/base/hotspot-master_2019-08-24.img.zip",
-        "name": "hotspot-master_2019-08-24.img.zip",
+        "url": "{mirror}/hotspots/base/hotspot-master_2021-04-13.img.zip",
+        "name": "hotspot-master_2021-04-13.img.zip",
         "root_partition_size": 7000000000,
-        "checksum": "105c6a49193177dca7d12d148b1f86e5607dcc4457a5bf9e2062e06dfff58203",
-        "archive_size": 2141277652,
-        "expanded_size": 7760000000
+        "checksum": "46422437e6d1c6c9714de55abd6aa8a41bab83831d7aadcb2e9f5aac6f39bda1",
+        "archive_size": 2503267506,
+        "expanded_size": 8589934592
     },
     "aflatoun_content": {
         "url": "{mirror}/other/aflatoun/content.tar.gz",
@@ -125,11 +125,11 @@
         "expanded_size": 35420045
     },
     "africatik_all": {
-        "url": "{mirror}/other/africatik/africatik-1.0.zip",
-        "name": "africatik-1.0.zip",
+        "url": "{mirror}/other/africatik/africatik-1.0.2.zip",
+        "name": "africatik-1.0.2.zip",
         "folder_name": null,
-        "checksum": "4a34f8ef7c06f30e43e2081396bef1c85e2b58747fac7933a197c820fb5662b1",
-        "archive_size": 2743580745,
-        "expanded_size": 2743697408
+        "checksum": "003e9af9181db847d599d1e1ba71585b6717fe2f3c95a508b53cdfc6e8006f09",
+        "archive_size": 2765216942,
+        "expanded_size": 2765216942
     }
 }

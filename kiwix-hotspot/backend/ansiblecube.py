@@ -34,7 +34,7 @@ def run(machine, tags, extra_vars={}, secret_keys=[]):
 
     # prepare ansible command
     ansible_cmd = [
-        "/usr/local/bin/ansible-playbook",
+        "/usr/bin/ansible-playbook",
         "--inventory hosts",
         "--tags {}".format(",".join(tags)),
         '--extra-vars="@{}"'.format(extra_vars_path),
@@ -72,19 +72,18 @@ def run_for_image(machine, root_partition_size, disk_size):
     """ initial launch of a bare raspbian to create a base (master) image """
     tags = ["master", "rename", "setup"]
 
-    machine.exec_cmd("sudo apt-get update -y")
+    # sync clock, clean up apt and wait to prevent hash mismatch on update
+    machine.exec_cmd(
+        "echo 'deb https://mirror.netcologne.de/raspbian/raspbian/ "
+        "buster main contrib non-free rpi' | sudo tee /etc/apt/sources.list"
+    )
+    machine.exec_cmd("sudo rm /etc/apt/sources.list.d/raspi.list")
+    machine.exec_cmd("sudo timedatectl --adjust-system-clock set-ntp 1")
+    machine.exec_cmd("sudo rm -rf /var/lib/apt/lists/*")
+
+    machine.exec_cmd("sudo apt-get update -y -o Acquire::BrokenProxy::=true")
     # install ansible dependencies (packages)
-    machine.exec_cmd(
-        "sudo apt-get install -y python-dev libffi-dev libssl-dev git lsb-release"
-    )
-    # install the latest pip
-    machine.exec_cmd("wget https://bootstrap.pypa.io/get-pip.py -O /tmp/get-pip.py")
-    machine.exec_cmd("sudo python /tmp/get-pip.py")
-    # install latest ansible and important python dependencies
-    machine.exec_cmd(
-        "sudo sudo python -m pip install -U "
-        "pip virtualenv jinja2 paramiko pyyaml httplib2 ansible==2.6.18"
-    )
+    machine.exec_cmd("sudo apt-get install -y ansible")
 
     # prepare ansible files
     machine.exec_cmd("sudo mkdir --mode 0755 -p /etc/ansible")

@@ -228,15 +228,17 @@ class _RunningInstance:
                 self._emulation._ram,
                 "-M",
                 "vexpress-a15",
+                "-cpu",
+                "cortex-a15",
                 "-kernel",
                 self._emulation._kernel,
                 "-dtb",
                 self._emulation._dtb,
                 "-append",
-                "root=/dev/mmcblk0p2 console=ttyAMA0 console=tty",
+                "root=/dev/mmcblk0p2 console=ttyAMA0 console=tty "
+                "rw rootwait rootfstype=ext4 ",
                 "-serial",
-                "stdio",
-                "-no-acpi",
+                "mon:stdio",
                 "-drive",
                 "format=raw,if=sd,file={}".format(self._emulation._image),
                 "-display",
@@ -309,6 +311,9 @@ class _RunningInstance:
                     allow_agent=False,
                     look_for_keys=False,
                 )
+                # enable keep-alive to prevent connection drop on long-lasting command
+                # > for github actions
+                self._client.get_transport().set_keepalive(2)
             except Exception as exp:
                 self._logger.err(exp)
                 tries += 1

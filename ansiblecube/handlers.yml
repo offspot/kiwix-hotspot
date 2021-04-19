@@ -34,7 +34,7 @@
 
 - name: restart kiwix
   service:
-    name: kiwix-server
+    name: kiwix
     state: restarted
     enabled: yes
 

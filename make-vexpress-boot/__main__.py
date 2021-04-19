@@ -1,25 +1,23 @@
 import os
-import re
 import sys
-import shutil
-import fileinput
+import pathlib
 import subprocess
-import urllib.request
-from zipfile import ZipFile
-from netfilter_conf import NETFILTER_CONF
 
+
+def run(args, **kwargs):
+    print(f"running {args}")
+    subprocess.run(args, check=True, shell=True, **kwargs)
+
+
+netcfg_path = pathlib.Path(__file__).parent.joinpath("network.conf").resolve()
 os.makedirs("build", exist_ok=True)
 os.chdir("build")
 
 boot_dir = "vexpress-boot"
 boot_zip = boot_dir + ".zip"
 
-linux_version = "4.10"
+linux_version = "5.10"
 linux_folder = "linux-" + linux_version
-linux_zip = linux_folder + ".zip"
-url = "https://github.com/torvalds/linux/archive/v{}.zip".format(linux_version)
-exfat_url = "https://github.com/dorimanx/exfat-nofuse/archive/master.zip"
-exfat_zip = "exfat-nofuse-master.zip"
 
 print("--> make vexpress boot")
 if os.path.isdir(boot_zip):
@@ -30,50 +28,32 @@ print("--> download linux")
 if os.path.isdir(linux_folder):
     print("nothing to do")
 else:
-    urllib.request.urlretrieve(url, filename=linux_zip)
-
-    print("--> extract linux")
-    zipFile = ZipFile(linux_zip)
-    zipFile.extractall()
-    os.remove(linux_zip)
-
-print("--> download & extract exfat-nofuse")
-urllib.request.urlretrieve(exfat_url, filename=exfat_zip)
-zipFile = ZipFile(exfat_zip)
-zipFile.extractall()
-
-print("--> insert exfat module into kernel tree")
-# move downloaded code to fs/exfat
-exfat_folder = os.path.join(linux_folder, "fs", "exfat")
-shutil.rmtree(exfat_folder, ignore_errors=True)
-shutil.move("exfat-nofuse-master", exfat_folder)
-
-# add a reference to fs/exfat in the fs/ Makefile
-with open(os.path.join(linux_folder, "fs", "Makefile"), "a") as fs_makefile:
-    fs_makefile.write("\nobj-$(CONFIG_EXFAT_FS)     += exfat/\n")
-
-# add a reference to fs/exfat in the fs/ MenuConfig
-for line in fileinput.input(os.path.join(linux_folder, "fs", "Kconfig"), inplace=True):
-    sys.stdout.write(line)
-    if 'source "fs/fat/Kconfig"' in line:
-        new_line = 'source "fs/exfat/Kconfig"\n'
-        sys.stdout.write(new_line)
+    run(
+        [
+            "git",
+            "clone",
+            "--depth=1",
+            "--branch",
+            f"v{linux_version}",
+            "https://github.com/torvalds/linux/",
+            linux_folder,
+        ]
+    )
 
 os.chdir(linux_folder)
 
-print("--> set linux configuration")
-subprocess.check_call(
-    "make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- vexpress_defconfig", shell=True
-)
+pathlib.Path(".config").unlink(missing_ok=True)
 
-# Modify configuration
-with open(".config", "r") as config:
-    lines = config.readlines()
-with open(".config", "w") as config:
-    for line in lines:
-        # Disable HW_RANDOM otherwise
-        line = re.sub(r"^CONFIG_HW_RANDOM=y$", "CONFIG_HW_RANDOM=n", line)
-        config.write(line)
+print("--> create dummy config from host")
+run("make -j 4 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- olddefconfig")
+
+print("--> set linux configuration")
+run("make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- vexpress_defconfig")
+
+with open(".config", "a") as config:
+
+    # Disable HW_RANDOM
+    config.write("\nCONFIG_HW_RANDOM=n\n")
 
     # Enable FUSE
     config.write("\nCONFIG_FUSE_FS=y\n")
@@ -88,44 +68,50 @@ with open(".config", "w") as config:
     config.write("\nCONFIG_NET_NS=y\n")
 
     # Enable netfilter
-    config.write(NETFILTER_CONF)
-
-subprocess.check_call(
-    "make -j 2 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- olddefconfig", shell=True
-)
+    with open(netcfg_path, "r") as netcfg:
+        config.write(netcfg.read())
 
 print("--> compile linux")
-subprocess.check_call(
-    "make -j 2 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- all", shell=True
-)
+run("make -j 4 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- all")
 
 print("--> create vexpress boot directory")
 os.mkdir("../{}".format(boot_dir))
-subprocess.check_call(
-    "cp .config arch/arm/boot/zImage arch/arm/boot/dts/vexpress-v2p-ca15-tc1.dtb ../{}".format(
-        boot_dir
-    ),
-    shell=True,
+run(
+    [
+        "cp",
+        ".config",
+        "arch/arm/boot/zImage",
+        "arch/arm/boot/dts/vexpress-v2p-ca15-tc1.dtb",
+        f"../{boot_dir}",
+    ]
 )
-subprocess.check_call(
-    "cp .config arch/arm/boot/zImage arch/arm/boot/dts/vexpress-v2p-ca15_a7.dtb ../{}".format(
-        boot_dir
-    ),
-    shell=True,
+run(
+    [
+        "cp",
+        ".config",
+        "arch/arm/boot/zImage",
+        "arch/arm/boot/dts/vexpress-v2p-ca15_a7.dtb",
+        f"../{boot_dir}",
+    ]
 )
-subprocess.check_call(
-    "cp .config arch/arm/boot/zImage arch/arm/boot/dts/vexpress-v2p-ca9.dtb ../{}".format(
-        boot_dir
-    ),
-    shell=True,
+run(
+    [
+        "cp",
+        ".config",
+        "arch/arm/boot/zImage",
+        "arch/arm/boot/dts/vexpress-v2p-ca9.dtb",
+        f"../{boot_dir}",
+    ]
 )
 os.chdir("..")
 with open("{}/README.txt".format(boot_dir), "w+") as readme:
     readme.write(
-        """This is the kernel used by kiwix-hotspot to boot the vexpress machine in QEMU
-It has been generated by make-vexpress-boot script at https://github.com/kiwix/kiwix-hotspot"""
+        "This is the kernel used by kiwix-hotspot to "
+        "boot the vexpress machine in QEMU\n"
+        "It has been generated by make-vexpress-boot script at "
+        "https://github.com/kiwix/kiwix-hotspot"
     )
     readme.flush()
 
 print("--> create vexpress boot zip archive")
-subprocess.check_call("zip -r --move {} {}".format(boot_zip, boot_dir), shell=True)
+run(f"zip -r --move {boot_zip} {boot_dir}")

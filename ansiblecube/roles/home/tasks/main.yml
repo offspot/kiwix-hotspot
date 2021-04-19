@@ -26,9 +26,7 @@
 
 # copy branding again in reconfigure to allow out-of-master updates
 - name: Copy static files (general branding)
-  copy:
-    src: static
-    dest: /var/www/
+  command: cp -r {{ playbook_dir }}/roles/home/files/static /var/www/
   tags: ["master", "reconfigure"]
 
 - name: copy blank homepage
@@ -56,7 +54,7 @@
       group: root
       mode: 0755
 
-  - stat: 
+  - stat:
       path: "{{ custom_branding_path }}/{{ item }}"
     with_items:
      - favicon.png

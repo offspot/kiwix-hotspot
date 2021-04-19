@@ -6,6 +6,7 @@ import re
 import sys
 import json
 import data
+import math
 import signal
 import base64
 import string
@@ -32,14 +33,10 @@ import humanfriendly
 
 from data import cache_folder_name
 
-if sys.platform == "win32":
-    from win32com.shell import shellcon, shell
-
 ONE_MiB = 2 ** 20
 ONE_GiB = 2 ** 30
 ONE_GB = int(1e9)
 EXFAT_FORBIDDEN_CHARS = ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]
-PREFERENCES = None
 
 
 STAGES = collections.OrderedDict(
@@ -52,6 +49,10 @@ STAGES = collections.OrderedDict(
         ("write", "SD-card creation"),
     ]
 )
+
+
+class Global:
+    PREFERENCES = None
 
 
 class ProgressHelper(object):
@@ -148,7 +149,6 @@ class ProgressHelper(object):
                 ]
             except Exception as exp:
                 print(str(exp))
-                pass
 
         # detect tasks being executed
         # TODO: we currently record the task as complete while it just started
@@ -266,9 +266,8 @@ def get_free_space_in_dir(dirname):
             ctypes.c_wchar_p(dirname), None, None, ctypes.pointer(free_bytes)
         )
         return free_bytes.value
-    else:
-        st = os.statvfs(dirname)
-        return st.f_bavail * st.f_frsize
+    st = os.statvfs(dirname)
+    return st.f_bavail * st.f_frsize
 
 
 # Thread safe class to register pid to cancel in case of abort
@@ -500,6 +499,11 @@ def check_user_inputs(
     )
 
 
+def as_power_of_2(size):
+    """ round to the next nearest power of 2 """
+    return 2 ** int(math.ceil(math.log(size) / math.log(2)))
+
+
 def get_adjusted_image_size(size):
     """ save some space to accomodate real SD card sizes
 
@@ -507,10 +511,10 @@ def get_adjusted_image_size(size):
 
     # if size is not a rounded GB multiple, assume it's OK
     if not size % ONE_GB == 0:
-        return size
+        return as_power_of_2(size)
 
     rate = 0.97 if size / ONE_GB <= 16 else 0.96
-    return int(size * rate)
+    return as_power_of_2(int(size * rate))
 
 
 def get_folder_size(path):
@@ -547,10 +551,7 @@ def get_prefs_path():
     fname = "kiwix-hotspot.prefs"
     homedir = os.path.expanduser("~")
     if sys.platform == "win32":
-        try:
-            prefsdir = shell.SHGetFolderPath(0, shellcon.CSIDL_LOCAL_APPDATA, 0, 0)
-        except Exception:
-            prefsdir = homedir
+        prefsdir = os.getenv("LOCALAPPDATA") or homedir
     elif sys.platform == "linux":
         prefsdir = os.path.join(homedir, ".config")
     elif sys.platform == "darwin":
@@ -576,10 +577,9 @@ def read_preferences():
 
 def get_prefs(force_reload=False):
     """ cached-shortcut to PREFERENCES """
-    global PREFERENCES
-    if PREFERENCES is None or force_reload:
-        PREFERENCES = read_preferences()
-    return PREFERENCES
+    if Global.PREFERENCES is None or force_reload:
+        Global.PREFERENCES = read_preferences()
+    return Global.PREFERENCES
 
 
 def save_prefs(prefs, auto_reload=True):

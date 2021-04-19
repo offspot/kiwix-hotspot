@@ -24,27 +24,16 @@
   tags: master
 
 - block:
-  
-  - name: set python3.5 for stretch
-    set_fact:
-      python3_version: "3.5"
-    when: ansible_distribution_release == "stretch"
 
   - name: set python3.7 for buster
     set_fact:
       python3_version: "3.7"
     when: ansible_distribution_release == "buster"
 
-  - name: set php7.0 for stretch
-    set_fact:
-      php_version: "7.0"
-    when: ansible_distribution_release == "stretch"
-
   - name: set php7.3 for buster
     set_fact:
       php_version: "7.3"
     when: ansible_distribution_release == "buster"
-
   tags: always
 
 # set hostname and variants
@@ -89,7 +78,6 @@
       name: "{{ fqdn }}"
     name: Set hostname using to {{ fqdn }}
     notify: restart systemd-logind
-  
   tags: always
 
 - name: Create config.fact file
