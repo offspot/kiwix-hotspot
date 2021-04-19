@@ -24,9 +24,9 @@ $Env:Path += ";C:\Program Files\7-Zip"
 echo "[*] Installing (extracting actually) MSYS2"
 curl.exe -L -O http://repo.msys2.org/distrib/x86_64/msys2-base-x86_64-20210228.tar.xz
 ThrowOnNativeFailure
-C:\Program Files\7-Zip\7z.exe x msys2-base-x86_64-20210228.tar.xz
+'C:\Program Files\7-Zip\7z.exe' x msys2-base-x86_64-20210228.tar.xz
 ThrowOnNativeFailure
-C:\Program Files\7-Zip\7z.exe x msys2-base-x86_64-20210228.tar
+'C:\Program Files\7-Zip\7z.exe' x msys2-base-x86_64-20210228.tar
 ThrowOnNativeFailure
 
 echo "[*] Updating and upgrading MSYS2 packages"
