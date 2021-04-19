@@ -234,8 +234,21 @@ jobs:
       - name: setup environ vars
         run: python ./.github/setup_build_env.py
 
-      # - name: update PATH
-      #   run: $Env:Path += ";C:\Program Files (x86)\Windows Kits\10\bin\x64\"
+      - name: find latest msys version
+        shell: python
+        run: |
+          import os
+          import json
+          import subprocess
+          gh_url = "https://api.github.com/repos/msys2/msys2-installer/releases"
+          releases = subprocess.run(["curl.exe", "-L", gh_url], universal_newlines=True, encoding="utf-8", stdout=subprocess.PIPE).stdout
+          release = json.loads(releases)[0]
+          for asset in release["assets"]:
+              if asset["name"].endswith(".tar.xz"):
+                  url = asset["browser_download_url"]
+                  with open(os.getenv("GITHUB_ENV"), "a") as fh:
+                      fh.write(f"MSYSURL={url}")
+                  break
 
       - name: Decode SSH key
         id: base64dec
@@ -314,7 +327,7 @@ jobs:
           curl.exe -L -o ca-certificates.crt http://mirror.download.kiwix.org/dev/ca-certificates.crt
 
       - name: build pyinstaller in docker
-        run: docker.exe run -v ${Env:GITHUB_WORKSPACE}:'c:\code' mcr.microsoft.com/windows/servercore:ltsc2019 powershell.exe -File C:\code\build-hotspot.ps1
+        run: docker.exe run -e MSYSURL=${Env:MSYSURL} -v ${Env:GITHUB_WORKSPACE}:'c:\code' mcr.microsoft.com/windows/servercore:ltsc2019 powershell.exe -File C:\code\build-hotspot.ps1
 
       - name: archive it
         run: |

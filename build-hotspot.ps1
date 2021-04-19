@@ -15,18 +15,17 @@ function ThrowOnNativeFailure {
 echo "### Starting kiwix-hotspot build ###"
 
 echo "[*] Installing 7zip"
-curl.exe -L -O https://www.7-zip.org/a/7z1900-x64.msi
+curl.exe -L -O http://mirror.download.kiwix.org/dev/7zcli1900.zip
 ThrowOnNativeFailure
-msiexec /i 7z1900-x64.msi
-ThrowOnNativeFailure
-$Env:Path += ";C:\Program Files\7-Zip"
+Expand-Archive -LiteralPath 7zcli1900.zip -DestinationPath C:\
+Test-Path -Path 'C:\7za.exe' -PathType Leaf
 
 echo "[*] Installing (extracting actually) MSYS2"
-curl.exe -L -O http://repo.msys2.org/distrib/x86_64/msys2-base-x86_64-20210228.tar.xz
+curl.exe -L -o msys2-base-x86_64.tar.xz $Env:MSYSURL
 ThrowOnNativeFailure
-& 'C:\Program Files\7-Zip\7z.exe' x msys2-base-x86_64-20210228.tar.xz
+c:\7za.exe x .\msys2-base-x86_64.tar.xz
 ThrowOnNativeFailure
-& 'C:\Program Files\7-Zip\7z.exe' x msys2-base-x86_64-20210228.tar
+c:\7za.exe x .\msys2-base-x86_64.tar
 ThrowOnNativeFailure
 
 echo "[*] Updating and upgrading MSYS2 packages"
