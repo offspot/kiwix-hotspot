@@ -37,7 +37,6 @@ ONE_MiB = 2 ** 20
 ONE_GiB = 2 ** 30
 ONE_GB = int(1e9)
 EXFAT_FORBIDDEN_CHARS = ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]
-PREFERENCES = None
 
 
 STAGES = collections.OrderedDict(
@@ -50,6 +49,10 @@ STAGES = collections.OrderedDict(
         ("write", "SD-card creation"),
     ]
 )
+
+
+class Global:
+    PREFERENCES = None
 
 
 class ProgressHelper(object):
@@ -146,7 +149,6 @@ class ProgressHelper(object):
                 ]
             except Exception as exp:
                 print(str(exp))
-                pass
 
         # detect tasks being executed
         # TODO: we currently record the task as complete while it just started
@@ -264,9 +266,8 @@ def get_free_space_in_dir(dirname):
             ctypes.c_wchar_p(dirname), None, None, ctypes.pointer(free_bytes)
         )
         return free_bytes.value
-    else:
-        st = os.statvfs(dirname)
-        return st.f_bavail * st.f_frsize
+    st = os.statvfs(dirname)
+    return st.f_bavail * st.f_frsize
 
 
 # Thread safe class to register pid to cancel in case of abort
@@ -576,10 +577,9 @@ def read_preferences():
 
 def get_prefs(force_reload=False):
     """ cached-shortcut to PREFERENCES """
-    global PREFERENCES
-    if PREFERENCES is None or force_reload:
-        PREFERENCES = read_preferences()
-    return PREFERENCES
+    if Global.PREFERENCES is None or force_reload:
+        Global.PREFERENCES = read_preferences()
+    return Global.PREFERENCES
 
 
 def save_prefs(prefs, auto_reload=True):
