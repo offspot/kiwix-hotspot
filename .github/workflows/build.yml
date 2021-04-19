@@ -283,6 +283,7 @@ jobs:
           del qemu-w64-setup-20210203.exe
           move qemu-system-arm.exe qemu-arm.exe
           # remove .fd files
+          Remove-Item edk2* -Recurse -Force
           Remove-Item keymaps -Recurse -Force
           Remove-Item share -Recurse -Force
           Remove-Item '$PLUGINSDIR' -Recurse -Force
