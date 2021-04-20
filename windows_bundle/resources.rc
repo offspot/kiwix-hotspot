@@ -1,25 +1,26 @@
-VS_VERSION_INFO VERSIONINFO
-    FILEVERSION    1,0,0,0
-    PRODUCTVERSION VERSION_TUPLE,0,0
-    FILEOS VOS_UNKNOWN
-    FILETYPE VFT_APP
+1 VERSIONINFO
+FILEVERSION 1,0,0,0
+PRODUCTVERSION VERSION_TUPLE,0,0
+FILEOS VOS_UNKNOWN
+FILETYPE VFT_APP
 {
-    BLOCK "StringFileInfo"
+BLOCK "StringFileInfo"
+{
+    BLOCK "040904B0"
     {
-        BLOCK "040904b0"
-        {
-            VALUE "CompanyName",        "Kiwix\0"
-            VALUE "FileDescription",    "Kiwix Hotspot\0"
-            VALUE "FileVersion",        "1.0.0.0\0"
-            VALUE "InternalName",       "kiwix-hotspot.exe\0"
-            VALUE "LegalCopyright",     "Association Kiwix\0"
-            VALUE "OriginalFilename",   "kiwix-hotspot.exe\0"
-            VALUE "ProductName",        "Kiwix Hotspot\0"
-            VALUE "ProductVersion",     "VERSION_STR\0"
-        }
+        VALUE "CompanyName", "Kiwix"
+        VALUE "FileDescription", "Kiwix Hotspot"
+        VALUE "FileVersion", "1.0.0.0"
+        VALUE "InternalName", "kiwix-hotspot.exe"
+        VALUE "LegalCopyright", "Association Kiwix"
+        VALUE "OriginalFilename", "kiwix-hotspot.exe"
+        VALUE "ProductName", "Kiwix Hotspot"
+        VALUE "ProductVersion", "VERSION_STR"
     }
-    BLOCK "VarFileInfo"
-    {
-        VALUE "Translation", 0x0409 1200
-    }
+}
+
+BLOCK "VarFileInfo"
+{
+    VALUE "Translation", 0x0409 1200
+}
 }

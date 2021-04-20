@@ -20,7 +20,11 @@ if GITHUB_ENV is None or GITHUB_REF is None or GITHUB_SHA is None:
 
 UPDATES = {}
 
-BRANCH = GITHUB_REF.split("/", 2)[-1] if GITHUB_REF.startswith("refs/heads/") else None
+BRANCH = (
+    GITHUB_REF.split("/", 2)[-1].replace("/", "__")
+    if GITHUB_REF.startswith("refs/heads/")
+    else None
+)
 TAG = GITHUB_REF.split("/", 2)[-1] if GITHUB_REF.startswith("refs/tags/") else None
 SCOMMIT = GITHUB_SHA[0:7]
 
@@ -42,7 +46,11 @@ elif not SCHEDULED and TAG is not None and TAG.startswith("v"):
 # check if a branch
 elif BRANCH is not None:
     UPDATES.update(
-        {"BRANCH": BRANCH, "VERSION": f"CI ({BRANCH} - {SCOMMIT})", "BUILDTYPE": "CI"}
+        {
+            "BRANCH": BRANCH,
+            "VERSION": f"CI ({BRANCH} - {SCOMMIT})",
+            "BUILDTYPE": "CI",
+        }
     )
 
 # check if dangling commit

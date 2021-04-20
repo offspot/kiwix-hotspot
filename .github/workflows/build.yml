@@ -227,12 +227,25 @@ jobs:
     name: build Windows
     runs-on: windows-2019
     steps:
-      - uses: Vampire/setup-wsl@v1
       - name: checkout code
         uses: actions/checkout@v1
 
       - name: setup environ vars
         run: python ./.github/setup_build_env.py
+
+      - name: update windows exe version metadata
+        env:
+          PYTHONPATH: kiwix-hotspot
+        shell: python
+        run: |
+          import os
+          from version import get_version_str, get_version_tuple
+          fpath = os.path.join("windows_bundle", "resources.rc")
+          v = get_version_tuple()
+          with open(fpath, "r") as fh:
+              content = fh.read()
+          with open(fpath, "w") as fh:
+              fh.write(content.replace("VERSION_TUPLE", f"{v[0]},{v[1]}").replace("VERSION_STR", get_version_str()))
 
       - name: find latest msys version
         shell: python
@@ -278,7 +291,7 @@ jobs:
         run: |
           mkdir "assets\qemu"
           cd "assets\qemu"
-          curl.exe -L -O https://qemu.weilnetz.de/w64/2021/qemu-w64-setup-20210203.exe
+          curl.exe -L -O http://mirror.download.kiwix.org/dev/qemu-w64-setup-20210203.exe
           7z.exe x qemu-w64-setup-20210203.exe
           del qemu-w64-setup-20210203.exe
           move qemu-system-arm.exe qemu-arm.exe
@@ -339,7 +352,7 @@ jobs:
         run: |
           mkdir C:\resource_hacker
           cd C:\resource_hacker
-          curl.exe -L -O http://www.angusj.com/resourcehacker/resource_hacker.zip
+          curl.exe -L -o resource_hacker.zip http://mirror.download.kiwix.org/dev/resource_hacker518.zip
           7z.exe x resource_hacker.zip
           del resource_hacker.zip
 
@@ -349,11 +362,14 @@ jobs:
           cd $Env:GITHUB_WORKSPACE\windows_bundle\
           # create SFX exe from 7z archive
           C:\Windows\System32\cmd.exe /c copy /b "..\assets\7zextra\7zS.sfx" + sfxconfig.txt + kiwix-hotspot.7z kiwix-hotspot.exe
-          # change icon and add version info to exe
+          # change icon, version info and add UAC manifest to to exe
           C:\Windows\System32\cmd.exe /c copy ..\kiwix-hotspot-logo.ico icon.ico
           C:\resource_hacker\ResourceHacker.exe -open resources.rc -save resources.res -action compile -log CONSOLE
-          # not changing version info due to a bug in ResourceHacker now removing elevation request when doing this
+          C:\resource_hacker\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res manifest.txt -mask 24,1, -log CONSOLE
+          ping -n 10 127.0.0.1
           C:\resource_hacker\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res icon.ico -mask ICONGROUP,MAINICON, -log CONSOLE
+          ping -n 10 127.0.0.1
+          C:\resource_hacker\ResourceHacker.exe -open kiwix-hotspot.exe -save kiwix-hotspot.exe -action addoverwrite -res resources.res -mask VERSIONINFO,1, -log CONSOLE
           ping -n 10 127.0.0.1
           cd $Env:GITHUB_WORKSPACE
           mkdir signed
