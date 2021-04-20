@@ -1,11 +1,5 @@
 ---
 
-- name: disable services using {{ data_path }}
-  shell: systemctl stop kiwix edupi kalite aflatoun
-  become: yes
-  ignore_errors: yes
-  tags: ['master', 'resize']
-
 - name: create tar of {{ data_path }}
   become: yes
   become_user: "{{ username }}"

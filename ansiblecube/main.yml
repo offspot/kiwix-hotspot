@@ -17,6 +17,12 @@
       ignore_errors: yes
       tags: always
 
+    - name: stop services using {{ data_path }}
+      shell: systemctl stop kiwix edupi kalite aflatoun
+      become: yes
+      ignore_errors: yes
+      tags: always
+
   roles:
     - role: variables
 
@@ -97,6 +103,12 @@
       tags: seal
 
   post_tasks:
+    - name: disable services using {{ data_path }}
+      shell: systemctl disable kiwix edupi kalite aflatoun
+      become: yes
+      ignore_errors: yes
+      tags: ['master', 'resize']
+
     - name: Heartbeat mode on KoomBook LED, update is over !!!
       shell: echo heartbeat >/sys/class/leds/a20-olinuxino-lime2:green:usr/trigger
       when: ansible_architecture == 'armv7l' and ansible_lsb.id == 'Debian'
