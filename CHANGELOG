@@ -11,6 +11,7 @@
 * Updated Africatik contents
 * removed dep to pypiwin32
 * increased captive portal's session timeout from 15mn to 60mn
+* Version info metadata back on windows exe file
 
 2.3.8
 
