@@ -10,6 +10,7 @@
 * using new 2021-04-13 master image
 * Updated Africatik contents
 * removed dep to pypiwin32
+* increased captive portal's session timeout from 15mn to 60mn
 
 2.3.8
 

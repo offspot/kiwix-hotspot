@@ -7,7 +7,7 @@ for ip in $passlist
 do
 	## Count ESTABLISHED connections from/to $ip
 	is_connected=`conntrack -L | grep $ip | grep ESTABLISHED | wc -l`
-	
+
 	## If no connections then remove iptables rule to bypass redirection
 	if [ $is_connected -eq 0 ]
 	then

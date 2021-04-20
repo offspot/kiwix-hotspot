@@ -166,7 +166,7 @@
 - name: Add a cron entry to clean iptables rules
   cron:
     name: "Clear dead connections from CAPTIVE_PASSLIST"
-    minute: "*/15"
+    minute: "*/60"
     job: "/usr/local/bin/clean_iptables.sh"
     state: present
   tags: master
