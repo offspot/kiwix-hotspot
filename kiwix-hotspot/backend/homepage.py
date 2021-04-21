@@ -66,8 +66,6 @@ def generate_homepage(logger, options):
             {
                 "url": "http://{}".format(edupi_fqdn),
                 "css_class": "",
-                "category_class": "access",
-                "category": category,
                 "title": title,
                 "description": description,
                 "fa": "file",
@@ -86,8 +84,6 @@ def generate_homepage(logger, options):
             {
                 "url": "http://{}".format(noamad_fqdn),
                 "css_class": "nomad",
-                "category_class": "access",
-                "category": category,
                 "title": title,
                 "description": description,
             }
@@ -107,8 +103,6 @@ def generate_homepage(logger, options):
             {
                 "url": "http://{}".format(mathews_fqdn),
                 "css_class": "mathews",
-                "category_class": "access",
-                "category": category,
                 "title": title,
                 "description": description,
             }
@@ -128,8 +122,6 @@ def generate_homepage(logger, options):
             {
                 "url": "http://{}".format(africatik_fqdn),
                 "css_class": "africatik",
-                "category_class": "access",
-                "category": category,
                 "title": title,
                 "description": description,
             }
@@ -142,8 +134,6 @@ def generate_homepage(logger, options):
                 {
                     "url": "http://fr.{}".format(wikifundi_fqdn),
                     "css_class": "",
-                    "category_class": "create",
-                    "category": "WIKI",
                     "title": "WikiFundi",
                     "description": "Environnement qui vous permet de créer des articles Wikipédia hors-ligne (en français)",
                     "fa": "pencil",
@@ -154,8 +144,6 @@ def generate_homepage(logger, options):
                 {
                     "url": "http://en.{}".format(wikifundi_fqdn),
                     "css_class": "",
-                    "category_class": "create",
-                    "category": "WIKI",
                     "title": "WikiFundi",
                     "description": "Offline editable environment that provides a similar experience to editing Wikipedia online (in English)",
                     "fa": "pencil",
@@ -176,8 +164,6 @@ def generate_homepage(logger, options):
             {
                 "url": url,
                 "css_class": "",
-                "category_class": "learn",
-                "category": category,
                 "title": "Aflatoun",
                 "description": description,
                 "fa": "book",
@@ -191,8 +177,6 @@ def generate_homepage(logger, options):
                 {
                     "url": "http://{}/go/fr".format(kalite_fqdn),
                     "css_class": "khanacademy",
-                    "category_class": "learn",
-                    "category": "Apprendre",
                     "title": "Khan Academy",
                     "description": "Apprendre via des vidéos et des exercices.",
                 }
@@ -202,8 +186,6 @@ def generate_homepage(logger, options):
                 {
                     "url": "http://{}/go/es".format(kalite_fqdn),
                     "css_class": "khanacademy",
-                    "category_class": "learn",
-                    "category": "Aprender",
                     "title": "Khan Academy",
                     "description": "Aprende con videos y ejercicios.",
                 }
@@ -213,8 +195,6 @@ def generate_homepage(logger, options):
                 {
                     "url": "http://{}/go/en".format(kalite_fqdn),
                     "css_class": "khanacademy",
-                    "category_class": "learn",
-                    "category": "Learn",
                     "title": "Khan Academy",
                     "description": "Learn with videos and exercises.",
                 }
@@ -230,8 +210,6 @@ def generate_homepage(logger, options):
                         fqdn=kiwix_fqdn, id=package.get("langid", package_id)
                     ),
                     "css_class": "zim_{}".format(package_id.rsplit(".", 1)[0]),
-                    "category_class": "read",
-                    "category": "ZIM",
                     "title": package.get("name"),
                     "description": package.get("description"),
                     "fa": "",

@@ -12,6 +12,7 @@
 * removed dep to pypiwin32
 * increased captive portal's session timeout from 15mn to 60mn
 * Version info metadata back on windows exe file
+* Removed labels from homepage (next to titles)
 
 2.3.8
 
