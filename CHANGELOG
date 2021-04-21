@@ -13,6 +13,7 @@
 * increased captive portal's session timeout from 15mn to 60mn
 * Version info metadata back on windows exe file
 * Removed labels from homepage (next to titles)
+* Updated aria2c to version 1.35.0
 
 2.3.8
 
