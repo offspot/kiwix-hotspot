@@ -2,7 +2,7 @@
 
 * dropped support for ubuntu-16.04
 * image size now rounded to next power of two (qemu expects it)
-* [master] master based off raspiOS 2021-03-04
+* [master] master based off raspiOS 2021-03-04 (80c5f8e)
 * [master] root partition resized first as raspi's image is tight
 * [master] reboot after resize
 * [master] removed download/install of custom exfat modules (now in system)
