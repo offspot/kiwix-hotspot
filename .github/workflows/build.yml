@@ -397,7 +397,7 @@ jobs:
 
       - name: upload nightly build (cron on master)
         run: |
-          SRCDIR=nightly/$Env:DATE
+          $SRCDIR = "nightly/${Env:DATE}"
           mkdir -p $SRCDIR
           cp kiwix-hotspot-win64.exe $SRCDIR/
           scp -i ${HOME}/.ssh/id_rsa -r -v -o StrictHostKeyChecking=no $SRCDIR ci@mirror.download.kiwix.org:/data/download/nightly/
@@ -405,9 +405,10 @@ jobs:
 
       - name: upload release build (tagged)
         run: |
-          mkdir -p releases/$Env:RELEASE
-          cp kiwix-hotspot-win64.exe releases/$Env:RELEASE/
-          scp -i ${HOME}/.ssh/id_rsa -r -v -o StrictHostKeyChecking=no releases/$Env:RELEASE ci@mirror.download.kiwix.org:/data/download/release/kiwix-hotspot/
+          $SRCDIR = "releases/${Env:RELEASE}"
+          mkdir -p $SRCDIR
+          cp kiwix-hotspot-win64.exe $SRCDIR/
+          scp -i ${HOME}/.ssh/id_rsa -r -v -o StrictHostKeyChecking=no $SRCDIR ci@mirror.download.kiwix.org:/data/download/release/kiwix-hotspot/
         if: env.BUILDTYPE == 'release'
 
 
