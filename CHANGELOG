@@ -1,19 +1,23 @@
-2.4
+2.4.0
 
 * dropped support for ubuntu-16.04
+* dropped support for windows-32b
+* Using new Kiwix logo
 * image size now rounded to next power of two (qemu expects it)
 * [master] master based off raspiOS 2021-03-04 (80c5f8e)
 * [master] root partition resized first as raspi's image is tight
 * [master] reboot after resize
 * [master] removed download/install of custom exfat modules (now in system)
 * [master] using secure protocol for composer update to prevent qemu network issues
-* using new 2021-04-13 master image
+* [master] renaned kiwix-server service to kiwix
+* [linux] Added support for fedora-based distrib in mounting steps
 * Updated Africatik contents
-* removed dep to pypiwin32
 * increased captive portal's session timeout from 15mn to 60mn
 * Version info metadata back on windows exe file
 * Removed labels from homepage (next to titles)
 * Updated aria2c to version 1.35.0
+* Updated qemu to 5.20
+* Replaced gitlab-ci, travis and appveyor with Github Actions for builds
 
 2.3.8
 
