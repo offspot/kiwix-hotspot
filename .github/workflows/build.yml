@@ -198,6 +198,12 @@ jobs:
         run: |
           apppath="dist/Kiwix Hotspot.app"
           wrapper_zip="kiwix-hotspot.zip"
+          for fpath in aria2c etcher-cli/balena-etcher etcher-cli/node_modules/lzma-native/binding/lzma_native.node etcher-cli/node_modules/lzma-native/build/Release/lzma_native.node etcher-cli/node_modules/drivelist/build/Release/drivelist.node etcher-cli/node_modules/usb/build/Release/usb_bindings.node etcher-cli/node_modules/usb/src/binding/usb_bindings.node etcher-cli/node_modules/xxhash/build/Release/hash.node etcher-cli/node_modules/mountutils/build/Release/MountUtils.node etcher-cli/node_modules/winusb-driver-generator/build/Release/Generator.node etcher-cli/node_modules/winusb-driver-generator/build/Release/installer_x86.node etcher-cli/node_modules/winusb-driver-generator/build/Release/installer_x64.node etcher-cli/node_modules/winusb-driver-generator/build/Release/embedder.node etcher-cli/node_modules/winusb-driver-generator/build/Release/wdi.node
+          do
+            echo "Signing "${apppath}/Contents/Resources/${fpath}"
+            codesign --force --sign "$SIGNING_IDENTITY" "${apppath}/Contents/Resources/${fpath}" --deep --timestamp --strict --options=runtime
+          done
+          echo "Signing app"
           codesign --force --sign "$SIGNING_IDENTITY" "${apppath}" --deep --timestamp --strict --options=runtime
           spctl -vvv --assess --type exec "${apppath}"
           ditto -c -k --keepParent "${apppath}" ${wrapper_zip}
