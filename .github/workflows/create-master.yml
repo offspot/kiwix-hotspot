@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master-image-test
-      # - raspios-master
   workflow_dispatch:
     types: create-master
   schedule:
@@ -17,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: set image name
-        run: echo "OUT_IMG=hotspot-master_$(echo $(date +%Y-%m-%d)).img" >> $GITHUB_ENV
+        run: echo "OUT_IMG=hotspot-master_$(echo $(date +%Y-%m-%d))_${GITHUB_SHA:0:7}.img" >> $GITHUB_ENV
       - name: verify image name
         run : echo $OUT_IMG
 
@@ -93,6 +92,6 @@ jobs:
           ls -l *
           openssl dgst -sha256 ${OUT_IMG}.zip
 
-      - name: upload master image to kiwix server
+      - name: upload master image to kiwix server (only on workflow_dispatch)
         run: scp -i ${HOME}/ssh_key -c aes128-ctr ${OUT_IMG}.zip ci@mirror.download.kiwix.org:/data/download/hotspots/base/
-
+        if: env.GITHUB_EVENT_NAME == 'workflow_dispatch'
