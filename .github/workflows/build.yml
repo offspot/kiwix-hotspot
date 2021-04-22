@@ -198,9 +198,9 @@ jobs:
         run: |
           apppath="dist/Kiwix Hotspot.app"
           wrapper_zip="kiwix-hotspot.zip"
-          codesign --force --sign "$SIGNING_IDENTITY" ${apppath} --deep --timestamp --strict --options=runtime
-          spctl -vvv --assess --type exec ${apppath}
-          ditto -c -k --keepParent ${apppath} ${wrapper_zip}
+          codesign --force --sign "$SIGNING_IDENTITY" "${apppath}" --deep --timestamp --strict --options=runtime
+          spctl -vvv --assess --type exec "${apppath}"
+          ditto -c -k --keepParent "${apppath}" ${wrapper_zip}
           xcrun altool --notarize-app --file ${wrapper_zip} \
             --primary-bundle-id org.kiwix.hotspot.app \
             --username "${{ secrets.APPLE_SIGNING_ALTOOL_USERNAME }}" \
@@ -209,7 +209,7 @@ jobs:
           echo "remove zip file"
           rm ${wrapper_zip}
           echo "display request status (should be rejected)"
-          spctl -a -v -t install ${apppath} || true
+          spctl -a -v -t install "${apppath}" || true
 
       - name: create dmg
         run: |
