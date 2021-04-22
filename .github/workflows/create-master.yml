@@ -61,15 +61,15 @@ jobs:
           tar xvf qemu-5.2.0-linux-x86_64.tar.gz
       - name: download etcher-cli (packaging only)
         run: |
-          wget http://download.kiwix.org/dev/balena-etcher-cli-1.4.8-linux-x64.tar.gz
+          wget http://mirror.download.kiwix.org/dev/balena-etcher-cli-1.4.8-linux-x64.tar.gz
           mkdir -p etcher-cli
           tar xf balena-etcher-cli-1.4.8-linux-x64.tar.gz -C etcher-cli --strip-components=1
       - name: download aria2c (packaging only)
         run: |
-          wget http://download.kiwix.org/dev/aria2c-linux64.zip
+          wget http://mirror.download.kiwix.org/dev/aria2c-linux64.zip
           unzip aria2c-linux64.zip
           rm aria2c-linux64.zip
-          wget http://download.kiwix.org/dev/ca-certificates.crt
+          wget http://mirror.download.kiwix.org/dev/ca-certificates.crt
 
       - name: install python deps
         run: |
