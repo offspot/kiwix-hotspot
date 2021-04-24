@@ -117,7 +117,7 @@ class RequestedFile(object):
         )
 
 
-def download_file(url, fpath, logger, checksum=None, debug=False):
+def download_file(url, fpath, logger, checksum=None, debug=True):
 
     """ download an URL into a named path and reports progress to logger
 
@@ -144,9 +144,9 @@ def download_file(url, fpath, logger, checksum=None, debug=False):
         "--max-resume-failure-tries=1",
         "--auto-file-renaming=false",
         "--download-result=full",
-        "--log-level=error",
-        "--console-log-level=error",
-        "--summary-interval=1",  # display a line with progress every X seconds
+        "--log-level=debug",
+        "--console-log-level=debug",
+        # "--summary-interval=1",  # display a line with progress every X seconds
         "--human-readable={}".format(str(logger.on_tty).lower()),
         "--ca-certificate={}".format(os.path.join(data_dir, "ca-certificates.crt")),
     ]
@@ -166,22 +166,23 @@ def download_file(url, fpath, logger, checksum=None, debug=False):
 
     metalink_target = None
     for line in iter(aria2c.stdout.readline, ""):
-        line = line.strip()
-        # [#915371 5996544B/90241109B(6%) CN:4 DL:1704260B ETA:49s]
-        if line.startswith("[#") and line.endswith("]"):  # quick check, no re
-            if logger.on_tty:
-                logger.flash(line + "                    ")
-            else:
-                try:
-                    downloaded_size, total_size = [
-                        int(x)
-                        for x in list(
-                            re.search(r"\s([0-9]+)B\/([0-9]+)B", line).groups()
-                        )
-                    ]
-                except Exception:
-                    downloaded_size, total_size = 1, -1
-                logger.ascii_progressbar(downloaded_size, total_size)
+        # line = line.strip()
+        # # [#915371 5996544B/90241109B(6%) CN:4 DL:1704260B ETA:49s]
+        # if line.startswith("[#") and line.endswith("]"):  # quick check, no re
+        #     if logger.on_tty:
+        #         logger.flash(line + "                    ")
+        #     else:
+        #         try:
+        #             downloaded_size, total_size = [
+        #                 int(x)
+        #                 for x in list(
+        #                     re.search(r"\s([0-9]+)B\/([0-9]+)B", line).groups()
+        #                 )
+        #             ]
+        #         except Exception:
+        #             downloaded_size, total_size = 1, -1
+        #         logger.ascii_progressbar(downloaded_size, total_size)
+        logger.std(line)
 
         # parse metalink filename from results summary (if not caught before)
         if metalink_target is None and "|OK  |" in line and "[MEMORY]" not in line:
