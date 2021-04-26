@@ -2,6 +2,7 @@
 
 * Using new home for master images (/release/kiwix-hotspot/master/)
 * Shrunk image size now also rounded to next power of 2
+* Fixed GUI mode on Linux
 
 2.4.0
 
