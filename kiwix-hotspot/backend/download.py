@@ -144,8 +144,8 @@ def download_file(url, fpath, logger, checksum=None, debug=True):
         "--max-resume-failure-tries=1",
         "--auto-file-renaming=false",
         "--download-result=full",
-        "--log-level=debug",
-        "--console-log-level=debug",
+        "--log-level=info",
+        "--console-log-level=info",
         # "--summary-interval=1",  # display a line with progress every X seconds
         "--human-readable={}".format(str(logger.on_tty).lower()),
         "--ca-certificate={}".format(os.path.join(data_dir, "ca-certificates.crt")),
