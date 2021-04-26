@@ -18,6 +18,7 @@ from util import (
     get_cache,
     ensure_zip_exfat_compatible,
     EXFAT_FORBIDDEN_CHARS,
+    as_power_of_2,
 )
 
 from backend import ansiblecube
@@ -384,7 +385,9 @@ def run_installation(
                 pass
             else:
                 # set physical size to required + margin
-                physical_size = math.ceil(required_image_size / ONE_GB) * ONE_GB
+                physical_size = as_power_of_2(
+                    math.ceil(required_image_size / ONE_GB) * ONE_GB
+                )
                 emulator.resize_image(physical_size, shrink=True)
 
         # wait for QEMU to release file (windows mostly)
