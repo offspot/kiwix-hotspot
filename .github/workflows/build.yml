@@ -19,7 +19,7 @@ jobs:
       - name: setup python version
         uses: actions/setup-python@v1
         with:
-          python-version: '3.7'
+          python-version: '3.8'
 
       - name: setup environ vars
         run: python ./.github/setup_build_env.py
@@ -40,9 +40,8 @@ jobs:
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
-          sudo apt-get update
-          sudo apt-get install -y locales openssh-client wget zip unzip tar python3-gi python3-gi-cairo python3-cairo gir1.2-gtk-3.0 libdbus-1-dev libdbus-glib-1-dev libffi-dev build-essential libssl-dev python3-dev libgdk-pixbuf2.0-dev exfat-fuse exfat-utils
-          sudo usermod -a -G disk runner
+          sudo apt-get update -y
+          sudo apt-get install -y locales openssh-client wget zip unzip tar build-essential python3-dev libdbus-1-dev libdbus-glib-1-dev libgirepository1.0-dev gcc libcairo2-dev pkg-config python3-dev gir1.2-gtk-3.0
 
       - name: download custom kernel
         run: |
@@ -66,8 +65,9 @@ jobs:
 
       - name: install python deps
         run: |
-          python -m pip install --upgrade pip
+          pip install --upgrade pip
           pip install -r requirements-linux.txt
+          python -c "import gi ; print(gi.__file__)"
           pip install -U pyinstaller
 
       - name: compile app
