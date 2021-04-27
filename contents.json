@@ -8,10 +8,10 @@
         "expanded_size": 1866465280
     },
     "hotspot_master_image": {
-        "url": "{mirror}/release/kiwix-hotspot/master-images/2021-04-20/hotspot-master_2021-04-20_80c5f8e.img.zip",
-        "name": "hotspot-master_2021-04-20_80c5f8e.img.zip",
+        "url": "{mirror}/release/kiwix-hotspot/master/kiwix-hostpot_master_2021-04-27.img.zip",
+        "name": "kiwix-hostpot_master_2021-04-27.img.zip",
         "root_partition_size": 7000000000,
-        "checksum": "948ae12c32fc3c9a27e30c7bd2c4fd76fcfec023eacf1b63b7a41b239e6739c7",
+        "checksum": "7ac7b3fad556e830ae88f65869e80a9317ad536ed43da1287601ab837d392c56",
         "archive_size": 2523590834,
         "expanded_size": 8589934592
     },
