@@ -47,8 +47,6 @@ def run_in_qemu(image_fpath, disk_size, root_size, logger, cancel_event, qemu_ra
 
         emulator.resize_image(disk_size)
 
-        return
-
         # expand root system size early so we can update packages
         with emulator.run(cancel_event) as emulation:
             emulation.put_file(
