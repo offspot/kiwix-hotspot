@@ -5,10 +5,16 @@
 import os
 import sys
 import json
-import yaml
 import time
+import math
 import argparse
 import tempfile
+
+import yaml
+try:
+    from yaml import CSafeDumper as Dumper
+except ImportError:
+    from yaml import SafeDumper as Dumper
 
 import data
 from backend.content import (
@@ -246,11 +252,12 @@ for key, value in defaults.items():
 if args.catalog:
     for catalog in get_catalogs(logger):
         print(
-            yaml.safe_dump(
+            yaml.dump(
                 catalog,
                 default_flow_style=False,
                 allow_unicode=True,
                 encoding="utf-8",
+                Dumper=Dumper
             ).decode("UTF-8")
         )
     sys.exit(0)

@@ -7,6 +7,10 @@ import tempfile
 import posixpath
 
 import yaml
+try:
+    from yaml import CSafeDumper as Dumper
+except ImportError:
+    from yaml import SafeDumper as Dumper
 
 from data import mirror
 from version import get_version_str
@@ -203,12 +207,13 @@ def run_phase_one(
     # save YAML catalogs into local files inside VM for use by ideascube
     for index, catalog in enumerate(CATALOGS):
         with tempfile.NamedTemporaryFile(suffix=".yml", delete=False) as fd:
-            yaml.safe_dump(
+            yaml.dump(
                 get_catalogs(machine._logger)[index],
                 fd,
                 default_flow_style=False,
                 allow_unicode=True,
                 encoding="utf-8",
+                Dumper=Dumper,
             )
             machine.put_file(fd.name, catalog["local_url"].replace("file://", ""))
             try:
