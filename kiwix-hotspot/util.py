@@ -33,6 +33,7 @@ import humanfriendly
 
 from data import cache_folder_name
 
+ONE_MB = 10 ** 6
 ONE_MiB = 2 ** 20
 ONE_GiB = 2 ** 30
 ONE_GB = int(1e9)
@@ -516,17 +517,28 @@ def as_power_of_2(size):
     return 2 ** int(math.ceil(math.log(size) / math.log(2)))
 
 
-def get_adjusted_image_size(size):
-    """ save some space to accomodate real SD card sizes
+def get_hardware_margin(size: int):
+    """ number of bytes we must keep free as the HW might not support it """
+    return size * 0.03 if size / ONE_GB <= 16 else 0.04
 
-        the larger the SD card, the larger the loss space is """
 
-    # if size is not a rounded GB multiple, assume it's OK
+def get_hardware_adjusted_image_size(size: int):
+    """ number of bytes we can safely write on an SD card of such size
+
+        to accomodate difference between marketed size and available space """
+    return int(size - get_hardware_margin(size))
+
+
+def get_qemu_adjusted_image_size(size):
+    """ number of bytes to resize image file to to accomodate Qemu
+
+        which expects it to be a power of 2 (integer) """
+
+    # if size is not a rounded GB multiple, round it to previous power of 2
     if not size % ONE_GB == 0:
-        return as_power_of_2(size)
+        return 2 ** math.floor(math.log(size, 2))
 
-    rate = 0.97 if size / ONE_GB <= 16 else 0.96
-    return as_power_of_2(int(size * rate))
+    return size
 
 
 def get_folder_size(path):

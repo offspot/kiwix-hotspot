@@ -3,6 +3,10 @@
 * Allows customizing mirror via env (HOTSPOT_MIRROR) or param (--mirror).
   Does not apply to catalog retrieval nor ZIM downloads (url in catalog)
 * Faster catalog processing by using C-libyaml when possible
+* Changed content margin (2%) min. to 512MB instead of 2GB
+* Hardware margin (3% < 16GB, 4% otherwise) now set as free space during process
+  Image shrunk at end of process so QEMU can work with a power-of-2 sized image
+* Creating 8GB master image instead of 8GiB
 
 2.4.2
 

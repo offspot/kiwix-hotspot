@@ -22,7 +22,7 @@ from backend.ansiblecube import (
     run_for_image,
     ansiblecube_path as ansiblecube_emulation_path,
 )
-from util import CLILogger, CancelEvent, ONE_GB, get_adjusted_image_size
+from util import CLILogger, CancelEvent, ONE_GB, get_qemu_adjusted_image_size
 
 MIN_ROOT_SIZE = 7 * ONE_GB
 
@@ -42,9 +42,12 @@ def run_in_qemu(image_fpath, disk_size, root_size, logger, cancel_event, qemu_ra
         )
 
         logger.step(
-            "resizing QEMU image to {}GB".format(human_readable_size(disk_size, False))
+            "resizing QEMU image to {}".format(human_readable_size(disk_size, False))
         )
+
         emulator.resize_image(disk_size)
+
+        return
 
         # expand root system size early so we can update packages
         with emulator.run(cancel_event) as emulation:
@@ -91,7 +94,7 @@ def main(logger, disk_size, root_size, build_folder, qemu_ram, image_fname=None)
     # convert sizes to bytes and make sure those are usable
     try:
         root_size = int(root_size) * ONE_GB
-        disk_size = get_adjusted_image_size(int(disk_size) * ONE_GB)
+        disk_size = get_qemu_adjusted_image_size(int(disk_size) * ONE_GB)
 
         if root_size < MIN_ROOT_SIZE:
             raise ValueError(

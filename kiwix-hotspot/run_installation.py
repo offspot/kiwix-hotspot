@@ -72,7 +72,7 @@ def run_installation(
     build_dir=".",
     filename=None,
     qemu_ram="2G",
-    shrink=False,
+    shrink_to=None,
 ):
 
     logger.start(bool(sd_card))
@@ -376,19 +376,9 @@ def run_installation(
             logger.step("Run ansiblecube phase II")
             ansiblecube.run_phase_two(emulation, extra_vars, secret_keys)
 
-        if shrink:
-            logger.step("Shrink size of physical image file")
-            # calculate physical size of image
-            required_image_size = get_required_image_size(collection)
-            if required_image_size + ONE_GB >= size:
-                # less than 1GB difference, don't bother
-                pass
-            else:
-                # set physical size to required + margin
-                physical_size = as_power_of_2(
-                    math.ceil(required_image_size / ONE_GB) * ONE_GB
-                )
-                emulator.resize_image(physical_size, shrink=True)
+        # shrink image
+        if shrink_to is not None:
+            emulator.resize_image(shrink_to, shrink=True)
 
         # wait for QEMU to release file (windows mostly)
         logger.succ("Image creation successful.")

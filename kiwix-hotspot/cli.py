@@ -29,10 +29,10 @@ from util import check_user_inputs
 from version import get_version_str
 from util import CLILogger, b64decode
 from util import get_free_space_in_dir
-from util import get_adjusted_image_size
+from util import get_qemu_adjusted_image_size, get_hardware_adjusted_image_size
 from backend.catalog import get_catalogs
 from run_installation import run_installation
-from util import human_readable_size, get_cache
+from util import human_readable_size, get_cache, ONE_GB
 from backend.util import sd_has_single_partition, is_admin
 
 import tzlocal
@@ -275,13 +275,10 @@ else:
 # parse requested size
 try:
     args.size = humanfriendly.parse_size(args.size)
-    args.output_size = get_adjusted_image_size(args.size)  # adjust image size for HW
+    args.qemu_size = get_qemu_adjusted_image_size(args.size)  # adjust for QEMU
 except Exception:
     print("Unable to understand required size ({})".format(args.size))
     sys.exit(1)
-else:
-    args.human_size = human_readable_size(args.output_size, False)
-
 
 # check arguments
 (
@@ -320,16 +317,6 @@ if args.sdcard and not sd_has_single_partition(args.sdcard, logger):
     print("SD card is not clean (must have a single FAT-like partition). Please wipe.")
     sys.exit(1)
 
-# display configuration and offer time to cancel
-print("Configuration:")
-keys = args.__dict__.keys()
-longest = max([len(key) for key in keys])
-for name in keys:
-    print(
-        "  {name}:{space} {value}".format(
-            name=name, value=getattr(args, name), space=" " * (longest - len(name))
-        )
-    )
 
 # check disk space
 collection = get_collection(
@@ -346,13 +333,34 @@ collection = get_collection(
 cache_folder = get_cache(args.build_dir)
 # how much space is available on the build directory?
 avail_space_in_build_dir = get_free_space_in_dir(args.build_dir)
+
+# how large should the image be?
+required_image_size = get_required_image_size(collection)
+
+# compute physical size: don't bother shrinking if less than 1GB difference
+if args.shrink == "yes" and required_image_size + ONE_GB < args.size:
+    # set physical size to required + margin
+    args.physical_size = math.ceil(required_image_size / ONE_GB) * ONE_GB
+else:
+    args.physical_size = get_hardware_adjusted_image_size(args.size)
+args.human_size = human_readable_size(args.physical_size, False)
+
+# display configuration and offer time to cancel
+print("Configuration:")
+keys = args.__dict__.keys()
+longest = max([len(key) for key in keys])
+for name in keys:
+    print(
+        "  {name}:{space} {value}".format(
+            name=name, value=getattr(args, name), space=" " * (longest - len(name))
+        )
+    )
+
 try:
     # how much space do we need to build the image?
     space_required_to_build = get_required_building_space(
-        collection, cache_folder, args.output_size
+        collection, cache_folder, args.qemu_size
     )
-    # how large should the image be?
-    required_image_size = get_required_image_size(collection)
 except FileNotFoundError as exp:
     print("Supplied File Not Found: {}".format(exp.filename), file=sys.stderr)
     sys.exit(1)
@@ -367,11 +375,11 @@ if args.size < base_image_size:
     )
     sys.exit(3)
 
-if args.output_size < required_image_size:
+if args.physical_size < required_image_size:
     print(
         "image size ({img}/{img2}) is not large enough for the content ({req})".format(
             img=human_readable_size(args.size, False),
-            img2=human_readable_size(args.output_size, False),
+            img2=human_readable_size(args.physical_size, False),
             req=human_readable_size(required_image_size, False),
         ),
         file=sys.stderr,
@@ -413,7 +421,7 @@ try:
         mathews=args.mathews == "yes",
         africatik=args.africatik == "yes",
         zim_install=args.zim_install,
-        size=args.output_size,
+        size=args.qemu_size,
         logger=logger,
         cancel_event=cancel_event,
         sd_card=args.sdcard,
@@ -423,7 +431,7 @@ try:
         admin_account=admin_account,
         build_dir=args.build_dir,
         filename=args.filename,
-        shrink=args.shrink == "yes",
+        shrink_to=args.physical_size,
         qemu_ram=args.ram,
     )
 except Exception:
