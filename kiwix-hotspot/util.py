@@ -535,7 +535,7 @@ def get_qemu_adjusted_image_size(size):
         which expects it to be a power of 2 (integer) """
 
     # if size is not a rounded GB multiple, round it to previous power of 2
-    if not size % ONE_GB == 0:
+    if not size % ONE_GiB == 0:
         return 2 ** math.floor(math.log(size, 2))
 
     return size
