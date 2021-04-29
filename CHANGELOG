@@ -2,6 +2,7 @@
 
 * Allows customizing mirror via env (HOTSPOT_MIRROR) or param (--mirror).
   Does not apply to catalog retrieval nor ZIM downloads (url in catalog)
+* Faster catalog processing by using C-libyaml when possible
 
 2.4.2
 
