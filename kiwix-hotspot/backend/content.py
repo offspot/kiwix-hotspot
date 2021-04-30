@@ -11,7 +11,8 @@ import requests
 from data import content_file, mirror
 from backend.catalog import get_catalogs
 from backend.download import get_content_cache, unarchive
-from util import get_temp_folder, get_checksum, ONE_GiB, ONE_MiB, CLILogger
+from util import (
+    get_temp_folder, get_checksum, ONE_GiB, ONE_MB, CLILogger, get_hardware_margin)
 
 # prepare CONTENTS from JSON file
 with open(content_file, "r") as fp:
@@ -497,8 +498,8 @@ def get_expanded_size(collection, add_margin=True):
         ]
     )
 
-    # add a 2% margin ; make sure it's at least 2GB
-    margin = max([2 * ONE_GiB, total_size * 0.02]) if add_margin else 0
+    # add a 2% margin ; make sure it's at least 512MB
+    margin = max([512 * ONE_MB, total_size * 0.02]) if add_margin else 0
     return total_size + margin
 
 
@@ -507,10 +508,11 @@ def get_required_image_size(collection):
         [
             get_content("hotspot_master_image").get("root_partition_size"),
             get_expanded_size(collection),
+            ONE_MB * 256  # make sure we have some free space
         ]
     )
 
-    return required_size + ONE_MiB * 256  # make sure we have some free space
+    return required_size + get_hardware_margin(required_size)
 
 
 def get_required_building_space(collection, cache_folder, image_size=None):

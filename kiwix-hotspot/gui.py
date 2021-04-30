@@ -4,6 +4,7 @@
 import os
 import sys
 import json
+import math
 import platform
 import tempfile
 import threading
@@ -35,7 +36,7 @@ from util import check_user_inputs
 from version import get_version_str
 from util import b64encode, b64decode
 from util import get_free_space_in_dir
-from util import get_adjusted_image_size
+from util import get_qemu_adjusted_image_size, get_hardware_adjusted_image_size
 from util import split_proxy, save_prefs
 from backend.catalog import get_catalogs
 from util import CancelEvent, ProgressHelper
@@ -1865,11 +1866,40 @@ class Application:
 
         edupi = self.component.edupi_switch.get_active()
 
+        edupi_resources = self.get_edupi_resources()
+
         nomad = self.component.nomad_switch.get_active()
 
         mathews = self.component.mathews_switch.get_active()
 
         africatik = self.component.africatik_switch.get_active()
+
+        collection = get_collection(
+            edupi=edupi,
+            edupi_resources=edupi_resources,
+            nomad=nomad,
+            mathews=mathews,
+            africatik=africatik,
+            packages=zim_install,
+            kalite_languages=kalite,
+            wikifundi_languages=wikifundi,
+            aflatoun_languages=["fr", "en"] if aflatoun else [],
+        )
+        try:
+            required_image_size = get_required_image_size(collection)
+        except FileNotFoundError:
+            self.display_error_message(
+                "Disk Space Calculation Error",
+                "Failed to compute requiered disk space.",
+                self.component.window,
+            )
+            return -1
+
+        if required_image_size + ONE_GB < output_size:
+            # set physical size to required + margin
+            physical_size = math.ceil(required_image_size / ONE_GB) * ONE_GB
+        else:
+            physical_size = get_hardware_adjusted_image_size(output_size)
 
         logo = self.component.logo_chooser.get_filename()
         favicon = self.component.favicon_chooser.get_filename()
@@ -1917,7 +1947,7 @@ class Application:
                     wikifundi=wikifundi,
                     aflatoun=aflatoun,
                     edupi=edupi,
-                    edupi_resources=self.get_edupi_resources(),
+                    edupi_resources=edupi_resources,
                     nomad=nomad,
                     mathews=mathews,
                     africatik=africatik,
@@ -1934,7 +1964,7 @@ class Application:
                     done_callback=lambda error: GLib.idle_add(
                         self.installation_done, error
                     ),
-                    shrink=True,
+                    shrink_to=physical_size,
                 )
 
             self.component.window.hide()
@@ -2065,7 +2095,7 @@ class Application:
                 )
         else:
             try:
-                size = get_adjusted_image_size(
+                size = get_qemu_adjusted_image_size(
                     data.sdcard_sizes[self.component.size_combobox.get_active()]
                     * ONE_GB
                 )

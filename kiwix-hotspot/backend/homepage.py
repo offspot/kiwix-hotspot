@@ -5,6 +5,10 @@ import os
 import tempfile
 
 import yaml
+try:
+    from yaml import CSafeLoader as Loader
+except ImportError:
+    from yaml import SafeLoader as Loader
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from data import data_dir
@@ -13,7 +17,7 @@ from backend.catalog import get_package
 
 def get_ansible_group_vars():
     with open(os.path.join(data_dir, "ansiblecube", "group_vars", "all"), "r") as fp:
-        return yaml.safe_load(fp.read())
+        return yaml.load(fp.read(), Loader=Loader)
 
 
 ANSIBLE_GROUP_VARS = get_ansible_group_vars()

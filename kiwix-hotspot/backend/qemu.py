@@ -238,7 +238,7 @@ class _RunningInstance:
                 "root=/dev/mmcblk0p2 console=ttyAMA0 console=tty "
                 "rw rootwait rootfstype=ext4 ",
                 "-serial",
-                "mon:stdio",
+                "stdio",
                 "-drive",
                 "format=raw,if=sd,file={}".format(self._emulation._image),
                 "-display",
