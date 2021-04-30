@@ -1881,8 +1881,8 @@ class Application:
             mathews=mathews,
             africatik=africatik,
             packages=zim_install,
-            kalite_languages=kalite,
-            wikifundi_languages=wikifundi,
+            kalite_languages=kalite or [],
+            wikifundi_languages=wikifundi or [],
             aflatoun_languages=["fr", "en"] if aflatoun else [],
         )
         try:
