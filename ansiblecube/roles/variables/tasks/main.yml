@@ -48,7 +48,7 @@
       hostname: "{{ project_name_safe }}"
       fqdn: "{{ project_name_safe }}.{{ tld }}"
       hotspot_name: "{{ project_name }}"
-    name: Set hostname and hostpot_name
+    name: Set hostname and hotspot_name
 
   - set_fact:
       kiwix_server_name: kiwix.{{ hostname }}
