@@ -514,7 +514,7 @@ def check_user_inputs(
 
 def as_power_of_2(size):
     """ round to the next nearest power of 2 """
-    return 2 ** int(math.ceil(math.log(size) / math.log(2)))
+    return 2 ** math.ceil(math.log(size, 2))
 
 
 def get_hardware_margin(size: int):
@@ -534,11 +534,8 @@ def get_qemu_adjusted_image_size(size):
 
         which expects it to be a power of 2 (integer) """
 
-    # if size is not a rounded GB multiple, round it to previous power of 2
-    if not size % ONE_GiB == 0:
-        return 2 ** math.floor(math.log(size, 2))
-
-    return size
+    # if size is not a rounded GiB multiple, round it to next power of 2
+    return size if size % ONE_GiB == 0 else as_power_of_2(size)
 
 
 def get_folder_size(path):
