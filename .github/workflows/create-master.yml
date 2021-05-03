@@ -13,7 +13,7 @@ on:
 jobs:
   build:
     name: master image build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: set image name
         run: echo "OUT_IMG=hotspot-master_$(echo $(date +%Y-%m-%d))_${GITHUB_SHA:0:7}.img" >> $GITHUB_ENV
@@ -41,8 +41,8 @@ jobs:
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
-          sudo apt-get update
-          sudo apt-get install -y locales openssh-client wget zip unzip tar python3-gi python3-gi-cairo python3-cairo gir1.2-gtk-3.0 libdbus-1-dev libdbus-glib-1-dev libffi-dev build-essential libssl-dev python3-dev libgdk-pixbuf2.0-dev
+          sudo apt-get update -y
+          sudo apt-get install -y locales openssh-client wget zip unzip tar build-essential python3-dev libdbus-1-dev libdbus-glib-1-dev libgirepository1.0-dev gcc libcairo2-dev pkg-config python3-dev gir1.2-gtk-3.0
 
       - name: checkout code
         uses: actions/checkout@v1
@@ -73,7 +73,9 @@ jobs:
 
       - name: install python deps
         run: |
+          pip install --upgrade pip wheel
           pip install -r requirements-linux.txt
+          python -c "import gi ; print(gi.__file__)"
           pip install -U pyinstaller
 
       - name: compile app
