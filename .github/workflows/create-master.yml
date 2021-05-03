@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master-image-test
+    tags:
+      - master-v*
   workflow_dispatch:
     types: create-master
   schedule:
@@ -15,8 +17,33 @@ jobs:
     name: master image build
     runs-on: ubuntu-18.04
     steps:
-      - name: set image name
-        run: echo "OUT_IMG=hotspot-master_$(echo $(date +%Y-%m-%d))_${GITHUB_SHA:0:7}.img" >> $GITHUB_ENV
+      - name: setup environ vars
+        shell: python
+        run: |
+          import os
+          import datetime
+
+          GITHUB_ENV = os.getenv("GITHUB_ENV")
+          GITHUB_EVENT_NAME = os.getenv("GITHUB_EVENT_NAME", "")
+          GITHUB_REF = os.getenv("GITHUB_REF")
+          GITHUB_SHA = os.getenv("GITHUB_SHA")
+          GITHUB_WORKSPACE = os.getenv("GITHUB_WORKSPACE")
+
+          TAG = GITHUB_REF.split("/", 2)[-1] if GITHUB_REF.startswith("refs/tags/") else None
+          SCOMMIT = GITHUB_SHA[0:7]
+          DATE = datetime.date.today().strftime("%Y-%m-%d")
+
+          if TAG and TAG.startswith("master-v"):
+              UPDATES = {"BUILDTYPE": "release", "OUT_IMG": "kiwix-hotspot_master_{date}.img".format(date=DATE)}
+          else:
+              UPDATES = {"BUILDTYPE": "CI", "OUT_IMG": "kiwix-hotspot_master_{date}_{scommit}.img".format(date=DATE, scommit=SCOMMIT)}
+
+          # append new environ vars to GITHUB_ENV
+          lines = "\n".join(["{k}={v}".format(k=k, v=v) for k, v in UPDATES.items()])
+          print("Updating GITHUB_ENV:\n-----\n{lines}\n-----".format(lines=lines))
+          with open(GITHUB_ENV, "a") as fh:
+              fh.write(lines)
+
       - name: verify image name
         run : echo $OUT_IMG
 
@@ -84,7 +111,8 @@ jobs:
       - name: build master image
         env:
             QEMU_CPU: 2
-        run: dist/kiwix-hotspot image --ram 6G --root 7 --size 8 --out ${OUT_IMG}
+        # run: dist/kiwix-hotspot image --ram 6G --root 7 --size 8 --out ${OUT_IMG}
+        run: echo "test" > ${OUT_IMG}
 
       - name: ZIP master image
         run: zip -9 ${OUT_IMG}.zip ${OUT_IMG}
@@ -94,6 +122,10 @@ jobs:
           ls -l *
           openssl dgst -sha256 ${OUT_IMG}.zip
 
-      - name: upload master image to kiwix server (only on workflow_dispatch)
-        run: scp -i ${HOME}/ssh_key -c aes128-ctr ${OUT_IMG}.zip ci@mirror.download.kiwix.org:/data/download/hotspots/base/
-        if: env.GITHUB_EVENT_NAME == 'workflow_dispatch'
+      - name: upload master image to CI
+        run: scp -i ${HOME}/ssh_key -c aes128-ctr ${OUT_IMG}.zip ci@mirror.download.kiwix.org:/data/tmp/ci/hotspot-master/
+        if: env.BUILDTYPE == 'CI'
+
+      - name: upload master image to release folder
+        run: scp -i ${HOME}/ssh_key -c aes128-ctr ${OUT_IMG}.zip ci@mirror.download.kiwix.org:/data/download/release/kiwix-hotspot/master/
+        if: env.BUILDTYPE == 'release'
