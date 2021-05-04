@@ -200,7 +200,7 @@ jobs:
           wrapper_zip="kiwix-hotspot.zip"
           # remove etcher-cli
           touch somefile
-          cp somefile ${apppath}/Contents/Resources/etcher-cli/balena-etcher
+          cp somefile "${apppath}/Contents/Resources/etcher-cli/balena-etcher"
           for fpath in aria2c etcher-cli/node_modules/lzma-native/binding/lzma_native.node etcher-cli/node_modules/lzma-native/build/Release/lzma_native.node etcher-cli/node_modules/drivelist/build/Release/drivelist.node etcher-cli/node_modules/usb/build/Release/usb_bindings.node etcher-cli/node_modules/usb/src/binding/usb_bindings.node etcher-cli/node_modules/xxhash/build/Release/hash.node etcher-cli/node_modules/mountutils/build/Release/MountUtils.node etcher-cli/node_modules/winusb-driver-generator/build/Release/Generator.node etcher-cli/node_modules/winusb-driver-generator/build/Release/installer_x86.node etcher-cli/node_modules/winusb-driver-generator/build/Release/installer_x64.node etcher-cli/node_modules/winusb-driver-generator/build/Release/embedder.node etcher-cli/node_modules/winusb-driver-generator/build/Release/wdi.node
           do
             echo "Signing ${apppath}/Contents/Resources/${fpath}"
