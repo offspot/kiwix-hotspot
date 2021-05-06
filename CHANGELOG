@@ -7,6 +7,8 @@
 * Hardware margin (3% < 16GB, 4% otherwise) now set as free space during process
   Image shrunk at end of process so QEMU can work with a power-of-2 sized image
 * Creating 8GB master image instead of 8GiB
+* Fixing stability of SSH connection between installer and QEMU
+* Fixed error during mount stage on Linux with libmount != 2.31
 
 2.4.2
 
@@ -173,7 +175,7 @@
 2.0-rc16
 * Fixed etcher-cli call on macOS GUI (space escaping)
 * Added partition number check on startup (must be one)
-* Added SD-card wipe dialog 
+* Added SD-card wipe dialog
 
 2.0-rc15
 * Fixed concurrent access error on Windows
