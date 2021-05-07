@@ -293,13 +293,19 @@ class CancelEvent:
 
     def cancel(self):
         if self.thread is not None:
-            self.thread.stop()
-            self.thread.join(timeout=5)  # allow proper release of handles
+            try:
+                self.thread.stop()
+                self.thread.join(timeout=5)  # allow proper release of handles
+            except Exception as exc:
+                print("Failed to stop thread: {}".format(exc))
             self.unregister_thread()
 
         self._lock.acquire()
         for pid in self._pids:
-            os.kill(pid, signal.SIGTERM)
+            try:
+                os.kill(pid, signal.SIGTERM)
+            except OSError as exc:
+                print("Failed to stop PID {}: {}".format(pid, exc))
 
 
 class _CancelEventRegister:
