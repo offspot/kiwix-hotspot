@@ -1,3 +1,7 @@
+2.4.4
+
+* Allows HTTPS access to hotspot and projects (requires manually bypassing warning)
+
 2.4.3
 
 * Allows customizing mirror via env (HOTSPOT_MIRROR) or param (--mirror).

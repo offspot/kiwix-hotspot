@@ -5,6 +5,7 @@ import os
 import tempfile
 
 import yaml
+
 try:
     from yaml import CSafeLoader as Loader
 except ImportError:
@@ -68,7 +69,7 @@ def generate_homepage(logger, options):
             description = "Access to various resources"
         cards.append(
             {
-                "url": "http://{}".format(edupi_fqdn),
+                "url": "//{}".format(edupi_fqdn),
                 "css_class": "",
                 "title": title,
                 "description": description,
@@ -86,7 +87,7 @@ def generate_homepage(logger, options):
             category = "Access"
         cards.append(
             {
-                "url": "http://{}".format(noamad_fqdn),
+                "url": "//{}".format(noamad_fqdn),
                 "css_class": "nomad",
                 "title": title,
                 "description": description,
@@ -105,7 +106,7 @@ def generate_homepage(logger, options):
             description = "Download the App"
         cards.append(
             {
-                "url": "http://{}".format(mathews_fqdn),
+                "url": "//{}".format(mathews_fqdn),
                 "css_class": "mathews",
                 "title": title,
                 "description": description,
@@ -124,7 +125,7 @@ def generate_homepage(logger, options):
             description = "Download the Apps"
         cards.append(
             {
-                "url": "http://{}".format(africatik_fqdn),
+                "url": "//{}".format(africatik_fqdn),
                 "css_class": "africatik",
                 "title": title,
                 "description": description,
@@ -136,7 +137,7 @@ def generate_homepage(logger, options):
         if "fr" in options["wikifundi_languages"]:
             cards.append(
                 {
-                    "url": "http://fr.{}".format(wikifundi_fqdn),
+                    "url": "//fr.{}".format(wikifundi_fqdn),
                     "css_class": "",
                     "title": "WikiFundi",
                     "description": "Environnement qui vous permet de créer des articles Wikipédia hors-ligne (en français)",
@@ -146,7 +147,7 @@ def generate_homepage(logger, options):
         if "en" in options["wikifundi_languages"]:
             cards.append(
                 {
-                    "url": "http://en.{}".format(wikifundi_fqdn),
+                    "url": "//en.{}".format(wikifundi_fqdn),
                     "css_class": "",
                     "title": "WikiFundi",
                     "description": "Offline editable environment that provides a similar experience to editing Wikipedia online (in English)",
@@ -159,11 +160,11 @@ def generate_homepage(logger, options):
         if options["language"] == "fr":
             description = "Appentissage social/finance pour les enfants et les jeunes"
             category = "Apprendre"
-            url = "http://{}/go/fr".format(aflatoun_fqdn)
+            url = "//{}/go/fr".format(aflatoun_fqdn)
         else:
             description = "Social and Financial Education for Children and Young People"
             category = "Learn"
-            url = "http://{}".format(aflatoun_fqdn)
+            url = "//{}".format(aflatoun_fqdn)
         cards.append(
             {
                 "url": url,
@@ -179,7 +180,7 @@ def generate_homepage(logger, options):
         if "fr" in options["kalite_languages"]:
             cards.append(
                 {
-                    "url": "http://{}/go/fr".format(kalite_fqdn),
+                    "url": "//{}/go/fr".format(kalite_fqdn),
                     "css_class": "khanacademy",
                     "title": "Khan Academy",
                     "description": "Apprendre via des vidéos et des exercices.",
@@ -188,7 +189,7 @@ def generate_homepage(logger, options):
         if "es" in options["kalite_languages"]:
             cards.append(
                 {
-                    "url": "http://{}/go/es".format(kalite_fqdn),
+                    "url": "//{}/go/es".format(kalite_fqdn),
                     "css_class": "khanacademy",
                     "title": "Khan Academy",
                     "description": "Aprende con videos y ejercicios.",
@@ -197,7 +198,7 @@ def generate_homepage(logger, options):
         if "en" in options["kalite_languages"]:
             cards.append(
                 {
-                    "url": "http://{}/go/en".format(kalite_fqdn),
+                    "url": "//{}/go/en".format(kalite_fqdn),
                     "css_class": "khanacademy",
                     "title": "Khan Academy",
                     "description": "Learn with videos and exercises.",
@@ -210,7 +211,7 @@ def generate_homepage(logger, options):
             package = get_package(logger, package_id)
             cards.append(
                 {
-                    "url": "http://{fqdn}/{id}".format(
+                    "url": "//{fqdn}/{id}".format(
                         fqdn=kiwix_fqdn, id=package.get("langid", package_id)
                     ),
                     "css_class": "zim_{}".format(package_id.rsplit(".", 1)[0]),

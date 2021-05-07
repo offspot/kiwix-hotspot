@@ -1,4 +1,9 @@
 server {
+    listen 80;
+    listen 443;
+    ssl_certificate /etc/nginx/ssl/hotspot.crt;
+    ssl_certificate_key /etc/nginx/ssl/hotspot.key;
+
     server_name {{ time_fqdn }} {{ time_server_name }};
 
     location / {

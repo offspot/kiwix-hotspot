@@ -1,5 +1,9 @@
 server {
     listen  80;
+    listen 443;
+    ssl_certificate /etc/nginx/ssl/hotspot.crt;
+    ssl_certificate_key /etc/nginx/ssl/hotspot.key;
+
     server_name kiwix.{{ fqdn }} kiwix.{{ hostname }};
     location / {
         rewrite ^/$ http://{{ fqdn }} permanent;  # redirect kiwix-serve home to hotspot home
@@ -12,7 +16,7 @@ server {
         proxy_read_timeout 60;
         proxy_pass http://localhost:8002/;
     }
-    
+
     location /hotspot-static/ { alias {{ common_static_path }}/; expires 1y; }
     location /502.html { internal; root /var/www; }
     error_page 502 /502.html;

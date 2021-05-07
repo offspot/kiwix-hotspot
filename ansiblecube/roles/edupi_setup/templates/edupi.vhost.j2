@@ -1,5 +1,9 @@
 server {
     listen 80;
+    listen 443;
+    ssl_certificate /etc/nginx/ssl/hotspot.crt;
+    ssl_certificate_key /etc/nginx/ssl/hotspot.key;
+
     server_name {{ edupi_fqdn }} {{ edupi_server_name }};
 
     client_max_body_size 500M;

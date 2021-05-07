@@ -1,11 +1,9 @@
 server {
 
-    # Captive portal responding all non-specified names
     listen    80 default_server;
     listen    [::]:80 default_server;
     listen    443 ssl default_server;
 
-    # SSL certificate only used to allow forwarding of HTTPS requests. 
     ssl_certificate /etc/nginx/ssl/hotspot.crt;
     ssl_certificate_key /etc/nginx/ssl/hotspot.key;
     keepalive_timeout 0;

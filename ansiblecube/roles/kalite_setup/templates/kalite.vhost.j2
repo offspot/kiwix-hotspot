@@ -9,6 +9,10 @@
 server {
 
     listen 80;
+    listen 443;
+    ssl_certificate /etc/nginx/ssl/hotspot.crt;
+    ssl_certificate_key /etc/nginx/ssl/hotspot.key;
+
     server_name {{ kalite_fqdn }} {{ kalite_server_name }};
 
     # Default value, overwritten in nginx.d
