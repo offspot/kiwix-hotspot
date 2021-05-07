@@ -24,6 +24,12 @@ jobs:
       - name: setup environ vars
         run: python ./.github/setup_build_env.py
 
+      - name: create tarball of sources
+        run: |
+          mkdir -p releases/$RELEASE
+          tar cfJ releases/$RELEASE/kiwix-hotspot.xz *
+        if: env.BUILDTYPE == 'release'
+
       - name: decrypt SSH key
         env:
           ssh_key: ${{ secrets.ssh_key }}
@@ -94,7 +100,7 @@ jobs:
           scp -r -v -o StrictHostKeyChecking=no $SRCDIR ci@mirror.download.kiwix.org:/data/download/nightly/
         if: env.BUILDTYPE == 'nightly'
 
-      - name: upload release build (tagged)
+      - name: upload release build and sources (tagged)
         run: |
           mkdir -p releases/$RELEASE
           cp dist/kiwix-hotspot-linux.tar.gz releases/$RELEASE/
@@ -410,5 +416,3 @@ jobs:
           cp kiwix-hotspot-win64.exe $SRCDIR/
           scp -i ${HOME}/.ssh/id_rsa -r -v -o StrictHostKeyChecking=no $SRCDIR ci@mirror.download.kiwix.org:/data/download/release/kiwix-hotspot/
         if: env.BUILDTYPE == 'release'
-
-
