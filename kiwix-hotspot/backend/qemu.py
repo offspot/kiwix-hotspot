@@ -311,9 +311,6 @@ class _RunningInstance:
                     allow_agent=False,
                     look_for_keys=False,
                 )
-                # enable keep-alive to prevent connection drop on long-lasting command
-                # > for github actions
-                self._client.get_transport().set_keepalive(2)
             except Exception as exp:
                 self._logger.err(exp)
                 tries += 1
