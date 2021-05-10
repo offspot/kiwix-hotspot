@@ -49,6 +49,11 @@ def run_in_qemu(image_fpath, disk_size, root_size, logger, cancel_event, qemu_ra
 
         # expand root system size early so we can update packages
         with emulator.run(cancel_event) as emulation:
+            # update OpenSSH configuration
+            emulation.exec_cmd("printf \"TCPKeepAlive yes\n\" | sudo tee -a /etc/ssh/sshd_config")
+            emulation.exec_cmd("printf \"ClientAliveInterval 30\n\" | sudo tee -a /etc/ssh/sshd_config")
+            emulation.exec_cmd("printf \"ClientAliveCountMax 30\n\" | sudo tee -a /etc/ssh/sshd_config")
+
             emulation.put_file(
                 os.path.join(data.ansiblecube_path, "partition_boundaries.py"),
                 "/tmp/partition_boundaries.py",
