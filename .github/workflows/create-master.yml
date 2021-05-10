@@ -110,8 +110,7 @@ jobs:
       - name: build master image
         env:
             QEMU_CPU: 2
-        # run: dist/kiwix-hotspot image --ram 6G --root 7 --size 8 --out ${OUT_IMG}
-        run: echo "test" > ${OUT_IMG}
+        run: dist/kiwix-hotspot image --ram 6G --root 7 --size 8 --out ${OUT_IMG}
 
       - name: ZIP master image
         run: zip -9 ${OUT_IMG}.zip ${OUT_IMG}
