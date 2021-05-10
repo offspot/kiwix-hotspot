@@ -532,7 +532,9 @@ def get_hardware_adjusted_image_size(size: int):
     """ number of bytes we can safely write on an SD card of such size
 
         to accomodate difference between marketed size and available space """
-    return int(size - get_hardware_margin(size))
+    size = int(size - get_hardware_margin(size))
+    # round up to next 512 multiple to accomodate picky SD writers such as rpi-imager
+    return math.ceil(size / 512) * 512
 
 
 def get_qemu_adjusted_image_size(size):
