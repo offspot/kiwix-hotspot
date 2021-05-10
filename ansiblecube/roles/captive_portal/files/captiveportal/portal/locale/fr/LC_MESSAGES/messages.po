@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-10-14 10:24+0000\n"
+"POT-Creation-Date: 2021-05-10 09:10+0000\n"
 "PO-Revision-Date: 2019-10-07 09:38+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.7.0\n"
+"Generated-By: Babel 2.9.1\n"
 
 #: portal/utils.py:138
 msgid "Online"
@@ -65,28 +65,18 @@ msgid ""
 "You will be disconnected after %(interval)smn of inactivity: use this "
 "address to reconnect."
 msgstr ""
-"Vous serez déconnecté après %(interval)smn"
-" d'innactivité. Utilisez cette adresse pour"
-" vous reconnecter."
+"Vous serez déconnecté après %(interval)smn d'innactivité. Utilisez cette "
+"adresse pour vous reconnecter."
 
 #: portal/templates/portal.html:16
-msgid "Agree and register"
-msgstr "S'enregistrer"
+msgid "Got it!"
+msgstr "C'est compris !"
 
-#: portal/templates/registered.html:3
-#, python-format
-msgid ""
-"Registered to “<em>%(hotspot_name)s</em>” (<a "
-"href=\"http://%(fqdn)s/\">%(fqdn)s</a>)"
-msgstr ""
-"Enregistré sur «<em>%(hotspot_name)s</em>» (<a "
-"href=\"http://%(fqdn)s/\">%(fqdn)s</a>)"
-
-#: portal/templates/registered.html:6
+#: portal/templates/registered.html:4
 msgid "You're all set!"
 msgstr "C'est tout bon !"
 
-#: portal/templates/registered.html:8
+#: portal/templates/registered.html:6
 #, python-format
 msgid ""
 "Now open your web browser and go to <button class=\"clipboard button "
@@ -98,14 +88,24 @@ msgstr ""
 "text=\"http://%(fqdn)s/\">%(fqdn)s</button> en suivant les instructions "
 "précédentes."
 
-#: portal/templates/registered.html:10
+#: portal/templates/registered.html:8
 #, python-format
 msgid "You're now ready to access <em>%(project_name)s's content</em>."
 msgstr ""
 "Vous êtes désormais prêt à accèder aux <em>contenus de "
 "%(project_name)s</em>."
 
-#: portal/templates/registered.html:11
+#: portal/templates/registered.html:9
 #, python-format
 msgid "Go to %(fqdn)s"
 msgstr "Aller à %(fqdn)s"
+
+#~ msgid "Agree and register"
+#~ msgstr "S'enregistrer"
+
+#~ msgid ""
+#~ "Registered to “<em>%(hotspot_name)s</em>” (<a "
+#~ "href=\"http://%(fqdn)s/\">%(fqdn)s</a>)"
+#~ msgstr ""
+#~ "Enregistré sur «<em>%(hotspot_name)s</em>» (<a "
+#~ "href=\"http://%(fqdn)s/\">%(fqdn)s</a>)"

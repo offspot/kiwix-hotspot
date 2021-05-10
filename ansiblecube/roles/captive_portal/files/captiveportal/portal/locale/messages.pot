@@ -1,21 +1,21 @@
 # Translations template for PROJECT.
-# Copyright (C) 2019 ORGANIZATION
+# Copyright (C) 2021 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-10-14 10:24+0000\n"
+"POT-Creation-Date: 2021-05-10 09:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.7.0\n"
+"Generated-By: Babel 2.9.1\n"
 
 #: portal/utils.py:138
 msgid "Online"
@@ -59,21 +59,14 @@ msgid ""
 msgstr ""
 
 #: portal/templates/portal.html:16
-msgid "Agree and register"
+msgid "Got it!"
 msgstr ""
 
-#: portal/templates/registered.html:3
-#, python-format
-msgid ""
-"Registered to “<em>%(hotspot_name)s</em>” (<a "
-"href=\"http://%(fqdn)s/\">%(fqdn)s</a>)"
-msgstr ""
-
-#: portal/templates/registered.html:6
+#: portal/templates/registered.html:4
 msgid "You're all set!"
 msgstr ""
 
-#: portal/templates/registered.html:8
+#: portal/templates/registered.html:6
 #, python-format
 msgid ""
 "Now open your web browser and go to <button class=\"clipboard button "
@@ -81,13 +74,12 @@ msgid ""
 "text=\"http://%(fqdn)s/\">%(fqdn)s</button> as instructed earlier."
 msgstr ""
 
-#: portal/templates/registered.html:10
+#: portal/templates/registered.html:8
 #, python-format
 msgid "You're now ready to access <em>%(project_name)s's content</em>."
 msgstr ""
 
-#: portal/templates/registered.html:11
+#: portal/templates/registered.html:9
 #, python-format
 msgid "Go to %(fqdn)s"
 msgstr ""
-
