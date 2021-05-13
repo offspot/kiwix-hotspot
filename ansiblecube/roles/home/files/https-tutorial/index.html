@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <title>HTTPS Tutorial</title>
+    <link rel="icon" href="/hotspot-static/branding/favicon.png">
+    <link rel="stylesheet" href="/hotspot-static/font-awesome/css/font-awesome.min.css" />
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/hotspot-static/main.css" />
+    <link rel="stylesheet" type="text/css" href="/hotspot-static/branding/style.css" />
+    <style type="text/css">
+        .lead a, .lead a:hover, .lead a:visited { color: white; text-decoration: none; font-size: .6em; }
+        .row p:last-of-type { margin-top: 1em; }
+        .i18n.switch, .i18n.common { display: none; }
+        #animation { margin-top: 20px; display: none; }
+    </style>
+  </head>
+  <body class="home">
+    <header>
+        <section>
+          <a href="/"><h1><img src="/hotspot-static/branding/logo.png" /></h1></a>
+          <span class="boxid"></span>
+        </section>
+    </header>
+
+    <div class="content">
+        <noscript>
+            <p>This is a tutorial for bypassing the HTTPS browser warning when accessing a Service Worker enabled ZIM file.</p>
+            <p>Both the tutorial and the ZIM file requires Javascript to be enabled to work. You shall go back.</p>
+        </noscript>
+        <div class="row">
+            <h1 class="i18n common">action_required</h1>
+            <p class="lead"><span class="i18n common">requires_https</span>
+                <a tabindex="0" role="button" href="" onclick="javascript:return false;" class="badge bg-info i18n switch en all" role="button" data-bs-toggle="popover" data-bs-trigger="focus"
+                title="Why switch to HTTPS?"
+                data-bs-content="This content uses a technical feature called Service Workers to replicate the source website in an offline bundle. This feature requires the content to be accessed via HTTPS.">Why?</a>
+                <a tabindex="0" role="button" href="" onclick="javascript:return false;" class="badge bg-info i18n switch fr all" role="button" data-bs-toggle="popover" data-bs-trigger="focus"
+                title="Pourquoi utiliser HTTPS ?"
+                data-bs-content="Ce contenu utilise une fonctionnalité appelée Service Workers pour simuler le site d'origine en version hors-ligne. Cette fonctionnalité nécessite que le contenu soit accédé en HTTPS.">Pourquoi ?</a>
+            </p>
+            <p class="lead"><span class="i18n common">triggers_warning</span>
+                <a tabindex="0" role="button" href="" onclick="javascript:return false;" class="badge bg-info i18n switch en all" role="button" data-bs-toggle="popover" data-bs-trigger="focus"
+                title="Why a warning?"
+                data-bs-content="HTTPS secures the connection between your browser and the server using a Certificate. To ensure revocability and trust, this certificate must be emmited by an Entity recognized by your browser. We can't provide an approved certificate in this Hotspot context so we use a “self-signed” one.">Why?</a>
+                <a tabindex="0" role="button" href="" onclick="javascript:return false;" class="badge bg-info i18n switch fr all" role="button" data-bs-toggle="popover" data-bs-trigger="focus"
+                title="Pourquoi cet avertissement ?"
+                data-bs-content="HTTPS sécurise la connection entre votre navigateur et le serveur en utilisant un certificat. Pour assurer validité et révocabilité, ce certificat doit avoir été émit par une entité reconnue de votre navigateur. Nous ne pouvons pas fournir un certificat approuvé dans ce contexte du Hotspot alors nous utilisons un certificat «auto-signé».">Pourquoi ?</a>
+            </p>
+            <p class="lead i18n common">requires_action</p>
+            <ul class="i18n switch en firefox">
+                <li>Click the <em>Advanced</em> button</li>
+                <li>Click the <em>Accept the Risk & Continue</em> button</li>
+            </ul>
+            <ul class="i18n switch fr firefox">
+                <li>Cliquer sur le bouton <em>Avancé</em></li>
+                <li>Cliquer sur le bouton <em>Accepter le risque et poursuivre</em></li>
+            </ul>
+            <ul class="i18n switch en chrome">
+                <li>Click the <em>Advanced</em> button</li>
+                <li>Click the <em>Proceed to … (unsafe)</em> link</li>
+            </ul>
+            <ul class="i18n switch fr chrome">
+                <li>Cliquer sur le bouton <em>Avancé</em></li>
+                <li>Cliquer sur le lien <em>Continuer vers le site … (dangereux)</em></li>
+            </ul>
+            <ul class="i18n switch en safari">
+                <li>Click the <em>Show Details</em> link</li>
+                <li>Click the <em>visit this website</em> link</li>
+                <li>Confirm by clicking the <em>Visit Website</em> button</li>
+            </ul>
+            <ul class="i18n switch fr safari">
+                <li>Cliquer sur le lien <em>Afficher les détails</em></li>
+                <li>Cliquer sur le lien <em>visiter ce site web</em></li>
+                <li>Confirmer en cliquant sur le bouton <em>Visiter le site web</em></li>
+            </ul>
+
+            <p><a id="show-animation-btn" class="btn btn-sm btn-outline-primary" href="" onclick="javascript:showAnimation(); return false;"><i class="fa fa-desktop"></i> <span class="i18n common">display_animation</span></a></p>
+        </div>
+
+        <div id="animation" class="row">
+            <p></p>
+        </div>
+
+        <div class="row">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+              <button id="go-btn" type="button" class="btn btn-primary btn-lg px-4 me-md-2 i18n common" onclick="javascript:window.location=this.getAttribute('href');">letsdoit</button>
+              <button type="button" class="btn btn-outline-secondary btn-lg px-4 i18n common" onclick="javascript:window.history.back();">take_me_back</button>
+            </div>
+        </div>
+
+      </div>
+    </div>
+
+    <footer>
+        <div class="row">
+            <div class="col third i18n_switch"></div>
+            <div class="col half"></div>
+        </div>
+    </footer>
+
+    <script src="./js/popper.min.js"></script>
+    <script src="./js/gifffer.min.js"></script>
+    <script src="./js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript">
+        var translations = {
+            'en': {
+                action_required: 'Action required!',
+                requires_https: 'Accessing this content requires switching to the <em>HTTPS</em> protocol.',
+                triggers_warning: 'Unfortunately, this will trigger a scary warning from your Internet Browser.',
+                requires_action: 'You need to perfom (<strong>only once</strong>) the following to access the content:',
+                display_animation: 'Display the animation of how to do it',
+                letsdoit: 'Let\'s do it!',
+                take_me_back: 'Take me back',
+            },
+            'fr': {
+                action_required: 'Action requise !',
+                requires_https: 'Ce contenu nécessite d\'utiliser le protocole <em>HTTPS</em> pour y accèder.',
+                triggers_warning: 'Malheureusement, cela déclenchera l\'affichage d\'un message d\'alerte effrayant par votre navigateur Web.',
+                requires_action: 'Vous devez effectuer (<strong>une seule fois</strong>) les actions suivantes:',
+                display_animation: 'Afficher l\'animation décrivant comment faire',
+                letsdoit: 'Allons-y !',
+                take_me_back: 'Retour',
+            },
+        };
+        function showAnimation() {
+            document.getElementById('animation').style.display = 'block';
+            document.getElementById('show-animation-btn').parentNode.style.display = 'none';
+            Gifffer({
+              playButtonStyles: {
+                'width': '60px',
+                'height': '60px',
+                'border-radius': '30px',
+                'background': 'rgba(255, 0, 0, 0.8)',
+                'position': 'absolute',
+                'top': '50%',
+                'left': '50%',
+                'margin': '-30px 0 0 -30px'
+              },
+              playButtonIconStyles: {
+                'width': '0',
+                'height': '0',
+                'border-top': '14px solid transparent',
+                'border-bottom': '14px solid transparent',
+                'border-left': '14px solid rgba(0, 0, 0, 0.8)',
+                'position': 'absolute',
+                'left': '26px',
+                'top': '16px'
+              }
+            });
+        }
+        window.onload = function() {
+            // Language detection
+            var lang = 'en';
+            var langs = ['en', 'fr'];
+            try {
+                let userLang = navigator.language || navigator.userLanguage;
+                let language = userLang.toLowerCase().split('-')[0];
+                if (langs.indexOf(language) != -1) {
+                    lang = language;
+                }
+            } catch (e) {}
+            console.log('Using locale:', lang);
+
+            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+            var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+              return new bootstrap.Popover(popoverTriggerEl)
+            });
+            console.log(popoverList);
+
+            // Browser detection
+            var browser = 'firefox';
+            var sizes = {'firefox': [600, 600], 'chrome': [270, 503], 'safari': [320, 560]}
+            let userAgent = navigator.userAgent;
+            if (userAgent.indexOf("Firefox") > -1) {
+                browser = 'firefox';
+            }
+            else if (userAgent.indexOf("Chrome") > -1 || userAgent.indexOf("Edge") > -1) {
+                 browser = "chrome";
+            }
+            else if (userAgent.indexOf("Safari") > -1) {
+                browser = "safari";
+            }
+            console.log('using browser:', browser);
+
+            // displaying appropriate texts
+            let matches = document.querySelectorAll('.i18n.common');
+            for (i=0; i<matches.length; i++) {
+                let match = matches[i];
+                match.innerHTML = translations[lang][match.innerText];
+                match.style.display = 'inline';
+            }
+            matches = document.querySelectorAll('.i18n.switch.' + lang + '.all');
+            for (i=0; i<matches.length; i++) {
+                matches[i].style.display = 'inline';
+            }
+            matches = document.querySelectorAll('.i18n.switch.' + lang + '.' + browser);
+            for (i=0; i<matches.length; i++) {
+                matches[i].style.display = 'block';
+            }
+
+            // setting animation based on Browser and Language
+            function setAnimation() {
+                let p = document.querySelectorAll('#animation p')[0];
+                p.innerHTML = '<img data-gifffer="./img/' + browser + '-' + lang + '.gif" data-gifffer-width="' + sizes[browser][0] + '" data-gifffer-height="'+ sizes[browser][1] +'" />'
+            }
+            setAnimation();
+
+            // make sure we rebuild it on resizes as gifffer modifies its content and calculates sizes
+            function resetAnimationOnResize() {
+                setAnimation();
+                showAnimation();
+            }
+            // window.onresize = resetAnimationOnResize;
+            window.addEventListener("orientationchange", function() {resetAnimationOnResize();}, false);
+
+            // Goto button behavior (only enabled if we have an URL)
+            var btn = document.getElementById('go-btn');
+            const params = new URLSearchParams(window.location.search);
+            if (!params.has('url')) {
+                console.error("No URL querystring, disabling button");
+                btn.setAttribute("disabled", "disabled");
+            } else {
+                btn.setAttribute('href', params.get('url'));
+            }
+
+            // Config name retrieval
+            try {
+                fetch("../config.json").then(function(response) {
+                    if (response.ok) {
+                        response.json().then(function (body) {
+                            console.debug(body);
+                            document.querySelectorAll('.boxid')[0].innerText = body.project_name;
+                        })
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error fetching config.json', error);
+                });
+            } catch (error) {
+                console.error("Unable to fetch config name", error);
+            }
+        }
+    </script>
+  </body>
+</html>

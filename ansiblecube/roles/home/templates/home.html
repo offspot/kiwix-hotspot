@@ -35,7 +35,7 @@
         	<div class="pure-g card-container">
 		        {% for card in cards %}
 	                <div class="pure-u-1 pure-u-md-1-2 pure-u-lg-1-3 pure-u-xl-1-4 pure-u">
-		                <a href="{{ card.url }}" class="card tinted {{ card.css_class }}">
+		                <a href="{{ card.url }}" class="card tinted {{ card.css_class }} {% if card.sw %} sw-zim{% endif %}">
 						  {% if card.fa %}<i class="fa fa-{{ card.fa }} fa-3x"></i>{% endif %}
 						  <h4><span>{{ card.title }}</span></h4>
 						  <p>{{ card.description }}</p>
@@ -50,5 +50,38 @@
 		        <div class="col half"></div>
 		    </div>
 		</footer>
+        <script type="text/javascript">
+            async function checkCertificate() {
+                // whether our certificate has already been installed in browser
+                let installed = false;
+                let url = "https://kiwix.{{ fqdn }}/catalog/searchdescription.xml"
+                try {
+                    let response = await fetch(url);
+                    return response.ok;
+                } catch (NetworkError) {
+                    return false;
+                }
+            }
+            async function goto(event) {
+                event.preventDefault();
+                let elem = event.target.closest("a");
+                var url = elem.getAttribute("href");
+                var dest;
+                if (!await checkCertificate()) {
+                    console.debug("certificate not installed, showing tutorial");
+                     dest = "/https-tutorial?url=" + url;
+                } else {
+                    console.debug("Already has certificate, going!")
+                    dest = "https:" + url;
+                }
+                window.location.href = dest;
+            }
+            if (location.protocol == "http:") {
+                let sw_links = document.getElementsByClassName('sw-zim');
+                for (var i=0; i<sw_links.length; i++) {
+                    sw_links[i].onclick = goto;
+                }
+            }
+        </script>
     </body>
 </html>
