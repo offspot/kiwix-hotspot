@@ -209,17 +209,20 @@ def generate_homepage(logger, options):
         kiwix_fqdn = "kiwix.{fqdn}".format(fqdn=fqdn)
         for package_id in options["packages"]:
             package = get_package(logger, package_id)
+            css_class = "zim_{}".format(package_id.rsplit(".", 1)[0])
+            if package.get("sw") == "y":
+                css_class += " sw-zim"
             cards.append(
                 {
                     "url": "//{fqdn}/{id}".format(
                         fqdn=kiwix_fqdn, id=package.get("langid", package_id)
                     ),
-                    "css_class": "zim_{}".format(package_id.rsplit(".", 1)[0]),
+                    "css_class": css_class,
                     "title": package.get("name"),
                     "description": package.get("description"),
                     "fa": "",
                 }
             )
-    context = {"name": options["name"], "cards": cards}
+    context = {"name": options["name"], "cards": cards, "fqdn": fqdn}
     content = jinja_env.get_template("home.html").render(**context)
     return content
