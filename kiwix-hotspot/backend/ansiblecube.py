@@ -47,12 +47,13 @@ def run(machine, tags, extra_vars={}, secret_keys=[]):
 
     # display sent configuration to logger
     machine._logger.std("ansiblecube extra_vars")
-    machine._logger.raw_std(
-        json.dumps(
-            {k: "****" if k in secret_keys else v for k, v in extra_vars.items()},
-            indent=4,
-        )
-    )
+    public = {k: "****" if k in secret_keys else v for k, v in extra_vars.items()}
+    machine._logger.raw_std(json.dumps(public, indent=4))
+    with tempfile.NamedTemporaryFile("w", delete=False, encoding="utf-8") as fp:
+        json.dump(public, fp, indent=4)
+        fp.close()
+        machine.put_file(fp.name, "/var/www/home/config.json")
+        os.unlink(fp.name)
 
     # review the list of tasks so the logger can  use it to track progression
     tasks_cmd = ansible_cmd[0:1] + ["--list-tasks"] + ansible_cmd[1:]
