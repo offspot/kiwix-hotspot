@@ -2090,9 +2090,9 @@ class Application:
                 size = -1
             else:
                 get_size_index = sd_card_info.get_size_index()
-                size = int(
+                size = get_qemu_adjusted_image_size(int(
                     self.component.sd_card_list_store[sd_card_id][get_size_index]
-                )
+                ))
         else:
             try:
                 size = get_qemu_adjusted_image_size(
@@ -2101,7 +2101,6 @@ class Application:
                 )
             except Exception:
                 size = -1
-
         return size
 
     def zim_language_selection_changed(self, selection):

@@ -5,7 +5,6 @@ import os
 import sys
 import time
 import json
-import math
 import shutil
 import traceback
 from datetime import datetime
@@ -13,12 +12,10 @@ from datetime import datetime
 import data
 from backend import qemu
 from util import (
-    ONE_GB,
     human_readable_size,
     get_cache,
     ensure_zip_exfat_compatible,
     EXFAT_FORBIDDEN_CHARS,
-    as_power_of_2,
 )
 
 from backend import ansiblecube
@@ -29,7 +26,6 @@ from backend.content import (
     isremote,
     get_content_cache,
     get_alien_content,
-    get_required_image_size,
 )
 from backend.download import download_content, unzip_file
 from backend.mount import (
