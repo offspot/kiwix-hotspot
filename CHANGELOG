@@ -4,6 +4,7 @@
 * Added Service Worker dependent ZIM support:
   * Clicking on such a ZIM card on homepage redirects to an HTTPS switch tutorial
 * Public config now available through //<name>.hotspot/config.json
+* Fixed working with an SD card (not a file) using GUI
 
 2.4.3
 
