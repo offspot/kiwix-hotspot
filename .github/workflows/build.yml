@@ -27,7 +27,8 @@ jobs:
       - name: create tarball of sources
         run: |
           mkdir -p releases/$RELEASE
-          tar cfJ releases/$RELEASE/kiwix-hotspot.xz *
+          tar cfJ /tmp/kiwix-hotspot.xz *
+          mv /tmp/kiwix-hotspot.xz releases/$RELEASE/kiwix-hotspot.xz
         if: env.BUILDTYPE == 'release'
 
       - name: decrypt SSH key
