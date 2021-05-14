@@ -148,11 +148,12 @@ def get_admin_command(command, from_gui, logger, log_to=None):
     if sys.platform == "darwin":
         # write command to a separate temp bash script
         script = (
-            "#!/bin/bash\n\n{command} 2>&1 {redir}\n\n"
-            'if [ $? -eq 1 ]; then\n    echo "!!! echer returned 1" {redir}\n'
+            "#!/bin/bash\n\n{command} {out_redir} {err_redir}\n\n"
+            'if [ $? -eq 1 ]; then\n    echo "!!! echer returned 1" {err_redir}\n'
             "    exit 11\nfi\n\n".format(
                 command=" ".join([shlex.quote(cmd) for cmd in command]),
-                redir=">>{}".format(log_to) if log_to else "",
+                out_redir="1>>{}".format(log_to) if log_to else "",
+                err_redir="2>>{}".format(log_to) if log_to else "",
             )
         )
 
@@ -355,7 +356,7 @@ def get_etcher_command(image_fpath, device_fpath, logger, from_cli):
     log_to_file = not from_cli and sys.platform == "darwin"
     if log_to_file:
         log_file = tempfile.NamedTemporaryFile(
-            suffix=".log", delete=False, encoding="utf-8"
+            mode="w", suffix=".log", delete=False, encoding="utf-8"
         )
     else:
         log_file = None
