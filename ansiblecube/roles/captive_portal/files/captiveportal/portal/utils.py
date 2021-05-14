@@ -9,7 +9,7 @@ from flask_babel import gettext
 
 # seconds to expire registration after
 # synced with cron job launching clean_iptables.sh
-REGISTRATION_TIMEOUT = 15 * 60
+REGISTRATION_TIMEOUT = 60 * 60
 
 APPLE_HOSTS = [
     "captive.apple.com",

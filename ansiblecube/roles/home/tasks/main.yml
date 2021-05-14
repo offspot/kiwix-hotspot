@@ -43,6 +43,10 @@
     mode: 0644
   tags: reconfigure
 
+- name: Copy https tutorial
+  command: cp -r {{ playbook_dir }}/roles/home/files/https-tutorial /var/www/home/
+  tags: ['master', 'reconfigure']
+
 - block:
   - debug: msg="Customize branding"
 
