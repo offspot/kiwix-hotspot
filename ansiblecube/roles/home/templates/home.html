@@ -69,7 +69,7 @@
                 var dest;
                 if (!await checkCertificate()) {
                     console.debug("certificate not installed, showing tutorial");
-                     dest = "/https-tutorial?url=" + url;
+                     dest = "/https-tutorial?url=https:" + url;
                 } else {
                     console.debug("Already has certificate, going!")
                     dest = "https:" + url;
