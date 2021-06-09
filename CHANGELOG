@@ -1,3 +1,7 @@
+2.4.6
+
+* Using kiwix-serve 3.1.2-5 which fixes an important freeze on low-ram devices
+
 2.4.5
 
 * Fixed HTTPS Tutorial Goto button
