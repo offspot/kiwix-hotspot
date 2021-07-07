@@ -99,11 +99,11 @@ def generate_homepage(logger, options):
         if options["language"] == "fr":
             title = "Math Mathews Treasure Hunt"
             category = "Accès"
-            description = "Téléchargez l'application"
+            description = "Un jeu pour faire des maths (6-9 ans)"
         else:
             title = "Math Mathews Treasure Hunt"
             category = "Access"
-            description = "Download the App"
+            description = "Un jeu pour faire des maths (6-9 ans)"
         cards.append(
             {
                 "url": "//{}".format(mathews_fqdn),
@@ -118,11 +118,11 @@ def generate_homepage(logger, options):
         if options["language"] == "fr":
             title = "Apps Africatik"
             category = "Accès"
-            description = "Téléchargez les apps"
+            description = "Des applications éducatives pour Windows et Android adaptées au contexte culturel africain."
         else:
             title = "Africatik apps"
             category = "Access"
-            description = "Download the Apps"
+            description = "Windows and Android educative apps centered on Africa."
         cards.append(
             {
                 "url": "//{}".format(africatik_fqdn),
