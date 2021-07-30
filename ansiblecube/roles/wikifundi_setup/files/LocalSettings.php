@@ -12,7 +12,7 @@
 
 # Protect against web entry
 if ( !defined( 'MEDIAWIKI' ) ) {
-	exit;
+    exit;
 }
 
 ## UPO means: this is also a user preference option
@@ -83,6 +83,7 @@ wfLoadSkin( 'Vector' );
 $wgDefaultSkin = "vector";
 
 # Path to the GNU diff3 utility. Used for conflict resolution.
+$wgDiff = "/usr/bin/diff";
 $wgDiff3 = "/usr/bin/diff3";
 
 # Query string length limit for ResourceLoader. You should only set this if
@@ -169,7 +170,6 @@ $wgUploadWizardConfig['fallbackToAltUploadForm'] = false;
 $wgUploadWizardConfig['enableMultiFileSelect'] = true;
 $wgUploadWizardConfig['enableChunked'] = true;
 
-
 # Hieroglyphs
 wfLoadExtension( 'wikihiero' );
 
@@ -181,6 +181,7 @@ $wgDefaultUserOptions['math'] = 'png';
 # Timeline
 putenv("GDFONTPATH=/usr/share/fonts/truetype/freefont");
 wfLoadExtension( 'timeline' );
+$wgTimelineFontFile = "FreeSans.ttf";
 
 # Echo extension
 wfLoadExtension( 'Echo' );
@@ -191,7 +192,8 @@ $wgMFAutodetectMobileView = true;
 wfLoadSkin( 'Vector' );
 $wgMFDefaultSkinClass = "SkinVector";
 
-# EventLogging used by GuidedTour
+# EventLogging used by GuidedTour (depends on EventStreamConfig)
+wfLoadExtension( 'EventStreamConfig' );
 wfLoadExtension( 'EventLogging' );
 # Allow to provides a framework for creating "guided tours,"
 wfLoadExtension( 'GuidedTour' );
@@ -204,18 +206,18 @@ wfLoadExtension( 'GeoData' );
 
 # Visual Editor
 wfLoadExtension( 'VisualEditor' );
-$wgDefaultUserOptions['visualeditor-enable'] = 1;
-$wgVisualEditorNamespaces[] = NS_PROJECT;
-$wgVirtualRestConfig['modules']['parsoid'] = array(
-						   'url' => 'http://localhost:8000',
-						   'domain' => 'localhost',
-						   'prefix' => 'mediawiki_kiwix',
-						   'forwardCookies' => true
-						   );
+$wgVisualEditorAvailableNamespaces = [
+    "Project" => true
+];
 
-# TimedMediaHandler (videos)
-wfLoadExtension('MwEmbedSupport');
-require_once("$IP/extensions/TimedMediaHandler/TimedMediaHandler.php");
+wfLoadExtension( 'TimedMediaHandler' );
+wfLoadExtension( 'Widgets' );
+
+wfLoadExtension( 'Iframe' );
+$wgIframe = array();
+
+
+wfLoadExtension( 'Thanks' );
 
 # Mantle extensions
 #require_once("$IP/extensions/Mantle/Mantle.php");
@@ -230,13 +232,13 @@ $wgFileExtensions = array_merge( $wgFileExtensions, array( 'doc', 'docx' ) );
 
 # Wikibase
 #$wgEnableWikibaseRepo = true;
-#$wgEnableWikibaseClient = true; 
+#$wgEnableWikibaseClient = true;
 #require_once "$IP/extensions/Wikibase/repo/Wikibase.php";
-#require_once "$IP/extensions/Wikibase/repo/ExampleSettings.php"; 
+#require_once "$IP/extensions/Wikibase/repo/ExampleSettings.php";
 #require_once "$IP/extensions/Wikibase/client/WikibaseClient.php";
 #require_once "$IP/extensions/Wikibase/client/ExampleSettings.php";
 
-# Add specific path                                                                                                                  
+# Add specific path
 function add_include_path ($path) {
     foreach (func_get_args() AS $path) {
         if (!file_exists($path) OR (file_exists($path) && filetype($path) !== 'dir')) {
@@ -305,6 +307,8 @@ $wgSessionCacheType = CACHE_MEMCACHED;
 $wgSessionsInObjectCache = true;
 $wgMemCachedServers = array("127.0.0.1:11211");
 
+$wgUseGzip = true;
+
 # Cache user interface
 $wgCacheDirectory = "/dev/shm/";
 $wgEnableSidebarCache = true;
@@ -350,7 +354,7 @@ $wgMaxShellTime = 3600;
 $wgMaxShellFileSize = 524288;
 
 # Number of seconds before autoblock entries expire
-$wgAutoblockExpiry = 8640000; 
+$wgAutoblockExpiry = 8640000;
 
 # Allow user customizations
 $wgAllowUserCss = true;
@@ -381,7 +385,7 @@ $wgAllowSlowParserFunctions = true;
 
 # Necessary if you use nginx as reverse proxy
 $wgUsePrivateIPs = true;
-$wgSquidServersNoPurge = array('127.0.0.1');
+$wgSquidServersNoPurge = array("127.0.0.1", "192.168.0.0/16");
 
 # Avoid blocked users to login
 $wgBlockDisablesLogin = true;
