@@ -47,7 +47,7 @@
   environment:
     RUNLEVEL: 1
   apt:
-    name: git,vim,unzip,imagemagick,libicu-dev,ffmpeg,librsvg2-bin,poppler-utils,memcached,lua5.1,python3,locales,sqlite3,fonts-freefont-ttf,ttf-unifont
+    name: git,vim,unzip,imagemagick,libicu-dev,ffmpeg,librsvg2-bin,poppler-utils,memcached,lua5.1,python3,locales,sqlite3,fonts-freefont-ttf,ttf-unifont,exiv2,libtiff-tools,libvips-tools
     state: latest
     autoremove: yes
     autoclean: yes
@@ -65,6 +65,15 @@
 
 - name: hack to avoid thumbs generation error for PDF with errors
   shell: mv /usr/bin/gs /usr/bin/gs9-20 ; echo '/usr/bin/gs9-20 -sstdout=%stderr $@' > /usr/bin/gs ; chmod a+x /usr/bin/gs
+  tags: setup
+
+- name: make cache dir
+  file:
+    dest: "/dev/shm/mw"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: 0755
   tags: setup
 
 - name: make sure directories exists
