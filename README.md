@@ -29,7 +29,7 @@ Kiwix Hotspot is a graphical app but has a command-line counterpart that
 usage: kiwix-hotspot [-h] [--name NAME] [--timezone TIMEZONE]
                      [--language {en,fr}] [--wifi-pwd WIFI_PWD]
                      [--kalite {fr,en,es} [{fr,en,es} ...]]
-                     [--aflatoun {yes,no}] [--wikifundi {fr,en} [{fr,en} ...]]
+                     [--aflatoun {yes,no}] [--wikifundi {fr,en,es} [{fr,en,es} ...]]
                      [--edupi {yes,no}] [--nomad {yes,no}]
                      [--mathews {yes,no}] [--africatik {yes,no}]
                      [--edupi-resources EDUPI_RESOURCES]

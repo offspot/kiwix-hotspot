@@ -109,7 +109,7 @@ def run_for_image(machine, root_partition_size, disk_size):
         nomad=True,
         mathews=True,
         africatik=True,
-        wikifundi_languages=["en", "fr"],
+        wikifundi_languages=["en", "fr", "es"],
         aflatoun_languages=["en", "fr"],
         kalite_languages=["en", "fr", "es"],
         packages=[],

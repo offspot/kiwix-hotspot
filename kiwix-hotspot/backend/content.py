@@ -223,7 +223,7 @@ def get_kalite_contents(languages=[]):
 
 
 def get_wikifundi_contents(languages=[]):
-    """ wikifundi: small size parsoid + large language pack for each lang """
+    """ wikifundi: large language pack for each lang """
     return [
         get_content("wikifundi_langpack_{lang}".format(lang=lang)) for lang in languages
     ]
@@ -396,7 +396,7 @@ def run_kalite_actions(cache_folder, mount_point, logger, languages=[]):
 
 
 def run_wikifundi_actions(cache_folder, mount_point, logger, languages=[]):
-    """ wikifundi: extract parsoid and all lang packs """
+    """ wikifundi: extract all lang packs """
 
     if not len(languages):
         return

@@ -86,4 +86,5 @@
     - { name: 'aflatoun', fqdn: "{{ aflatoun_fqdn }}" }
     - { name: 'fr.wikifundi', fqdn: "fr.{{ wikifundi_fqdn }}" }
     - { name: 'en.wikifundi', fqdn: "en.{{ wikifundi_fqdn }}" }
+    - { name: 'es.wikifundi', fqdn: "es.{{ wikifundi_fqdn }}" }
   tags: master

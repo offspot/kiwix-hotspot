@@ -35,11 +35,6 @@
 
 - import_tasks: enable_service.yml
   vars:
-    service: parsoid
-  when: ansible_local.config.wikifundi_languages | length
-
-- import_tasks: enable_service.yml
-  vars:
     service: memcached
   when: ansible_local.config.wikifundi_languages | length
 

@@ -183,7 +183,7 @@ parser.add_argument(
 )
 parser.add_argument("--aflatoun", help="install aflatoun", choices=["yes", "no"])
 parser.add_argument(
-    "--wikifundi", help="install wikifundi", choices=["fr", "en"], nargs="+"
+    "--wikifundi", help="install wikifundi", choices=["fr", "en", "es"], nargs="+"
 )
 parser.add_argument("--edupi", help="install edupi", choices=["yes", "no"])
 parser.add_argument("--nomad", help="install Nomad Education", choices=["yes", "no"])
