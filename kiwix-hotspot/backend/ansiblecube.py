@@ -97,6 +97,9 @@ def run_for_image(machine, root_partition_size, disk_size):
     )
     machine.exec_cmd("sudo mkdir --mode 0755 -p /etc/ansible/facts.d")
 
+    # will host the config json file
+    machine.exec_cmd("sudo mkdir --mode 0755 -p /var/www/home/")
+
     # default configuration on the master: all contents enabled for setup tag
     extra_vars, _ = build_extra_vars(
         name="default",
