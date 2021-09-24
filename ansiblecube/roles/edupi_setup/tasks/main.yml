@@ -5,7 +5,7 @@
 # excluding node (npm,nodejs) as already installed during wikifundi_setup
 - name: Install dependencies
   apt:
-    name: nginx,libmagickwand-dev,python3-dev
+    name: nginx,libmagickwand-dev,python3-dev,npm,nodejs
     state: latest
     autoremove: yes
     autoclean: yes
