@@ -87,12 +87,12 @@
 
 - name: download mediawiki
   get_url:
-    url: "{{ mirror }}/dev/mediawiki-1.36.1__with-extensions.tar.gz"
-    dest: /tmp/mediawiki.tar.gz
+    url: "{{ mirror }}/dev/mediawiki-1.36.1__with-extensions.tar.bz2"
+    dest: /tmp/mediawiki.tar.bz2
   tags: setup
 
 - name: extract mediawiki
-  command: tar -C {{ mediawiki_root }} -xz --strip-components=1 -f /tmp/mediawiki.tar.gz
+  command: tar -C {{ mediawiki_root }} -x --strip-components=1 -f /tmp/mediawiki.tar.bz2
   tags: setup
 
 - name: change ownership of folders
