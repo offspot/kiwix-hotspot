@@ -8,11 +8,11 @@
         "expanded_size": 1866465280
     },
     "hotspot_master_image": {
-        "url": "{mirror}/release/kiwix-hotspot/master/kiwix-hostpot_master_2021-04-27.img.zip",
-        "name": "kiwix-hostpot_master_2021-04-27.img.zip",
+        "url": "{mirror}/release/kiwix-hotspot/master/kiwix-hotspot_master_2021-09-24.img.zip",
+        "name": "kiwix-hotspot_master_2021-09-24.img.zip",
         "root_partition_size": 7000000000,
-        "checksum": "7ac7b3fad556e830ae88f65869e80a9317ad536ed43da1287601ab837d392c56",
-        "archive_size": 2523590834,
+        "checksum": "118a9fa08078a39270e4fe5f60c2d1c415ce265bd91719ef0bdd8dd218243fe2",
+        "archive_size": 2213181022,
         "expanded_size": 8589934592
     },
     "aflatoun_content": {
