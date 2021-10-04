@@ -1,3 +1,7 @@
+2.4.8
+
+* Rebuild with updates ca-certificates for aria2
+
 2.4.7
 
 * Using older firmware for broadcom devices (#616)
