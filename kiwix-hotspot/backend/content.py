@@ -244,7 +244,7 @@ def get_package_content(package_id):
             package.update({"ext": "zip" if package["type"] != "zim" else "zim"})
             package.update({"langid": package.get("langid") or package_id})
             return {
-                "url": package["url"],
+                "url": package["url"].replace("http://download.kiwix.org", mirror),
                 "name": "{langid}.{ext}".format(**package),
                 "checksum": package["sha256sum"],
                 "archive_size": package["size"],
