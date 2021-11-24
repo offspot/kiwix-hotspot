@@ -60,6 +60,22 @@
   with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
   tags: move-content
 
+- name: start memcached
+  service:
+    name: memcached
+    state: started
+  tags: move-content
+
+- name: Run update script
+  environment:
+    WIKIFUNDI_LANG: "{{ item }}"
+  command: php maintenance/update.php --quick
+  args:
+    chdir: "{{ mediawiki_root }}"
+  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  when: ansible_local.config.admin_account is defined
+  tags: move-content
+
 - name: Add admin account to Wikifundi
   environment:
     WIKIFUNDI_LANG: "{{ item }}"
