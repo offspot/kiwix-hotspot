@@ -2,20 +2,6 @@
 - import_tasks: clean_apt.yml
   tags: setup
 
-- name: download node
-  get_url:
-    url: "{{ mirror }}/dev/node-v10.16.3-linux-armv6l.tar.xz"
-    dest: /tmp/node-v10.16.3-linux-armv6l.tar.xz
-  tags: setup
-
-- name: extract mediawiki
-  command: tar -C /tmp -x -f /tmp/node-v10.16.3-linux-armv6l.tar.xz
-  tags: setup
-
-- name: install node files
-  shell: mv /tmp/node-v10.16.3-linux-armv6l/bin/* /usr/bin/ && mv /tmp/node-v10.16.3-linux-armv6l/include/node /usr/include/ && mv /tmp/node-v10.16.3-linux-armv6l/lib/node_modules /usr/lib/ && ln -sf /usr/bin/node /usr/sbin/node
-  tags: setup
-
 - name: Install dependencies (tex, for MathRenderer)
   apt:
     name: texlive,texlive-fonts-recommended,texlive-lang-greek,texlive-latex-recommended,texlive-latex-extra,build-essential,dvipng,ocaml,cjk-latex
@@ -31,7 +17,7 @@
   environment:
     RUNLEVEL: 1
   apt:
-    name: php{{ php_version }}-fpm,php{{ php_version }}-sqlite3,php{{ php_version }}-intl,php{{ php_version }}-mbstring,php{{ php_version }}-xml,php{{ php_version }}-curl
+    name: php{{ php_version }}-fpm,php{{ php_version }}-sqlite3,php{{ php_version }}-intl,php{{ php_version }}-mbstring,php{{ php_version }}-xml,php{{ php_version }}-curl,php{{ php_version }}-gd,php{{ php_version }}-gmp
     state: latest
     autoremove: yes
     autoclean: yes
@@ -48,6 +34,12 @@
     dest: /etc/php/{{ php_version }}/fpm/conf.d/90-wikifundi.ini
   tags: setup
 
+- name: change PHP7 config
+  template:
+    src: www.conf.j2
+    dest: /etc/php/{{ php_version }}/fpm/pool.d/www.conf
+  tags: setup
+
 - import_tasks: clean_apt.yml
   tags: setup
 
@@ -55,7 +47,7 @@
   environment:
     RUNLEVEL: 1
   apt:
-    name: git,vim,unzip,imagemagick,libicu-dev,ffmpeg,librsvg2-bin,poppler-utils,memcached,redis-server,lua5.1,python3,locales
+    name: git,vim,unzip,imagemagick,libicu-dev,ffmpeg,librsvg2-bin,poppler-utils,memcached,lua5.1,python3,locales,sqlite3,fonts-freefont-ttf,ttf-unifont,exiv2,libtiff-tools,libvips-tools
     state: latest
     autoremove: yes
     autoclean: yes
@@ -64,11 +56,6 @@
 - import_tasks: disable_service.yml
   vars:
     service: memcached
-  tags: setup
-
-- import_tasks: disable_service.yml
-  vars:
-    service: redis-server
   tags: setup
 
 - import_tasks: clean_apt.yml
@@ -80,6 +67,15 @@
   shell: mv /usr/bin/gs /usr/bin/gs9-20 ; echo '/usr/bin/gs9-20 -sstdout=%stderr $@' > /usr/bin/gs ; chmod a+x /usr/bin/gs
   tags: setup
 
+- name: make cache dir
+  file:
+    dest: "/dev/shm/mw"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: 0755
+  tags: setup
+
 - name: make sure directories exists
   file:
     dest: "{{ item }}"
@@ -87,17 +83,16 @@
   with_items:
     - "{{ wikifundi_root }}"
     - "{{ mediawiki_root }}"
-    - "{{ parsoid_root }}"
   tags: setup
 
 - name: download mediawiki
   get_url:
-    url: "{{ mirror }}/dev/mediawiki-1.31.0-rc.0__with-extensions.tar.gz"
-    dest: /tmp/mediawiki.tar.gz
+    url: "{{ mirror }}/dev/mediawiki-1.36.1__with-extensions.tar.bz2"
+    dest: /tmp/mediawiki.tar.bz2
   tags: setup
 
 - name: extract mediawiki
-  command: tar -C {{ mediawiki_root }} -xz --strip-components=1 -f /tmp/mediawiki.tar.gz
+  command: tar -C {{ mediawiki_root }} -x --strip-components=1 -f /tmp/mediawiki.tar.bz2
   tags: setup
 
 - name: change ownership of folders
@@ -112,56 +107,10 @@
     - cache
   tags: setup
 
-- name: download parsoid
-  unarchive:
-    remote_src: yes
-    src: "{{ mirror }}/dev/parsoid_0.9.0.tar.gz"
-    dest: "{{ parsoid_root }}"
-  tags: setup
-
-- name: downgrade npm first
-  command: npm install -g npm@4
-  tags: setup
-
-- name: install node dependencies for parsoid
-  command: npm install
-  args:
-    chdir: "{{ parsoid_root }}"
-  ignore_errors: yes
-  tags: setup
-
-- name: clean npm cache
-  command: npm cache clean -f
-  args:
-    chdir: "{{ mediawiki_root }}"
-  tags: setup
-
-- name: install n for parsoid
-  command: npm install -g n
-  args:
-    chdir: "{{ mediawiki_root }}"
-  tags: setup
-
-- name: upgrade npm back
-  command: npm install -g npm
-  tags: setup
-
-- name: updating node to lastest stable
-  command: n stable
-  args:
-    chdir: "{{ mediawiki_root }}"
-  tags: setup
-
 - name: download composer
   get_url:
-    url: "{{ mirror }}/dev/composer_1.6.5.phar"
+    url: "{{ mirror }}/dev/composer-2.phar"
     dest: "{{ mediawiki_root }}/composer.phar"
-  tags: setup
-
-- name: copy our composer config
-  copy:
-    src: composer.json
-    dest: "{{ mediawiki_root }}/composer.json"
   tags: setup
 
 - name: update composer config to prevent network header mismatch
@@ -177,30 +126,15 @@
   tags: setup
 
 - name: install composer
-  command: php composer.phar update --no-dev
+  command: php composer.phar install --no-dev
   args:
     chdir: "{{ mediawiki_root }}"
   tags: setup
 
-- name: clean Math extensions
-  command: make -C extensions/Math/{{ item }} clean all
+- name: link FreeSans font without extension
+  command: ln -s FreeSans.ttf FreeSans
   args:
-    chdir: "{{ mediawiki_root }}"
-  with_items:
-    - math
-    - texvccheck
-  tags: setup
-
-- name: fix math extension paths
-  replace:
-    name: "{{ mediawiki_root }}/extensions/Math/math/render.ml"
-    regexp: '"{{ item }} '
-    replace: '"/usr/bin/{{ item }} '
-  with_items:
-    - latex
-    - dvips
-    - convert
-    - dvipng
+    chdir: /usr/share/fonts/truetype/freefont
   tags: setup
 
 - name: fix permission on folder
@@ -245,17 +179,3 @@
     - debug
     - mirroring
   tags: setup
-
-- name: set parsoid config
-  template:
-    src: config.yaml.j2
-    dest: "{{ parsoid_root }}/config.yaml"
-  tags: ['setup', 'rename']
-
-- name: Setup parsoid service
-  template:
-    src: parsoid.service.j2
-    dest: /etc/systemd/system/parsoid.service
-  notify: reload systemd
-  tags: setup
-

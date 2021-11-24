@@ -144,6 +144,16 @@ def generate_homepage(logger, options):
                     "fa": "pencil",
                 }
             )
+        if "es" in options["wikifundi_languages"]:
+            cards.append(
+                {
+                    "url": "//es.{}".format(wikifundi_fqdn),
+                    "css_class": "",
+                    "title": "WikiFundi",
+                    "description": "Entorno editable sin conexión que brinda una experiencia similar a la edición de Wikipedia en línea (en español)",
+                    "fa": "pencil",
+                }
+            )
         if "en" in options["wikifundi_languages"]:
             cards.append(
                 {

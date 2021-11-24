@@ -97,6 +97,9 @@ def run_for_image(machine, root_partition_size, disk_size):
     )
     machine.exec_cmd("sudo mkdir --mode 0755 -p /etc/ansible/facts.d")
 
+    # will host the config json file
+    machine.exec_cmd("sudo mkdir --mode 0755 -p /var/www/home/")
+
     # default configuration on the master: all contents enabled for setup tag
     extra_vars, _ = build_extra_vars(
         name="default",
@@ -109,7 +112,7 @@ def run_for_image(machine, root_partition_size, disk_size):
         nomad=True,
         mathews=True,
         africatik=True,
-        wikifundi_languages=["en", "fr"],
+        wikifundi_languages=["en", "fr", "es"],
         aflatoun_languages=["en", "fr"],
         kalite_languages=["en", "fr", "es"],
         packages=[],

@@ -28,3 +28,4 @@ kiwix-hotspot.cache
 ca-certificates.crt
 *.img
 *.zip
+ansiblecube/roles/home/files/config.json

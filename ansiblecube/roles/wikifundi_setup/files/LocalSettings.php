@@ -12,7 +12,7 @@
 
 # Protect against web entry
 if ( !defined( 'MEDIAWIKI' ) ) {
-	exit;
+    exit;
 }
 
 ## UPO means: this is also a user preference option
@@ -55,6 +55,7 @@ $wgEmailAuthentication = true;
 $wgEnableUploads  = true;
 $wgUseImageMagick = true;
 $wgImageMagickConvertCommand = "/usr/bin/convert";
+$wgImageMagickIdentifyCommand= "/usr/bin/identify";
 
 # Upload from URL
 $wgGroupPermissions['autoconfirmed']['upload_by_url'] = true;
@@ -83,6 +84,7 @@ wfLoadSkin( 'Vector' );
 $wgDefaultSkin = "vector";
 
 # Path to the GNU diff3 utility. Used for conflict resolution.
+$wgDiff = "/usr/bin/diff";
 $wgDiff3 = "/usr/bin/diff3";
 
 # Query string length limit for ResourceLoader. You should only set this if
@@ -100,7 +102,12 @@ wfLoadExtension('Gadgets');
 wfLoadExtension('Nuke');
 wfLoadExtension('ParserFunctions');
 wfLoadExtension('Renameuser');
+
+wfLoadExtension( 'ArticleCreationWorkflow' );
+
 wfLoadExtension('WikiEditor');
+
+$wgDefaultUserOptions['usebetatoolbar'] = 1;
 
 # CategoryTree extension
 wfLoadExtension('CategoryTree');
@@ -148,11 +155,24 @@ $wgPdfProcessor="/usr/bin/gs";
 $wgPdfPostProcessor="/usr/bin/convert";
 $wgPdfInfo="/usr/bin/pdfinfo";
 
+# TemplateStyles (required for use with Lua module bundling CSS)
+wfLoadExtension( 'TemplateStyles' );
+$wgTemplateStylesAllowedUrls = [
+    'audio' => [ '<.>' ],
+    'image' => [ '<.>' ],
+    'svg' => [ '<.>' ],
+    'font' => [ '<.>' ],
+    'namespace' => [ '<.>' ],
+    'css' => [ '<.>' ],
+];
+
 # Scribunto (Lua) extension
 wfLoadExtension( 'Scribunto' );
+$wgScribuntoUseGeSHi = true;
+$wgScribuntoUseCodeEditor = true;
+$wgScribuntoGatherFunctionStats = true;  // ori, 29-Oct-2015
+$wgScribuntoSlowFunctionThreshold = 0.99;
 $wgScribuntoDefaultEngine = 'luastandalone';
-#$wgScribuntoUseGeSHi = true;
-#$wgScribuntoUseCodeEditor = true;
 $wgScribuntoEngineConf['luastandalone']['luaPath'] = "/usr/bin/lua5.1";
 $wgScribuntoEngineConf['luastandalone']['cpuLimit'] = 30000;
 $wgScribuntoEngineConf['luastandalone']['memoryLimit'] = 209715200; # bytes
@@ -162,13 +182,17 @@ wfLoadExtension('UploadWizard');
 $wgEnableAPI = true;
 $wgEnableWriteAPI = true;
 $wgApiFrameOptions = 'SAMEORIGIN'; // Needed to make UploadWizard work in IE, see bug 39877
-$wgUploadNavigationUrl = '/wiki/Special:Upload';
 $wgUploadWizardConfig['altUploadForm'] = 'Special:Upload';
-$wgUploadWizardConfig['skipTutorial'] = false;
-$wgUploadWizardConfig['fallbackToAltUploadForm'] = false;
-$wgUploadWizardConfig['enableMultiFileSelect'] = true;
-$wgUploadWizardConfig['enableChunked'] = true;
+$wgUploadWizardConfig['tutorial']['skip'] = false;
+$wgUploadWizardConfig['uwLanguages'] = [ 'en' => 'English' ];
+$wgUploadWizardConfig['allCategoriesLink'] = '';
+$wgUploadWizardConfig['alternativeUploadToolsPage'] = '';
+$wgUploadWizardConfig['wikibase']['enabled'] = false;
 
+$wgExtensionFunctions[] = function() {
+    $GLOBALS['wgUploadNavigationUrl'] = SpecialPage::getTitleFor( 'UploadWizard' )->getLocalURL();
+    return true;
+};
 
 # Hieroglyphs
 wfLoadExtension( 'wikihiero' );
@@ -181,6 +205,7 @@ $wgDefaultUserOptions['math'] = 'png';
 # Timeline
 putenv("GDFONTPATH=/usr/share/fonts/truetype/freefont");
 wfLoadExtension( 'timeline' );
+$wgTimelineFontFile = "FreeSans.ttf";
 
 # Echo extension
 wfLoadExtension( 'Echo' );
@@ -191,10 +216,13 @@ $wgMFAutodetectMobileView = true;
 wfLoadSkin( 'Vector' );
 $wgMFDefaultSkinClass = "SkinVector";
 
-# EventLogging used by GuidedTour
-wfLoadExtension( 'EventLogging' );
-# Allow to provides a framework for creating "guided tours,"
-wfLoadExtension( 'GuidedTour' );
+wfLoadExtension( 'TextExtracts' );
+
+// # EventLogging used by GuidedTour (depends on EventStreamConfig)
+// wfLoadExtension( 'EventStreamConfig' );
+// wfLoadExtension( 'EventLogging' );
+// # Allow to provides a framework for creating "guided tours,"
+// wfLoadExtension( 'GuidedTour' );
 
 # Thanks
 wfLoadExtension( 'Thanks' );
@@ -204,18 +232,18 @@ wfLoadExtension( 'GeoData' );
 
 # Visual Editor
 wfLoadExtension( 'VisualEditor' );
-$wgDefaultUserOptions['visualeditor-enable'] = 1;
-$wgVisualEditorNamespaces[] = NS_PROJECT;
-$wgVirtualRestConfig['modules']['parsoid'] = array(
-						   'url' => 'http://localhost:8000',
-						   'domain' => 'localhost',
-						   'prefix' => 'mediawiki_kiwix',
-						   'forwardCookies' => true
-						   );
+$wgVisualEditorAvailableNamespaces = [
+    "Project" => true
+];
 
-# TimedMediaHandler (videos)
-wfLoadExtension('MwEmbedSupport');
-require_once("$IP/extensions/TimedMediaHandler/TimedMediaHandler.php");
+wfLoadExtension( 'TimedMediaHandler' );
+wfLoadExtension( 'Widgets' );
+
+wfLoadExtension( 'Iframe' );
+$wgIframe = array();
+
+
+wfLoadExtension( 'Thanks' );
 
 # Mantle extensions
 #require_once("$IP/extensions/Mantle/Mantle.php");
@@ -229,14 +257,16 @@ require_once("$IP/extensions/TimedMediaHandler/TimedMediaHandler.php");
 $wgFileExtensions = array_merge( $wgFileExtensions, array( 'doc', 'docx' ) );
 
 # Wikibase
-#$wgEnableWikibaseRepo = true;
-#$wgEnableWikibaseClient = true; 
+$wgEnableWikibaseRepo = false;
+$wgDefaultUserOptions['wlshowwikibase'] = 0;
+$wgUploadWizardConfig['wikibase']['enabled'] = false;
+#$wgEnableWikibaseClient = true;
 #require_once "$IP/extensions/Wikibase/repo/Wikibase.php";
-#require_once "$IP/extensions/Wikibase/repo/ExampleSettings.php"; 
+#require_once "$IP/extensions/Wikibase/repo/ExampleSettings.php";
 #require_once "$IP/extensions/Wikibase/client/WikibaseClient.php";
 #require_once "$IP/extensions/Wikibase/client/ExampleSettings.php";
 
-# Add specific path                                                                                                                  
+# Add specific path
 function add_include_path ($path) {
     foreach (func_get_args() AS $path) {
         if (!file_exists($path) OR (file_exists($path) && filetype($path) !== 'dir')) {
@@ -305,8 +335,10 @@ $wgSessionCacheType = CACHE_MEMCACHED;
 $wgSessionsInObjectCache = true;
 $wgMemCachedServers = array("127.0.0.1:11211");
 
+$wgUseGzip = true;
+
 # Cache user interface
-$wgCacheDirectory = "/dev/shm/";
+$wgCacheDirectory = "/dev/shm/mw";
 $wgEnableSidebarCache = true;
 $wgUseLocalMessageCache = true;
 
@@ -350,7 +382,7 @@ $wgMaxShellTime = 3600;
 $wgMaxShellFileSize = 524288;
 
 # Number of seconds before autoblock entries expire
-$wgAutoblockExpiry = 8640000; 
+$wgAutoblockExpiry = 8640000;
 
 # Allow user customizations
 $wgAllowUserCss = true;
@@ -381,7 +413,7 @@ $wgAllowSlowParserFunctions = true;
 
 # Necessary if you use nginx as reverse proxy
 $wgUsePrivateIPs = true;
-$wgSquidServersNoPurge = array('127.0.0.1');
+$wgSquidServersNoPurge = array("127.0.0.1", "192.168.0.0/16");
 
 # Avoid blocked users to login
 $wgBlockDisablesLogin = true;
@@ -392,6 +424,57 @@ $wgGroupPermissions['*']['edit'] = false;
 
 # Upload file allowed extension
 $wgFileExtensions = array_merge( $wgFileExtensions, array( 'zip', 'ogg', 'webm' ) );
+
+// Additional extensions used on WPEN
+wfLoadExtension( 'VipsScaler' );
+$wgVipsCommand          = "/usr/bin/vips";
+
+wfLoadExtension( 'PagedTiffHandler' );
+$wgTiffUseExiv          = true;
+$wgExiv2Command         = "/usr/bin/exiv2";
+$wgTiffUseTiffinfo      = true;
+$wgTiffTiffinfoCommand  = "/usr/bin/tiffinfo";
+
+wfLoadExtension( 'UniversalLanguageSelector' );
+wfLoadExtension( 'TemplateSandbox' );
+wfLoadExtension( 'PageAssessments' );
+wfLoadExtension( 'CodeMirror' );
+wfLoadExtension( 'CharInsert' );
+wfLoadExtension( 'Kartographer' );
+wfLoadExtension( 'LabeledSectionTransclusion' );
+wfLoadExtension( 'Poem' );
+
+wfLoadExtension( 'TemplateData' );
+$wgTemplateDataUseGUI = true;
+wfLoadExtension( 'TemplateWizard' );
+$wgTemplateDataSuggestedValuesEditor = true;
+
+wfLoadExtension( 'GettingStarted' );
+wfLoadExtension( 'PageImages' );
+wfLoadExtension( 'AdvancedSearch' );
+wfLoadExtension( 'Disambiguator' );
+wfLoadExtension( 'Linter' );
+wfLoadExtension( 'DismissableSiteNotice' );
+wfLoadExtension( 'FileExporter' );
+wfLoadExtension( 'JsonConfig' );
+
+
+// Safety: before extension.json, these values were initialized by JsonConfig.php
+if ( !isset( $wgJsonConfigModels ) ) {
+    $wgJsonConfigModels = [];
+}
+if ( !isset( $wgJsonConfigs ) ) {
+    $wgJsonConfigs = [];
+}
+
+$wgJsonConfigEnableLuaSupport = true;
+
+
+wfLoadExtension( 'MultimediaViewer' );
+wfLoadExtension( 'PageViewInfo' );
+wfLoadExtension( 'SandboxLink' );
+wfLoadExtension( 'TemplateWizard' );
+wfLoadExtension( 'WikiLove' );
 
 # Include the cutom part of the configuration
 $wikifundi_lang = array_key_exists("WIKIFUNDI_LANG", $_SERVER) ? $_SERVER["WIKIFUNDI_LANG"] : getenv('WIKIFUNDI_LANG');

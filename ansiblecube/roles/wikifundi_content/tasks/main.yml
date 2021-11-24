@@ -25,19 +25,18 @@
   with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
   tags: move-content
 
+- name: change WG_SERVER in LocalSettings.custom
+  lineinfile:
+    dest: "{{ mediawiki_root }}/LocalSettings.custom.{{ item }}.php"
+    line: '$wgServer        = "http://{{ item }}.{{ wikifundi_fqdn }}";'
+    insertbefore: '\?>'
+  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  tags: move-content
+
 - stat:
     path: "{{ mediawiki_root }}/LocalSettings.custom.{{ item }}.php"
   with_items: "{{ wikifundi_languages | default(omit) }}"
   register: localsettings_files
-  tags: ['move-content', 'rename']
-
-- name: add parsoid config to LocalSettings.custom
-  lineinfile:
-    dest: "{{ mediawiki_root }}/LocalSettings.custom.{{ item.item }}.php"
-    line: "$wgVirtualRestConfig['modules']['parsoid'] = array('url' => 'http://localhost:8000', 'domain' => '{{ item.item }}.{{ wikifundi_fqdn }}', 'prefix' => 'mediawiki_kiwix', 'forwardCookies' => true);"
-    insertbefore: '\?>'
-  when: item.stat.exists
-  with_items: "{{ localsettings_files.results }}"
   tags: ['move-content', 'rename']
 
 - name: add upload path to LocalSettings.custom
@@ -59,6 +58,22 @@
 - name: move wikifundi database
   command: mv {{ wikifundi_langpack_prefix }}{{ item }}/mw_wikifundi_{{ item }}.sqlite {{ wikifundi_data_root }}/mw_wikifundi_{{ item }}.sqlite
   with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  tags: move-content
+
+- name: start memcached
+  service:
+    name: memcached
+    state: started
+  tags: move-content
+
+- name: Run update script
+  environment:
+    WIKIFUNDI_LANG: "{{ item }}"
+  command: php maintenance/update.php --quick
+  args:
+    chdir: "{{ mediawiki_root }}"
+  with_items: "{{ ansible_local.config.wikifundi_languages | default(omit) }}"
+  when: ansible_local.config.admin_account is defined
   tags: move-content
 
 - name: Add admin account to Wikifundi

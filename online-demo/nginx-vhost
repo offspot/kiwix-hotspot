@@ -5,7 +5,7 @@
 
 server {
 	listen 80;
-	server_name demo.hotspot.kiwix.org kiwix.demo.hotspot.kiwix.org sites.demo.hotspot.kiwix.org khanacademy.demo.hotspot.kiwix.org aflatoun.demo.hotspot.kiwix.org edupi.demo.hotspot.kiwix.org fr.wikifundi.demo.hotspot.kiwix.org en.wikifundi.demo.hotspot.kiwix.org;
+	server_name demo.hotspot.kiwix.org kiwix.demo.hotspot.kiwix.org sites.demo.hotspot.kiwix.org khanacademy.demo.hotspot.kiwix.org aflatoun.demo.hotspot.kiwix.org edupi.demo.hotspot.kiwix.org fr.wikifundi.demo.hotspot.kiwix.org es.wikifundi.demo.hotspot.kiwix.org en.wikifundi.demo.hotspot.kiwix.org;
 	root /var/www;
 	autoindex on;
 

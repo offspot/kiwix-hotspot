@@ -790,6 +790,7 @@ class Application:
         return [
             ("fr", self.component.wikifundi_fr_check_button),
             ("en", self.component.wikifundi_en_check_button),
+            ("es", self.component.wikifundi_es_check_button),
         ]
 
     def space_error_window_ok_button_clicked(self, widget):
