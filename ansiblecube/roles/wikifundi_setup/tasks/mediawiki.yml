@@ -17,7 +17,7 @@
   environment:
     RUNLEVEL: 1
   apt:
-    name: php{{ php_version }}-fpm,php{{ php_version }}-sqlite3,php{{ php_version }}-intl,php{{ php_version }}-mbstring,php{{ php_version }}-xml,php{{ php_version }}-curl,php{{ php_version }}-gd
+    name: php{{ php_version }}-fpm,php{{ php_version }}-sqlite3,php{{ php_version }}-intl,php{{ php_version }}-mbstring,php{{ php_version }}-xml,php{{ php_version }}-curl,php{{ php_version }}-gd,php{{ php_version }}-gmp
     state: latest
     autoremove: yes
     autoclean: yes
