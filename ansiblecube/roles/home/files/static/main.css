@@ -493,6 +493,7 @@ header h1 a {
     top: 25px;
     left: -50px;
     float: right;
+    display: none;
 }
 html[dir='rtl'] .boxid {
     float: left;
