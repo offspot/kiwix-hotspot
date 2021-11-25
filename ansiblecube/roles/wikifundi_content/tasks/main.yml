@@ -1,4 +1,11 @@
 ---
+# should be removed on next master release (already in mediawiki setup)
+- name: increase mediawiki UI timeout
+  command: sed -i 's/30/150/g' resources/src/mediawiki.api/index.js
+  args:
+    chdir: "{{ mediawiki_root }}"
+  tags: move-content
+
 - name: make sure wikifundi data folder exists
   file:
     path: "{{ wikifundi_data_root }}"

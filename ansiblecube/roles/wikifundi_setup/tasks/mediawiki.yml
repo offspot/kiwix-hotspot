@@ -95,6 +95,12 @@
   command: tar -C {{ mediawiki_root }} -x --strip-components=1 -f /tmp/mediawiki.tar.bz2
   tags: setup
 
+- name: increase mediawiki UI timeout
+  command: sed -i 's/30/150/g' resources/src/mediawiki.api/index.js
+  args:
+    chdir: "{{ mediawiki_root }}"
+  tags: setup
+
 - name: change ownership of folders
   file:
     path: "{{ mediawiki_root }}/{{ item }}"
