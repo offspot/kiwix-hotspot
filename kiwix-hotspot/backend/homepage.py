@@ -229,7 +229,7 @@ def generate_homepage(logger, options):
                     ),
                     "css_class": css_class,
                     "title": package.get("name"),
-                    "description": package.get("description"),
+                    "description": package.get("description", "")[:100] or None,
                     "fa": "",
                 }
             )

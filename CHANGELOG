@@ -4,6 +4,7 @@
 * New 2021-11 WikiFundi package for all languages
 * Updated Nomad to include secondary school APK
 * Removed (hide) project name in home page (#618)
+* ZIM description limited to 100 characters in homepage (#534)
 
 2.4.8
 
