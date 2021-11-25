@@ -116,13 +116,13 @@
         "archive_size": 22402590720,
         "expanded_size": 26901218918
     },
-    "nomad_apk": {
-        "url": "{mirror}/other/nomad/nomadeducation-ecoles_2.7.0.apk",
-        "name": "ecoles_numeriques.apk",
+    "nomad_zip": {
+        "url": "{mirror}/other/nomad/nomadeducation_2021-11.zip",
+        "name": "nomadeducation_2021-11.zip",
         "folder_name": null,
-        "checksum": "2d6c51458ebcddbd4d7f0b28d68203ef0af734940b562fcc4c28910e9e2a8f1d",
-        "archive_size": 51473201,
-        "expanded_size": 51473201
+        "checksum": "385a87e86ad11d913504c512b950ea85a77de872b0b3434cc632c101b77bb5ac",
+        "archive_size": 120999731,
+        "expanded_size": 120999731
     },
     "mathews_apk": {
         "url": "{mirror}/other/mathews/mathmathews_1.6.apk",

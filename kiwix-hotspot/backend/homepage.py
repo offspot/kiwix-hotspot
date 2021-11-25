@@ -79,7 +79,7 @@ def generate_homepage(logger, options):
 
     if options["nomad"]:
         noamad_fqdn = "nomad.{fqdn}".format(fqdn=fqdn)
-        title = "Nomad exercices du CP au CM2"
+        title = "Nomad exercices du CP à la 3è"
         description = "Téléchargez l'application pour android"
         if options["language"] == "fr":
             category = "Accès"

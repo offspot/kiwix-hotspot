@@ -201,7 +201,7 @@ def get_edupi_contents(enable=False, resources_path=None):
 
 def get_nomad_contents(enable=False):
     """ nomad: only contains one APK """
-    return [get_content("nomad_apk")]
+    return [get_content("nomad_zip")]
 
 
 def get_mathews_contents(enable=False):
@@ -325,13 +325,13 @@ def run_nomad_actions(cache_folder, mount_point, logger, enable=False):
     if not enable:
         return
 
-    nomad_apk = get_content("nomad_apk")
+    nomad_ark = get_content("nomad_zip")
     nomad_folder = os.path.join(mount_point, "nomad")
-    os.makedirs(nomad_folder, exist_ok=True)
-    copy(
-        content=nomad_apk,
+    extract_and_move(
+        content=nomad_ark,
         cache_folder=cache_folder,
-        final_path=os.path.join(nomad_folder, nomad_apk["name"]),
+        root_path=mount_point,
+        final_path=nomad_folder,
         logger=logger,
     )
 
