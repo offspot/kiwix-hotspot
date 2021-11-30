@@ -6,11 +6,11 @@ This solution serves offline content (using [kiwix-serve](https://github.com/kiw
 
 Kiwix Hotspot configures the RaspberryPi image into a WiFi hotspot with offline contents.
 
-[![latest release](https://img.shields.io/github/v/tag/kiwix/kiwix-hotspot?label=latest%20release&sort=semver)](https://download.kiwix.org/release/kiwix-hotspot/)
-[![CodeFactor](https://www.codefactor.io/repository/github/kiwix/kiwix-hotspot/badge)](https://www.codefactor.io/repository/github/kiwix/kiwix-hotspot)
+[![latest release](https://img.shields.io/github/v/tag/offspot/kiwix-hotspot?label=latest%20release&sort=semver)](https://download.kiwix.org/release/kiwix-hotspot/)
+[![CodeFactor](https://www.codefactor.io/repository/github/offspot/kiwix-hotspot/badge)](https://www.codefactor.io/repository/github/offspot/kiwix-hotspot)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![CI build](https://github.com/kiwix/kiwix-hotspot/actions/workflows/build.yml/badge.svg)](https://github.com/kiwix/kiwix-hotspot/actions/workflows/build.yml)
-[![create master](https://github.com/kiwix/kiwix-hotspot/actions/workflows/create-master.yml/badge.svg)](https://github.com/kiwix/kiwix-hotspot/actions/workflows/create-master.yml)
+[![CI build](https://github.com/offspot/kiwix-hotspot/actions/workflows/build.yml/badge.svg)](https://github.com/offspot/kiwix-hotspot/actions/workflows/build.yml)
+[![create master](https://github.com/offspot/kiwix-hotspot/actions/workflows/create-master.yml/badge.svg)](https://github.com/offspot/kiwix-hotspot/actions/workflows/create-master.yml)
 
 Building an hotspot image is a long and resources consuming process (from 30mn to 7h+ depending on your content selection, Internet bandwidth and computer power).
 
