@@ -50,7 +50,7 @@
         "expanded_size": 10071138304
     },
     "wikifundi_langpack_es": {
-        "url": "{mirror}/other/wikifundi/2.0/mediawiki_data_es_2021-11.tar.bz2",
+        "url": "{mirror}/other/wikifundi/3.0/mediawiki_data_es_2021-11.tar.bz2",
         "name": "mediawiki_data_es_2021-11.tar.bz2",
         "folder_name": "data",
         "checksum": "1e5119e3f5a2cd39e34c1ea3f62409a9010e6db9ceb73a808434898932235ff4",
@@ -58,7 +58,7 @@
         "expanded_size": 12299411456
     },
     "wikifundi_langpack_en": {
-        "url": "{mirror}/other/wikifundi/2.0/mediawiki_data_en_2021-11.tar.bz2",
+        "url": "{mirror}/other/wikifundi/3.0/mediawiki_data_en_2021-11.tar.bz2",
         "name": "mediawiki_data_en_2021-11.tar.bz2",
         "folder_name": "data",
         "checksum": "02f285987e94ecf495affeeaec118ccd49a1eae0cd238a1ae9914693ff3a1bec",
