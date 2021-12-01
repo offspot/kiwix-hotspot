@@ -450,7 +450,16 @@ def mount_data_partition(image_fpath, logger):
 
         try:
             subprocess_pretty_check_call(
-                [mount_exe, "-t", "exfat", target_dev, mount_point], logger
+                [
+                    mount_exe,
+                    "-t",
+                    "exfat",
+                    "-o",
+                    "iocharset=utf16",
+                    target_dev,
+                    mount_point,
+                ],
+                logger,
             )
         except Exception:
             # ensure we release the loop device on mount failure
