@@ -42,28 +42,28 @@
         "expanded_size": 2097152
     },
     "wikifundi_langpack_fr": {
-        "url": "{mirror}/other/wikifundi/3.0/mediawiki_data_fr_2021-11.tar.bz2",
-        "name": "mediawiki_data_fr_2021-11.tar.bz2",
+        "url": "{mirror}/other/wikifundi/3.0/mediawiki_data_fr_2021-12.tar.bz2",
+        "name": "mediawiki_data_fr_2021-12.tar.bz2",
         "folder_name": "data",
-        "checksum": "6bf94ec70f6a5e4503ce08d3cb456d4f688d4387dec836d19f32856b78e09023",
-        "archive_size": 4118012908,
-        "expanded_size": 10071138304
+        "checksum": "20a30f3970a49192b2f5e0bc7de5d450441dd38759341b17290233ed1fabf0bd",
+        "archive_size": 4037106277,
+        "expanded_size": 4756688896
     },
     "wikifundi_langpack_es": {
-        "url": "{mirror}/other/wikifundi/3.0/mediawiki_data_es_2021-11.tar.bz2",
-        "name": "mediawiki_data_es_2021-11.tar.bz2",
+        "url": "{mirror}/other/wikifundi/3.0/mediawiki_data_es_2021-12.tar.bz2",
+        "name": "mediawiki_data_es_2021-12.tar.bz2",
         "folder_name": "data",
-        "checksum": "1e5119e3f5a2cd39e34c1ea3f62409a9010e6db9ceb73a808434898932235ff4",
-        "archive_size": 4735719538,
-        "expanded_size": 12299411456
+        "checksum": "71d296cd2bebf689ec747752f1a940198f84358d98d7f9ec477d9f9e6330fd43",
+        "archive_size": 4649860767,
+        "expanded_size": 5886746624
     },
     "wikifundi_langpack_en": {
-        "url": "{mirror}/other/wikifundi/3.0/mediawiki_data_en_2021-11.tar.bz2",
-        "name": "mediawiki_data_en_2021-11.tar.bz2",
+        "url": "{mirror}/other/wikifundi/3.0/mediawiki_data_en_2021-12.tar.bz2",
+        "name": "mediawiki_data_en_2021-12.tar.bz2",
         "folder_name": "data",
-        "checksum": "02f285987e94ecf495affeeaec118ccd49a1eae0cd238a1ae9914693ff3a1bec",
-        "archive_size": 4427045002,
-        "expanded_size": 11633336320
+        "checksum": "03dd9eb46783fb6c0e319391bac51846b7c2936c704698f41cea9dc2db61eee0",
+        "archive_size": 4339240313,
+        "expanded_size": 5512069120
     },
     "kalite_langpack_fr": {
         "url": "{mirror}/other/kalite/langpack_fr_0.17.zip",

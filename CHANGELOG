@@ -1,3 +1,7 @@
+2.4.10
+
+* Updated WikiFundi packages (failed to extract on Linux and Windows)
+
 2.4.9
 
 * Using new 2021-11-24 master image
