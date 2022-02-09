@@ -1,3 +1,7 @@
+2.4.11
+
+* Updated kiwix-serve to 3.2.0-1
+
 2.4.10
 
 * Updated WikiFundi packages (failed to extract on Linux and Windows)
