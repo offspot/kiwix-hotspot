@@ -40,7 +40,7 @@ python3_version: "3.5"
 php_version: "7.3"
 nomad_version: "2.7.0"
 mathews_version: "1.6"
-africatik: "1.0.1"
+africatik: "202202"
 
 # Apps path
 venvs_root: /home/{{ username }}/venvs
