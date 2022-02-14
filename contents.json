@@ -133,11 +133,11 @@
         "expanded_size": 35420045
     },
     "africatik_all": {
-        "url": "{mirror}/other/africatik/africatik-1.0.2.zip",
-        "name": "africatik-1.0.2.zip",
+        "url": "https://drive.offspot.it/africatik/africatik-202202.zip",
+        "name": "africatik-202202.zip",
         "folder_name": null,
-        "checksum": "003e9af9181db847d599d1e1ba71585b6717fe2f3c95a508b53cdfc6e8006f09",
-        "archive_size": 2765216942,
-        "expanded_size": 2765216942
+        "checksum": "39e93aa560f856029dbda3481c680af899381c25e05b09c78e3cf16e166b7181",
+        "archive_size": 9410157927,
+        "expanded_size": 9410157927
     }
 }
