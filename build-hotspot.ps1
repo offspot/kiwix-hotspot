@@ -15,7 +15,7 @@ function ThrowOnNativeFailure {
 echo "### Starting kiwix-hotspot build ###"
 
 echo "[*] Installing 7zip"
-curl.exe -L -O http://mirror.download.kiwix.org/dev/7zcli1900.zip
+curl.exe -L -O https://drive.offspot.it/creator/build-dependencies/7zcli1900.zip
 ThrowOnNativeFailure
 Expand-Archive -LiteralPath 7zcli1900.zip -DestinationPath C:\
 Test-Path -Path 'C:\7za.exe' -PathType Leaf

@@ -31,7 +31,7 @@ fi
 
 if [ ! -f ~/zImage ] ; then
 	echo "kernel files not present, downloading"
-	wget -O ~/boot.zip http://download.kiwix.org/dev/vexpress-boot.zip
+	wget -O ~/boot.zip https://drive.offspot.it/creator/bundled-in-creator/vexpress-boot.zip
 	unzip boot.zip
 	mv ~/vexpress-boot/* ~/.
 	rmdir ~/vexpress-boot

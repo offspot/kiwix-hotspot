@@ -217,13 +217,8 @@ parser.add_argument(
     action="store_true",
     help="Don't use udisks2 (linux-only, must be ran as root)",
 )
-parser.add_argument("--mirror", help="Kiwix mirror to download from.")
 
 args = parser.parse_args()
-
-# change mirror early if requested
-if args.mirror:
-    data.mirror = args.mirror
 
 # handle root option (disable udisks use)
 if args.root:

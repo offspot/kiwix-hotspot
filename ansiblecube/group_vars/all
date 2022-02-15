@@ -25,7 +25,6 @@ root_partition_size: 7000000000
 username: user
 group: user
 password: $6$YcJS1HjRAv/$1bUosoPalzHEvfpx71UhnG6vCeckTGbA5U1i6UpA8X21Jrv7fYRPyNrq/YWuiBp3xQWd5kRRhrKKPHcbTkkfQ/
-mirror: https://download.kiwix.org
 timezone: "Europe/Paris"
 language: "en"
 language_name: "English"

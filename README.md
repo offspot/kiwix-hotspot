@@ -51,7 +51,6 @@ usage: kiwix-hotspot [-h] [--name NAME] [--timezone TIMEZONE]
   --ram RAM             Max RAM for QEMU
   --sdcard SDCARD       Device to copy image to
   --root                Don't use udisks2 (linux-only, must be ran as root)
-  --mirror MIRROR       Kiwix mirror to download from.
 ```
 
 ## Run kiwix-hotspot from source

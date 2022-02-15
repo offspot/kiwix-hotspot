@@ -10,7 +10,7 @@
 
 - name: Download Aflatoun
   get_url:
-    url: "{{ mirror }}/other/aflatoun/ka-lite-static-0.16.7b3.tar.gz"
+    url: "https://drive.offspot.it/aflatoun/ka-lite-static-0.16.7b3.tar.gz"
     dest: /tmp/ka-lite-static-0.16.7b3.tar.gz
   tags: setup
 

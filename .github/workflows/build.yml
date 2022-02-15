@@ -52,23 +52,23 @@ jobs:
 
       - name: download custom kernel
         run: |
-          wget http://mirror.download.kiwix.org/dev/vexpress-boot.zip
+          wget https://drive.offspot.it/creator/bundled-in-creator/vexpress-boot.zip
           unzip vexpress-boot.zip
       - name: download static Qemu
         run: |
-          wget http://mirror.download.kiwix.org/dev/qemu-5.2.0-linux-x86_64.tar.gz
+          wget https://drive.offspot.it/creator/bundled-in-creator/qemu-5.2.0-linux-x86_64.tar.gz
           tar xvf qemu-5.2.0-linux-x86_64.tar.gz
       - name: download etcher-cli (packaging only)
         run: |
-          wget http://mirror.download.kiwix.org/dev/balena-etcher-cli-1.4.8-linux-x64.tar.gz
+          wget https://drive.offspot.it/creator/bundled-in-creator/balena-etcher-cli-1.4.8-linux-x64.tar.gz
           mkdir -p etcher-cli
           tar xf balena-etcher-cli-1.4.8-linux-x64.tar.gz -C etcher-cli --strip-components=1
       - name: download aria2c (packaging only)
         run: |
-          wget http://mirror.download.kiwix.org/dev/aria2c-linux64.zip
+          wget https://drive.offspot.it/creator/bundled-in-creator/aria2c-linux64.zip
           unzip aria2c-linux64.zip
           rm aria2c-linux64.zip
-          wget http://mirror.download.kiwix.org/dev/ca-certificates.crt
+          wget https://drive.offspot.it/creator/bundled-in-creator/ca-certificates.crt
 
       - name: install python deps
         run: |
@@ -153,26 +153,26 @@ jobs:
 
       - name: Download vexpress-boot
         run: |
-          wget http://mirror.download.kiwix.org/dev/vexpress-boot.zip
+          wget https://drive.offspot.it/creator/bundled-in-creator/vexpress-boot.zip
           unzip vexpress-boot.zip
 
       - name: Bundle QEMU
         run: |
-          wget http://mirror.download.kiwix.org/dev/qemu-5.2.0_macOS.tar
-          tar xf qemu-5.2.0_macOS.tar
+          wget https://drive.offspot.it/creator/bundled-in-creator/qemu-5.2.0-macOS.tar
+          tar xf qemu-5.2.0-macOS.tar
 
       - name: Bundle Etcher-cli
         run: |
-          wget http://mirror.download.kiwix.org/dev/balena-etcher-cli-1.4.8-darwin-x64.tar.gz
+          wget https://drive.offspot.it/creator/bundled-in-creator/balena-etcher-cli-1.4.8-darwin-x64.tar.gz
           mkdir -p etcher-cli
           tar xf balena-etcher-cli-1.4.8-darwin-x64.tar.gz -C etcher-cli --strip-components=1
 
       - name: Bundle aria2c
         run: |
-          wget http://mirror.download.kiwix.org/dev/aria2c-darwin.zip
+          wget https://drive.offspot.it/creator/bundled-in-creator/aria2c-darwin.zip
           unzip aria2c-darwin.zip
           rm aria2c-darwin.zip
-          wget http://mirror.download.kiwix.org/dev/ca-certificates.crt
+          wget https://drive.offspot.it/creator/bundled-in-creator/ca-certificates.crt
 
       - name: Run PyInstaller
         run: pyinstaller --log-level=DEBUG kiwix-hotspot-macos.spec
@@ -291,14 +291,14 @@ jobs:
 
       - name: Download vexpress-boot
         run: |
-          curl.exe -L -O http://mirror.download.kiwix.org/dev/vexpress-boot.zip
+          curl.exe -L -O https://drive.offspot.it/creator/bundled-in-creator/vexpress-boot.zip
           7z x vexpress-boot.zip
 
       - name: install QEMU
         run: |
           mkdir "assets\qemu"
           cd "assets\qemu"
-          curl.exe -L -O http://mirror.download.kiwix.org/dev/qemu-w64-setup-20210203.exe
+          curl.exe -L -O https://drive.offspot.it/creator/bundled-in-creator/qemu-w64-setup-20210203.exe
           7z.exe x qemu-w64-setup-20210203.exe
           del qemu-w64-setup-20210203.exe
           move qemu-system-arm.exe qemu-arm.exe
@@ -315,9 +315,9 @@ jobs:
         run: |
           mkdir "assets\7zextra"
           cd "assets\7zextra"
-          curl.exe -L -O http://mirror.download.kiwix.org/dev/7z920_extra.7z
+          curl.exe -L -O https://drive.offspot.it/creator/bundled-in-creator/7z920_extra.7z
           7z.exe x 7z920_extra.7z
-          curl.exe -L -O http://mirror.download.kiwix.org/dev/7z1805-extra.7z
+          curl.exe -L -O https://drive.offspot.it/creator/bundled-in-creator/7z1805-extra.7z
           7z.exe -y x 7z1805-extra.7z
           cd ..\..
 
@@ -325,7 +325,7 @@ jobs:
         run: |
           mkdir "assets\imdiskinst"
           cd "assets\imdiskinst"
-          curl.exe -L -o imdiskinst.exe http://mirror.download.kiwix.org/dev/imdiskinst.exe
+          curl.exe -L -o imdiskinst.exe https://drive.offspot.it/creator/bundled-in-creator/imdiskinst.exe
           7z.exe x imdiskinst.exe
           del imdiskinst.exe
           cd ..\..
@@ -334,7 +334,7 @@ jobs:
         run: |
           mkdir "assets\etcher-cli"
           cd "assets\etcher-cli"
-          curl.exe -L -o etcher-cli.zip http://mirror.download.kiwix.org/dev/Etcher-cli-1.1.2-win32-x64.zip
+          curl.exe -L -o etcher-cli.zip https://drive.offspot.it/creator/bundled-in-creator/Etcher-cli-1.1.2-win32-x64.zip
           7z.exe x etcher-cli.zip
           del etcher-cli.zip
           cd ..\..
@@ -342,10 +342,10 @@ jobs:
       - name: Download aria2
         run: |
           cd $Env:GITHUB_WORKSPACE
-          curl.exe -L -o aria2c.zip http://mirror.download.kiwix.org/dev/aria2c-win64.zip
+          curl.exe -L -o aria2c.zip https://drive.offspot.it/creator/bundled-in-creator/aria2c-win64.zip
           7z.exe x aria2c.zip
           del aria2c.zip
-          curl.exe -L -o ca-certificates.crt http://mirror.download.kiwix.org/dev/ca-certificates.crt
+          curl.exe -L -o ca-certificates.crt https://drive.offspot.it/creator/bundled-in-creator/ca-certificates.crt
 
       - name: build pyinstaller in docker
         run: docker.exe run -e MSYSURL=${Env:MSYSURL} -v ${Env:GITHUB_WORKSPACE}:'c:\code' mcr.microsoft.com/windows/servercore:ltsc2019 powershell.exe -File C:\code\build-hotspot.ps1
@@ -359,7 +359,7 @@ jobs:
         run: |
           mkdir C:\resource_hacker
           cd C:\resource_hacker
-          curl.exe -L -o resource_hacker.zip http://mirror.download.kiwix.org/dev/resource_hacker518.zip
+          curl.exe -L -o resource_hacker.zip https://drive.offspot.it/creator/build-dependencies/resource_hacker518.zip
           7z.exe x resource_hacker.zip
           del resource_hacker.zip
 

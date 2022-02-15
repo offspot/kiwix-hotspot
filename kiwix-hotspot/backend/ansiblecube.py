@@ -12,7 +12,6 @@ try:
 except ImportError:
     from yaml import SafeDumper as Dumper
 
-from data import mirror
 from version import get_version_str
 from backend.content import get_content
 from backend.catalog import CATALOGS, get_catalogs
@@ -148,7 +147,6 @@ def build_extra_vars(
     extra_vars = {
         # predefined defaults we want to superseed whichever in ansiblecube
         "installer_version": get_version_str(),
-        "mirror": mirror,
         "catalogs": CATALOGS,
         "kernel_version": get_content("raspbian_image").get("kernel_version"),
         "root_partition_size": root_partition_size,
