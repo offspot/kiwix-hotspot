@@ -59,9 +59,7 @@ def generate_random_name():
 def get_free_port():
     with socket.socket() as s:
         s.bind(("", 0))
-        port = s.getsockname()[1]
-
-    return port
+        return s.getsockname()[1]
 
 
 def get_qemu_image_size(image_fpath, logger):
@@ -99,7 +97,7 @@ class Emulator:
         self._set_ram(ram.lower())
 
     def _set_ram(self, requested_ram):
-        """ applies requested RAM to qemu if it's available otherwise less """
+        """applies requested RAM to qemu if it's available otherwise less"""
 
         # less than a GB is very short
         if host_ram / ONE_GiB <= 1.0:
@@ -213,7 +211,7 @@ class _RunningInstance:
                 return
 
     def _boot(self):
-        ssh_port = get_free_port()
+        ssh_port = int(os.getenv("QEMU_SSH_PORT", get_free_port()))
 
         stdout_reader, stdout_writer = os.pipe()
         stdin_reader, stdin_writer = os.pipe()
