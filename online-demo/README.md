@@ -37,7 +37,7 @@ Please, update the scripts to your needs.
 apt install -y uml-utilities unzip nginx
 
 # download a regular static qemu (linux64). We need qemu 2.8+
-wget http://download.kiwix.org/dev/qemu-2.12.0-linux-x86_64.tar.gz
+wget https://drive.offspot.it/creator/bundled-in-creator/qemu-5.2.0-linux-x86_64.tar.gz
 tar xf qemu-*.tar.gz
 mv qemu-{system-arm,img} /usr/local/bin/
 

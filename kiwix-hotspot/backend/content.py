@@ -8,7 +8,7 @@ import itertools
 
 import requests
 
-from data import content_file, mirror
+from data import content_file
 from backend.catalog import get_catalogs
 from backend.download import get_content_cache, unarchive
 from util import (
@@ -17,9 +17,6 @@ from util import (
 # prepare CONTENTS from JSON file
 with open(content_file, "r") as fp:
     CONTENTS = json.load(fp)
-    for key, dl_data in CONTENTS.items():
-        if "url" in dl_data.keys():
-            CONTENTS[key]["url"] = CONTENTS[key]["url"].format(mirror=mirror)
 
 
 def get_content(key):
@@ -244,7 +241,7 @@ def get_package_content(package_id):
             package.update({"ext": "zip" if package["type"] != "zim" else "zim"})
             package.update({"langid": package.get("langid") or package_id})
             return {
-                "url": package["url"].replace("http://download.kiwix.org", mirror),
+                "url": package["url"],
                 "name": "{langid}.{ext}".format(**package),
                 "checksum": package["sha256sum"],
                 "archive_size": package["size"],

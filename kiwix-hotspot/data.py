@@ -23,7 +23,6 @@ content_file = os.path.join(data_dir, "contents.json")
 
 ansiblecube_path = os.path.join(data_dir, "ansiblecube")
 
-mirror = os.getenv("HOTSPOT_MIRROR", "http://download.kiwix.org")
 sdcard_sizes = (16, 32, 64, 128, 200, 256)
 
 http_proxy_test_url = "http://download.kiwix.org/library/ideascube.yml"

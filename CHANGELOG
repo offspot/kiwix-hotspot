@@ -2,6 +2,8 @@
 
 * Updated kiwix-serve to 3.2.0-1
 * Updated africatik package to 202202
+* Changed download origin (download.kiwix.org to drive.offspot.it) and removed --mirror
+* Updated download trust store
 
 2.4.10
 

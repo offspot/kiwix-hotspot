@@ -15,7 +15,7 @@
   tags: reconfigure
 
 - name: replace 20190114 Broadcom/Cypress firmware with older (2015 for 0 and 2018 for 3+) versions
-  shell: cp -v /lib/firmware/brcm/brcmfmac43455-sdio.bin /lib/firmware/brcm/brcmfmac43455-sdio.bin.orig && cp -v /lib/firmware/brcm/brcmfmac43430-sdio.bin /lib/firmware/brcm/brcmfmac43430-sdio.bin.orig && wget http://mirror.download.kiwix.org/dev/firmware-brcm80211-old.zip && unzip -o -d /lib/firmware/brcm firmware-brcm80211-old.zip && chmod 644 /lib/firmware/*
+  shell: cp -v /lib/firmware/brcm/brcmfmac43455-sdio.bin /lib/firmware/brcm/brcmfmac43455-sdio.bin.orig && cp -v /lib/firmware/brcm/brcmfmac43430-sdio.bin /lib/firmware/brcm/brcmfmac43430-sdio.bin.orig && wget https://drive.offspot.it/creator/installed-in-master/firmware-brcm80211-old.zip && unzip -o -d /lib/firmware/brcm firmware-brcm80211-old.zip && chmod 644 /lib/firmware/*
   tags: reconfigure
 
 - name: remove resize_fs from first boot

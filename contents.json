@@ -8,7 +8,7 @@
         "expanded_size": 1866465280
     },
     "hotspot_master_image": {
-        "url": "{mirror}/release/kiwix-hotspot/master/kiwix-hotspot_master_2021-11-24.img.zip",
+        "url": "https://drive.offspot.it/master/kiwix-hotspot_master_2021-11-24.img.zip",
         "name": "kiwix-hotspot_master_2021-11-24.img.zip",
         "root_partition_size": 7000000000,
         "checksum": "7f2901c5308989c4b9d535c48d3f69d14f26248121e5efa0de1645e471f01c13",
@@ -16,7 +16,7 @@
         "expanded_size": 8589934592
     },
     "aflatoun_content": {
-        "url": "{mirror}/other/aflatoun/content.tar.gz",
+        "url": "https://drive.offspot.it/aflatoun/content.tar.gz",
         "name": "aflatoun_content.tar.gz",
         "folder_name": "content",
         "checksum": "396e8850d8f0bbd5ad0252d7dca30791d132d28918654666e8400bf2858b89f7",
@@ -24,7 +24,7 @@
         "expanded_size": 3742367744
     },
     "aflatoun_langpack_fr": {
-        "url": "{mirror}/other/aflatoun/fr.zip",
+        "url": "https://drive.offspot.it/aflatoun/fr.zip",
         "name": "aflatoun_pack_fr.zip",
         "folder_name": null,
         "checksum": "936e9f7051b5a9cba7fef61e4598568588f2ba6f1aa441b42234c8e41d11e372",
@@ -33,7 +33,7 @@
         "expanded_size": 1966080
     },
     "aflatoun_langpack_en": {
-        "url": "{mirror}/other/aflatoun/en.zip",
+        "url": "https://drive.offspot.it/aflatoun/en.zip",
         "name": "aflatoun_pack_en.zip",
         "folder_name": null,
         "checksum": "77ef69f7acd596cbf7c59c7f9316d3a97127d70b097af80cd20ef275801a4358",
@@ -42,7 +42,7 @@
         "expanded_size": 2097152
     },
     "wikifundi_langpack_fr": {
-        "url": "{mirror}/other/wikifundi/3.0/mediawiki_data_fr_2021-12.tar.bz2",
+        "url": "https://drive.offspot.it/wikifundi/mediawiki_data_fr_2021-12.tar.bz2",
         "name": "mediawiki_data_fr_2021-12.tar.bz2",
         "folder_name": "data",
         "checksum": "20a30f3970a49192b2f5e0bc7de5d450441dd38759341b17290233ed1fabf0bd",
@@ -50,7 +50,7 @@
         "expanded_size": 4756688896
     },
     "wikifundi_langpack_es": {
-        "url": "{mirror}/other/wikifundi/3.0/mediawiki_data_es_2021-12.tar.bz2",
+        "url": "https://drive.offspot.it/wikifundi/mediawiki_data_es_2021-12.tar.bz2",
         "name": "mediawiki_data_es_2021-12.tar.bz2",
         "folder_name": "data",
         "checksum": "71d296cd2bebf689ec747752f1a940198f84358d98d7f9ec477d9f9e6330fd43",
@@ -58,7 +58,7 @@
         "expanded_size": 5886746624
     },
     "wikifundi_langpack_en": {
-        "url": "{mirror}/other/wikifundi/3.0/mediawiki_data_en_2021-12.tar.bz2",
+        "url": "https://drive.offspot.it/wikifundi/mediawiki_data_en_2021-12.tar.bz2",
         "name": "mediawiki_data_en_2021-12.tar.bz2",
         "folder_name": "data",
         "checksum": "03dd9eb46783fb6c0e319391bac51846b7c2936c704698f41cea9dc2db61eee0",
@@ -66,7 +66,7 @@
         "expanded_size": 5512069120
     },
     "kalite_langpack_fr": {
-        "url": "{mirror}/other/kalite/langpack_fr_0.17.zip",
+        "url": "https://drive.offspot.it/kalite/langpack_fr_0.17.zip",
         "name": "kalite_pack_fr.zip",
         "folder_name": null,
         "checksum": "90807ceff17694d74a7748dab76c5765cd87347ea09b260ba83604c2f4b4019b",
@@ -75,7 +75,7 @@
         "expanded_size": 102690816
     },
     "kalite_langpack_en": {
-        "url": "{mirror}/other/kalite/langpack_en_0.17.zip",
+        "url": "https://drive.offspot.it/kalite/langpack_en_0.17.zip",
         "name": "kalite_pack_en.zip",
         "folder_name": null,
         "checksum": "011d45a47df66de445526122495b7146f755bceb0186219b834b244223aae059",
@@ -84,7 +84,7 @@
         "expanded_size": 1117425664
     },
     "kalite_langpack_es": {
-        "url": "{mirror}/other/kalite/langpack_es_0.17.zip",
+        "url": "https://drive.offspot.it/kalite/langpack_es_0.17.zip",
         "name": "kalite_pack_es.zip",
         "folder_name": null,
         "checksum": "69567e9fe94ed6185af1ee3f1bde31bebf474d9e7019f516402d35a214aeea72",
@@ -93,7 +93,7 @@
         "expanded_size": 95309824
     },
     "kalite_videos_fr": {
-        "url": "{mirror}/other/kalite/videos_fr_0.17.tar",
+        "url": "https://drive.offspot.it/kalite/videos_fr_0.17.tar",
         "name": "kalite_videos_fr.tar",
         "folder_name": "kalite_videos_fr",
         "checksum": "4fd0e13b6ed02c3d7b3abac7d913ffb8b3e792405b5a7be6c5547faccbae1f47",
@@ -101,7 +101,7 @@
         "expanded_size": 13675998412
     },
     "kalite_videos_en": {
-        "url": "{mirror}/other/kalite/videos_en_0.17.tar",
+        "url": "https://drive.offspot.it/kalite/videos_en_0.17.tar",
         "name": "kalite_videos_en.tar",
         "folder_name": "kalite_videos_en",
         "checksum": "4f459155682535ddf82f4f58a888a19256a0bee3441ec344393e3e3c9c193c4c",
@@ -109,7 +109,7 @@
         "expanded_size": 56172817612
     },
     "kalite_videos_es": {
-        "url": "{mirror}/other/kalite/videos_es_0.17.tar",
+        "url": "https://drive.offspot.it/kalite/videos_es_0.17.tar",
         "name": "kalite_videos_es.tar",
         "folder_name": "kalite_videos_es",
         "checksum": "ab155d0c66d3fde43ec7c99b28ef72a03c304e9f9dab1e0ca75332c7cb202ff5",
@@ -117,7 +117,7 @@
         "expanded_size": 26901218918
     },
     "nomad_zip": {
-        "url": "{mirror}/other/nomad/nomadeducation_2021-11.zip",
+        "url": "https://drive.offspot.it/nomad/nomadeducation_2021-11.zip",
         "name": "nomadeducation_2021-11.zip",
         "folder_name": null,
         "checksum": "385a87e86ad11d913504c512b950ea85a77de872b0b3434cc632c101b77bb5ac",
@@ -125,7 +125,7 @@
         "expanded_size": 120999731
     },
     "mathews_apk": {
-        "url": "{mirror}/other/mathews/mathmathews_1.6.apk",
+        "url": "https://drive.offspot.it/mathews/mathmathews_1.6.apk",
         "name": "math_mathews.apk",
         "folder_name": null,
         "checksum": "a779239f0e948ccff808552bf134723c2315b3fc22765bffb10dca62ac333e3f",

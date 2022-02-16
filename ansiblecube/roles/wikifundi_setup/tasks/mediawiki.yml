@@ -87,7 +87,7 @@
 
 - name: download mediawiki
   get_url:
-    url: "{{ mirror }}/dev/mediawiki-1.36.1__with-extensions.tar.bz2"
+    url: "https://drive.offspot.it/creator/installed-in-master/mediawiki-1.36.1__with-extensions.tar.bz2"
     dest: /tmp/mediawiki.tar.bz2
   tags: setup
 
@@ -115,7 +115,7 @@
 
 - name: download composer
   get_url:
-    url: "{{ mirror }}/dev/composer-2.phar"
+    url: "https://drive.offspot.it/creator/installed-in-master/composer-2.1.5.phar"
     dest: "{{ mediawiki_root }}/composer.phar"
   tags: setup
 
