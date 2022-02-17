@@ -28,7 +28,7 @@ jobs:
         run: |
           mkdir -p releases/$RELEASE
           tar cfJ /tmp/kiwix-hotspot.xz *
-          mv /tmp/kiwix-hotspot.xz releases/$RELEASE/kiwix-hotspot.xz
+          mv /tmp/kiwix-hotspot.xz releases/$RELEASE/kiwix-hotspot-$VERSION.xz
         if: env.BUILDTYPE == 'release'
 
       - name: decrypt SSH key
@@ -104,7 +104,7 @@ jobs:
       - name: upload release build and sources (tagged)
         run: |
           mkdir -p releases/$RELEASE
-          cp dist/kiwix-hotspot-linux.tar.gz releases/$RELEASE/
+          cp dist/kiwix-hotspot-linux.tar.gz releases/$RELEASE/kiwix-hotspot-linux-$VERSION.tar.gz
           scp -r -v -o StrictHostKeyChecking=no releases/$RELEASE ci@mirror.download.kiwix.org:/data/download/release/kiwix-hotspot/
         if: env.BUILDTYPE == 'release'
 
@@ -226,7 +226,7 @@ jobs:
       - name: upload release build (tagged)
         run: |
           mkdir -p releases/$RELEASE
-          cp kiwix-hotspot-macos.dmg releases/$RELEASE/
+          cp kiwix-hotspot-macos.dmg releases/$RELEASE/kiwix-hotspot-macos-$VERSION.dmg
           scp -r -v -o StrictHostKeyChecking=no releases/$RELEASE ci@mirror.download.kiwix.org:/data/download/release/kiwix-hotspot/
         if: env.BUILDTYPE == 'release'
 
@@ -414,6 +414,6 @@ jobs:
         run: |
           $SRCDIR = "releases/${Env:RELEASE}"
           mkdir -p $SRCDIR
-          cp kiwix-hotspot-win64.exe $SRCDIR/
+          cp kiwix-hotspot-win64.exe $SRCDIR/kiwix-hotspot-win64-${Env:VERSION}.exe
           scp -i ${HOME}/.ssh/id_rsa -r -v -o StrictHostKeyChecking=no $SRCDIR ci@mirror.download.kiwix.org:/data/download/release/kiwix-hotspot/
         if: env.BUILDTYPE == 'release'
