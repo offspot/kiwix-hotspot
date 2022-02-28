@@ -10,5 +10,7 @@ requests==2.20.1
 requests[socks]==2.20.1
 scandir==1.9.0
 Jinja2==2.10.1
+# jinja2 dependency (https://github.com/pallets/markupsafe/issues/284)
+markupsafe==2.0.1
 pycairo==1.20.0
 pygobject==3.40.1
