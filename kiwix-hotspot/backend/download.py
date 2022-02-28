@@ -138,7 +138,7 @@ def download_file(url, fpath, logger, checksum=None, debug=False):
         "--max-tries=5",
         "--retry-wait=60",
         "--timeout=60",
-        "--follow-metalink=mem",
+        "--follow-metalink=true",
         "--allow-overwrite=true",
         "--always-resume=false",
         "--max-resume-failure-tries=1",
@@ -184,7 +184,7 @@ def download_file(url, fpath, logger, checksum=None, debug=False):
                 logger.ascii_progressbar(downloaded_size, total_size)
 
         # parse metalink filename from results summary (if not caught before)
-        if metalink_target is None and "|OK  |" in line and "[MEMORY]" not in line:
+        if "|OK  |" in line and "[MEMORY]" not in line:
             metalink_target = os.path.join(
                 output_dir, os.path.basename(line.split("|", 4)[-1].strip())
             )
