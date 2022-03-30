@@ -39,8 +39,8 @@ jobs:
           chmod 700 ~/.ssh
           echo "$ssh_key" | base64 -d > ${HOME}/.ssh/id_rsa
           chmod 600 ${HOME}/.ssh/id_rsa
-          ssh-keyscan tmp.kiwix.org >> ${HOME}/.ssh/known_hosts
-          ssh-keyscan mirror.download.kiwix.org >> ${HOME}/.ssh/known_hosts
+          ssh-keyscan -p 30022 tmp.kiwix.org >> ${HOME}/.ssh/known_hosts
+          ssh-keyscan -p 30022 master.download.kiwix.org >> ${HOME}/.ssh/known_hosts
           chmod 644 ${HOME}/.ssh/known_hosts
 
       - name: install system deps
@@ -90,7 +90,7 @@ jobs:
           cd ..
 
       - name: upload CI build
-        run: scp -v -o StrictHostKeyChecking=no dist/kiwix-hotspot-linux.tar.gz ci@tmp.kiwix.org:/data/tmp/ci/kiwix-hotspot-linux-$BRANCH.tar.gz
+        run: scp -P 30022 -v -o StrictHostKeyChecking=no dist/kiwix-hotspot-linux.tar.gz ci@tmp.kiwix.org:/data/tmp/ci/kiwix-hotspot-linux-$BRANCH.tar.gz
         if: env.BUILDTYPE == 'CI'
 
       - name: upload nightly build (cron on master)
@@ -98,14 +98,14 @@ jobs:
           SRCDIR=nightly/$DATE
           mkdir -p $SRCDIR
           cp dist/kiwix-hotspot-linux.tar.gz $SRCDIR/
-          scp -r -v -o StrictHostKeyChecking=no $SRCDIR ci@mirror.download.kiwix.org:/data/download/nightly/
+          scp -P 30022 -r -v -o StrictHostKeyChecking=no $SRCDIR ci@master.download.kiwix.org:/data/download/nightly/
         if: env.BUILDTYPE == 'nightly'
 
       - name: upload release build and sources (tagged)
         run: |
           mkdir -p releases/$RELEASE
           cp dist/kiwix-hotspot-linux.tar.gz releases/$RELEASE/kiwix-hotspot-linux-$VERSION.tar.gz
-          scp -r -v -o StrictHostKeyChecking=no releases/$RELEASE ci@mirror.download.kiwix.org:/data/download/release/kiwix-hotspot/
+          scp -P 30022 -r -v -o StrictHostKeyChecking=no releases/$RELEASE ci@master.download.kiwix.org:/data/download/release/kiwix-hotspot/
         if: env.BUILDTYPE == 'release'
 
   build_macos:
@@ -135,8 +135,8 @@ jobs:
           chmod 700 ~/.ssh
           echo "$ssh_key" | base64 -d > ${HOME}/.ssh/id_rsa
           chmod 600 ${HOME}/.ssh/id_rsa
-          ssh-keyscan tmp.kiwix.org >> ${HOME}/.ssh/known_hosts
-          ssh-keyscan mirror.download.kiwix.org >> ${HOME}/.ssh/known_hosts
+          ssh-keyscan -p 30022 tmp.kiwix.org >> ${HOME}/.ssh/known_hosts
+          ssh-keyscan -p 30022 master.download.kiwix.org >> ${HOME}/.ssh/known_hosts
           chmod 644 ${HOME}/.ssh/known_hosts
 
       - name: install system deps
@@ -212,7 +212,7 @@ jobs:
           appdmg dmg.json kiwix-hotspot-macos.dmg
 
       - name: upload CI build
-        run: scp -v -o StrictHostKeyChecking=no kiwix-hotspot-macos.dmg ci@tmp.kiwix.org:/data/tmp/ci/kiwix-hotspot-macos-$BRANCH.dmg
+        run: scp -P 30022 -v -o StrictHostKeyChecking=no kiwix-hotspot-macos.dmg ci@tmp.kiwix.org:/data/tmp/ci/kiwix-hotspot-macos-$BRANCH.dmg
         if: env.BUILDTYPE == 'CI'
 
       - name: upload nightly build (cron on master)
@@ -220,14 +220,14 @@ jobs:
           SRCDIR=nightly/$DATE
           mkdir -p $SRCDIR
           cp kiwix-hotspot-macos.dmg $SRCDIR/
-          scp -r -v -o StrictHostKeyChecking=no $SRCDIR ci@mirror.download.kiwix.org:/data/download/nightly/
+          scp -P 30022 -r -v -o StrictHostKeyChecking=no $SRCDIR ci@master.download.kiwix.org:/data/download/nightly/
         if: env.BUILDTYPE == 'nightly'
 
       - name: upload release build (tagged)
         run: |
           mkdir -p releases/$RELEASE
           cp kiwix-hotspot-macos.dmg releases/$RELEASE/kiwix-hotspot-macos-$VERSION.dmg
-          scp -r -v -o StrictHostKeyChecking=no releases/$RELEASE ci@mirror.download.kiwix.org:/data/download/release/kiwix-hotspot/
+          scp -P 30022 -r -v -o StrictHostKeyChecking=no releases/$RELEASE ci@master.download.kiwix.org:/data/download/release/kiwix-hotspot/
         if: env.BUILDTYPE == 'release'
 
   build_windows:
@@ -283,8 +283,8 @@ jobs:
           chmod 700 ~/.ssh
           mv ${{ steps.base64dec.outputs.filePath }} ${HOME}/.ssh/id_rsa
           chmod 600 ${HOME}/.ssh/id_rsa
-          ssh-keyscan tmp.kiwix.org >> ${HOME}/.ssh/known_hosts
-          ssh-keyscan mirror.download.kiwix.org >> ${HOME}/.ssh/known_hosts
+          ssh-keyscan -p 30022 tmp.kiwix.org >> ${HOME}/.ssh/known_hosts
+          ssh-keyscan -p 30022 master.download.kiwix.org >> ${HOME}/.ssh/known_hosts
           chmod 644 ${HOME}/.ssh/known_hosts
           echo ${HOME}/.ssh/id_rsa
           ls -l ${HOME}/.ssh/id_rsa
@@ -399,7 +399,7 @@ jobs:
           cd $Env:GITHUB_WORKSPACE\
 
       - name: upload CI build
-        run: scp -i ${HOME}/.ssh/id_rsa -v -o StrictHostKeyChecking=no kiwix-hotspot-win64.exe ci@tmp.kiwix.org:/data/tmp/ci/kiwix-hotspot-win64-$Env:BRANCH.exe
+        run: scp -P 30022 -i ${HOME}/.ssh/id_rsa -v -o StrictHostKeyChecking=no kiwix-hotspot-win64.exe ci@tmp.kiwix.org:/data/tmp/ci/kiwix-hotspot-win64-$Env:BRANCH.exe
         if: env.BUILDTYPE == 'CI'
 
       - name: upload nightly build (cron on master)
@@ -407,7 +407,7 @@ jobs:
           $SRCDIR = "nightly/${Env:DATE}"
           mkdir -p $SRCDIR
           cp kiwix-hotspot-win64.exe $SRCDIR/
-          scp -i ${HOME}/.ssh/id_rsa -r -v -o StrictHostKeyChecking=no $SRCDIR ci@mirror.download.kiwix.org:/data/download/nightly/
+          scp -P 30022 -i ${HOME}/.ssh/id_rsa -r -v -o StrictHostKeyChecking=no $SRCDIR ci@master.download.kiwix.org:/data/download/nightly/
         if: env.BUILDTYPE == 'nightly'
 
       - name: upload release build (tagged)
@@ -415,5 +415,5 @@ jobs:
           $SRCDIR = "releases/${Env:RELEASE}"
           mkdir -p $SRCDIR
           cp kiwix-hotspot-win64.exe $SRCDIR/kiwix-hotspot-win64-${Env:VERSION}.exe
-          scp -i ${HOME}/.ssh/id_rsa -r -v -o StrictHostKeyChecking=no $SRCDIR ci@mirror.download.kiwix.org:/data/download/release/kiwix-hotspot/
+          scp -P 30022 -i ${HOME}/.ssh/id_rsa -r -v -o StrictHostKeyChecking=no $SRCDIR ci@master.download.kiwix.org:/data/download/release/kiwix-hotspot/
         if: env.BUILDTYPE == 'release'

@@ -54,14 +54,14 @@ jobs:
           chmod 600 ${HOME}/ssh_key
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          ssh-keyscan mirror.download.kiwix.org >> ${HOME}/.ssh/known_hosts
-          ssh-keyscan tmp.kiwix.org >> ${HOME}/.ssh/known_hosts
+          ssh-keyscan -p 30022 tmp.kiwix.org >> ${HOME}/.ssh/known_hosts
+          ssh-keyscan -p 30022 master.download.kiwix.org >> ${HOME}/.ssh/known_hosts
           chmod 644 ${HOME}/.ssh/known_hosts
 
       - name: test upload
         run: |
           echo "from workflow" > test-file
-          scp -i ${HOME}/ssh_key test-file ci@tmp.kiwix.org:/data/tmp/ci/test-file
+          scp -P 30022 -i ${HOME}/ssh_key test-file ci@tmp.kiwix.org:/data/tmp/ci/test-file
 
       - name: install system deps
         env:
@@ -121,9 +121,9 @@ jobs:
           openssl dgst -sha256 ${OUT_IMG}.zip
 
       - name: upload master image to CI
-        run: scp -i ${HOME}/ssh_key -c aes128-ctr ${OUT_IMG}.zip ci@mirror.download.kiwix.org:/data/tmp/ci/hotspot-master/
+        run: scp -P 30022 -i ${HOME}/ssh_key -c aes128-ctr ${OUT_IMG}.zip ci@master.download.kiwix.org:/data/tmp/ci/hotspot-master/
         if: env.BUILDTYPE == 'CI'
 
       - name: upload master image to release folder
-        run: scp -i ${HOME}/ssh_key -c aes128-ctr ${OUT_IMG}.zip ci@mirror.download.kiwix.org:/data/download/release/kiwix-hotspot/master/
+        run: scp -P 30022 -i ${HOME}/ssh_key -c aes128-ctr ${OUT_IMG}.zip ci@master.download.kiwix.org:/data/download/release/kiwix-hotspot/master/
         if: env.BUILDTYPE == 'release'
