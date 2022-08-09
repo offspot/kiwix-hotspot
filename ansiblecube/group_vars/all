@@ -5,7 +5,6 @@ hotspot_interface: wlan0
 lan_interface: eth0
 lan_interface2: eth1
 client_interface: wlan1
-max_wifi_client: 15
 hostname: kiwix
 tld: "hotspot"
 fqdn: "{{ hostname }}.{{ tld }}"
