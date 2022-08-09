@@ -357,6 +357,8 @@ def run_installation(
                 pass  # if mount_point or device are not defined
             raise exp
 
+        # make sure to sync before unmounting
+        os.sync()
         time.sleep(10)
 
         # unmount partition
