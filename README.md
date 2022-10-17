@@ -1,5 +1,11 @@
 # Kiwix Hotspot
 
+## ⚠️ STATUS NOTICE ⚠️
+
+This project will be superseeded by another one. As such it is not receiving any improvement effort beside critical bug fixes. Watch this file or notify yourself to contact@kiwix.org if you want to be informed once the new project is released.
+
+---
+
 This Windows/macOS/Linux software installs an hotspot system on an SD card (or an img file) for raspberrypi (from Pi zero to Pi400).
 
 This solution serves offline content (using [kiwix-serve](https://github.com/kiwix/kiwix-tools) and other tools) from the web such as Wikipedia, the Gutenberg library, TED talks.
