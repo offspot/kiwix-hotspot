@@ -227,12 +227,12 @@ class Logger(ProgressHelper):
         self.progress(1)
 
     def run_pulse(self):
-        """ used for progress bar animation (unknown progress) """
+        """used for progress bar animation (unknown progress)"""
         self._update_progress_text("")
         self.timeout_id = GObject.timeout_add(50, self.on_timeout)
 
     def on_timeout(self):
-        """ used for progress bar animation (unknown progress) """
+        """used for progress bar animation (unknown progress)"""
         if self.stage_progress is None:
             new_value = self.component.run_progressbar.get_fraction() + 0.035
             # inverse direction if end reached
@@ -550,7 +550,7 @@ class Application:
             )
         )
 
-        # africatik
+        # africatik (ecoles numeriques)
         self.component.africatik_switch.connect(
             "notify::active", lambda switch, state: self.update_free_space()
         )
@@ -559,6 +559,21 @@ class Application:
                 self.component.africatik_label.get_label(),
                 human_readable_size(
                     get_expanded_size(get_collection(africatik=True), add_margin=False)
+                ),
+            )
+        )
+
+        # africatikmd (maisons digitales)
+        self.component.africatikmd_switch.connect(
+            "notify::active", lambda switch, state: self.update_free_space()
+        )
+        self.component.africatikmd_label.set_label(
+            "{} ({})".format(
+                self.component.africatikmd_label.get_label(),
+                human_readable_size(
+                    get_expanded_size(
+                        get_collection(africatikmd=True), add_margin=False
+                    )
                 ),
             )
         )
@@ -573,7 +588,7 @@ class Application:
         self.catalogs_thread.start()
 
     def ensure_connection(self):
-        """ test and return Connection Status. Display Error of failure """
+        """test and return Connection Status. Display Error of failure"""
         conn_working, failed_protocol = test_connection()
         if not conn_working:
             self.display_error_message(
@@ -715,7 +730,7 @@ class Application:
         self.update_free_space()
 
     def reset_config(self):
-        """ restore UI to its initial (non-configured) state """
+        """restore UI to its initial (non-configured) state"""
 
         # name
         self.component.project_name_entry.set_text("Kiwix")
@@ -761,7 +776,14 @@ class Application:
             for lang, button in getattr(self, "iter_{}_check_button".format(key))():
                 button.set_active(False)
 
-        for key in ("edupi", "aflatoun", "nomad", "mathews", "africatik"):
+        for key in (
+            "edupi",
+            "aflatoun",
+            "nomad",
+            "mathews",
+            "africatik",
+            "africatikmd",
+        ):
             getattr(self.component, "{}_switch".format(key)).set_active(False)
 
         # edupi resources
@@ -808,7 +830,7 @@ class Application:
         webbrowser.open(data.help_url)
 
     def _set_proxies_entries(self, proxies=None):
-        """ fill proxies_dialog entries with proxies conf (passed or prefs) """
+        """fill proxies_dialog entries with proxies conf (passed or prefs)"""
         proxies = proxies if proxies is not None else get_proxies()
         http_loc, http_port = split_proxy(proxies.get("http", ""))
         self.component.http_proxy_entry.set_text(http_loc)
@@ -819,7 +841,7 @@ class Application:
         self.component.https_proxy_port_entry.set_text(https_port)
 
     def _get_proxies_entries(self):
-        """ return proxies conf from the proxies_dialog entries """
+        """return proxies conf from the proxies_dialog entries"""
         http_proxy = self.component.http_proxy_entry.get_text().strip()
         http_proxy_port = self.component.http_proxy_port_entry.get_text().strip()
         https_proxy = self.component.https_proxy_entry.get_text().strip()
@@ -845,7 +867,7 @@ class Application:
         return proxies
 
     def test_proxies_button_clicked(self, widget):
-        """ test connection using the (non-saved) proxy conf in the proxies dialog """
+        """test connection using the (non-saved) proxy conf in the proxies dialog"""
         proxies = self._get_proxies_entries()
         conn_working, failed_protocol = test_connection(proxies=proxies)
         if conn_working:
@@ -872,7 +894,7 @@ class Application:
         msg_box.destroy()
 
     def reset_proxies_button_clicked(self, widget):
-        """ set proxies conf and prefs to not use proxy at all """
+        """set proxies conf and prefs to not use proxy at all"""
 
         # reset UI
         self._set_proxies_entries({})
@@ -885,7 +907,7 @@ class Application:
         self.component.proxies_dialog.hide()
 
     def save_proxies_button_clicked(self, widget):
-        """ save in prefs and use proxies conf from proxies_dialog """
+        """save in prefs and use proxies conf from proxies_dialog"""
 
         proxies = self._get_proxies_entries()
         prefs = {}
@@ -1032,7 +1054,7 @@ class Application:
         dialog.close()
 
     def changed_build_path(self, widget):
-        """ display Clean cache button only if build-path is set """
+        """display Clean cache button only if build-path is set"""
         self.component.clean_cache_button.set_visible(
             bool(self.component.build_path_chooser.get_filename().strip())
         )
@@ -1578,7 +1600,14 @@ class Application:
                         button.set_active(lang in config["content"][key])
 
             # boolean contents (switches)
-            for key in ("edupi", "aflatoun", "nomad", "mathews", "africatik"):
+            for key in (
+                "edupi",
+                "aflatoun",
+                "nomad",
+                "mathews",
+                "africatik",
+                "africatikmd",
+            ):
                 if config["content"].get(key) is not None:
                     getattr(self.component, "{}_switch".format(key)).set_active(
                         config["content"][key]
@@ -1712,6 +1741,10 @@ class Application:
                             ("nomad", self.component.nomad_switch.get_active()),
                             ("mathews", self.component.mathews_switch.get_active()),
                             ("africatik", self.component.africatik_switch.get_active()),
+                            (
+                                "africatikmd",
+                                self.component.africatikmd_switch.get_active(),
+                            ),
                         ]
                     ),
                 ),
@@ -1875,12 +1908,15 @@ class Application:
 
         africatik = self.component.africatik_switch.get_active()
 
+        africatikmd = self.component.africatikmd_switch.get_active()
+
         collection = get_collection(
             edupi=edupi,
             edupi_resources=edupi_resources,
             nomad=nomad,
             mathews=mathews,
             africatik=africatik,
+            africatikmd=africatikmd,
             packages=zim_install,
             kalite_languages=kalite or [],
             wikifundi_languages=wikifundi or [],
@@ -1952,6 +1988,7 @@ class Application:
                     nomad=nomad,
                     mathews=mathews,
                     africatik=africatik,
+                    africatikmd=africatikmd,
                     zim_install=zim_install,
                     size=output_size,
                     logger=self.logger,
@@ -2036,6 +2073,7 @@ class Application:
         nomad = self.component.nomad_switch.get_active()
         mathews = self.component.mathews_switch.get_active()
         africatik = self.component.africatik_switch.get_active()
+        africatikmd = self.component.africatikmd_switch.get_active()
 
         collection = get_collection(
             edupi=edupi,
@@ -2043,6 +2081,7 @@ class Application:
             nomad=nomad,
             mathews=mathews,
             africatik=africatik,
+            africatikmd=africatikmd,
             packages=zim_list,
             kalite_languages=kalite,
             wikifundi_languages=wikifundi,
@@ -2091,9 +2130,9 @@ class Application:
                 size = -1
             else:
                 get_size_index = sd_card_info.get_size_index()
-                size = get_qemu_adjusted_image_size(int(
-                    self.component.sd_card_list_store[sd_card_id][get_size_index]
-                ))
+                size = get_qemu_adjusted_image_size(
+                    int(self.component.sd_card_list_store[sd_card_id][get_size_index])
+                )
         else:
             try:
                 size = get_qemu_adjusted_image_size(

@@ -133,11 +133,19 @@
         "expanded_size": 35420045
     },
     "africatik_all": {
-        "url": "https://drive.offspot.it/africatik/africatik-202202.zip",
-        "name": "africatik-202202.zip",
+        "url": "https://drive.offspot.it/africatik/africatik-ecoles-202302.zip",
+        "name": "africatik-ecoles-202302.zip",
         "folder_name": null,
-        "checksum": "39e93aa560f856029dbda3481c680af899381c25e05b09c78e3cf16e166b7181",
-        "archive_size": 9410157927,
-        "expanded_size": 9410157927
+        "checksum": "0856be476cd25bb1552d19ca20aa3c74aa89bac8f90f3f140f4aae6ab42fd199",
+        "archive_size": 13897349379,
+        "expanded_size": 13897349379
+    },
+    "africatik_md": {
+        "url": "https://drive.offspot.it/africatik/africatik-md-202302.zip",
+        "name": "africatik-md-202302.zip",
+        "folder_name": null,
+        "checksum": "a7f09c9895037d4032143a6536042d4863f2593615d66a4c49eae6345bc07f00",
+        "archive_size": 4386684042,
+        "expanded_size": 4386684042
     }
 }

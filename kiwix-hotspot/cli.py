@@ -11,6 +11,7 @@ import argparse
 import tempfile
 
 import yaml
+
 try:
     from yaml import CSafeDumper as Dumper
 except ImportError:
@@ -131,7 +132,14 @@ def set_config(config, args):
                     setif(arg_key, value)
 
         # bool contents (switch)
-        for key in ("edupi", "aflatoun", "nomad", "mathews", "africatik"):
+        for key in (
+            "edupi",
+            "aflatoun",
+            "nomad",
+            "mathews",
+            "africatik",
+            "africatikmd",
+        ):
             if config["content"].get(key) is not None:
                 vl = "yes" if config["content"][key] in ("yes", True) else "no"
                 setif(key, vl)
@@ -164,6 +172,7 @@ defaults = {
     "nomad": "no",
     "mathews": "no",
     "africatik": "no",
+    "africatikmd": "no",
     "aflatoun": "no",
     "kalite": [],
     "wikifundi": [],
@@ -188,7 +197,12 @@ parser.add_argument(
 parser.add_argument("--edupi", help="install edupi", choices=["yes", "no"])
 parser.add_argument("--nomad", help="install Nomad Education", choices=["yes", "no"])
 parser.add_argument("--mathews", help="install Math Mathews", choices=["yes", "no"])
-parser.add_argument("--africatik", help="install Africatik", choices=["yes", "no"])
+parser.add_argument(
+    "--africatik", help="install Africatik Écoles Numériques", choices=["yes", "no"]
+)
+parser.add_argument(
+    "--africatikmd", help="install Africatik Maisons Digitales", choices=["yes", "no"]
+)
 parser.add_argument(
     "--edupi-resources", help="Zipped folder of resources to init EduPi with"
 )
@@ -257,7 +271,7 @@ if args.catalog:
                 default_flow_style=False,
                 allow_unicode=True,
                 encoding="utf-8",
-                Dumper=Dumper
+                Dumper=Dumper,
             ).decode("UTF-8")
         )
     sys.exit(0)
@@ -320,6 +334,7 @@ collection = get_collection(
     nomad=args.nomad == "yes",
     mathews=args.mathews == "yes",
     africatik=args.africatik == "yes",
+    africatikmd=args.africatikmd == "yes",
     packages=args.zim_install,
     kalite_languages=args.kalite,
     wikifundi_languages=args.wikifundi,
@@ -415,6 +430,7 @@ try:
         nomad=args.nomad == "yes",
         mathews=args.mathews == "yes",
         africatik=args.africatik == "yes",
+        africatikmd=args.africatikmd == "yes",
         zim_install=args.zim_install,
         size=args.qemu_size,
         logger=logger,

@@ -51,7 +51,7 @@ def save_homepage(html):
 
 
 def generate_homepage(logger, options):
-    """ generate an ideascube lookalike HTML homepage from options """
+    """generate an ideascube lookalike HTML homepage from options"""
     hostname = get_domain(options["name"])
     fqdn = "{hostname}.{tld}".format(
         hostname=hostname, tld=ANSIBLE_GROUP_VARS.get("tld")
@@ -116,17 +116,48 @@ def generate_homepage(logger, options):
     if options["africatik"]:
         africatik_fqdn = "africatik.{fqdn}".format(fqdn=fqdn)
         if options["language"] == "fr":
-            title = "Apps Africatik"
+            title = "Africatik Écoles numériques"
             category = "Accès"
-            description = "Des applications éducatives pour Windows et Android adaptées au contexte culturel africain."
+            description = (
+                "Applications éducatives adaptées au contexte culturel "
+                "africain (version Écoles numériques)"
+            )
         else:
-            title = "Africatik apps"
+            title = "Africatik Écoles numériques"
             category = "Access"
-            description = "Windows and Android educative apps centered on Africa."
+            description = (
+                "Educational apps adapted to African cultural contexts "
+                "(Écoles numériques version)"
+            )
         cards.append(
             {
                 "url": "//{}".format(africatik_fqdn),
                 "css_class": "africatik",
+                "title": title,
+                "description": description,
+            }
+        )
+
+    if options["africatikmd"]:
+        africatik_fqdn = "africatikmd.{fqdn}".format(fqdn=fqdn)
+        if options["language"] == "fr":
+            title = "Africatik Maisons digitales"
+            category = "Accès"
+            description = (
+                "Applications éducatives adaptées au contexte culturel "
+                "africain (version Maisons digitales)"
+            )
+        else:
+            title = "Africatik Maisons digitales"
+            category = "Access"
+            description = (
+                "Educational apps adapted to African cultural contexts "
+                "(Maisons digitales version)"
+            )
+        cards.append(
+            {
+                "url": "//{}".format(africatik_fqdn),
+                "css_class": "africatikmd",
                 "title": title,
                 "description": description,
             }

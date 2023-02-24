@@ -1369,8 +1369,8 @@ In File mode the image is created at build path, you can choose the size
                   <object class="GtkLabel" id="africatik_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="tooltip_text" translatable="yes">Africatik APKs and EXEs</property>
-                    <property name="label" translatable="yes">Africatik :</property>
+                    <property name="tooltip_text" translatable="yes">Africatik Écoles numériques</property>
+                    <property name="label" translatable="yes">Africatik écoles :</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -1380,6 +1380,42 @@ In File mode the image is created at build path, you can choose the size
                 </child>
                 <child>
                   <object class="GtkSwitch" id="africatik_switch">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="pack_type">end</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">17</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <child>
+                  <object class="GtkLabel" id="africatikmd_label">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">Africatik Maisons digitales</property>
+                    <property name="label" translatable="yes">Africatik maisons :</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkSwitch" id="africatikmd_switch">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                   </object>
