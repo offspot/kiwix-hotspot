@@ -1,5 +1,5 @@
 ---
-- debug: msg="Installing kiwix_version ({{ installed_kiwix_version.stdout }} -> {{ kiwix_version }})"
+- debug: msg="Installing kiwix_version {{ kiwix_version }}"
 
 - name: Downloading kiwix binaries {{ kiwix_version }} for x86
   get_url:

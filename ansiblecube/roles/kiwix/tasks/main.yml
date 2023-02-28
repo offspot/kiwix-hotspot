@@ -1,12 +1,10 @@
 ---
 - name: Check installed kiwix-serve version
   shell: /usr/local/bin/kiwix-serve --version
-  register: installed_kiwix_version
   ignore_errors: True
   tags: ['master', 'reconfigure']
 
 - import_tasks: install.yml
-  when: kiwix_version != installed_kiwix_version.stdout
   tags: ['master', 'reconfigure']
 
 - name: Create the ZIM destination folder
