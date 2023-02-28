@@ -1,6 +1,9 @@
 2.4.12
 
 * Saving metalink to a temp file to fix very large downloads (.meta4 > 5MiB)
+* Updated kiwix-serve to 3.4.0
+* Updated Africatik package (2023-02)
+* Added Africatikmd package (2023-02)
 
 2.4.11
 
