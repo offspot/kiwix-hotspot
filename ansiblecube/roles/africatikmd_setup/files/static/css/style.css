@@ -730,7 +730,7 @@ transition: all 0.4s ease-in-out;
 text-align: center;
 vertical-align: middle;
 position: relative;
-margin: 22px 12px 10px 12px;
+margin: 22px 12px 10px;
 }
 
 .social-icon li a:hover {
