@@ -80,6 +80,7 @@ def get_collection(
     nomad=False,
     mathews=False,
     africatik=False,
+    africatikmd=False,
     packages=[],
     kalite_languages=[],
     wikifundi_languages=[],
@@ -134,10 +135,20 @@ def get_collection(
     if africatik:
         collection.append(
             (
-                "Africatik",
+                "Africatik Écoles Numériques",
                 get_africatik_contents,
                 run_africatik_actions,
                 {"enable": africatik},
+            )
+        )
+
+    if africatikmd:
+        collection.append(
+            (
+                "Africatik Maisons Digitales",
+                get_africatikmd_contents,
+                run_africatikmd_actions,
+                {"enable": africatikmd},
             )
         )
 
@@ -207,8 +218,13 @@ def get_mathews_contents(enable=False):
 
 
 def get_africatik_contents(enable=False):
-    """ africatik: a ZIP to extract """
+    """ africatik ecoles numeriques: a ZIP to extract """
     return [get_content("africatik_all")]
+
+
+def get_africatikmd_contents(enable=False):
+    """ africatik maisons digitales: a ZIP to extract """
+    return [get_content("africatik_md")]
 
 
 def get_kalite_contents(languages=[]):
@@ -356,6 +372,22 @@ def run_africatik_actions(cache_folder, mount_point, logger, enable=False):
 
     africatik_ark = get_content("africatik_all")
     africatik_folder = os.path.join(mount_point, "africatik")
+    extract_and_move(
+        content=africatik_ark,
+        cache_folder=cache_folder,
+        root_path=mount_point,
+        final_path=africatik_folder,
+        logger=logger,
+    )
+
+
+def run_africatikmd_actions(cache_folder, mount_point, logger, enable=False):
+    """ extract ZIP to folder """
+    if not enable:
+        return
+
+    africatik_ark = get_content("africatik_md")
+    africatik_folder = os.path.join(mount_point, "africatikmd")
     extract_and_move(
         content=africatik_ark,
         cache_folder=cache_folder,

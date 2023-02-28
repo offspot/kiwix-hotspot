@@ -68,6 +68,9 @@
     - role: africatik_setup
       when: ansible_local.config.africatik|bool
 
+    - role: africatikmd_setup
+      when: ansible_local.config.africatikmd|bool
+
     - role: wikifundi_setup
       when: ansible_local.config.wikifundi_languages | length
 

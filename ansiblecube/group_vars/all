@@ -38,7 +38,8 @@ python3_version: "3.5"
 php_version: "7.3"
 nomad_version: "2.7.0"
 mathews_version: "1.6"
-africatik: "202202"
+africatik: "202302"
+africatikmd: "202302"
 
 # Apps path
 venvs_root: /home/{{ username }}/venvs
@@ -58,6 +59,7 @@ common_static_path: "/var/www/static"
 nomad_root: "/var/www/nomad"
 mathews_root: "/var/www/mathews"
 africatik_root: "/var/www/africatik"
+africatikmd_root: "/var/www/africatikmd"
 
 # Domain names
 kiwix_server_name: kiwix.{{ hostname }}
@@ -68,6 +70,7 @@ wikifundi_server_name: wikifundi.{{ hostname }}
 nomad_server_name: nomad.{{ hostname }}
 mathews_server_name: mathews.{{ hostname }}
 africatik_server_name: africatik.{{ hostname }}
+africatikmd_server_name: africatikmd.{{ hostname }}
 time_server_name: time.{{ hostname }}
 
 kiwix_fqdn: kiwix.{{ fqdn }}
@@ -78,6 +81,7 @@ wikifundi_fqdn: wikifundi.{{ fqdn }}
 nomad_fqdn: nomad.{{ fqdn }}
 mathews_fqdn: mathews.{{ fqdn }}
 africatik_fqdn: africatik.{{ fqdn }}
+africatikmd_fqdn: africatikmd.{{ fqdn }}
 time_fqdn: time.{{ fqdn }}
 
 # content & features
@@ -101,3 +105,4 @@ edupi_resources_path: "{{ data_path }}/edupi_resources"
 nomad_content_path: "{{ data_path }}/nomad"
 mathews_content_path: "{{ data_path }}/mathews"
 africatik_content_path: "{{ data_path }}/africatik"
+africatikmd_content_path: "{{ data_path }}/africatikmd"
