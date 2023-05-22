@@ -3,5 +3,5 @@ pytz==2018.7
 iso-639==0.4.5
 path.py==11.5.0
 humanfriendly==4.17
-requests==2.20.1
+requests==2.31.0
 requests[socks]==2.20.1
