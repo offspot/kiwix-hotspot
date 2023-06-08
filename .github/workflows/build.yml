@@ -12,7 +12,7 @@ on:
 jobs:
   build_linux:
     name: build linux
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - name: checkout code
         uses: actions/checkout@v1
@@ -110,7 +110,7 @@ jobs:
 
   build_macos:
     name: build macOS
-    runs-on: macos-10.15
+    runs-on: macos-11
     env:
       CERTIFICATE: /tmp/wmch-devid.p12
       SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
