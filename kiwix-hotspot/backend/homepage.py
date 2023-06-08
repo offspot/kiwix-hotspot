@@ -255,7 +255,7 @@ def generate_homepage(logger, options):
                 css_class += " sw-zim"
             cards.append(
                 {
-                    "url": "//{fqdn}/{id}".format(
+                    "url": "//{fqdn}/viewer#{id}".format(
                         fqdn=kiwix_fqdn, id=package.get("langid", package_id)
                     ),
                     "css_class": css_class,
