@@ -361,7 +361,8 @@ def run_installation(
             raise exp
 
         # make sure to sync before unmounting
-        os.sync()
+        if sys.platform in ("linux", "darwin"):
+            os.sync()
         time.sleep(10)
 
         # unmount partition
