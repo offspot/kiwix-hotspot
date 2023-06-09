@@ -1,6 +1,6 @@
-2.4.13
+ 2.4.13
 
-* Updated kiwix-serve to 3.5.0
+* Updated kiwix-serve to 3.5.0-1
 * Updated homepage links and icons to new kiwix-serve patterns
 * Removed os.sync() call on Windows preventing image from being created
 
