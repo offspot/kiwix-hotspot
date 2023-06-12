@@ -1,4 +1,3 @@
-ansiblecube/group_vars/all---
 # Network
 hotspot_ip: 192.168.2.1
 hotspot_interface: wlan0
