@@ -4,6 +4,13 @@
 * Updated homepage links and icons to new kiwix-serve patterns
 * Removed os.sync() call on Windows preventing image from being created
 
+KNOWN ISSUE:
+On Windows, bundled cryptography library is out-of-date.
+An error message is displayed on start and the tool does not start.
+
+One has to edit Windows's environment variables to work around it.
+See https://github.com/offspot/kiwix-hotspot/issues/675#issuecomment-1512875691
+
 2.4.12
 
 * Saving metalink to a temp file to fix very large downloads (.meta4 > 5MiB)
