@@ -3,6 +3,7 @@
 
 import os
 import sys
+import shutil
 
 from backend.mount import system_has_exfat
 
@@ -39,13 +40,13 @@ def host_matches_requirements(build_dir):
                 missing_reqs.append("udisks2 (udisksctl) is required.")
 
         # exfat
-        mount_exfat = "/sbin/mount.exfat"
+        mount_exfat = shutil.which('mount.exfat-fuse')
         if not system_has_exfat() and (
             not os.path.exists(mount_exfat) or not os.access(mount_exfat, os.X_OK)
         ):
             missing_reqs.append("exfat-fuse is required.")
 
-        mkfs_exfat = "/sbin/mkfs.exfat"
+        mkfs_exfat = shutil.which('mkfs.exfat')
         if not os.path.exists(mkfs_exfat) or not os.access(mkfs_exfat, os.X_OK):
             missing_reqs.append("exfat-utils is required.")
 
