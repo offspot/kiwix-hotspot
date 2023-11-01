@@ -6,7 +6,7 @@ iso-639==0.4.5
 path.py==11.5.0
 psutil==5.4.8
 humanfriendly==4.17
-requests==2.20.1
+requests==2.31.0
 requests[socks]==2.20.1
 scandir==1.9.0
 Jinja2==2.10.1
