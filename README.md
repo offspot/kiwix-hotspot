@@ -1,8 +1,10 @@
 # Kiwix Hotspot
 
-## ⚠️ STATUS NOTICE ⚠️
+## ⚠️ End-of-Life ⚠️
 
-This project will be superseeded by another one. As such it is not receiving any improvement effort beside critical bug fixes. Watch this file or notify yourself to contact@kiwix.org if you want to be informed once the new project is released.
+This project has been superseeded by [a new generation of tools](https://github.com/offspot/overview). Therefore this tool has reached its end-of-life and its code base is not receiving any fix anymore.
+
+We might in the future (re-)launch this tool, which would be called [Imager Desktop](https://github.com/offspot/imager-desktop), but there is at this stage no timeline for its developement.
 
 ---
 
